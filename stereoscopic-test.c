@@ -4,8 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "config.h"
+
 int main(void)
 {
-	printf("Test succesfull\n");
+	printf("Test version %d.%d succesfull\n", SST_VERSION_MAJOR, SST_VERSION_MINOR);
 	return EXIT_SUCCESS;
 }
