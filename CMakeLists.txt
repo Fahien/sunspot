@@ -12,6 +12,10 @@ configure_file (
 )
 
 # Add the binary tree to the search path for include files so that we will find config.h
-include_directories("${PROJECT_BINARY_DIR}")
+include_directories ("${PROJECT_BINARY_DIR}")
 
 add_executable (stereoscopic-test stereoscopic-test.c)
+
+find_package (glfw3 3.2 REQUIRED)
+
+target_link_libraries (stereoscopic-test GL GLEW glfw)
