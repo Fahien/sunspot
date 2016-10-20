@@ -46,13 +46,8 @@ GLuint link_program(const GLuint vertexShader, const GLuint fragmentShader)
 		fprintf(stderr, "Error linking shader program: %s\n", infoLog);
 		glDeleteProgram(program);
 	}
-	else {
-		glUseProgram(program);
-	}
 	glDetachShader(program, vertexShader); // Detach shader objects
 	glDetachShader(program, fragmentShader);
-	glDeleteShader(vertexShader); // Delete shader objects
-	glDeleteShader(fragmentShader);
 	return program;
 }
 
@@ -79,15 +74,24 @@ GLuint compile_shader(const GLenum type, const GLchar *source)
 
 
 /// Loads shader sources, compile shaders and link them into a program
-bool create_shaders() {
+bool create_programs(GLuint *baseProgram, GLuint *depthProgram) {
 	GLchar *vertexSource = load_shader_source("shader/base.vert");
-	GLchar *fragmentSource = load_shader_source("shader/white.frag");
 	GLuint vertexShader = compile_shader(GL_VERTEX_SHADER, vertexSource);
+	GLchar *fragmentSource = load_shader_source("shader/base.frag");
 	GLuint fragmentShader = compile_shader(GL_FRAGMENT_SHADER, fragmentSource);
-	GLuint program = link_program(vertexShader, fragmentShader);
-	free(vertexSource);
+	*baseProgram = link_program(vertexShader, fragmentShader);
+
+	GLchar *depthSource = load_shader_source("shader/depth.frag");
+	GLuint depthShader = compile_shader(GL_FRAGMENT_SHADER, depthSource);
+	*depthProgram = link_program(vertexShader, depthShader);
+
+	glDeleteShader(vertexShader); // Delete shader objects
+	glDeleteShader(fragmentShader);
+	glDeleteShader(depthShader);
+	free(vertexSource); // Free shader sources
 	free(fragmentSource);
-	return vertexShader != 0 && fragmentShader != 0 && program != 0;
+
+	return vertexShader != 0 && fragmentShader != 0 && baseProgram != 0 && depthProgram != 0;
 }
 
 
@@ -96,8 +100,8 @@ GLuint create_triangle()
 {
 	GLfloat vertices[] = {
 		-0.5f, -0.5f, 1.0f,
-		 0.5f, -0.5f, 1.0f,
-		 0.0f,  0.5f, 1.0f
+		 0.5f, -0.5f, 0.0f,
+		 0.0f,  0.5f, -1.0f
 	};
 	GLuint vbo; // Generate a vertex buffer object
 	glGenBuffers(1, &vbo);
@@ -125,7 +129,7 @@ GLFWwindow *init_window()
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 	// Create a window object
-	GLFWwindow *window = glfwCreateWindow(960, 570, "StereoscopicTest", NULL, NULL);
+	GLFWwindow *window = glfwCreateWindow(960 * 2, 570, "StereoscopicTest", NULL, NULL);
 	if (window == NULL) { // Handle error
 		fprintf(stderr, "Could not create GLFW window\n");
 		glfwTerminate();
@@ -139,23 +143,33 @@ GLFWwindow *init_window()
 		exit(EXIT_FAILURE);
 	}
 
-	int width, height; // Take dimensions from GLFW such that it also works on high DPI screens
-	glfwGetFramebufferSize(window, &width, &height);
-	glViewport(0, 0, width, height);
-
 	return window;
 }
 
 
 /// Keeps drawing and handling input until explicitly stopped
-void game_loop(GLFWwindow *window, const GLuint triangle)
+void game_loop(GLFWwindow *window, const GLuint baseProgram, const GLuint depthProgram, const GLuint triangle)
 {
 	while(!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
-		glClearColor(0.3f, 0.5f, 0.7f, 1.0f);
+		
+		int width, height; // Take dimensions from GLFW such that it also works on high DPI screens
+		glfwGetFramebufferSize(window, &width, &height);
+		glViewport(0, 0, width, height);
+
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);// Clear the color buffer
+		
 		glBindVertexArray(triangle);
+		
+		glViewport(0, 0, width / 2, height);
+		glUseProgram(baseProgram);
 		glDrawArrays(GL_TRIANGLES, 0, 3); // Draw triangle
+		
+		glViewport(width / 2, 0, width / 2, height);
+		glUseProgram(depthProgram);
+		glDrawArrays(GL_TRIANGLES, 0, 3); // Draw triangle depth
+		
 		glBindVertexArray(0);
 		glfwSwapBuffers(window);
 	}
@@ -166,8 +180,11 @@ int main(void)
 {
 	GLFWwindow *window = init_window();
 	GLuint triangle = create_triangle();
-	if (create_shaders()) {
-		game_loop(window, triangle);
+
+	GLuint baseProgram;
+	GLuint depthProgram;
+	if (create_programs(&baseProgram, &depthProgram)) {
+		game_loop(window, baseProgram, depthProgram, triangle);
 	}
 
 	glfwTerminate();
