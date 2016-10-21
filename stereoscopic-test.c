@@ -25,6 +25,7 @@ GLchar *load_shader_source(const char *filePath)
 	if (ferror(file)) {
 		fprintf(stderr, "Could not read shader file: %s\n", filePath);
 	}
+	source[length - 1] = 0;
 	fclose(file);
 	return source;
 }
@@ -99,9 +100,10 @@ bool create_programs(GLuint *baseProgram, GLuint *depthProgram) {
 GLuint create_triangle()
 {
 	GLfloat vertices[] = {
-		-0.5f, -0.5f, 1.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.0f,  0.5f, -1.0f
+		// Positions        // Colors
+		-0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, // Bottom left
+		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // Bottom right
+		 0.0f,  0.5f, -1.0f, 0.0f, 0.0f, 1.0f // Top
 	};
 	GLuint vbo; // Generate a vertex buffer object
 	glGenBuffers(1, &vbo);
@@ -112,8 +114,10 @@ GLuint create_triangle()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof vertices, vertices, GL_STATIC_DRAW);
 	// Specify the vertex shader input in the form of vertex attributes
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 	glBindVertexArray(0);
 	return vao;
 }
@@ -150,16 +154,17 @@ GLFWwindow *init_window()
 /// Keeps drawing and handling input until explicitly stopped
 void game_loop(GLFWwindow *window, const GLuint baseProgram, const GLuint depthProgram, const GLuint triangle)
 {
+	int width, height; // Take dimensions from GLFW such that it also works on high DPI screens
+
 	while(!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		
-		int width, height; // Take dimensions from GLFW such that it also works on high DPI screens
 		glfwGetFramebufferSize(window, &width, &height);
 		glViewport(0, 0, width, height);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);// Clear the color buffer
-		
+
 		glBindVertexArray(triangle);
 		
 		glViewport(0, 0, width / 2, height);
