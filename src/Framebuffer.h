@@ -12,11 +12,22 @@ class Framebuffer
 	inline void bind() const { glBindFramebuffer(GL_FRAMEBUFFER, fbo_); }
 	inline void unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-	inline void bindColorTexture() const { glBindTexture(GL_TEXTURE_2D, colorTexture_); }
+	inline void bindColorTexture() const
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, colorTexture_);
+	}
+
+	inline void bindMaskTexture() const
+	{
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, maskTexture_);
+	}
   private:
 	GLuint fbo_;
 	GLuint colorTexture_;
 	GLuint depthTexture_;
+	GLuint maskTexture_;
 	GLuint rbo_;
 };
 

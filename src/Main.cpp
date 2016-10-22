@@ -8,7 +8,7 @@
 
 
 constexpr unsigned width {960 * 2};
-constexpr unsigned height {570};
+constexpr unsigned height {540 * 2};
 
 int main(void)
 {

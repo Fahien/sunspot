@@ -44,7 +44,7 @@ ShaderProgram::ShaderProgram(const char *vertex, const char *fragment)
 	GLchar *fragmentSource {loadShaderSource(fragment)};
 	GLuint fragmentShader {compileShader(GL_FRAGMENT_SHADER, fragmentSource)};
 	linkProgram(baseProgram_, vertexShader, fragmentShader);
-
+	
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 	free(vertexSource);

@@ -95,24 +95,24 @@ void Window::render(const ShaderProgram &modelProgram, const Model &model,
 {
 	int width, height;
 	glfwGetFramebufferSize(window_, &width, &height);
-	Framebuffer frame {static_cast<unsigned>(width), static_cast<unsigned>(height)};
+	Framebuffer frame {static_cast<unsigned>(width), static_cast<unsigned>(height / 2)};
 
 	while (!glfwWindowShouldClose(window_)) {
 		glfwPollEvents();
 		
 		// First pass
 		frame.bind();
-		glViewport(0, 0, width, height);
+		glViewport(0, 0, width, height / 2);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
 		modelProgram.setBase();
 		model.bind();
 		
-		glViewport(0, 0, width / 2, height);
+		glViewport(0, 0, width / 2, height / 2);
 		modelProgram.setBase();
 		model.render();
 
-		glViewport(width / 2, 0, width / 2, height);
+		glViewport(width / 2, 0, width / 2, height / 2);
 		modelProgram.setDepth();
 		model.render();
 		
@@ -122,7 +122,9 @@ void Window::render(const ShaderProgram &modelProgram, const Model &model,
 		// Second pass
 		glViewport(0, 0, width, height);
 		quadProgram.setBase();
+		quadProgram.setUniforms();
 		frame.bindColorTexture();
+		frame.bindMaskTexture();
 
 		quad.bind();
 		quad.render();
