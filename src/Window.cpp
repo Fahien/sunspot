@@ -13,7 +13,8 @@ Window::Window(const unsigned width, const unsigned height, const std::string &t
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	window_ = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr); // Create a window object
+ 	// Create a full screen window object
+	window_ = glfwCreateWindow(width, height, title.c_str(), glfwGetPrimaryMonitor(), nullptr);
 	if (window_ == nullptr) { // Handle error
 		std::cerr << "Could not create GLFW window\n";
 		glfwTerminate();
@@ -125,6 +126,7 @@ void Window::render(const ShaderProgram &modelProgram, const Model &model,
 		quadProgram.setUniforms();
 		frame.bindColorTexture();
 		frame.bindMaskTexture();
+		frame.bindHeaderTexture();
 
 		quad.bind();
 		quad.render();

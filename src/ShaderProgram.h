@@ -21,6 +21,8 @@ class ShaderProgram
 		glUniform1i(texLoc, 0);
 		texLoc = glGetUniformLocation(baseProgram_, "maskTexture");
 		glUniform1i(texLoc, 1);
+		texLoc = glGetUniformLocation(baseProgram_, "headerTexture");
+		glUniform1i(texLoc, 2);
 	}
 
   private:

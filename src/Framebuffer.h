@@ -23,11 +23,21 @@ class Framebuffer
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, maskTexture_);
 	}
+
+	inline void bindHeaderTexture() const
+	{
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, headerTexture_);
+	}
+
   private:
+	GLubyte *loadHeader();
+
 	GLuint fbo_;
 	GLuint colorTexture_;
 	GLuint depthTexture_;
 	GLuint maskTexture_;
+	GLuint headerTexture_;
 	GLuint rbo_;
 };
 
