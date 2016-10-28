@@ -11,6 +11,7 @@ class Model
 	~Model();
 
 	void translateX(const float amount);
+	void rotateY(const float radians);
 	void rotateZ(const float radians);
 
 	inline void bind() const { glBindVertexArray(vao_); }
@@ -19,7 +20,7 @@ class Model
 	{
 		GLuint transformLoc {program.getLocation("transform")};
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform_[0]);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}
 
   private:

@@ -16,14 +16,28 @@ Model::Model()
 {
 	GLfloat vertices[] = {
 		// Positions         // Colors
-		-1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // Bottom left
-		 1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom right
-		 1.0f,  1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // Top right
-		-1.0f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, // Top left
+		-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, // Bottom left
+		 0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // Bottom right
+		 0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // Top right
+		-0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, // Top left
+		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, // Bottom left rear
+		 0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, // Bottom right rear
+		 0.5f,  0.5f, 0.5f, 0.0f, 0.0f, 1.0f, // Top right rear
+		-0.5f,  0.5f, 0.5f, 1.0f, 1.0f, 1.0f, // Top left rear
 	};
 	GLuint indices[] = {
 		0, 1, 2,
-		0, 2, 3
+		0, 2, 3,
+		1, 5, 6,
+		1, 6, 2,
+		5, 4, 7,
+		5, 7, 6,
+		4, 0, 3,
+		4, 3, 7,
+		1, 0, 4,
+		1, 4, 5,
+		3, 2, 6,
+		3, 6, 7
 	};
 	glGenBuffers(1, &vbo_); // Generate the vertex buffer object
 	glGenBuffers(1, &ebo_); // Generate the element buffer object
@@ -60,14 +74,29 @@ void Model::translateX(const float amount)
 }
 
 
+void Model::rotateY(const float radians)
+{
+	float cosrad {static_cast<float>(cos(radians))};
+	float sinrad {static_cast<float>(sin(radians))};
+	float t00 {transform_[0][0] * cosrad + transform_[2][0] * -sinrad};
+	float t20 {transform_[0][0] * sinrad + transform_[2][0] * cosrad};
+	float t02 {transform_[0][2] * cosrad + transform_[2][2] * -sinrad};
+	float t22 {transform_[0][2] * sinrad + transform_[2][2] * cosrad};
+	transform_[0][0] = t00;
+	transform_[2][0] = t20;
+	transform_[0][2] = t02;
+	transform_[2][2] = t22;
+}
+
+
 void Model::rotateZ(const float radians)
 {
-	float cosrad = cos(radians);
-	float sinrad = sin(radians);
-	float t00 = transform_[0][0] * cosrad + transform_[1][0] * sinrad;
-	float t10 = transform_[0][0] * -sinrad + transform_[1][0] * cosrad;
-	float t01 = transform_[0][1] * cosrad + transform_[1][1] * sinrad;
-	float t11 = transform_[0][1] * -sinrad + transform_[1][1] * cosrad;
+	float cosrad {static_cast<float>(cos(radians))};
+	float sinrad {static_cast<float>(sin(radians))};
+	float t00 {transform_[0][0] * cosrad + transform_[1][0] * sinrad};
+	float t10 {transform_[0][0] * -sinrad + transform_[1][0] * cosrad};
+	float t01 {transform_[0][1] * cosrad + transform_[1][1] * sinrad};
+	float t11 {transform_[0][1] * -sinrad + transform_[1][1] * cosrad};
 	transform_[0][0] = t00;
 	transform_[0][1] = t01;
 	transform_[1][0] = t10;

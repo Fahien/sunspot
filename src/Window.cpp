@@ -49,18 +49,21 @@ void Window::render(const ShaderProgram &baseProgram, const ShaderProgram &depth
 		glfwGetFramebufferSize(window_, &width, &height);
 		glViewport(0, 0, width, height);
 
+		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color buffer
 
 		model.bind();
 		
 		glViewport(0, 0, width / 2, height);
 		baseProgram.use();
-		model.rotateZ(0.125f);
+		model.rotateY(0.0025f);
+		model.rotateZ(0.0025f);
 		//model.translateX(0.0125f);
 		model.render(baseProgram);
 
 		glViewport(width / 2, 0, width / 2, height);
+		glDisable(GL_DEPTH_TEST);
 		depthProgram.use();
 		model.render(depthProgram);
 
