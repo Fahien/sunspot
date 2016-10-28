@@ -13,12 +13,13 @@ constexpr unsigned height {540 * 2};
 int main(void)
 {
 	Window window {width, height, SST_TITLE};
-	ShaderProgram program {"shader/depth.frag"};
+	ShaderProgram baseProgram {"shader/base.vert", "shader/base.frag"};
+	ShaderProgram depthProgram {"shader/base.vert", "shader/depth.frag"};
 	Model model {};
 	Quad quad {};
 	ShaderProgram quadProgram {"shader/quad.vert", "shader/quad.frag"};
-	//window.render(program, model);
+	window.render(baseProgram, depthProgram, model);
 	//window.render(quadProgram, quad);
-	window.render(program, model, quadProgram, quad);
+	//window.render(baseProgram, depthProgram, model, quadProgram, quad);
 	std::cout << "Test version " << SST_VERSION_MAJOR << "." << SST_VERSION_MINOR << " successfull" << std::endl;
 }

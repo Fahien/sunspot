@@ -14,7 +14,7 @@ Window::Window(const unsigned width, const unsigned height, const std::string &t
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
  	// Create a full screen window object
-	window_ = glfwCreateWindow(width, height, title.c_str(), glfwGetPrimaryMonitor(), nullptr);
+	window_ = glfwCreateWindow(width, height, title.c_str(), nullptr /*glfwGetPrimaryMonitor()*/, nullptr);
 	if (window_ == nullptr) { // Handle error
 		std::cerr << "Could not create GLFW window\n";
 		glfwTerminate();
@@ -39,7 +39,7 @@ Window::~Window()
 }
 
 
-void Window::render(const ShaderProgram &program, const Model& model)
+void Window::render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model& model)
 {
 	int width, height; // Dimensions from GLFW such that it also works on high DPI screens
 
@@ -55,12 +55,14 @@ void Window::render(const ShaderProgram &program, const Model& model)
 		model.bind();
 		
 		glViewport(0, 0, width / 2, height);
-		program.setBase();
-		model.render();
+		baseProgram.use();
+		model.rotateZ(0.125f);
+		//model.translateX(0.0125f);
+		model.render(baseProgram);
 
 		glViewport(width / 2, 0, width / 2, height);
-		program.setDepth();
-		model.render();
+		depthProgram.use();
+		model.render(depthProgram);
 
 		model.unbind();
 		glfwSwapBuffers(window_);
@@ -71,7 +73,7 @@ void Window::render(const ShaderProgram &program, const Model& model)
 void Window::render(const ShaderProgram &program, const Quad& quad)
 {
 	int width, height; // Dimensions from GLFW such that it also works on high DPI screens
-	program.setBase();
+	program.use();
 
 	while (!glfwWindowShouldClose(window_)) {
 		glfwPollEvents();
@@ -91,7 +93,7 @@ void Window::render(const ShaderProgram &program, const Quad& quad)
 }
 
 
-void Window::render(const ShaderProgram &modelProgram, const Model &model,
+void Window::render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model,
 			       const ShaderProgram &quadProgram, const Quad &quad)
 {
 	int width, height;
@@ -106,23 +108,23 @@ void Window::render(const ShaderProgram &modelProgram, const Model &model,
 		glViewport(0, 0, width, height / 2);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
-		modelProgram.setBase();
+		baseProgram.use();
 		model.bind();
 		
 		glViewport(0, 0, width / 2, height / 2);
-		modelProgram.setBase();
-		model.render();
+		baseProgram.use();
+		model.render(baseProgram);
 
 		glViewport(width / 2, 0, width / 2, height / 2);
-		modelProgram.setDepth();
-		model.render();
+		depthProgram.use();
+		model.render(depthProgram);
 		
 		model.unbind();
 		frame.unbind();
 
 		// Second pass
 		glViewport(0, 0, width, height);
-		quadProgram.setBase();
+		quadProgram.use();
 		quadProgram.setUniforms();
 		frame.bindColorTexture();
 		frame.bindMaskTexture();

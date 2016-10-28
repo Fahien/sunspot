@@ -29,7 +29,7 @@ Framebuffer::Framebuffer(const unsigned width, const unsigned height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture_, 0);
 
-	GLubyte mask[1][2][4] = { {{0,0,0}, {255, 255, 255}} };
+	GLubyte mask[1][2][4] = { {{255, 255, 255}, {0, 0, 0}} };
 	glGenTextures(1, &maskTexture_); // Create a texture for mask
 	glBindTexture(GL_TEXTURE_2D, maskTexture_);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 2, 0, GL_RGB, GL_UNSIGNED_BYTE, mask); 

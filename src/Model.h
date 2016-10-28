@@ -2,6 +2,7 @@
 #define SST_MODEL_H
 
 #include "Graphics.h"
+#include "ShaderProgram.h"
 
 class Model
 {
@@ -9,14 +10,23 @@ class Model
 	Model();
 	~Model();
 
+	void translateX(const float amount);
+	void rotateZ(const float radians);
+
 	inline void bind() const { glBindVertexArray(vao_); }
 	inline void unbind() const { glBindVertexArray(0); }
-
-	inline void render() const { glDrawArrays(GL_TRIANGLES, 0, 3); }
+	inline void render(const ShaderProgram &program) const
+	{
+		GLuint transformLoc {program.getLocation("transform")};
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform_[0]);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	}
 
   private:
 	GLuint vbo_;
+	GLuint ebo_;
 	GLuint vao_;
+	float transform_[4][4];
 };
 
 #endif // SST_MODEL_H
