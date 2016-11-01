@@ -62,7 +62,8 @@ Framebuffer::Framebuffer(const unsigned width, const unsigned height)
 
 GLubyte *Framebuffer::loadHeader()
 {
-	FILE *file {fopen("shader/header.bmp", "rb")};
+	FILE *file;
+	fopen_s(&file, "shader/header.bmp", "rb");
 	if (file == nullptr) { // TODO throw an exception
 		std::cerr << "Framebuffer -> Could not open header bitmap\n";
 	}

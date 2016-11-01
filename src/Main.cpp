@@ -18,8 +18,8 @@ int main(void)
 	Model model {};
 	Quad quad {};
 	ShaderProgram quadProgram {"shader/quad.vert", "shader/quad.frag"};
-	window.render(baseProgram, depthProgram, model);
+	//window.render(baseProgram, depthProgram, model);
 	//window.render(quadProgram, quad);
-	//window.render(baseProgram, depthProgram, model, quadProgram, quad);
+	window.render(baseProgram, depthProgram, model, quadProgram, quad);
 	std::cout << "Test version " << SST_VERSION_MAJOR << "." << SST_VERSION_MINOR << " successfull" << std::endl;
 }

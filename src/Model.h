@@ -18,7 +18,7 @@ class Model
 	inline void unbind() const { glBindVertexArray(0); }
 	inline void render(const ShaderProgram &program) const
 	{
-		GLuint transformLoc {program.getLocation("transform")};
+		GLuint transformLoc {program.getLocation("model")};
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform_[0]);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}

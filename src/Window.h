@@ -22,6 +22,7 @@ class Window
 		        const ShaderProgram &quadProgram, const Quad &quad);
   private:
 	GLFWwindow *window_;
+	GLFWkeyfun keyCallback_;
 };
 
 #endif // SST_WINDOW_H
