@@ -106,7 +106,7 @@ GLchar *ShaderProgram::loadShaderSource(const char *path)
 	FILE *file;
 	fopen_s(&file, path, "r");
 	if (file == nullptr) { // TODO should throw exception
-		std::cerr << "Could not open shader file: " << path << std::endl;
+		std::cerr << "Could not open shader file: " << path << std::endl;;
 	}
 	fseek(file, 0, SEEK_END); // Calculate length
 	long length {ftell(file) + 1};

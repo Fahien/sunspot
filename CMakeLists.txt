@@ -11,15 +11,23 @@ set (SST_TITLE "StereoscopicTest")
 # Configure a header file to pass some of the CMake settings to the source code
 configure_file (
 	"${PROJECT_SOURCE_DIR}/src/Config.h.in"
-	"${PROJECT_BINARY_DIR}/Config.h"
+	"${PROJECT_SOURCE_DIR}/include/Config.h"
 )
 
-# Add the binary tree to the search path for include files so that we will find config.h
-include_directories ("${PROJECT_BINARY_DIR}")
+# Add the given directories to those the compiler uses to search for include files
+include_directories ("${PROJECT_SOURCE_DIR}/include", "${PROJECT_SOURCE_DIR}/shader")
+
+# Specify the paths in which the linker should search for libraries
+link_directories("${PROJECT_SOURCE_DIR}/lib")
 
 set (SOURCES
+	src/Graphics.h
 	src/Window.h
 	src/Window.cpp
+	src/GlfwWindow.h
+	src/GlfwWindow.cpp
+	src/SdlWindow.h
+	src/SdlWindow.cpp
 	src/Model.h
 	src/Model.cpp
 	src/Quad.h
@@ -34,6 +42,4 @@ set (SOURCES
 
 add_executable (stereoscopic-test ${SOURCES})
 
-find_package(OpenGL REQUIRED)
-
-target_link_libraries (stereoscopic-test glew32s glfw3)
+target_link_libraries (stereoscopic-test opengl32 glew32s glfw3 SDL2 SDL2main)

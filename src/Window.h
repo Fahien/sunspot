@@ -7,22 +7,21 @@
 #include "Model.h"
 #include "Quad.h"
 
-
-struct GLFWwindow;
-
 class Window
 {
   public:
-	Window(const unsigned width, const unsigned height, const std::string &title);
-	~Window();
+	Window(const unsigned width, const unsigned height);
 
-	void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model);
-	void render(const ShaderProgram &program, const Quad &quad);
-	void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model,
-		        const ShaderProgram &quadProgram, const Quad &quad);
-  private:
-	GLFWwindow *window_;
-	GLFWkeyfun keyCallback_;
+	virtual void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model) = 0;
+	virtual void render(const ShaderProgram &program, const Quad &quad) = 0;
+	virtual void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model,
+		                const ShaderProgram &quadProgram, const Quad &quad) = 0;
+
+  protected:
+	static void initGlew();
+
+	unsigned width_;
+	unsigned height_;
 };
 
 #endif // SST_WINDOW_H

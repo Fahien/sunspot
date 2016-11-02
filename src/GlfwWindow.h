@@ -1,0 +1,22 @@
+#ifndef SST_GLFWWINDOW_H
+#define SST_GLFWWINDOW_H
+
+#include "Window.h"
+
+class GlfwWindow : public Window
+{
+  public:
+	GlfwWindow(const unsigned width, const unsigned height, const std::string &title);
+	~GlfwWindow();
+
+	void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model);
+	void render(const ShaderProgram &program, const Quad &quad);
+	void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model,
+		const ShaderProgram &quadProgram, const Quad &quad);
+
+  private:
+	GLFWwindow *window_;
+	GLFWkeyfun keyCallback_;
+};
+
+#endif
