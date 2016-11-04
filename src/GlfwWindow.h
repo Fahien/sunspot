@@ -17,6 +17,9 @@ class GlfwWindow : public Window
 	GlfwWindow(const unsigned width, const unsigned height, const std::string &title);
 	~GlfwWindow();
 
+	void handleInput(int key);
+	void toggleFullscreen();
+
 	void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model);
 	void render(const ShaderProgram &program, const Quad &quad);
 	void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model,
@@ -25,6 +28,7 @@ class GlfwWindow : public Window
   private:
 	GLFWwindow *window_;
 	GLFWkeyfun keyCallback_;
+	const GLFWvidmode* videoMode_;
 };
 
 #endif

@@ -21,6 +21,7 @@ SdlWindow::SdlWindow(const unsigned width, const unsigned height, const std::str
 		SDL_Quit();
 		throw SdlException(tag);
 	}
+	toggleFullscreen();
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3); // Request OpenGL 3.3 context
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -143,8 +144,12 @@ EXIT:
 void SdlWindow::render(const ShaderProgram &modelProgram, const ShaderProgram &depthProgram, Model &model,
 	                   const ShaderProgram &quadProgram, const Quad &quad)
 {
-	Framebuffer frame{ width_, height_ / 2 };
-	float aspectRatio{ (width_ / 2.0f) / (height_ / 2.0f) };
+	int width = width_;
+	int height = height_;
+
+	//SDL_GL_GetDrawableSize(window_, &width, &height);
+	Framebuffer frame{ static_cast<unsigned>(width), static_cast<unsigned>(height / 2) };
+	float aspectRatio{ (width / 2.0f) / (height / 2.0f) };
 	Camera camera{ 45.0f, aspectRatio, 0.125f, 8.0f };
 
 	SDL_Event sdlEvent;
@@ -161,9 +166,10 @@ void SdlWindow::render(const ShaderProgram &modelProgram, const ShaderProgram &d
 			}
 			if (sdlEvent.type == SDL_QUIT) { goto EXIT; }
 		}
+		//SDL_GL_GetDrawableSize(window_, &width, &height);
 
 		frame.bind(); // First pass: render the scene on a framebuffer
-		glViewport(0, 0, width_, height_ / 2); // Viewport for color and depth sub-images
+		glViewport(0, 0, width, height / 2); // Viewport for color and depth sub-images
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffer
@@ -171,17 +177,17 @@ void SdlWindow::render(const ShaderProgram &modelProgram, const ShaderProgram &d
 		model.bind();
 		modelProgram.use();
 		camera.update(modelProgram);
-		glViewport(0, 0, width_ / 2, height_ / 2); // Render color sub-image
+		glViewport(0, 0, width / 2, height / 2); // Render color sub-image
 		model.rotateY(0.0025f);
 		model.render(modelProgram);
-		glViewport(width_ / 2, 0, width_ / 2, height_ / 2); // Render depth sub-image
+		glViewport(width / 2, 0, width / 2, height / 2); // Render depth sub-image
 		depthProgram.use();
 		camera.update(depthProgram);
 		model.render(depthProgram);
 		model.unbind();
 		frame.unbind(); // End first pass
 
-		glViewport(0, 0, width_, height_); // Second pass: render the framebuffer on a quad
+		glViewport(0, 0, width, height); // Second pass: render the framebuffer on a quad
 		glDisable(GL_DEPTH_TEST);
 		quadProgram.use();
 		quadProgram.setUniforms();

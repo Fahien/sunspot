@@ -36,6 +36,8 @@ class Window {
 
 	unsigned width_;
 	unsigned height_;
+	unsigned monitorWidth_;
+	unsigned monitorHeight_;
 
 	bool fullscreen_;
 };

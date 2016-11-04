@@ -16,11 +16,11 @@ static const std::string tag{ "Main" };
 int main(int argc, char **argv)
 {
 	Window *window{ nullptr };
-	
+
 	try {
 		if (argc > 1) {
 			std::string firstArg{ argv[1] };
-			if (firstArg == "-SDL") { window = new SdlWindow{ width / 2, height / 2, SST_TITLE }; }
+			if (firstArg == "-SDL") { window = new SdlWindow{ width, height, SST_TITLE }; }
 		}
 		if (window == nullptr) { window = new GlfwWindow{ width, height, SST_TITLE }; }
 
