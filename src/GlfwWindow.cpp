@@ -5,11 +5,17 @@
 #include "Framebuffer.h"
 #include "Camera.h"
 
+
+const std::string GlfwWindow::tag{ "GlfwWindow" };
+
+
 GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const std::string &title)
 	: Window::Window{ width, height }
 	, window_ {nullptr}
 {
-	glfwInit(); // Initialize GLFW
+	if (glfwInit() != GLFW_TRUE) { // Initialize GLFW and handle error
+		throw GlfwException{ tag, "Could not initialize GLFW" };
+	}
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // TODO refactor magic numbers
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // TODO refactor magic numbers
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -18,33 +24,39 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const std::s
 	// Create a full screen window object
 	window_ = glfwCreateWindow(width, height, title.c_str(), glfwGetPrimaryMonitor(), nullptr);
 	if (window_ == nullptr) { // Handle error
-		std::cerr << "Could not create GLFW window\n";
 		glfwTerminate();
-		exit(EXIT_FAILURE); // TODO refactor to exception
+		throw GlfwException{ tag, "Could not create GLFW window" };
 	}
 	glfwMakeContextCurrent(window_);
+	glfwSwapInterval(1); // Vsync
 
 	glfwSetKeyCallback(window_, [](GLFWwindow* window, int key, int scancode, int action, int mode) {
-
+		std::cout << tag << ": keyCallback invoked\n";
 	});
 
-	Window::initGlew();
-	std::cout << "GlfwWindow -> created\n"; // TODO remove debug log
+	try {
+		Window::initGlew();
+	}
+	catch (GlewException &) {
+		glfwDestroyWindow(window_);
+		glfwTerminate();
+		throw;
+	}
+	std::cout << tag << ": created\n"; // TODO remove debug log
 }
 
 
 GlfwWindow::~GlfwWindow()
 {
+	if (window_ != nullptr) { glfwDestroyWindow(window_); }
 	glfwTerminate();
-	std::cout << "GlfwWindow -> destroyed\n"; // TODO remove debug log
+	std::cout << tag << ": destroyed\n"; // TODO remove debug log
 }
 
 
 void GlfwWindow::render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model& model)
 {
-	int width, height; // Dimensions from GLFW such that it also works on high DPI screens
-	glfwGetFramebufferSize(window_, &width, &height);
-	Camera camera{ 45.0f, width / 2.0f / height, 0.125f, 8.0f };
+	Camera camera{ 45.0f, width_ / 2.0f / height_, 0.125f, 8.0f };
 
 	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -60,8 +72,7 @@ void GlfwWindow::render(const ShaderProgram &baseProgram, const ShaderProgram &d
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		glfwGetFramebufferSize(window_, &width, &height);
-		glViewport(0, 0, width, height);
+		glViewport(0, 0, width_, height_);
 
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -69,13 +80,13 @@ void GlfwWindow::render(const ShaderProgram &baseProgram, const ShaderProgram &d
 
 		model.bind();
 
-		glViewport(0, 0, width / 2, height);
+		glViewport(0, 0, width_ / 2, height_);
 		baseProgram.use();
 		camera.update(baseProgram);
 		model.rotateY(deltaTime);
 		model.render(baseProgram);
 
-		glViewport(width / 2, 0, width / 2, height);
+		glViewport(width_ / 2, 0, width_ / 2, height_);
 		glDisable(GL_DEPTH_TEST);
 		depthProgram.use();
 		camera.update(depthProgram);
@@ -111,7 +122,7 @@ void GlfwWindow::render(const ShaderProgram &program, const Quad& quad)
 
 
 void GlfwWindow::render(const ShaderProgram &modelProgram, const ShaderProgram &depthProgram, Model &model,
-	const ShaderProgram &quadProgram, const Quad &quad)
+	                    const ShaderProgram &quadProgram, const Quad &quad)
 {
 	int width, height;
 	glfwGetFramebufferSize(window_, &width, &height);

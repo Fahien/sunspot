@@ -3,9 +3,17 @@
 
 #include "Window.h"
 
+
+class GlfwException : public GraphicException {
+public:
+	GlfwException(const std::string &tag, const std::string &message) : GraphicException{ tag + ": " + message } {}
+};
+
+
 class GlfwWindow : public Window
 {
   public:
+	static const std::string tag;
 	GlfwWindow(const unsigned width, const unsigned height, const std::string &title);
 	~GlfwWindow();
 
