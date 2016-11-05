@@ -9,19 +9,19 @@
 
 
 class GraphicException : public std::runtime_error {
-  public:
+public:
 	GraphicException(const std::string& message) : std::runtime_error(message) {}
 };
 
 
 class GlewException : public GraphicException {
-  public:
+public:
 	GlewException(const std::string& tag) : GraphicException{ tag + ": Could not initialize GLEW" } {}
 };
 
 
 class Window {
-  public:
+public:
 	static const std::string tag;
 	Window(const unsigned width, const unsigned height);
 
@@ -29,9 +29,9 @@ class Window {
 	virtual void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model) = 0;
 	virtual void render(const ShaderProgram &program, const Quad &quad) = 0;
 	virtual void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model,
-		                const ShaderProgram &quadProgram, const Quad &quad) = 0;
+		const ShaderProgram &quadProgram, const Quad &quad) = 0;
 
-  protected:
+protected:
 	static void initGlew();
 
 	unsigned width_;

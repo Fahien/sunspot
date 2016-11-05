@@ -118,7 +118,5 @@ GLchar *ShaderProgram::loadShaderSource(const char *path)
 	}
 	source[length - 1] = 0;
 	fclose(file);
-
-	std::cout << "ShaderProgram -> shader source:\n" << source << std::endl; // TODO remove debug log
 	return source;
 }

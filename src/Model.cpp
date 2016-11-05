@@ -9,10 +9,10 @@ Model::Model()
 	, ebo_ {0}
 	, vao_ {0}
 	, transform_ {
-		{1, 0, 0, 0},
-		{0, 1, 0, 0},
-		{0, 0, 1, 0},
-		{0, 0, 0, 1}}
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1}
 {
 	GLfloat vertices[] = {
 		// Positions         // Colors
@@ -70,14 +70,21 @@ Model::~Model()
 
 void Model::translateX(const float amount)
 {
-	transform_[3][0] += amount;
+	transform_[12] += amount;
 }
 
 
 void Model::rotateY(const float radians)
 {
-	float cosrad {static_cast<float>(cos(radians))};
-	float sinrad {static_cast<float>(sin(radians))};
+	float cosrad{ cos(radians) };
+	float sinrad{ sin(radians) };
+	math::Mat4 rotation{
+		cosrad, 0.0f, -sinrad, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		sinrad, 0.0f, cosrad, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f };
+	transform_ = rotation * transform_;
+	/*
 	float t00 {transform_[0][0] * cosrad + transform_[2][0] * -sinrad};
 	float t20 {transform_[0][0] * sinrad + transform_[2][0] * cosrad};
 	float t02 {transform_[0][2] * cosrad + transform_[2][2] * -sinrad};
@@ -86,13 +93,22 @@ void Model::rotateY(const float radians)
 	transform_[2][0] = t20;
 	transform_[0][2] = t02;
 	transform_[2][2] = t22;
+	*/
 }
 
 
 void Model::rotateZ(const float radians)
 {
-	float cosrad {static_cast<float>(cos(radians))};
-	float sinrad {static_cast<float>(sin(radians))};
+	float cosrad{ static_cast<float>(cos(radians)) };
+	float sinrad{ static_cast<float>(sin(radians)) };
+	math::Mat4 rotation{
+		cosrad, sinrad, 0, 0,
+		-sinrad, cosrad, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1 };
+	transform_ = rotation * transform_;
+
+	/*
 	float t00 {transform_[0][0] * cosrad + transform_[1][0] * sinrad};
 	float t10 {transform_[0][0] * -sinrad + transform_[1][0] * cosrad};
 	float t01 {transform_[0][1] * cosrad + transform_[1][1] * sinrad};
@@ -101,4 +117,5 @@ void Model::rotateZ(const float radians)
 	transform_[0][1] = t01;
 	transform_[1][0] = t10;
 	transform_[1][1] = t11;
+	*/
 }

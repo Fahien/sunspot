@@ -22,6 +22,8 @@ link_directories("${PROJECT_SOURCE_DIR}/lib")
 
 set (SOURCES
 	src/Graphics.h
+	src/Math.h
+	src/Math.cpp
 	src/Window.h
 	src/Window.cpp
 	src/GlfwWindow.h

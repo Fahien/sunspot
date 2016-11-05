@@ -2,6 +2,7 @@
 #define SST_CAMERA_H
 
 #include "ShaderProgram.h"
+#include "Math.h"
 
 class Camera
 {
@@ -12,13 +13,13 @@ class Camera
 	void update(const ShaderProgram& program) const
 	{
 		GLuint transformLoc{ program.getLocation("view") };
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, view_[0]);
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, view_.matrix_);
 		transformLoc = program.getLocation("projection");
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, projection_[0]);
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, projection_.matrix_);
 	};
   private:
-	float view_[4][4];
-	float projection_[4][4];
+	math::Mat4 view_;
+	math::Mat4 projection_;
 };
 
 #endif // SST_CAMERA_H

@@ -3,6 +3,7 @@
 
 #include "Graphics.h"
 #include "ShaderProgram.h"
+#include "Math.h"
 
 class Model
 {
@@ -19,7 +20,7 @@ class Model
 	inline void render(const ShaderProgram &program) const
 	{
 		GLuint transformLoc {program.getLocation("model")};
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform_[0]);
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform_.matrix_);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}
 
@@ -27,7 +28,7 @@ class Model
 	GLuint vbo_;
 	GLuint ebo_;
 	GLuint vao_;
-	float transform_[4][4];
+	math::Mat4 transform_;
 };
 
 #endif // SST_MODEL_H

@@ -26,8 +26,8 @@ class GlfwWindow : public Window
 		const ShaderProgram &quadProgram, const Quad &quad);
 
   private:
+	bool rotateY_;
 	GLFWwindow *window_;
-	GLFWkeyfun keyCallback_;
 	const GLFWvidmode* videoMode_;
 };
 

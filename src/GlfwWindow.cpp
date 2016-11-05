@@ -11,21 +11,26 @@ const std::string GlfwWindow::tag{ "GlfwWindow" };
 
 GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const std::string &title)
 	: Window::Window{ width, height }
-	, window_{nullptr}
-	, keyCallback_{}
-	, videoMode_{nullptr}
+	, rotateY_{ false }
+	, window_{ nullptr }
+	, videoMode_{ nullptr }
 {
-	if (glfwInit() != GLFW_TRUE) { // Initialize GLFW and handle error
-		throw GlfwException{ tag, "Could not initialize GLFW" };
-	}
+	// Initialize GLFW and handle error
+	if (glfwInit() != GLFW_TRUE) { throw GlfwException{ tag, "Could not initialize GLFW" }; }
+	// Set the error callback
+	glfwSetErrorCallback([](int error, const char *description) {
+		std::cerr << tag << ": " << description << " [" << error << "]\n";
+	});
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // TODO refactor magic numbers
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // TODO refactor magic numbers
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2); // TODO refactor magic numbers
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
 	// Create a full screen window object
 	window_ = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
-	if (window_ == nullptr) { // Handle error
+	if (window_ == nullptr) { // Handle window creation error
 		glfwTerminate();
 		throw GlfwException{ tag, "Could not create GLFW window" };
 	}
@@ -47,15 +52,14 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const std::s
 	monitorWidth_ = videoMode_->width;
 	monitorHeight_ = videoMode_->height;
 
-	try {
-		Window::initGlew();
-	}
+	try { Window::initGlew(); }
 	catch (GlewException &) {
 		glfwDestroyWindow(window_);
 		glfwTerminate();
 		throw;
 	}
-	std::cout << tag << ": created\n"; // TODO remove debug log
+
+	std::cout << tag << ": created - " << glGetString(GL_VERSION) << " - " << glfwGetVersionString() << std::endl;
 }
 
 
@@ -70,10 +74,14 @@ GlfwWindow::~GlfwWindow()
 void GlfwWindow::handleInput(int key)
 {
 	switch (key) {
+	case GLFW_KEY_D:
+		rotateY_ = !rotateY_;
+		break;
 	case GLFW_KEY_F:
 		toggleFullscreen();
 		break;
 	case GLFW_KEY_ESCAPE:
+	case GLFW_KEY_Q:
 		glfwSetWindowShouldClose(window_, GLFW_TRUE);
 		break;
 	default: break;
@@ -179,9 +187,17 @@ void GlfwWindow::render(const ShaderProgram &modelProgram, const ShaderProgram &
 
 	glfwSwapInterval(1); // Vsync
 
+	double lastTime{ glfwGetTime() };
+	double currentTime{ glfwGetTime() };
+	float deltaTime{ static_cast<float>(currentTime - lastTime) };
+
 	while (!glfwWindowShouldClose(window_)) {
 		glfwPollEvents(); // Processes events that have already been received
 		glfwGetFramebufferSize(window_, &width, &height);
+
+		currentTime = glfwGetTime();
+		deltaTime = static_cast<float>(currentTime - lastTime);
+		lastTime = currentTime;
 
 		frame.bind(); // First pass: render the scene on a framebuffer
 		glViewport(0, 0, width, height / 2); // Viewport for color and depth sub-images
@@ -189,11 +205,11 @@ void GlfwWindow::render(const ShaderProgram &modelProgram, const ShaderProgram &
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffer
 
+		if (rotateY_) { model.rotateY(deltaTime); }
 		model.bind();
 		modelProgram.use();
 		camera.update(modelProgram);
 		glViewport(0, 0, width / 2, height / 2); // Render color sub-image
-		model.rotateY(0.0025f);
 		model.render(modelProgram);
 		glViewport(width / 2, 0, width / 2, height / 2); // Render depth sub-image
 		depthProgram.use();
