@@ -126,7 +126,7 @@ const float &GlfwWindow::computeDeltaTime()
 
 void GlfwWindow::render(const float &deltaTime) const
 {
-	renderStereoscopic(deltaTime);
+	render3D(deltaTime);
 }
 
 

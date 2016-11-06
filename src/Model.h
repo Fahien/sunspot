@@ -25,9 +25,12 @@ class Model
 	void render(const ShaderProgram *program) const;
 
   private:
+	GLubyte *loadTexture();
+
 	GLuint vbo_;
 	GLuint ebo_;
 	GLuint vao_;
+	GLuint texture_;
 	math::Mat4 transform_;
 };
 

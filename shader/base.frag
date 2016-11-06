@@ -2,11 +2,13 @@
 
 const float one = 1.0;
 
-in vec3 theColor;
+in vec2 texCoords;
 
 out vec4 color;
 
+uniform sampler2D theTexture;
+
 void main()
 {
-	color = vec4(theColor, one);
+	color = texture(theTexture, texCoords);
 }

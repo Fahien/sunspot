@@ -117,6 +117,7 @@ GLchar *ShaderProgram::loadShaderSource(const char *path)
 		std::cerr << "Could not read shader file: " << path << std::endl;
 	}
 	source[length - 1] = 0;
+	//std::cout << "Shader source: " << source << std::endl;
 	fclose(file);
 	return source;
 }
