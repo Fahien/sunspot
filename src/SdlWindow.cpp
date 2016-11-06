@@ -1,6 +1,9 @@
 #include <iostream>
 
 #include "SdlWindow.h"
+#include "ShaderProgram.h"
+#include "Model.h"
+#include "Quad.h"
 #include "Camera.h"
 #include "Framebuffer.h"
 
@@ -8,15 +11,15 @@
 const std::string SdlWindow::tag{ "SdlWindow" };
 
 
-SdlWindow::SdlWindow(const unsigned width, const unsigned height, const std::string &title)
-	: Window::Window{ width, height }
+SdlWindow::SdlWindow(const unsigned width, const unsigned height, const char *title)
+	: Window::Window{ width, height, title }
 	, window_{ nullptr }
 	, context_{ nullptr }
 {
 	// Initialize SDL video subsystem and handle error
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) { throw SdlException(tag); }
 
-	window_ = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
+	window_ = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
 	if (window_ == nullptr) { // Handle window creation error
 		SDL_Quit();
 		throw SdlException(tag);
@@ -49,6 +52,7 @@ SdlWindow::SdlWindow(const unsigned width, const unsigned height, const std::str
 		SDL_Quit();
 		throw;
 	}
+
 	std::cout << tag << ": created\n"; // TODO remove debug log
 }
 
@@ -79,94 +83,15 @@ void SdlWindow::toggleFullscreen()
 }
 
 
-void SdlWindow::render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model& model)
+void SdlWindow::loop()
 {
-	Camera camera{ 45.0f, width_ / 2.0f / height_, 0.125f, 8.0f };
-
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	SDL_Event sdlEvent;
-	while (true) {
-		while (SDL_PollEvent(&sdlEvent)) { // Processes events that have already been received
-			if (sdlEvent.type == SDL_QUIT) { goto EXIT; }
-		}
-
-		glViewport(0, 0, width_, height_);
-
-		glEnable(GL_DEPTH_TEST);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
-
-		model.bind();
-
-		glViewport(0, 0, width_ / 2, height_);  // Render color sub-image
-		baseProgram.use();
-		camera.update(baseProgram);
-		model.rotateY(0.0025f);
-		model.render(baseProgram);
-
-		glViewport(width_ / 2, 0, width_ / 2, height_); // Render depth sub-image
-		glDisable(GL_DEPTH_TEST);
-		depthProgram.use();
-		camera.update(depthProgram);
-		model.render(depthProgram);
-
-		model.unbind();
-
-		SDL_GL_SwapWindow(window_); // Swap back buffer to the front
-	}
-EXIT:
-	return;
-}
-
-
-void SdlWindow::render(const ShaderProgram &program, const Quad& quad)
-{
-	program.use();
-
-	SDL_Event sdlEvent;
-	while (true) {
-		while (SDL_PollEvent(&sdlEvent)) { // Processes events that have already been received
-			if (sdlEvent.type == SDL_QUIT) { goto EXIT; }
-		}
-
-		glViewport(0, 0, width_, height_);
-
-		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
-
-		quad.bind();
-		quad.render();
-		quad.unbind();
-
-		SDL_GL_SwapWindow(window_); // Swap back buffer to the front
-	}
-EXIT:
-	return;
-}
-
-
-void SdlWindow::render(const ShaderProgram &modelProgram, const ShaderProgram &depthProgram, Model &model,
-	const ShaderProgram &quadProgram, const Quad &quad)
-{
-	int width = width_;
-	int height = height_;
-
-	//SDL_GL_GetDrawableSize(window_, &width, &height);
-	Framebuffer frame{ static_cast<unsigned>(width), static_cast<unsigned>(height / 2) };
-	float aspectRatio{ (width / 2.0f) / (height / 2.0f) };
-	Camera camera{ 45.0f, aspectRatio, 0.125f, 8.0f };
-
-	double lastTime{ SDL_GetTicks() / 1000.0 };
-	double currentTime{ SDL_GetTicks() / 1000.0 };
-	float deltaTime{ static_cast<float>(currentTime - lastTime) };
-
 	SDL_Event sdlEvent;
 	while (true) {
 		while (SDL_PollEvent(&sdlEvent)) { // Processes events that have already been received
 			switch (sdlEvent.type) {
 			case SDL_KEYUP:
 				switch (sdlEvent.key.keysym.sym) {
+				case SDLK_q:
 				case SDLK_ESCAPE: goto EXIT;
 				case SDLK_f: toggleFullscreen(); break;
 				default: break;
@@ -175,45 +100,102 @@ void SdlWindow::render(const ShaderProgram &modelProgram, const ShaderProgram &d
 			}
 			if (sdlEvent.type == SDL_QUIT) { goto EXIT; }
 		}
-		SDL_GL_GetDrawableSize(window_, &width, &height);
-
-		currentTime = SDL_GetTicks() / 1000.0;
-		deltaTime = static_cast<float>(currentTime - lastTime);
-		lastTime = currentTime;
-
-		frame.bind(); // First pass: render the scene on a framebuffer
-		glViewport(0, 0, width, height / 2); // Viewport for color and depth sub-images
-		glEnable(GL_DEPTH_TEST);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffer
-
-		model.bind();
-		model.rotateY(deltaTime);
-		modelProgram.use();
-		camera.update(modelProgram);
-		glViewport(0, 0, width / 2, height / 2); // Render color sub-image
-		model.render(modelProgram);
-		glViewport(width / 2, 0, width / 2, height / 2); // Render depth sub-image
-		depthProgram.use();
-		camera.update(depthProgram);
-		model.render(depthProgram);
-		model.unbind();
-		frame.unbind(); // End first pass
-
-		glViewport(0, 0, width, height); // Second pass: render the framebuffer on a quad
-		glDisable(GL_DEPTH_TEST);
-		quadProgram.use();
-		quadProgram.setUniforms();
-		frame.bindColorTexture();
-		frame.bindMaskTexture();
-		frame.bindHeaderTexture();
-
-		quad.bind();
-		quad.render();
-		quad.unbind(); // End second pass
-
+		Window::render();
 		SDL_GL_SwapWindow(window_); // Swap back buffer to the front
 	}
 EXIT:
 	return;
+}
+
+
+const float &SdlWindow::computeDeltaTime()
+{
+	currentTime_ = static_cast<float>(SDL_GetTicks() / 1000.0);
+	deltaTime_ = currentTime_ - lastTime_;
+	lastTime_ = currentTime_;
+	return deltaTime_;
+}
+
+
+void SdlWindow::render(const float &deltaTime) const
+{
+	render3DplusDepth(deltaTime);
+}
+
+
+void SdlWindow::render3DplusDepth(const float &deltaTime) const
+{
+	glViewport(0, 0, width_, height_);
+
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
+
+	model_->bind();
+
+	glViewport(0, 0, width_ / 2, height_);  // Render color sub-image
+	baseProgram_->use();
+	camera_->update(baseProgram_);
+	model_->rotateY(0.0025f);
+	model_->render(baseProgram_);
+
+	glViewport(width_ / 2, 0, width_ / 2, height_); // Render depth sub-image
+	glDisable(GL_DEPTH_TEST);
+	depthProgram_->use();
+	camera_->update(depthProgram_);
+	model_->render(depthProgram_);
+
+	model_->unbind();
+}
+
+
+void SdlWindow::renderQuad(const float &deltaTime) const
+{
+	depthProgram_->use();
+	glViewport(0, 0, width_, height_);
+
+	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
+
+	quad_->bind();
+	quad_->render();
+	quad_->unbind();
+}
+
+
+void SdlWindow::renderStereoscopic(const float &deltaTime) const
+{
+	int width, height;
+	SDL_GL_GetDrawableSize(window_, &width, &height);
+
+	framebuffer_->bind(); // First pass: render the scene on a framebuffer
+	glViewport(0, 0, width, height / 2); // Viewport for color and depth sub-images
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffer
+
+	model_->bind();
+	model_->rotateY(deltaTime);
+	baseProgram_->use();
+	camera_->update(baseProgram_);
+	glViewport(0, 0, width / 2, height / 2); // Render color sub-image
+	model_->render(baseProgram_);
+	glViewport(width / 2, 0, width / 2, height / 2); // Render depth sub-image
+	depthProgram_->use();
+	camera_->update(depthProgram_);
+	model_->render(depthProgram_);
+	model_->unbind();
+	framebuffer_->unbind(); // End first pass
+
+	glViewport(0, 0, width, height); // Second pass: render the framebuffer on a quad
+	glDisable(GL_DEPTH_TEST);
+	quadProgram_->use();
+	quadProgram_->setUniforms();
+	framebuffer_->bindColorTexture();
+	framebuffer_->bindMaskTexture();
+	framebuffer_->bindHeaderTexture();
+
+	quad_->bind();
+	quad_->render();
+	quad_->unbind(); // End second pass
 }

@@ -25,15 +25,18 @@ Mat4::Mat4(float *matrix)
 	}
 }
 
+
 float &Mat4::operator[](const int index)
 {
 	return matrix_[index];
 }
 
+
 float Mat4::operator[](const int index) const
 {
 	return matrix_[index];
 }
+
 
 Mat4 &Mat4::operator=(const Mat4 &matrix)
 {

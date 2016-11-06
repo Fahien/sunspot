@@ -1,6 +1,8 @@
 #include <cmath>
 
 #include "Camera.h"
+#include "Graphics.h"
+#include "ShaderProgram.h"
 
 
 Camera::Camera(const float fov, const float aspectRatio, const float near, const float far)
@@ -18,3 +20,12 @@ Camera::Camera(const float fov, const float aspectRatio, const float near, const
 	projection_[14] = 2 * near * far / (near - far);
 	projection_[11] = -1;
 }
+
+
+void Camera::update(const ShaderProgram *program) const
+{
+	GLuint transformLoc{ program->getLocation("view") };
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, view_.matrix_);
+	transformLoc = program->getLocation("projection");
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, projection_.matrix_);
+};

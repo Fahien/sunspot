@@ -3,9 +3,11 @@
 
 #include<string>
 
-#include "ShaderProgram.h"
-#include "Model.h"
-#include "Quad.h"
+class ShaderProgram;
+class Model;
+class Quad;
+class Camera;
+class Framebuffer;
 
 
 class GraphicException : public std::runtime_error {
@@ -23,21 +25,48 @@ public:
 class Window {
 public:
 	static const std::string tag;
-	Window(const unsigned width, const unsigned height);
 
-	// TODO refactor rendering functions and add virtual input handling functions
-	virtual void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model) = 0;
-	virtual void render(const ShaderProgram &program, const Quad &quad) = 0;
-	virtual void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model,
-		const ShaderProgram &quadProgram, const Quad &quad) = 0;
+	Window(const unsigned width, const unsigned height, const char *title);
+
+	inline void setBaseProgram(const ShaderProgram *baseProgram) { baseProgram_ = baseProgram; }
+	inline void setDepthProgram(const ShaderProgram *depthProgram) { depthProgram_ = depthProgram; }
+	inline void setModel(Model *model) { model_ = model; }
+
+	inline void setQuadProgram(const ShaderProgram *quadProgram) { quadProgram_ = quadProgram; }
+	inline void setQuad(Quad *quad) { quad_ = quad; }
+
+	inline void setCamera(const Camera *camera) { camera_ = camera; }
+	inline void setFramebuffer(const Framebuffer *framebuffer) { framebuffer_ = framebuffer; }
+
+	virtual void loop() = 0;
 
 protected:
 	static void initGlew();
 
+	virtual void render();
+	virtual const float &computeDeltaTime() = 0;
+	virtual void render(const float &deltaTime) const = 0;
+
 	unsigned width_;
 	unsigned height_;
+	const char* title_;
 	unsigned monitorWidth_;
 	unsigned monitorHeight_;
+
+	float currentTime_;
+	float lastTime_;
+	float deltaTime_;
+
+	const ShaderProgram *baseProgram_;
+	const ShaderProgram *depthProgram_;
+	Model *model_;
+
+	const ShaderProgram *quadProgram_;
+	const Quad *quad_;
+
+	const Camera *camera_;
+
+	const Framebuffer *framebuffer_;
 
 	bool fullscreen_;
 };

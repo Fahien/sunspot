@@ -6,6 +6,8 @@
 #include "Model.h"
 #include "ShaderProgram.h"
 #include "Quad.h"
+#include "Camera.h"
+#include "Framebuffer.h"
 
 
 static constexpr unsigned width{ 960 * 2 };
@@ -24,14 +26,24 @@ int main(int argc, char **argv)
 		}
 		if (window == nullptr) { window = new GlfwWindow{ width, height, SST_TITLE }; }
 
+
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
 		ShaderProgram depthProgram{ "shader/base.vert", "shader/depth.frag" };
 		Model model{};
 		Quad quad{};
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
-		//window->render(baseProgram, depthProgram, model);
-		//window->render(quadProgram, quad);
-		window->render(baseProgram, depthProgram, model, quadProgram, quad);
+		Camera camera{ 45.0f, static_cast<float>(width) / height, 0.125f, 8.0f };
+		Framebuffer framebuffer { width, height / 2 };
+
+		window->setBaseProgram(&baseProgram);
+		window->setDepthProgram(&depthProgram);
+		window->setModel(&model);
+		window->setQuadProgram(&quadProgram);
+		window->setQuad(&quad);
+		window->setCamera(&camera);
+		window->setFramebuffer(&framebuffer);
+
+		window->loop();
 		std::cout << "Test version " << SST_VERSION_MAJOR << "." << SST_VERSION_MINOR << " successfull" << std::endl;
 
 		delete window;

@@ -2,6 +2,7 @@
 #include <cmath>
 
 #include "Model.h"
+#include "ShaderProgram.h"
 
 
 Model::Model()
@@ -74,6 +75,31 @@ void Model::translateX(const float amount)
 }
 
 
+void Model::translateY(const float amount)
+{
+	transform_[13] += amount;
+}
+
+
+void Model::translateZ(const float amount)
+{
+	transform_[14] += amount;
+}
+
+
+void Model::rotateX(const float radians)
+{
+	float cosrad{ cos(radians) };
+	float sinrad{ sin(radians) };
+	math::Mat4 rotation{
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, cosrad, sinrad, 0.0f,
+		0.0f, -sinrad, cosrad, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f };
+	transform_ = rotation * transform_;
+}
+
+
 void Model::rotateY(const float radians)
 {
 	float cosrad{ cos(radians) };
@@ -84,38 +110,25 @@ void Model::rotateY(const float radians)
 		sinrad, 0.0f, cosrad, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f };
 	transform_ = rotation * transform_;
-	/*
-	float t00 {transform_[0][0] * cosrad + transform_[2][0] * -sinrad};
-	float t20 {transform_[0][0] * sinrad + transform_[2][0] * cosrad};
-	float t02 {transform_[0][2] * cosrad + transform_[2][2] * -sinrad};
-	float t22 {transform_[0][2] * sinrad + transform_[2][2] * cosrad};
-	transform_[0][0] = t00;
-	transform_[2][0] = t20;
-	transform_[0][2] = t02;
-	transform_[2][2] = t22;
-	*/
 }
 
 
 void Model::rotateZ(const float radians)
 {
-	float cosrad{ static_cast<float>(cos(radians)) };
-	float sinrad{ static_cast<float>(sin(radians)) };
+	float cosrad{ cos(radians) };
+	float sinrad{ sin(radians) };
 	math::Mat4 rotation{
 		cosrad, sinrad, 0, 0,
 		-sinrad, cosrad, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1 };
 	transform_ = rotation * transform_;
+}
 
-	/*
-	float t00 {transform_[0][0] * cosrad + transform_[1][0] * sinrad};
-	float t10 {transform_[0][0] * -sinrad + transform_[1][0] * cosrad};
-	float t01 {transform_[0][1] * cosrad + transform_[1][1] * sinrad};
-	float t11 {transform_[0][1] * -sinrad + transform_[1][1] * cosrad};
-	transform_[0][0] = t00;
-	transform_[0][1] = t01;
-	transform_[1][0] = t10;
-	transform_[1][1] = t11;
-	*/
+
+void Model::render(const ShaderProgram *program) const
+{
+	GLuint transformLoc{ program->getLocation("model") };
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform_.matrix_);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }

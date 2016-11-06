@@ -2,6 +2,9 @@
 
 #include "Graphics.h"
 #include "GlfwWindow.h"
+#include "ShaderProgram.h"
+#include "Model.h"
+#include "Quad.h"
 #include "Framebuffer.h"
 #include "Camera.h"
 
@@ -9,8 +12,8 @@
 const std::string GlfwWindow::tag{ "GlfwWindow" };
 
 
-GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const std::string &title)
-	: Window::Window{ width, height }
+GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *title)
+	: Window::Window{ width, height, title }
 	, rotateY_{ false }
 	, window_{ nullptr }
 	, videoMode_{ nullptr }
@@ -23,13 +26,13 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const std::s
 	});
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // TODO refactor magic numbers
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2); // TODO refactor magic numbers
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // TODO refactor magic numbers
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	// Create a full screen window object
-	window_ = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+	window_ = glfwCreateWindow(width, height, title, nullptr, nullptr);
 	if (window_ == nullptr) { // Handle window creation error
 		glfwTerminate();
 		throw GlfwException{ tag, "Could not create GLFW window" };
@@ -59,7 +62,7 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const std::s
 		throw;
 	}
 
-	std::cout << tag << ": created - " << glGetString(GL_VERSION) << " - " << glfwGetVersionString() << std::endl;
+	std::cout << tag << ": created\n\tOpenGL " << glGetString(GL_VERSION) << "\n\tGLFW " << glfwGetVersionString() << std::endl;
 }
 
 
@@ -74,17 +77,11 @@ GlfwWindow::~GlfwWindow()
 void GlfwWindow::handleInput(int key)
 {
 	switch (key) {
-	case GLFW_KEY_D:
-		rotateY_ = !rotateY_;
-		break;
-	case GLFW_KEY_F:
-		toggleFullscreen();
-		break;
-	case GLFW_KEY_ESCAPE:
-	case GLFW_KEY_Q:
-		glfwSetWindowShouldClose(window_, GLFW_TRUE);
-		break;
-	default: break;
+	  case GLFW_KEY_D: rotateY_ = !rotateY_; break;
+	  case GLFW_KEY_F: toggleFullscreen(); break;
+	  case GLFW_KEY_ESCAPE:
+	  case GLFW_KEY_Q: glfwSetWindowShouldClose(window_, GLFW_TRUE); break;
+	  default: break;
 	}
 }
 
@@ -108,128 +105,126 @@ void GlfwWindow::toggleFullscreen()
 }
 
 
-void GlfwWindow::render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model& model)
+void GlfwWindow::loop()
 {
-	Camera camera{ 45.0f, width_ / 2.0f / height_, 0.125f, 8.0f };
-
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	float lastFrame = 0.0f;
-	float currentFrame = static_cast<float>(glfwGetTime());
-	float deltaTime = currentFrame - lastFrame;
-	lastFrame = currentFrame;
-
 	while (!glfwWindowShouldClose(window_)) {
 		glfwPollEvents();
-
-		currentFrame = static_cast<float>(glfwGetTime());
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
-		glViewport(0, 0, width_, height_);
-
-		glEnable(GL_DEPTH_TEST);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color buffer
-
-		model.bind();
-
-		glViewport(0, 0, width_ / 2, height_);
-		baseProgram.use();
-		camera.update(baseProgram);
-		model.rotateY(deltaTime);
-		model.render(baseProgram);
-
-		glViewport(width_ / 2, 0, width_ / 2, height_);
-		glDisable(GL_DEPTH_TEST);
-		depthProgram.use();
-		camera.update(depthProgram);
-		model.render(depthProgram);
-
-		model.unbind();
+		Window::render();
 		glfwSwapBuffers(window_);
 	}
 }
 
 
-void GlfwWindow::render(const ShaderProgram &program, const Quad &quad)
+const float &GlfwWindow::computeDeltaTime()
+{
+	currentTime_ = static_cast<float>(glfwGetTime());
+	deltaTime_ = currentTime_ - lastTime_;
+	lastTime_ = currentTime_;
+	return deltaTime_;
+}
+
+
+void GlfwWindow::render(const float &deltaTime) const
+{
+	renderStereoscopic(deltaTime);
+}
+
+
+void GlfwWindow::render3D(const float &deltaTime) const
+{
+	float rotationVelocity = 0.25f;
+	glEnable(GL_DEPTH_TEST);
+	baseProgram_->use();
+	glViewport(0, 0, width_, height_);
+
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color buffer
+
+	model_->bind();
+	camera_->update(baseProgram_);
+	model_->rotateX(deltaTime * rotationVelocity);
+	model_->rotateY(deltaTime * rotationVelocity);
+	model_->rotateZ(deltaTime * rotationVelocity);
+	model_->render(baseProgram_);
+	model_->unbind();
+}
+
+
+void GlfwWindow::render3DplusDepth(const float& deltaTime) const
+{
+	glViewport(0, 0, width_, height_);
+
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color buffer
+
+	model_->bind();
+
+	glViewport(0, 0, width_ / 2, height_);
+	baseProgram_->use();
+	camera_->update(baseProgram_);
+	model_->rotateY(deltaTime);
+	model_->render(baseProgram_);
+
+	glViewport(width_ / 2, 0, width_ / 2, height_);
+	glDisable(GL_DEPTH_TEST);
+	depthProgram_->use();
+	camera_->update(depthProgram_);
+	model_->render(depthProgram_);
+
+	model_->unbind();
+}
+
+
+void GlfwWindow::renderQuad(const float &deltaTime) const
 {
 	int width, height; // Dimensions from GLFW such that it also works on high DPI screens
-	program.use();
+	glfwGetFramebufferSize(window_, &width, &height);
 
-	while (!glfwWindowShouldClose(window_)) {
-		glfwPollEvents();
+	quadProgram_->use();
+	glViewport(0, 0, width, height);
 
-		glfwGetFramebufferSize(window_, &width, &height);
-		glViewport(0, 0, width, height);
+	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
 
-		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
-
-		quad.bind();
-		quad.render();
-		quad.unbind();
-
-		glfwSwapBuffers(window_);
-	}
+	quad_->bind();
+	quad_->render();
+	quad_->unbind();
 }
 
-
-void GlfwWindow::render(const ShaderProgram &modelProgram, const ShaderProgram &depthProgram, Model &model,
-	const ShaderProgram &quadProgram, const Quad &quad)
+void GlfwWindow::renderStereoscopic(const float &deltaTime) const
 {
-	int width = width_;
-	int height = height_;
-	//glfwGetFramebufferSize(window_, &width, &height);
-	Framebuffer frame{ static_cast<unsigned>(width), static_cast<unsigned>(height / 2) };
-	float aspectRatio{ (width / 2.0f) / (height / 2.0f) };
-	Camera camera{ 45.0f, aspectRatio, 0.125f, 8.0f };
+	int width, height; // Dimensions from GLFW such that it also works on high DPI screens
+	glfwGetFramebufferSize(window_, &width, &height);
 
-	glfwSwapInterval(1); // Vsync
+	framebuffer_->bind(); // First pass: render the scene on a framebuffer
+	glViewport(0, 0, width, height / 2); // Viewport for color and depth sub-images
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffer
 
-	double lastTime{ glfwGetTime() };
-	double currentTime{ glfwGetTime() };
-	float deltaTime{ static_cast<float>(currentTime - lastTime) };
+	if (rotateY_) { model_->rotateY(deltaTime); }
+	model_->bind();
+	baseProgram_->use();
+	camera_->update(baseProgram_);
+	glViewport(0, 0, width / 2, height / 2); // Render color sub-image
+	model_->render(baseProgram_);
+	glViewport(width / 2, 0, width / 2, height / 2); // Render depth sub-image
+	depthProgram_->use();
+	camera_->update(depthProgram_);
+	model_->render(depthProgram_);
+	model_->unbind();
+	framebuffer_->unbind(); // End first pass
 
-	while (!glfwWindowShouldClose(window_)) {
-		glfwPollEvents(); // Processes events that have already been received
-		glfwGetFramebufferSize(window_, &width, &height);
+	glViewport(0, 0, width, height); // Second pass: render the framebuffer on a quad
+	glDisable(GL_DEPTH_TEST);
+	quadProgram_->use();
+	quadProgram_->setUniforms();
+	framebuffer_->bindColorTexture();
+	framebuffer_->bindMaskTexture();
+	framebuffer_->bindHeaderTexture();
 
-		currentTime = glfwGetTime();
-		deltaTime = static_cast<float>(currentTime - lastTime);
-		lastTime = currentTime;
-
-		frame.bind(); // First pass: render the scene on a framebuffer
-		glViewport(0, 0, width, height / 2); // Viewport for color and depth sub-images
-		glEnable(GL_DEPTH_TEST);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffer
-
-		if (rotateY_) { model.rotateY(deltaTime); }
-		model.bind();
-		modelProgram.use();
-		camera.update(modelProgram);
-		glViewport(0, 0, width / 2, height / 2); // Render color sub-image
-		model.render(modelProgram);
-		glViewport(width / 2, 0, width / 2, height / 2); // Render depth sub-image
-		depthProgram.use();
-		camera.update(depthProgram);
-		model.render(depthProgram);
-		model.unbind();
-		frame.unbind(); // End first pass
-
-		glViewport(0, 0, width, height); // Second pass: render the framebuffer on a quad
-		glDisable(GL_DEPTH_TEST);
-		quadProgram.use();
-		quadProgram.setUniforms();
-		frame.bindColorTexture();
-		frame.bindMaskTexture();
-		frame.bindHeaderTexture();
-
-		quad.bind();
-		quad.render();
-		quad.unbind(); // End second pass
-
-		glfwSwapBuffers(window_);
-	}
+	quad_->bind();
+	quad_->render();
+	quad_->unbind(); // End second pass
 }

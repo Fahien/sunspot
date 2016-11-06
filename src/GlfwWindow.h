@@ -14,18 +14,24 @@ class GlfwWindow : public Window
 {
   public:
 	static const std::string tag;
-	GlfwWindow(const unsigned width, const unsigned height, const std::string &title);
+	GlfwWindow(const unsigned width, const unsigned height, const char *title);
 	~GlfwWindow();
 
 	void handleInput(int key);
 	void toggleFullscreen();
 
-	void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model);
-	void render(const ShaderProgram &program, const Quad &quad);
-	void render(const ShaderProgram &baseProgram, const ShaderProgram &depthProgram, Model &model,
-		const ShaderProgram &quadProgram, const Quad &quad);
+	void loop();
+
+  protected:
+	const float &computeDeltaTime();
+	void render(const float &deltaTime) const;
 
   private:
+	void render3D(const float &deltaTime) const;
+	void render3DplusDepth(const float &deltaTime) const;
+	void renderQuad(const float &deltaTime) const;
+	void renderStereoscopic(const float &deltaTime) const;
+
 	bool rotateY_;
 	GLFWwindow *window_;
 	const GLFWvidmode* videoMode_;
