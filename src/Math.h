@@ -28,7 +28,14 @@ class Mat4 {
 	Mat4 &operator*=(const Mat4 &matrix);
 	const Mat4 operator*(const Mat4 &other) const;
 
-	float matrix_[16];
+	void translateX(const float amount);
+	void translateY(const float amount);
+	void translateZ(const float amount);
+	void rotateX(const float radians);
+	void rotateY(const float radians);
+	void rotateZ(const float radians);
+
+	float matrix[16];
 };
 
 }

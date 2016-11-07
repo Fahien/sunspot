@@ -6,12 +6,13 @@
 
 
 Camera::Camera(const float fov, const float aspectRatio, const float near, const float far)
-	: view_{
+	: view{
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, -3.0f, 1.0f }
-	, projection_{ }
+	, projection_{}
+	, velocityX_{ 0.0f }
 {
 	float cotfov{ 1.0f / tan(fov * pi / 180.0f / 2.0f) };
 	projection_[0] = cotfov / aspectRatio;
@@ -22,10 +23,11 @@ Camera::Camera(const float fov, const float aspectRatio, const float near, const
 }
 
 
-void Camera::update(const ShaderProgram *program) const
+void Camera::update(const float deltaTime, const ShaderProgram *program)
 {
+	if (velocityX_ != 0.0f) { view.translateX(velocityX_ * deltaTime); }
 	GLuint transformLoc{ program->getLocation("view") };
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, view_.matrix_);
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, view.matrix);
 	transformLoc = program->getLocation("projection");
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, projection_.matrix_);
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, projection_.matrix);
 };

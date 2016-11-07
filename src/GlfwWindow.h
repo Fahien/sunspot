@@ -17,7 +17,7 @@ class GlfwWindow : public Window
 	GlfwWindow(const unsigned width, const unsigned height, const char *title);
 	~GlfwWindow();
 
-	void handleInput(int key);
+	void handleInput(const int key, const int action);
 	void toggleFullscreen();
 
 	void loop();

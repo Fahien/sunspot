@@ -7,15 +7,15 @@
 
 
 Model::Model()
-	: vbo_ {0}
-	, ebo_ {0}
-	, vao_ {0}
-	, texture_ {0}
-	, transform_ {
+	: transform{
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
-		0, 0, 0, 1}
+		0, 0, 0, 1 }
+	, vbo_ {0}
+	, ebo_ {0}
+	, vao_ {0}
+	, texture_ {0}
 {
 	GLfloat vertices[] = {
 		// Positions         // TexCoords
@@ -79,67 +79,10 @@ Model::~Model()
 }
 
 
-void Model::translateX(const float amount)
-{
-	transform_[12] += amount;
-}
-
-
-void Model::translateY(const float amount)
-{
-	transform_[13] += amount;
-}
-
-
-void Model::translateZ(const float amount)
-{
-	transform_[14] += amount;
-}
-
-
-void Model::rotateX(const float radians)
-{
-	float cosrad{ cos(radians) };
-	float sinrad{ sin(radians) };
-	math::Mat4 rotation{
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, cosrad, sinrad, 0.0f,
-		0.0f, -sinrad, cosrad, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f };
-	transform_ = rotation * transform_;
-}
-
-
-void Model::rotateY(const float radians)
-{
-	float cosrad{ cos(radians) };
-	float sinrad{ sin(radians) };
-	math::Mat4 rotation{
-		cosrad, 0.0f, -sinrad, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		sinrad, 0.0f, cosrad, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f };
-	transform_ = rotation * transform_;
-}
-
-
-void Model::rotateZ(const float radians)
-{
-	float cosrad{ cos(radians) };
-	float sinrad{ sin(radians) };
-	math::Mat4 rotation{
-		cosrad, sinrad, 0, 0,
-		-sinrad, cosrad, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1 };
-	transform_ = rotation * transform_;
-}
-
-
 void Model::render(const ShaderProgram *program) const
 {
 	GLuint transformLoc{ program->getLocation("model") };
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform_.matrix_);
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform.matrix);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture_);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);

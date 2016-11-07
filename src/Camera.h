@@ -10,11 +10,14 @@ class Camera {
 	const float pi{ 3.14159265f };
 	Camera(const float fov, const float aspectRatio, const float near, const float far);
 
-	void update(const ShaderProgram *program) const;
+	void update(const float deltaTime, const ShaderProgram *program);
 
+	inline void setVelocityX(const float velocityX) { velocityX_ = velocityX; }
+
+	math::Mat4 view;
   private:
-	math::Mat4 view_;
 	math::Mat4 projection_;
+	float velocityX_;
 };
 
 #endif // SST_CAMERA_H

@@ -35,7 +35,7 @@ public:
 	inline void setQuadProgram(const ShaderProgram *quadProgram) { quadProgram_ = quadProgram; }
 	inline void setQuad(Quad *quad) { quad_ = quad; }
 
-	inline void setCamera(const Camera *camera) { camera_ = camera; }
+	inline void setCamera(Camera *camera) { camera_ = camera; }
 	inline void setFramebuffer(const Framebuffer *framebuffer) { framebuffer_ = framebuffer; }
 
 	virtual void loop() = 0;
@@ -64,7 +64,7 @@ protected:
 	const ShaderProgram *quadProgram_;
 	const Quad *quad_;
 
-	const Camera *camera_;
+	Camera *camera_;
 
 	const Framebuffer *framebuffer_;
 

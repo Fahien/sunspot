@@ -43,7 +43,7 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 
 	glfwSetKeyCallback(window_, [](GLFWwindow* window, int key, int scancode, int action, int mode) {
 		GlfwWindow *win{ static_cast<GlfwWindow *>(glfwGetWindowUserPointer(window)) };
-		if (action != GLFW_PRESS) win->handleInput(key);
+		win->handleInput(key, action);
 	});
 
 	const GLFWvidmode *videoMode_{ glfwGetVideoMode(glfwGetPrimaryMonitor()) }; // Get the monitor resolution.
@@ -74,11 +74,19 @@ GlfwWindow::~GlfwWindow()
 }
 
 
-void GlfwWindow::handleInput(int key)
+void GlfwWindow::handleInput(const int key, const int action)
 {
 	switch (key) {
-	  case GLFW_KEY_D: rotateY_ = !rotateY_; break;
-	  case GLFW_KEY_F: toggleFullscreen(); break;
+	  case GLFW_KEY_A:
+		if (action == GLFW_PRESS) { camera_->setVelocityX(-1.0f); }
+		else if(action == GLFW_RELEASE) { camera_->setVelocityX(0.0f); }
+		break;
+	  case GLFW_KEY_D:
+		if (action == GLFW_PRESS) { camera_->setVelocityX(1.0f); }
+		else if (action == GLFW_RELEASE) { camera_->setVelocityX(0.0f); }
+		break;
+	  case GLFW_KEY_Y: rotateY_ = !rotateY_; break;
+	  case GLFW_KEY_F: if (action == GLFW_PRESS) { toggleFullscreen(); } break;
 	  case GLFW_KEY_ESCAPE:
 	  case GLFW_KEY_Q: glfwSetWindowShouldClose(window_, GLFW_TRUE); break;
 	  default: break;
@@ -126,7 +134,7 @@ const float &GlfwWindow::computeDeltaTime()
 
 void GlfwWindow::render(const float &deltaTime) const
 {
-	renderStereoscopic(deltaTime);
+	render3D(deltaTime);
 }
 
 
@@ -141,10 +149,10 @@ void GlfwWindow::render3D(const float &deltaTime) const
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color buffer
 
 	model_->bind();
-	camera_->update(baseProgram_);
-	model_->rotateX(deltaTime * rotationVelocity);
-	model_->rotateY(deltaTime * rotationVelocity);
-	model_->rotateZ(deltaTime * rotationVelocity);
+	camera_->update(deltaTime, baseProgram_);
+	model_->transform.rotateX(deltaTime * rotationVelocity);
+	model_->transform.rotateY(deltaTime * rotationVelocity);
+	model_->transform.rotateZ(deltaTime * rotationVelocity);
 	model_->render(baseProgram_);
 	model_->unbind();
 }
@@ -162,14 +170,14 @@ void GlfwWindow::render3DplusDepth(const float& deltaTime) const
 
 	glViewport(0, 0, width_ / 2, height_);
 	baseProgram_->use();
-	camera_->update(baseProgram_);
-	model_->rotateY(deltaTime);
+	camera_->update(deltaTime, baseProgram_);
+	model_->transform.rotateY(deltaTime);
 	model_->render(baseProgram_);
 
 	glViewport(width_ / 2, 0, width_ / 2, height_);
 	glDisable(GL_DEPTH_TEST);
 	depthProgram_->use();
-	camera_->update(depthProgram_);
+	camera_->update(deltaTime, depthProgram_);
 	model_->render(depthProgram_);
 
 	model_->unbind();
@@ -203,15 +211,15 @@ void GlfwWindow::renderStereoscopic(const float &deltaTime) const
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffer
 
-	if (rotateY_) { model_->rotateY(deltaTime); }
+	if (rotateY_) { model_->transform.rotateY(deltaTime); }
 	model_->bind();
 	baseProgram_->use();
-	camera_->update(baseProgram_);
+	camera_->update(deltaTime, baseProgram_);
 	glViewport(0, 0, width / 2, height / 2); // Render color sub-image
 	model_->render(baseProgram_);
 	glViewport(width / 2, 0, width / 2, height / 2); // Render depth sub-image
 	depthProgram_->use();
-	camera_->update(depthProgram_);
+	camera_->update(deltaTime, depthProgram_);
 	model_->render(depthProgram_);
 	model_->unbind();
 	framebuffer_->unbind(); // End first pass

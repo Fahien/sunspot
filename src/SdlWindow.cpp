@@ -135,14 +135,14 @@ void SdlWindow::render3DplusDepth(const float &deltaTime) const
 
 	glViewport(0, 0, width_ / 2, height_);  // Render color sub-image
 	baseProgram_->use();
-	camera_->update(baseProgram_);
-	model_->rotateY(0.0025f);
+	camera_->update(deltaTime, baseProgram_);
+	model_->transform.rotateY(0.0025f);
 	model_->render(baseProgram_);
 
 	glViewport(width_ / 2, 0, width_ / 2, height_); // Render depth sub-image
 	glDisable(GL_DEPTH_TEST);
 	depthProgram_->use();
-	camera_->update(depthProgram_);
+	camera_->update(deltaTime, depthProgram_);
 	model_->render(depthProgram_);
 
 	model_->unbind();
@@ -175,14 +175,14 @@ void SdlWindow::renderStereoscopic(const float &deltaTime) const
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffer
 
 	model_->bind();
-	model_->rotateY(deltaTime);
+	model_->transform.rotateY(deltaTime);
 	baseProgram_->use();
-	camera_->update(baseProgram_);
+	camera_->update(deltaTime, baseProgram_);
 	glViewport(0, 0, width / 2, height / 2); // Render color sub-image
 	model_->render(baseProgram_);
 	glViewport(width / 2, 0, width / 2, height / 2); // Render depth sub-image
 	depthProgram_->use();
-	camera_->update(depthProgram_);
+	camera_->update(deltaTime, depthProgram_);
 	model_->render(depthProgram_);
 	model_->unbind();
 	framebuffer_->unbind(); // End first pass
