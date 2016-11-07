@@ -5,6 +5,15 @@
 
 namespace math {
 
+class Vec3 {
+	Vec3();
+	Vec3(const float xx, const float yy, const float zz);
+
+	float x;
+	float y;
+	float z;
+};
+
 class Mat4 {
   public:
 	Mat4();

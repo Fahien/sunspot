@@ -5,8 +5,7 @@
 
 class ShaderProgram;
 
-class Camera
-{
+class Camera {
   public:
 	const float pi{ 3.14159265f };
 	Camera(const float fov, const float aspectRatio, const float near, const float far);

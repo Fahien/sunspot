@@ -2,6 +2,19 @@
 
 using namespace math;
 
+Vec3::Vec3()
+	: x{ 0.0f }
+	, y{ 0.0f }
+	, z{ 0.0f }
+{}
+
+Vec3::Vec3(const float xx, const float yy, const float zz)
+	: x {xx}
+	, y {yy}
+	, z {zz}
+{}
+
+
 Mat4::Mat4()
 	: matrix_{ 0 }
 {}

@@ -3,6 +3,7 @@
 
 #include "Model.h"
 #include "ShaderProgram.h"
+#include "Texture.h"
 
 
 Model::Model()
@@ -56,15 +57,14 @@ Model::Model()
 	glEnableVertexAttribArray(1);
 	glBindVertexArray(0); // Unbind vao
 
-	GLubyte *texture{ loadTexture() };
+	Texture texture{ "shader/crate.bmp" };
 	glGenTextures(1, &texture_); // Create a texture for colors
 	glBindTexture(GL_TEXTURE_2D, texture_);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, texture); // TODO remove magic numbers
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.getData()); // TODO remove magic numbers
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	free(texture); // Release data
 
-	std::cout << "Model -> created\n"; // TODO remove debug log
+	std::cout << "Model: created\n"; // TODO remove debug log
 }
 
 
@@ -75,75 +75,7 @@ Model::~Model()
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);
 
-	std::cout << "Model -> destroyed\n"; // TODO remove debuf log
-}
-
-
-GLubyte *Model::loadTexture() // TODO refactor that function to a concrete class for Textures
-{
-	FILE *file;
-	fopen_s(&file, "shader/crate.bmp", "rb");
-	if (file == nullptr) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not open header bitmap\n";
-	}
-
-	fseek(file, 14, SEEK_CUR);
-
-	unsigned hlen;
-	size_t nread{ fread(&hlen, 4, 1, file) };
-	if (nread != 1) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not read header from bitmap file\n";
-	}
-
-	unsigned width; // Read width
-	nread = fread(&width, 4, 1, file);
-	if (nread != 1) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not read width from bitmap file\n";
-	}
-
-	unsigned height; // Read height;
-	nread = fread(&height, 4, 1, file);
-	if (nread != 1) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not read height from bitmap file\n";
-	}
-
-	unsigned short planes; // Read planes
-	nread = fread(&planes, 2, 1, file);
-	if (nread != 1) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not read planes from bitmap file\n";
-	}
-
-	unsigned short bpp; // Read bit per pixel
-	nread = fread(&bpp, 2, 1, file);
-	if (nread != 1) {
-		std::cerr << "Framebuffer -> Could not read bpp from bitmap file\n";
-	}
-	if (bpp != 24) {
-		std::cerr << "Framebuffer -> Bpp is not 24: " << bpp << std::endl;
-	}
-
-	// TODO remove debug log
-	std::cout << "Framebuffer -> Bitmap header[" << hlen << "], size[" << width << "x" << height
-		<< "], planes[" << planes << "], bpp[" << bpp << "]\n";
-
-	fseek(file, 24, SEEK_CUR);
-
-	unsigned size{ width * height * 3 }; // Allocate memory for bitmap data
-	GLubyte *data{ static_cast<GLubyte *>(malloc(size)) };
-	if (!data) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not allocate " << size << " memory for bitmap data\n";
-	}
-	nread = fread(data, size, 1, file); // Read bitmap data
-	if (nread <= 0) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not read bitmap data: nread[" << nread << "]\n";
-	}
-	for (unsigned i{ 0 }; i < size; i += 3) { // Adjust red and blue
-		GLubyte temp = data[i];
-		data[i] = data[i + 2];
-		data[i + 2] = temp;
-	}
-
-	return data;
+	std::cout << "Model: destroyed\n"; // TODO remove debuf log
 }
 
 

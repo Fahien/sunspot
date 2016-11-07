@@ -6,8 +6,7 @@
 
 class ShaderProgram;
 
-class Model
-{
+class Model {
   public:
 	Model();
 	~Model();
@@ -25,8 +24,6 @@ class Model
 	void render(const ShaderProgram *program) const;
 
   private:
-	GLubyte *loadTexture();
-
 	GLuint vbo_;
 	GLuint ebo_;
 	GLuint vao_;

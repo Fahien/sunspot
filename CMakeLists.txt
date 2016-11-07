@@ -30,6 +30,8 @@ set (SOURCES
 	src/GlfwWindow.cpp
 	src/SdlWindow.h
 	src/SdlWindow.cpp
+	src/Texture.h
+	src/Texture.cpp
 	src/Model.h
 	src/Model.cpp
 	src/Quad.h

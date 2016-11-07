@@ -1,7 +1,10 @@
 #include <iostream>
-#include <cstdlib>
 
 #include "Framebuffer.h"
+#include "Texture.h"
+
+
+const std::string Framebuffer::tag{ "Framebuffer" };
 
 
 Framebuffer::Framebuffer(const unsigned width, const unsigned height)
@@ -36,11 +39,10 @@ Framebuffer::Framebuffer(const unsigned width, const unsigned height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	GLubyte *header{ loadHeader() };
+	Texture header{ "shader/header.bmp" };
 	glGenTextures(1, &headerTexture_); // Create a texture for header
 	glBindTexture(GL_TEXTURE_2D, headerTexture_);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, header);
-	free(header); // Release data
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, header.getData());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -51,80 +53,18 @@ Framebuffer::Framebuffer(const unsigned width, const unsigned height)
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo_);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "Framebuffer -> created\n"; // TODO remove debug log
+		std::cout << "Framebuffer: created\n"; // TODO remove debug log
 	}
-	else { // TODO throw an exception
-		std::cerr << "Framebuffer -> creation failed\n";
+	else {
+		glDeleteRenderbuffers(1, &rbo_);
+		glDeleteTextures(1, &headerTexture_);
+		glDeleteTextures(1, &maskTexture_);
+		glDeleteTextures(1, &depthTexture_);
+		glDeleteTextures(1, &colorTexture_);
+		glDeleteFramebuffers(1, &fbo_);
+		throw FramebufferException{ tag, "Creation failed" };
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-
-GLubyte *Framebuffer::loadHeader()
-{
-	FILE *file;
-	fopen_s(&file, "shader/header.bmp", "rb");
-	if (file == nullptr) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not open header bitmap\n";
-	}
-
-	fseek(file, 14, SEEK_CUR);
-
-	unsigned hlen;
-	size_t nread {fread(&hlen, 4, 1, file)};
-	if (nread != 1) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not read header from bitmap file\n";
-	}
-
-	unsigned width; // Read width
-	nread = fread(&width, 4, 1, file);
-	if (nread != 1) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not read width from bitmap file\n";
-	}
-
-	unsigned height; // Read height;
-	nread = fread(&height, 4, 1, file);
-	if (nread != 1) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not read height from bitmap file\n";
-	}
-
-	unsigned short planes; // Read planes
-	nread = fread(&planes, 2, 1, file);
-	if (nread != 1) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not read planes from bitmap file\n";
-	}
-
-	unsigned short bpp; // Read bit per pixel
-	nread = fread(&bpp, 2, 1, file);
-	if (nread != 1) {
-		std::cerr << "Framebuffer -> Could not read bpp from bitmap file\n";
-	}
-	if (bpp != 24) {
-		std::cerr << "Framebuffer -> Bpp is not 24: " << bpp << std::endl;
-	}
-
-	// TODO remove debug log
-	std::cout << "Framebuffer -> Bitmap header[" << hlen << "], size[" << width << "x" << height
-		<< "], planes[" << planes << "], bpp[" << bpp << "]\n";
-
-	fseek(file, 24, SEEK_CUR);
-
-	unsigned size {width * height * 3}; // Allocate memory for bitmap data
-	GLubyte *data {static_cast<GLubyte *>(malloc(size))};
-	if (!data) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not allocate " << size << " memory for bitmap data\n";
-	}
-	nread = fread(data, size, 1, file); // Read bitmap data
-	if (nread <= 0) { // TODO throw an exception
-		std::cerr << "Framebuffer -> Could not read bitmap data: nread[" << nread << "]\n";
-	}
-	for (unsigned i {0}; i < size; i += 3) { // Adjust red and blue
-		GLubyte temp = data[i];
-		data[i] = data[i+2];
-		data[i+2] = temp;
-	}
-
-	return data;
 }
 
 
@@ -136,5 +76,5 @@ Framebuffer::~Framebuffer()
 	glDeleteTextures(1, &depthTexture_);
 	glDeleteTextures(1, &colorTexture_);
 	glDeleteFramebuffers(1, &fbo_);
-	std::cout << "Framebuffer -> destroyed\n"; // TODO remove debug log
+	std::cout << "Framebuffer: destroyed\n"; // TODO remove debug log
 }

@@ -1,11 +1,21 @@
 #ifndef SST_FRAMEBUFFER_H
 #define SST_FRAMEBUFFER_H
 
+#include <exception>
+
 #include "Graphics.h"
 
-class Framebuffer
-{
+
+class FramebufferException : public std::runtime_error {
+public:
+	FramebufferException(const std::string& tag, const std::string& message) : std::runtime_error(tag + ": " + message) {}
+};
+
+
+class Framebuffer {
   public:
+	static const std::string tag;
+
 	Framebuffer(const unsigned width, const unsigned height);
 	~Framebuffer();
 
@@ -31,8 +41,6 @@ class Framebuffer
 	}
 
   private:
-	GLubyte *loadHeader();
-
 	GLuint fbo_;
 	GLuint colorTexture_;
 	GLuint depthTexture_;
