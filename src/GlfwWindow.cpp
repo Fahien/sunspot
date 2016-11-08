@@ -17,6 +17,7 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 	, rotateY_{ false }
 	, window_{ nullptr }
 	, videoMode_{ nullptr }
+	, cursor_{}
 {
 	// Initialize GLFW and handle error
 	if (glfwInit() != GLFW_TRUE) { throw GlfwException{ tag, "Could not initialize GLFW" }; }
@@ -40,6 +41,15 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 	glfwSetWindowUserPointer(window_, this);
 	glfwMakeContextCurrent(window_);
 	glfwSwapInterval(1); // Vsync
+
+	// Hide the cursor and capture it, perfect for an FPS camera system
+	glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	// Listen to mouse-movement events
+	glfwSetCursorPosCallback(window_, [](GLFWwindow* window, double xpos, double ypos) {
+		GlfwWindow *win{ static_cast<GlfwWindow *>(glfwGetWindowUserPointer(window)) };
+		win->handleMouse(xpos, ypos);
+	});
 
 	glfwSetKeyCallback(window_, [](GLFWwindow* window, int key, int scancode, int action, int mode) {
 		GlfwWindow *win{ static_cast<GlfwWindow *>(glfwGetWindowUserPointer(window)) };
@@ -74,9 +84,26 @@ GlfwWindow::~GlfwWindow()
 }
 
 
+void GlfwWindow::handleMouse(const double x, const double y)
+{
+	cursor_.setPosition(x, y);
+	camera_->setYaw(camera_->getYaw() - cursor_.getOffset().x * cursor_.getSensitivity() * deltaTime_);
+	camera_->setPitch(camera_->getPitch() + cursor_.getOffset().y * cursor_.getSensitivity() * deltaTime_);
+	camera_->updateVectors();
+}
+
+
 void GlfwWindow::handleInput(const int key, const int action)
 {
 	switch (key) {
+	  case GLFW_KEY_W:
+		if (action == GLFW_PRESS) { camera_->setVelocityZ(-1.0f); }
+		else if (action == GLFW_RELEASE) { camera_->setVelocityZ(0.0f); }
+		break;
+	  case GLFW_KEY_S:
+		if (action == GLFW_PRESS) { camera_->setVelocityZ(1.0f); }
+		else if (action == GLFW_RELEASE) { camera_->setVelocityZ(0.0f); }
+		break;
 	  case GLFW_KEY_A:
 		if (action == GLFW_PRESS) { camera_->setVelocityX(-1.0f); }
 		else if(action == GLFW_RELEASE) { camera_->setVelocityX(0.0f); }
@@ -96,18 +123,18 @@ void GlfwWindow::handleInput(const int key, const int action)
 
 void GlfwWindow::toggleFullscreen()
 {
+	GLFWmonitor *monitor{ glfwGetPrimaryMonitor() };
+	videoMode_ = glfwGetVideoMode(monitor);
 	if (fullscreen_) { // Use start-up values for "windowed" mode
-		GLFWmonitor *monitor{ glfwGetPrimaryMonitor() };
-		videoMode_ = glfwGetVideoMode(monitor);
 		unsigned centerX{ videoMode_->width / 2 - width_ / 2 };
 		unsigned centerY{ videoMode_->height / 2 - height_ / 2 };
 		glfwSetWindowMonitor(window_, nullptr, centerX, centerY, width_, height_, videoMode_->refreshRate);
+		glfwSwapInterval(1); // Vsync
 		fullscreen_ = false;
 	}
 	else { // Set window size for "fullscreen windowed" mode to the desktop resolution
-		GLFWmonitor *monitor{ glfwGetPrimaryMonitor() };
-		videoMode_ = glfwGetVideoMode(monitor);
 		glfwSetWindowMonitor(window_, monitor, 0, 0, videoMode_->width, videoMode_->height, videoMode_->refreshRate);
+		glfwSwapInterval(1); // Vsync
 		fullscreen_ = true;
 	}
 }

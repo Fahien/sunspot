@@ -5,14 +5,39 @@
 
 namespace math {
 
+const float pi{ 3.14159265f };
+
+class Vec2 {
+  public:
+	Vec2();
+	Vec2(const float xx, const float yy);
+
+	void normalize();
+	Vec2 &operator=(const Vec2 &other);
+	Vec2 &operator+=(const Vec2 &other);
+	const Vec2 operator+(const Vec2 &other) const;
+
+	float x;
+	float y;
+};
+
+
 class Vec3 {
+  public:
 	Vec3();
 	Vec3(const float xx, const float yy, const float zz);
+
+	static Vec3 &cross(const Vec3 &a, const Vec3 &b);
+
+	void normalize();
+	Vec3 &operator=(const Vec3 &other);
+	Vec3 &operator+=(const Vec3 &other);
 
 	float x;
 	float y;
 	float z;
 };
+
 
 class Mat4 {
   public:

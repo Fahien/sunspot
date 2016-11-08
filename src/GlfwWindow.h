@@ -2,6 +2,7 @@
 #define SST_GLFWWINDOW_H
 
 #include "Window.h"
+#include "Cursor.h"
 
 
 class GlfwException : public GraphicException {
@@ -17,6 +18,7 @@ class GlfwWindow : public Window
 	GlfwWindow(const unsigned width, const unsigned height, const char *title);
 	~GlfwWindow();
 
+	void handleMouse(const double x, const double y);
 	void handleInput(const int key, const int action);
 	void toggleFullscreen();
 
@@ -35,6 +37,7 @@ class GlfwWindow : public Window
 	bool rotateY_;
 	GLFWwindow *window_;
 	const GLFWvidmode* videoMode_;
+	Cursor cursor_;
 };
 
 #endif

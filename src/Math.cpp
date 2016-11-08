@@ -4,11 +4,56 @@
 
 using namespace math;
 
+
+Vec2::Vec2()
+	: x{ 0.0f }
+	, y{ 0.0f }
+{}
+
+
+Vec2::Vec2(const float xx, const float yy)
+	: x{ xx }
+	, y{ yy }
+{}
+
+
+void Vec2::normalize()
+{
+	float length{ sqrt(x * x + y * y) };
+	x /= length;
+	y /= length;
+}
+
+
+Vec2 &Vec2::operator=(const Vec2 &other)
+{
+	x = other.x;
+	y = other.y;
+	return *this;
+}
+
+
+Vec2 &Vec2::operator+=(const Vec2 &other)
+{
+	x += other.x;
+	y += other.y;
+	return *this;
+}
+
+
+const Vec2 Vec2::operator+(const Vec2 &other) const
+{
+	Vec2 result = *this;
+	return result += other;
+}
+
+
 Vec3::Vec3()
 	: x{ 0.0f }
 	, y{ 0.0f }
 	, z{ 0.0f }
 {}
+
 
 Vec3::Vec3(const float xx, const float yy, const float zz)
 	: x {xx}
@@ -17,8 +62,45 @@ Vec3::Vec3(const float xx, const float yy, const float zz)
 {}
 
 
+Vec3 &Vec3::cross(const Vec3 &a, const Vec3 &b)
+{
+	Vec3 result{};
+	result.x = a.y * b.z - a.z * b.y;
+	result.y = a.z * b.x - a.x * b.z;
+	result.z = a.x * b.y - a.y * b.x;
+	return result;
+}
+
+
+void Vec3::normalize()
+{
+	float length{ sqrtf(x * x + y * y + z * z) };
+	x /= length;
+	y /= length;
+	z /= length;
+}
+
+
+Vec3 &Vec3::operator=(const Vec3 &other)
+{
+	x = other.x;
+	y = other.y;
+	z = other.z;
+	return *this;
+}
+
+
+Vec3 &Vec3::operator+=(const Vec3 &other)
+{
+	x += other.x;
+	y += other.y;
+	z += other.z;
+	return *this;
+}
+
+
 Mat4::Mat4()
-	: matrix{ 0 }
+	: matrix{ 0.0f }
 {}
 
 
