@@ -27,7 +27,7 @@ class Vec3 {
 	Vec3();
 	Vec3(const float xx, const float yy, const float zz);
 
-	static Vec3 &cross(const Vec3 &a, const Vec3 &b);
+	static Vec3 cross(const Vec3 &a, const Vec3 &b);
 
 	void normalize();
 	Vec3 &operator=(const Vec3 &other);

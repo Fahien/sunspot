@@ -24,6 +24,8 @@ set (SOURCES
 	src/Graphics.h
 	src/Math.h
 	src/Math.cpp
+	src/Cursor.h
+	src/Cursor.cpp
 	src/Window.h
 	src/Window.cpp
 	src/GlfwWindow.h

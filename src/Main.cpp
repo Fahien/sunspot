@@ -11,7 +11,7 @@
 
 
 static constexpr unsigned width{ 960 * 2 };
-static constexpr unsigned height{ 540 * 2 };
+static constexpr unsigned height{ 540 * 2};
 
 static const std::string tag{ "Main" };
 
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 		Quad quad{};
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
 		Camera camera{ 45.0f, static_cast<float>(width) / height, 0.125f, 8.0f };
-		Framebuffer framebuffer { width, height / 2 };
+		Framebuffer framebuffer{ width, height / 2 };
 
 		window->setBaseProgram(&baseProgram);
 		window->setDepthProgram(&depthProgram);

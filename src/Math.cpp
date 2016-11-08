@@ -62,7 +62,7 @@ Vec3::Vec3(const float xx, const float yy, const float zz)
 {}
 
 
-Vec3 &Vec3::cross(const Vec3 &a, const Vec3 &b)
+Vec3 Vec3::cross(const Vec3 &a, const Vec3 &b)
 {
 	Vec3 result{};
 	result.x = a.y * b.z - a.z * b.y;

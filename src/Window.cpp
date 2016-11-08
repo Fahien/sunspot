@@ -22,7 +22,7 @@ Window::Window(const unsigned width, const unsigned height, const char* title)
 	, quad_{ nullptr }
 	, camera_ { nullptr }
 	, framebuffer_{ nullptr }
-	, fullscreen_{ false }
+	, fullscreen_{ true }
 {}
 
 

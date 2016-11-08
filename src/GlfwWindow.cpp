@@ -32,8 +32,10 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_DECORATED, GL_FALSE);
+	glfwWindowHint(GLFW_FOCUSED, GL_TRUE);
 	// Create a full screen window object
-	window_ = glfwCreateWindow(width, height, title, nullptr, nullptr);
+	window_ = glfwCreateWindow(width, height, title, glfwGetPrimaryMonitor(), nullptr);
 	if (window_ == nullptr) { // Handle window creation error
 		glfwTerminate();
 		throw GlfwException{ tag, "Could not create GLFW window" };
@@ -86,7 +88,7 @@ GlfwWindow::~GlfwWindow()
 
 void GlfwWindow::handleMouse(const double x, const double y)
 {
-	cursor_.setPosition(x, y);
+	cursor_.setPosition(static_cast<float>(x), static_cast<float>(y));
 	camera_->setYaw(camera_->getYaw() - cursor_.getOffset().x * cursor_.getSensitivity() * deltaTime_);
 	camera_->setPitch(camera_->getPitch() + cursor_.getOffset().y * cursor_.getSensitivity() * deltaTime_);
 	camera_->updateVectors();
@@ -126,13 +128,15 @@ void GlfwWindow::toggleFullscreen()
 	GLFWmonitor *monitor{ glfwGetPrimaryMonitor() };
 	videoMode_ = glfwGetVideoMode(monitor);
 	if (fullscreen_) { // Use start-up values for "windowed" mode
-		unsigned centerX{ videoMode_->width / 2 - width_ / 2 };
-		unsigned centerY{ videoMode_->height / 2 - height_ / 2 };
-		glfwSetWindowMonitor(window_, nullptr, centerX, centerY, width_, height_, videoMode_->refreshRate);
+		glfwSetWindowMonitor(window_, nullptr, 0, 0, width_, height_, videoMode_->refreshRate);
 		glfwSwapInterval(1); // Vsync
 		fullscreen_ = false;
 	}
 	else { // Set window size for "fullscreen windowed" mode to the desktop resolution
+		glfwWindowHint(GLFW_RED_BITS, videoMode_->redBits);
+		glfwWindowHint(GLFW_GREEN_BITS, videoMode_->greenBits);
+		glfwWindowHint(GLFW_BLUE_BITS, videoMode_->blueBits);
+		glfwWindowHint(GLFW_REFRESH_RATE, videoMode_->refreshRate);
 		glfwSetWindowMonitor(window_, monitor, 0, 0, videoMode_->width, videoMode_->height, videoMode_->refreshRate);
 		glfwSwapInterval(1); // Vsync
 		fullscreen_ = true;
@@ -161,13 +165,13 @@ const float &GlfwWindow::computeDeltaTime()
 
 void GlfwWindow::render(const float &deltaTime) const
 {
-	render3D(deltaTime);
+	renderStereoscopic(deltaTime);
 }
 
 
 void GlfwWindow::render3D(const float &deltaTime) const
 {
-	float rotationVelocity = 0.25f;
+	float rotationVelocity{ 0.25f };
 	glEnable(GL_DEPTH_TEST);
 	baseProgram_->use();
 	glViewport(0, 0, width_, height_);
@@ -177,9 +181,11 @@ void GlfwWindow::render3D(const float &deltaTime) const
 
 	model_->bind();
 	camera_->update(deltaTime, baseProgram_);
-	model_->transform.rotateX(deltaTime * rotationVelocity);
-	model_->transform.rotateY(deltaTime * rotationVelocity);
-	model_->transform.rotateZ(deltaTime * rotationVelocity);
+	if (rotateY_) {
+		model_->transform.rotateX(deltaTime * rotationVelocity);
+		model_->transform.rotateY(deltaTime * rotationVelocity);
+		model_->transform.rotateZ(deltaTime * rotationVelocity);
+	}
 	model_->render(baseProgram_);
 	model_->unbind();
 }
@@ -198,7 +204,7 @@ void GlfwWindow::render3DplusDepth(const float& deltaTime) const
 	glViewport(0, 0, width_ / 2, height_);
 	baseProgram_->use();
 	camera_->update(deltaTime, baseProgram_);
-	model_->transform.rotateY(deltaTime);
+	if (rotateY_) model_->transform.rotateY(deltaTime);
 	model_->render(baseProgram_);
 
 	glViewport(width_ / 2, 0, width_ / 2, height_);

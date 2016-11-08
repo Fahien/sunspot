@@ -15,22 +15,21 @@ Camera::Camera(const float fov, const float aspectRatio, const float near, const
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, -3.0f, 1.0f
-		}
+		0.0f, 0.0f, -3.0f, 1.0f }
 	, view_{
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 3.0f, 1.0f }
 	, projection_{}
-	, pitch_ {0.0f}
-	, yaw_ {-math::pi / 2.0f}
-	, position_{0.0f, 0.0f, -3.0f}
-	, direction_{0.0f, 0.0f, 1.0f}
-	, up_{0.0f, 1.0f, 0.0f}
-	, right_{1.0f, 0.0f, 0.0f}
-	, worldUp_{0.0f, 1.0f, 0.0f}
-	, velocity_{ }
+	, pitch_{ 0.0f }
+	, yaw_{ -math::pi / 2.0f }
+	, position_{ 0.0f, 0.0f, -1.0f }
+	, direction_{ 0.0f, 0.0f, 1.0f }
+	, up_{ 0.0f, 1.0f, 0.0f }
+	, right_{ 1.0f, 0.0f, 0.0f }
+	, worldUp_{ 0.0f, 1.0f, 0.0f }
+	, velocity_{}
 {
 	float cotfov{ 1.0f / tan(fov * math::pi / 180.0f / 2.0f) };
 	projection_[0] = cotfov / aspectRatio;
@@ -47,7 +46,7 @@ void Camera::updateVectors()
 	float cospitch{ cos(pitch_) };
 	float sinpitch{ sin(pitch_) };
 	float cosyaw{ cos(yaw_) };
-	float sinyaw{sin(yaw_)};
+	float sinyaw{ sin(yaw_) };
 	direction_.x = cospitch * cosyaw;
 	direction_.y = sinpitch;
 	direction_.z = cospitch * sinyaw;

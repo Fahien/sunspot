@@ -53,7 +53,7 @@ Texture::Texture(const char *path)
 	if (bpp != 24) {
 		fclose(file);
 		std::string message{ "Bpp is not 24: " };
-		message += bpp;
+		message += static_cast<char>(bpp);
 		throw TextureException{ tag, message };
 	}
 
@@ -75,7 +75,7 @@ Texture::Texture(const char *path)
 	if (nread <= 0) {
 		fclose(file);
 		std::string message{ "Could not read bitmap data: nread[" };
-		message += nread;
+		message += static_cast<char>(nread);
 		message += "]";
 		throw TextureException{ tag, message };
 	}
