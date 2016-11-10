@@ -31,6 +31,7 @@ public:
 	inline void setBaseProgram(const ShaderProgram *baseProgram) { baseProgram_ = baseProgram; }
 	inline void setDepthProgram(const ShaderProgram *depthProgram) { depthProgram_ = depthProgram; }
 	inline void setModel(Model *model) { model_ = model; }
+	inline void setRoom(Model *room) { room_ = room; }
 
 	inline void setQuadProgram(const ShaderProgram *quadProgram) { quadProgram_ = quadProgram; }
 	inline void setQuad(Quad *quad) { quad_ = quad; }
@@ -60,6 +61,7 @@ protected:
 	const ShaderProgram *baseProgram_;
 	const ShaderProgram *depthProgram_;
 	Model *model_;
+	Model *room_;
 
 	const ShaderProgram *quadProgram_;
 	const Quad *quad_;

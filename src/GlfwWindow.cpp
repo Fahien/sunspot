@@ -42,7 +42,7 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 	}
 	glfwSetWindowUserPointer(window_, this);
 	glfwMakeContextCurrent(window_);
-	glfwSwapInterval(1); // Vsync
+	toggleFullscreen();
 
 	// Hide the cursor and capture it, perfect for an FPS camera system
 	glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -165,7 +165,7 @@ const float &GlfwWindow::computeDeltaTime()
 
 void GlfwWindow::render(const float &deltaTime) const
 {
-	renderStereoscopic(deltaTime);
+	render3D(deltaTime);
 }
 
 
@@ -179,8 +179,11 @@ void GlfwWindow::render3D(const float &deltaTime) const
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color buffer
 
-	model_->bind();
 	camera_->update(deltaTime, baseProgram_);
+	room_->bind();
+	room_->render(baseProgram_);
+	room_->unbind();
+	model_->bind();
 	if (rotateY_) {
 		model_->transform.rotateX(deltaTime * rotationVelocity);
 		model_->transform.rotateY(deltaTime * rotationVelocity);

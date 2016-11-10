@@ -29,7 +29,8 @@ int main(int argc, char **argv)
 
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
 		ShaderProgram depthProgram{ "shader/base.vert", "shader/depth.frag" };
-		Model model{};
+		Model model{ "shader/crate.bmp", .25f };
+		Model room{ "shader/wall.bmp", 2.0f };
 		Quad quad{};
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
 		Camera camera{ 45.0f, static_cast<float>(width) / height, 0.125f, 8.0f };
@@ -38,6 +39,7 @@ int main(int argc, char **argv)
 		window->setBaseProgram(&baseProgram);
 		window->setDepthProgram(&depthProgram);
 		window->setModel(&model);
+		window->setRoom(&room);
 		window->setQuadProgram(&quadProgram);
 		window->setQuad(&quad);
 		window->setCamera(&camera);

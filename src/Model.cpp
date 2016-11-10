@@ -6,7 +6,7 @@
 #include "Texture.h"
 
 
-Model::Model()
+Model::Model(const char *path, const float scale)
 	: transform{
 		1, 0, 0, 0,
 		0, 1, 0, 0,
@@ -19,14 +19,14 @@ Model::Model()
 {
 	GLfloat vertices[] = {
 		// Positions         // TexCoords
-		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // Bottom left
-		 0.5f, -0.5f, -0.5f, 1.0f, 0.0f, // Bottom right
-		 0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // Top right
-		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f, // Top left
-		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, // Bottom left rear
-		 0.5f, -0.5f, 0.5f, 0.0f, 0.0f, // Bottom right rear
-		 0.5f,  0.5f, 0.5f, 0.0f, 1.0f, // Top right rear
-		-0.5f,  0.5f, 0.5f, 1.0f, 1.0f // Top left rear
+		-1.0f * scale, -1.0f * scale, -1.0f * scale, 0.0f, 0.0f, // Bottom left
+		1.0f * scale, -1.0f * scale, -1.0f * scale, 1.0f, 0.0f, // Bottom right
+		1.0f * scale,  1.0f * scale, -1.0f * scale, 1.0f, 1.0f, // Top right
+		-1.0f * scale,  1.0f * scale, -1.0f * scale, 0.0f, 1.0f, // Top left
+		-1.0f * scale, -1.0f * scale, 1.0f * scale, 1.0f, 0.0f, // Bottom left rear
+		1.0f * scale, -1.0f * scale, 1.0f * scale, 0.0f, 0.0f, // Bottom right rear
+		1.0f * scale,  1.0f * scale, 1.0f * scale, 0.0f, 1.0f, // Top right rear
+		-1.0f * scale,  1.0f * scale, 1.0f * scale, 1.0f, 1.0f // Top left rear
 	};
 	GLuint indices[] = {
 		0, 1, 2,
@@ -57,7 +57,7 @@ Model::Model()
 	glEnableVertexAttribArray(1);
 	glBindVertexArray(0); // Unbind vao
 
-	Texture texture{ "shader/crate.bmp" };
+	Texture texture{ path };
 	glGenTextures(1, &texture_); // Create a texture for colors
 	glBindTexture(GL_TEXTURE_2D, texture_);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.getData()); // TODO remove magic numbers
