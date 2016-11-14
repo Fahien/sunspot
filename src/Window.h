@@ -1,9 +1,10 @@
 #ifndef SST_WINDOW_H
 #define SST_WINDOW_H
 
-#include<string>
+#include <string>
 
 class ShaderProgram;
+class Light;
 class Model;
 class Quad;
 class Camera;
@@ -30,6 +31,7 @@ public:
 
 	inline void setBaseProgram(const ShaderProgram *baseProgram) { baseProgram_ = baseProgram; }
 	inline void setDepthProgram(const ShaderProgram *depthProgram) { depthProgram_ = depthProgram; }
+	inline void setLight(Light *light) { light_ = light; }
 	inline void setModel(Model *model) { model_ = model; }
 	inline void setRoom(Model *room) { room_ = room; }
 
@@ -60,6 +62,7 @@ protected:
 
 	const ShaderProgram *baseProgram_;
 	const ShaderProgram *depthProgram_;
+	Light *light_;
 	Model *model_;
 	Model *room_;
 

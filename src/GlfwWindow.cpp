@@ -3,6 +3,7 @@
 #include "Graphics.h"
 #include "GlfwWindow.h"
 #include "ShaderProgram.h"
+#include "Light.h"
 #include "Model.h"
 #include "Quad.h"
 #include "Framebuffer.h"
@@ -42,7 +43,7 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 	}
 	glfwSetWindowUserPointer(window_, this);
 	glfwMakeContextCurrent(window_);
-	toggleFullscreen();
+	glfwSwapInterval(1); // Vsync
 
 	// Hide the cursor and capture it, perfect for an FPS camera system
 	glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -53,12 +54,14 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 		win->handleMouse(xpos, ypos);
 	});
 
+	// Listen to keyboard events
 	glfwSetKeyCallback(window_, [](GLFWwindow* window, int key, int scancode, int action, int mode) {
 		GlfwWindow *win{ static_cast<GlfwWindow *>(glfwGetWindowUserPointer(window)) };
 		win->handleInput(key, action);
 	});
 
-	const GLFWvidmode *videoMode_{ glfwGetVideoMode(glfwGetPrimaryMonitor()) }; // Get the monitor resolution.
+	// Get the monitor resolution
+	const GLFWvidmode *videoMode_{ glfwGetVideoMode(glfwGetPrimaryMonitor()) };
 	if (videoMode_ == nullptr) { // Handle error
 		glfwDestroyWindow(window_);
 		glfwTerminate();
@@ -67,8 +70,8 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 	monitorWidth_ = videoMode_->width;
 	monitorHeight_ = videoMode_->height;
 
-	try { Window::initGlew(); }
-	catch (GlewException &) {
+	try { Window::initGlew(); } // Initialize glew
+	catch (GlewException &) { // Handle error
 		glfwDestroyWindow(window_);
 		glfwTerminate();
 		throw;
@@ -86,7 +89,7 @@ GlfwWindow::~GlfwWindow()
 }
 
 
-void GlfwWindow::handleMouse(const double x, const double y)
+void GlfwWindow::handleMouse(const double x, const double y) // TODO comment
 {
 	cursor_.setPosition(static_cast<float>(x), static_cast<float>(y));
 	camera_->setYaw(camera_->getYaw() - cursor_.getOffset().x * cursor_.getSensitivity() * deltaTime_);
@@ -95,7 +98,7 @@ void GlfwWindow::handleMouse(const double x, const double y)
 }
 
 
-void GlfwWindow::handleInput(const int key, const int action)
+void GlfwWindow::handleInput(const int key, const int action) // TODO comment
 {
 	switch (key) {
 	  case GLFW_KEY_W:
@@ -125,14 +128,14 @@ void GlfwWindow::handleInput(const int key, const int action)
 
 void GlfwWindow::toggleFullscreen()
 {
-	GLFWmonitor *monitor{ glfwGetPrimaryMonitor() };
-	videoMode_ = glfwGetVideoMode(monitor);
 	if (fullscreen_) { // Use start-up values for "windowed" mode
-		glfwSetWindowMonitor(window_, nullptr, 0, 0, width_, height_, videoMode_->refreshRate);
+		glfwSetWindowMonitor(window_, nullptr, 0, 0, width_, height_, 0);
 		glfwSwapInterval(1); // Vsync
 		fullscreen_ = false;
 	}
 	else { // Set window size for "fullscreen windowed" mode to the desktop resolution
+		GLFWmonitor *monitor{ glfwGetPrimaryMonitor() };
+		videoMode_ = glfwGetVideoMode(monitor);
 		glfwWindowHint(GLFW_RED_BITS, videoMode_->redBits);
 		glfwWindowHint(GLFW_GREEN_BITS, videoMode_->greenBits);
 		glfwWindowHint(GLFW_BLUE_BITS, videoMode_->blueBits);
@@ -144,7 +147,7 @@ void GlfwWindow::toggleFullscreen()
 }
 
 
-void GlfwWindow::loop()
+void GlfwWindow::loop() // TODO comment
 {
 	while (!glfwWindowShouldClose(window_)) {
 		glfwPollEvents();
@@ -154,7 +157,7 @@ void GlfwWindow::loop()
 }
 
 
-const float &GlfwWindow::computeDeltaTime()
+const float &GlfwWindow::computeDeltaTime() // TODO comment
 {
 	currentTime_ = static_cast<float>(glfwGetTime());
 	deltaTime_ = currentTime_ - lastTime_;
@@ -163,13 +166,13 @@ const float &GlfwWindow::computeDeltaTime()
 }
 
 
-void GlfwWindow::render(const float &deltaTime) const
+void GlfwWindow::render(const float &deltaTime) const // TODO comment
 {
 	render3D(deltaTime);
 }
 
 
-void GlfwWindow::render3D(const float &deltaTime) const
+void GlfwWindow::render3D(const float &deltaTime) const // TODO comment
 {
 	float rotationVelocity{ 0.25f };
 	glEnable(GL_DEPTH_TEST);
@@ -180,6 +183,7 @@ void GlfwWindow::render3D(const float &deltaTime) const
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color buffer
 
 	camera_->update(deltaTime, baseProgram_);
+	light_->update(baseProgram_);
 	room_->bind();
 	room_->render(baseProgram_);
 	room_->unbind();
@@ -194,7 +198,7 @@ void GlfwWindow::render3D(const float &deltaTime) const
 }
 
 
-void GlfwWindow::render3DplusDepth(const float& deltaTime) const
+void GlfwWindow::render3DplusDepth(const float& deltaTime) const // TODO comment
 {
 	glViewport(0, 0, width_, height_);
 

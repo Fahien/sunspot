@@ -6,6 +6,14 @@
 
 class ShaderProgram;
 
+struct Material {
+	math::Vec3 ambient;
+	math::Vec3 diffuse;
+	math::Vec3 specular;
+	float shininess;
+};
+
+
 class Model {
   public:
 	Model(const char *path, const float scale);
@@ -21,6 +29,7 @@ class Model {
 	GLuint vbo_;
 	GLuint ebo_;
 	GLuint vao_;
+	Material material_;
 	GLuint texture_;
 };
 

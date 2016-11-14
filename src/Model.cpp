@@ -15,6 +15,7 @@ Model::Model(const char *path, const float scale)
 	, vbo_ {0}
 	, ebo_ {0}
 	, vao_ {0}
+	, material_{}
 	, texture_ {0}
 {
 	GLfloat vertices[] = {
@@ -75,7 +76,7 @@ Model::~Model()
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);
 
-	std::cout << "Model: destroyed\n"; // TODO remove debuf log
+	std::cout << "Model: destroyed\n"; // TODO remove debug log
 }
 
 

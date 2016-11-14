@@ -2,7 +2,7 @@
 
 #include "Math.h"
 
-using namespace math;
+using namespace math; // TODO comment
 
 
 Vec2::Vec2()

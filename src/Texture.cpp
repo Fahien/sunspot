@@ -57,7 +57,7 @@ Texture::Texture(const char *path)
 		throw TextureException{ tag, message };
 	}
 
-	std::cout << tag.c_str() << ": header[" << hlen << "], size[" << width << "x" << height
+	std::cout << tag.c_str() << ": " << path << ", header[" << hlen << "], size[" << width << "x" << height
 		<< "], planes[" << planes << "], bpp[" << bpp << "]\n";
 
 	fseek(file, 24, SEEK_CUR);

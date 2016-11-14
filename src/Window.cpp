@@ -18,6 +18,7 @@ Window::Window(const unsigned width, const unsigned height, const char* title)
 	, deltaTime_{ 0.0f }
 	, baseProgram_{ nullptr }
 	, depthProgram_{ nullptr }
+	, light_{ nullptr }
 	, model_{ nullptr }
 	, room_{ nullptr }
 	, quad_{ nullptr }

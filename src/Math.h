@@ -5,7 +5,9 @@
 
 namespace math {
 
+
 const float pi{ 3.14159265f };
+
 
 class Vec2 {
   public:
