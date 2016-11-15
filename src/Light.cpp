@@ -18,4 +18,7 @@ void Light::update(const ShaderProgram *program) const
 
 	location = program->getLocation("light.diffuse");
 	glUniform3f(location, color_.r, color_.g, color_.b);
+
+	location = program->getLocation("light.specular");
+	glUniform3f(location, color_.r, color_.g, color_.b);
 }

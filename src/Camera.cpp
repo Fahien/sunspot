@@ -94,8 +94,11 @@ void Camera::update(const float deltaTime, const ShaderProgram *program)
 		position_.z += direction_.z * velocity_.z * deltaTime;
 	}
 	updateView();
-	GLuint transformLoc{ program->getLocation("view") };
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, view_.matrix);
-	transformLoc = program->getLocation("projection");
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, projection_.matrix);
+
+	GLuint location{ program->getLocation("view") };
+	glUniformMatrix4fv(location, 1, GL_FALSE, view_.matrix);
+	location = program->getLocation("projection");
+	glUniformMatrix4fv(location, 1, GL_FALSE, projection_.matrix);
+	location = program->getLocation("camera.position");
+	glUniform3fv(location, 1, &position_.x);
 };
