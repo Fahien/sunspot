@@ -19,29 +19,50 @@ Model::Model(const char *path, const float scale)
 	, texture_ {0}
 {
 	GLfloat vertices[] = {
-		// Positions         // TexCoords
-		-1.0f * scale, -1.0f * scale, -1.0f * scale, 0.0f, 0.0f, // Bottom left
-		1.0f * scale, -1.0f * scale, -1.0f * scale, 1.0f, 0.0f, // Bottom right
-		1.0f * scale,  1.0f * scale, -1.0f * scale, 1.0f, 1.0f, // Top right
-		-1.0f * scale,  1.0f * scale, -1.0f * scale, 0.0f, 1.0f, // Top left
-		-1.0f * scale, -1.0f * scale, 1.0f * scale, 1.0f, 0.0f, // Bottom left rear
-		1.0f * scale, -1.0f * scale, 1.0f * scale, 0.0f, 0.0f, // Bottom right rear
-		1.0f * scale,  1.0f * scale, 1.0f * scale, 0.0f, 1.0f, // Top right rear
-		-1.0f * scale,  1.0f * scale, 1.0f * scale, 1.0f, 1.0f // Top left rear
+		// Positions                                 //Normal           // TexCoords
+		-1.0f * scale, -1.0f * scale, -1.0f * scale, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // Bottom left Front
+		1.0f * scale, -1.0f * scale, -1.0f * scale,  0.0f, 0.0f, -1.0f, 1.0f, 0.0f, // Bottom right
+		1.0f * scale,  1.0f * scale, -1.0f * scale,  0.0f, 0.0f, -1.0f, 1.0f, 1.0f, // Top right
+		-1.0f * scale,  1.0f * scale, -1.0f * scale, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, // Top left
+
+		1.0f * scale, -1.0f * scale, -1.0f * scale,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, // Bottom left Right
+		1.0f * scale, -1.0f * scale, 1.0f * scale,   1.0f, 0.0f, 0.0f,  1.0f, 0.0f, // Bottom right
+		1.0f * scale, 1.0f * scale, 1.0f * scale,    1.0f, 0.0f, 0.0f,  1.0f, 1.0f, // Top right
+		1.0f * scale, 1.0f * scale, -1.0f * scale,   1.0f, 0.0f, 0.0f,  0.0f, 1.0f, // Top left
+
+		-1.0f * scale, -1.0f * scale, 1.0f * scale,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f, // Bottom left Rear
+		1.0f * scale, -1.0f * scale, 1.0f * scale,   0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // Bottom right
+		1.0f * scale,  1.0f * scale, 1.0f * scale,   0.0f, 0.0f, 1.0f,  0.0f, 1.0f, // Top right rear
+		-1.0f * scale,  1.0f * scale, 1.0f * scale,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f, // Top left rear
+
+		-1.0f * scale, -1.0f * scale, -1.0f * scale, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Bottom left Left
+		-1.0f * scale, -1.0f * scale, 1.0f * scale,  -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // Bottom right
+		-1.0f * scale, 1.0f * scale, 1.0f * scale,   -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top right
+		-1.0f * scale, 1.0f * scale, -1.0f * scale,  -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // Top left
+
+		-1.0f * scale, 1.0f * scale, -1.0f * scale,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, // Bottom left Top
+		1.0f * scale, 1.0f * scale, -1.0f * scale,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // Bottom right
+		1.0f * scale, 1.0f * scale, 1.0f * scale,    0.0f, 1.0f, 0.0f,  1.0f, 1.0f, // Top right
+		-1.0f * scale, 1.0f * scale, 1.0f * scale,   0.0f, 1.0f, 0.0f,  0.0f, 1.0f, // Top left
+
+		-1.0f * scale, -1.0f * scale, -1.0f * scale, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, // Bottom left Bottom
+		1.0f * scale, -1.0f * scale, -1.0f * scale,  0.0f, -1.0f, 0.0f, 1.0f, 0.0f, // Bottom right
+		1.0f * scale, -1.0f * scale, 1.0f * scale,   0.0f, -1.0f, 0.0f, 1.0f, 1.0f, // Top right
+		-1.0f * scale, -1.0f * scale, 1.0f * scale,  0.0f, -1.0f, 0.0f, 0.0f, 1.0f, // Top left
 	};
 	GLuint indices[] = {
 		0, 1, 2,
 		0, 2, 3,
-		1, 5, 6,
-		1, 6, 2,
-		5, 4, 7,
-		5, 7, 6,
-		4, 0, 3,
-		4, 3, 7,
-		1, 0, 4,
-		1, 4, 5,
-		3, 2, 6,
-		3, 6, 7
+		4, 5, 6,
+		4, 6, 7,
+		8, 9, 10,
+		8, 10, 11,
+		12, 13, 14,
+		12, 14, 15,
+		16, 17, 18,
+		16, 18, 19,
+		20, 21, 22,
+		20, 22, 23
 	};
 	glGenBuffers(1, &vbo_); // Generate the vertex buffer object
 	glGenBuffers(1, &ebo_); // Generate the element buffer object
@@ -52,10 +73,12 @@ Model::Model(const char *path, const float scale)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_); // Copy the indices in the buffer
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof indices, indices, GL_STATIC_DRAW);
 	// Specify the vertex shader input in the form of vertex attributes
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
 	glBindVertexArray(0); // Unbind vao
 
 	Texture texture{ path };

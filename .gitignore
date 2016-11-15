@@ -1,2 +1,4 @@
 bin
+include
+lib
 .ycm_extra_conf.pyc

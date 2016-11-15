@@ -19,6 +19,8 @@ struct Light {
 
 uniform Light light; 
 
+in vec3 position; 
+in vec3 normal;
 in vec2 texCoords;
 
 out vec4 color;
@@ -29,6 +31,12 @@ uniform sampler2D theTexture;
 
 void main()
 {
-	vec4 light = vec4(ambientStrength * light.ambient, 1.0f);
+	vec3 ambient = ambientStrength * light.ambient;
+
+	vec3 lightDirection = normalize(light.position - position);
+	float diffuseStrength = max(dot(normal, lightDirection), 0.0f);
+	vec3 diffuse = diffuseStrength * light.diffuse;
+ 
+	vec4 light = vec4(ambient + diffuse, 1.0f);
 	color = light * texture(theTexture, texCoords);
 }

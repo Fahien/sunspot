@@ -31,6 +31,7 @@ int main(int argc, char **argv)
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
 		ShaderProgram depthProgram{ "shader/base.vert", "shader/depth.frag" };
 		Light light{ 1.0f, 1.0f, 1.0f };
+		light.setPosition(2.0f, 1.0f, -1.0f);
 		Model model{ "shader/crate.bmp", .25f };
 		Model room{ "shader/wall.bmp", 2.0f };
 		Quad quad{};
