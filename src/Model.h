@@ -23,7 +23,6 @@ class Model {
 	GLuint ebo_;
 	GLuint vao_;
 	Material material_;
-	GLuint texture_;
 };
 
 #endif // SST_MODEL_H

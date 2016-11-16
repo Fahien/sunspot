@@ -16,7 +16,6 @@ Model::Model(const char *path, const float scale)
 	, ebo_ {0}
 	, vao_ {0}
 	, material_{}
-	, texture_ {0}
 {
 	GLfloat vertices[] = {
 		// Positions                                 //Normal           // TexCoords
@@ -82,8 +81,8 @@ Model::Model(const char *path, const float scale)
 	glBindVertexArray(0); // Unbind vao
 
 	Texture texture{ path };
-	glGenTextures(1, &texture_); // Create a texture for colors
-	glBindTexture(GL_TEXTURE_2D, texture_);
+	glGenTextures(1, &material_.texture); // Create a texture for colors
+	glBindTexture(GL_TEXTURE_2D, material_.texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.getData()); // TODO remove magic numbers
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -94,7 +93,7 @@ Model::Model(const char *path, const float scale)
 
 Model::~Model()
 {
-	glDeleteTextures(1, &texture_);
+	glDeleteTextures(1, &material_.texture);
 	glDeleteVertexArrays(1, &vao_);
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);
@@ -105,19 +104,13 @@ Model::~Model()
 
 void Model::render(const ShaderProgram *program) const
 {
-	GLuint location{ program->getLocation("model") };
-	glUniformMatrix4fv(location, 1, GL_FALSE, transform.matrix);
+	glUniformMatrix4fv(program->getLocation("model"), 1, GL_FALSE, transform.matrix);
 
-	location = program->getLocation("material.ambient");
-	glUniform3fv(location, 1, &material_.ambient.r);
-	location = program->getLocation("material.diffuse");
-	glUniform3fv(location, 1, &material_.diffuse.r);
-	location = program->getLocation("material.specular");
-	glUniform3fv(location, 1, &material_.specular.r);
-	location = program->getLocation("material.shininess");
-	glUniform1f(location, material_.shininess);
-
+	glUniform1i(program->getLocation("material.texture"), 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture_);
+	glBindTexture(GL_TEXTURE_2D, material_.texture);
+	glUniform3fv(program->getLocation("material.specular"), 1, &material_.specular.r);
+	glUniform1f(program->getLocation("material.shininess"), material_.shininess);
+
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
