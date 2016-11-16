@@ -3,16 +3,9 @@
 
 #include "Graphics.h"
 #include "Math.h"
+#include "Material.h"
 
 class ShaderProgram;
-
-struct Material {
-	math::Vec3 ambient;
-	math::Vec3 diffuse;
-	math::Vec3 specular;
-	float shininess;
-};
-
 
 class Model {
   public:

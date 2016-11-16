@@ -2,6 +2,7 @@
 #define SST_COLOR_H
 
 struct Color {
+	Color();
 	Color(const float r, const float g, const float b);
 
 	float r; // Red

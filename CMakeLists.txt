@@ -49,6 +49,7 @@ set (SOURCES
 	src/Model.cpp
 	src/Color.h
 	src/Color.cpp
+	src/Material.h
 	src/Light.h
 	src/Light.cpp
 	src/Quad.h

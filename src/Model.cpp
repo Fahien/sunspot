@@ -105,8 +105,18 @@ Model::~Model()
 
 void Model::render(const ShaderProgram *program) const
 {
-	GLuint transformLoc{ program->getLocation("model") };
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transform.matrix);
+	GLuint location{ program->getLocation("model") };
+	glUniformMatrix4fv(location, 1, GL_FALSE, transform.matrix);
+
+	location = program->getLocation("material.ambient");
+	glUniform3fv(location, 1, &material_.ambient.r);
+	location = program->getLocation("material.diffuse");
+	glUniform3fv(location, 1, &material_.diffuse.r);
+	location = program->getLocation("material.specular");
+	glUniform3fv(location, 1, &material_.specular.r);
+	location = program->getLocation("material.shininess");
+	glUniform1f(location, material_.shininess);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture_);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
