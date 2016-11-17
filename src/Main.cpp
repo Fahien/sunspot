@@ -30,10 +30,10 @@ int main(int argc, char **argv)
 
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
 		ShaderProgram depthProgram{ "shader/base.vert", "shader/depth.frag" };
-		Light light{ 1.0f, 1.0f, 1.0f };
+		Light light{ 0.5f, 0.5f, 0.5f };
 		light.setPosition(2.0f, 1.0f, -1.0f);
-		Model model{ "shader/crate.bmp", .25f };
-		Model room{ "shader/wall.bmp", 2.0f };
+		Model model{ "shader/crate", .25f };
+		Model room{ "shader/wall", 2.0f };
 		Quad quad{};
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
 		Camera camera{ 45.0f, static_cast<float>(width) / height, 0.125f, 8.0f };

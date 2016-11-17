@@ -4,8 +4,8 @@ const float zero = 0.0f;
 const float one = 1.0f;
 
 struct Material {
-	sampler2D texture;
-	vec3 specular;
+	sampler2D diffuse;
+	sampler2D specular;
 	float shininess;
 };
 
@@ -32,7 +32,7 @@ out vec4 color;
 
 void main()
 {
-	vec3 fragment = vec3(texture(material.texture, texCoords));
+	vec3 fragment = vec3(texture(material.diffuse, texCoords));
 	vec3 ambient = light.ambient * fragment;
 
 	vec3 lightDirection = normalize(light.position - position);
@@ -42,7 +42,7 @@ void main()
 	vec3 cameraDirection = normalize(camera.position - position);
 	vec3 reflectDirection = reflect(-lightDirection, normal); 
 	float specularFactor = pow(max(dot(cameraDirection, reflectDirection), zero), material.shininess);
-	vec3 specular = specularFactor * light.specular * material.specular;
+	vec3 specular = specularFactor * light.specular * vec3(texture(material.specular, texCoords));
 
 	color = vec4(ambient + diffuse + specular, one);
 }

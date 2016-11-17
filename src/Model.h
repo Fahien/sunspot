@@ -9,7 +9,7 @@ class ShaderProgram;
 
 class Model {
   public:
-	Model(const char *path, const float scale);
+	Model(const std::string &path, const float scale);
 	~Model();
 
 	inline void bind() const { glBindVertexArray(vao_); }

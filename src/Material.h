@@ -5,8 +5,8 @@
 #include "Color.h"
 
 struct Material {
-	GLuint texture;
-	Color specular;
+	GLuint diffuse;
+	GLuint specular;
 	float shininess = 32.0f;
 };
 

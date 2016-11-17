@@ -7,11 +7,11 @@
 const std::string Texture::tag{ "Texture" };
 
 
-Texture::Texture(const char *path)
+Texture::Texture(const std::string &path)
 	: data_{nullptr}
 {
 	FILE *file;
-	fopen_s(&file, path, "rb");
+	fopen_s(&file, (path + ".bmp").c_str(), "rb");
 	if (file == nullptr) { throw TextureException{ tag, "Could not open header bitmap" }; }
 
 	fseek(file, 14, SEEK_CUR);
@@ -57,7 +57,7 @@ Texture::Texture(const char *path)
 		throw TextureException{ tag, message };
 	}
 
-	std::cout << tag.c_str() << ": " << path << ", header[" << hlen << "], size[" << width << "x" << height
+	std::cout << tag.c_str() << ": " << path.c_str() << ", header[" << hlen << "], size[" << width << "x" << height
 		<< "], planes[" << planes << "], bpp[" << bpp << "]\n";
 
 	fseek(file, 24, SEEK_CUR);

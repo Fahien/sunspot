@@ -36,7 +36,7 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 	glfwWindowHint(GLFW_DECORATED, GL_FALSE);
 	glfwWindowHint(GLFW_FOCUSED, GL_TRUE);
 	// Create a full screen window object
-	window_ = glfwCreateWindow(width, height, title, glfwGetPrimaryMonitor(), nullptr);
+	window_ = glfwCreateWindow(width, height, title, nullptr, nullptr);
 	if (window_ == nullptr) { // Handle window creation error
 		glfwTerminate();
 		throw GlfwException{ tag, "Could not create GLFW window" };

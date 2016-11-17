@@ -39,7 +39,7 @@ Framebuffer::Framebuffer(const unsigned width, const unsigned height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	Texture header{ "shader/header.bmp" };
+	Texture header{ "shader/header" };
 	glGenTextures(1, &headerTexture_); // Create a texture for header
 	glBindTexture(GL_TEXTURE_2D, headerTexture_);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, header.getData());

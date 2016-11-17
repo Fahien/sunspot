@@ -15,7 +15,7 @@ class Texture {
   public:
 	static const std::string tag;
 
-	Texture(const char *path);
+	Texture(const std::string &path);
 	~Texture();
 
 	inline GLubyte *getData() { return data_; }
