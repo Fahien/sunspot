@@ -17,13 +17,33 @@ configure_file (
 	"${PROJECT_SOURCE_DIR}/include/Config.h")
 
 find_package (OpenGL REQUIRED)
+
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${PROJECT_SOURCE_DIR}" )
 find_package (GLEW REQUIRED)
 find_package (GLFW REQUIRED)
 find_package (SDL2 REQUIRED)
 
+if (${OPENGL_FOUND})
+	message("Found OpenGL ${OPENGL_INCLUDE_DIR} ${OPENGL_LIBRARIES}")
+endif()
+
+if (${GLEW_FOUND})
+	message("Found GLEW ${GLEW_INCLUDE_DIR} ${GLEW_LIBRARIES}")
+endif()
+
+if (${GLFW_FOUND})
+	message("Found GLFW ${GLFW_INCLUDE_DIR} ${GLFW_LIBRARIES}")
+endif()
+
+if (${SDL2_FOUND})
+	message ("Found SDL2 ${SDL2_INCLUDE_DIR} ${SDL2_LIBRARY}")
+endif()
+
 # Add the given directories to those the compiler uses to search for include files
+if (${OPENGL_INCLUDE_DIR})
+	include_directories ("${OPENGL_INCLUDE_DIR}")
+endif()
 include_directories (
-	"${OPENGL_INCLUDE_DIR}"
 	"${GLEW_INCLUDE_DIR}"
 	"${GLFW_INCLUDE_DIR}"
 	"${SDL2_INCLUDE_DIR}"
@@ -31,7 +51,6 @@ include_directories (
 	"${PROJECT_SOURCE_DIR}/shader")
 
 # Specify the paths in which the linker should search for libraries
-link_directories ("${PROJECT_SOURCE_DIR}/lib")
 
 set (SHADERS
 	shader/base.vert
@@ -76,22 +95,6 @@ source_group ("Sources" FILES ${SOURCES})
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
 add_executable (stereoscopic-test ${SOURCES} ${SHADERS})
-
-if (${OPENGL_FOUND})
-	message("Found OpenGL ${OPENGL_INCLUDE_DIR} ${OPENGL_LIBRARIES}")
-endif()
-
-if (${GLEW_FOUND})
-	message("Found GLEW ${GLEW_INCLUDE_DIR} ${GLEW_LIBRARIES}")
-endif()
-
-if (${GLFW_FOUND})
-	message("Found GLFW ${GLFW_INCLUDE_DIR} ${GLFW_LIBRARIES}")
-endif()
-
-if (${SDL2_FOUND})
-	message ("Found SDL2 ${SDL2_INCLUDE_DIR} ${SDL2_LIBRARY}")
-endif()
 
 target_link_libraries (stereoscopic-test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES}
 		${SDL2_LIBRARY})
