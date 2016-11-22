@@ -19,3 +19,4 @@ void main()
 	normal = normalize(in_Normal);
 	texCoords = in_TexCoords;
 }
+

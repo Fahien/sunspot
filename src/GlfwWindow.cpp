@@ -43,7 +43,6 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 	}
 	glfwSetWindowUserPointer(window_, this);
 	glfwMakeContextCurrent(window_);
-	glfwSwapInterval(1); // Vsync
 
 	// Hide the cursor and capture it, perfect for an FPS camera system
 	glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -76,6 +75,8 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 		glfwTerminate();
 		throw;
 	}
+
+	glfwSwapInterval(1); // Vsync
 
 	std::cout << tag << ": created\n\tOpenGL " << glGetString(GL_VERSION) << "\n\tGLFW " << glfwGetVersionString() << std::endl;
 }
@@ -168,6 +169,7 @@ const float &GlfwWindow::computeDeltaTime() // TODO comment
 
 void GlfwWindow::render(const float &deltaTime) const // TODO comment
 {
+	std::cout << "Delta: " << static_cast<int>(1.0f / deltaTime) << std::endl;
 	render3D(deltaTime);
 }
 
@@ -180,7 +182,7 @@ void GlfwWindow::render3D(const float &deltaTime) const // TODO comment
 	glViewport(0, 0, width_, height_);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
 
 	camera_->update(deltaTime, baseProgram_);
 	light_->update(baseProgram_);

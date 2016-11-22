@@ -24,3 +24,4 @@ void main()
 	float d = disparity(gl_FragCoord.z);
 	color = vec4(d, d, d, one);
 }
+

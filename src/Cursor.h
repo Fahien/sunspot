@@ -26,4 +26,4 @@ private:
 	float sensitivity_;
 };
 
-#endif SST_INPUT_H
+#endif // SST_INPUT_H

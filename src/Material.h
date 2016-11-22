@@ -10,4 +10,5 @@ struct Material {
 	float shininess = 32.0f;
 };
 
-#endif SST_MATERIAL_H
+#endif // SST_MATERIAL_H
+

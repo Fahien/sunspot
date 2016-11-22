@@ -10,4 +10,5 @@ struct Color {
 	float b; // Blue
 };
 
-#endif SST_COLOR_H
+#endif // SST_COLOR_H
+

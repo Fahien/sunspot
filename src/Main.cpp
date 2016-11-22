@@ -30,12 +30,18 @@ int main(int argc, char **argv)
 
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
 		ShaderProgram depthProgram{ "shader/base.vert", "shader/depth.frag" };
+		std::cout << "Light -> ";
 		Light light{ 0.5f, 0.5f, 0.5f };
 		light.setPosition(2.0f, 1.0f, -1.0f);
+		std::cout << "Model -> ";
 		Model model{ "shader/crate", .25f };
+		std::cout << "Room -> ";
 		Model room{ "shader/wall", 2.0f };
+		std::cout << "Quad -> ";
 		Quad quad{};
+		std::cout << "QuadProgram -> ";
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
+		std::cout << "Camera -> ";
 		Camera camera{ 45.0f, static_cast<float>(width) / height, 0.125f, 8.0f };
 		Framebuffer framebuffer{ width, height / 2 };
 

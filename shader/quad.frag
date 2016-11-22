@@ -19,3 +19,4 @@ void main()
 	float mask = texture(maskTexture, maskCoords).r;
 	color = mix(color, empty, mask);
 }
+

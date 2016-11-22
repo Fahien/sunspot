@@ -24,4 +24,5 @@ class Light {
 	Color color_;
 };
 
-#endif
+#endif // SST_LIGHT_H
+
