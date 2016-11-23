@@ -2,6 +2,7 @@
 #define SST_WINDOW_H
 
 #include <string>
+#include "Math.h"
 
 class ShaderProgram;
 class Light;
@@ -48,13 +49,14 @@ protected:
 
 	virtual void render();
 	virtual const float &computeDeltaTime() = 0;
-	virtual void render(const float &deltaTime) const = 0;
+	virtual void render(const float &deltaTime) = 0;
 
 	unsigned width_;
 	unsigned height_;
 	const char* title_;
-	unsigned monitorWidth_;
-	unsigned monitorHeight_;
+	math::Size monitorSize_;
+	math::Size frameSize_;
+	
 
 	float currentTime_;
 	float lastTime_;

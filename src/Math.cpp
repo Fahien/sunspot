@@ -5,6 +5,18 @@
 using namespace math; // TODO comment
 
 
+Size::Size()
+	: width{ 0 }
+	, height{ 0 }
+{}
+
+
+Size::Size(int w, int h)
+	: width{ w }
+	, height{ h }
+{}
+
+
 Vec2::Vec2()
 	: x{ 0.0f }
 	, y{ 0.0f }
@@ -56,9 +68,9 @@ Vec3::Vec3()
 
 
 Vec3::Vec3(const float xx, const float yy, const float zz)
-	: x {xx}
-	, y {yy}
-	, z {zz}
+	: x{ xx }
+	, y{ yy }
+	, z{ zz }
 {}
 
 
@@ -165,7 +177,7 @@ Mat4 &Mat4::operator*=(const Mat4 &other)
 	float temp[16];
 	for (int i{ 0 }; i < 4; ++i) {
 		for (int j{ 0 }; j < 4; ++j) {
-			temp[i+j*4] = matrix[i] * other[j*4] + matrix[i+4] * other[j*4+1] + matrix[i+8] * other[j*4+2] + matrix[i+12] * other[j*4+3];
+			temp[i + j * 4] = matrix[i] * other[j * 4] + matrix[i + 4] * other[j * 4 + 1] + matrix[i + 8] * other[j * 4 + 2] + matrix[i + 12] * other[j * 4 + 3];
 		}
 	}
 	for (int i{ 0 }; i < 16; ++i) {

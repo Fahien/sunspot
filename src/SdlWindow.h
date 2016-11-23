@@ -25,7 +25,7 @@ class SdlWindow : public Window {
 
   protected:
 	const float &computeDeltaTime();
-	void render(const float &deltaTime) const;
+	void render(const float &deltaTime);
 
   private:
 	void render3DplusDepth(const float &deltaTime) const;

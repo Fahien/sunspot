@@ -5,6 +5,8 @@
 
 #include "Graphics.h"
 
+class ShaderProgram;
+
 
 class FramebufferException : public std::runtime_error {
 public:
@@ -22,10 +24,18 @@ class Framebuffer {
 	inline void bind() const { glBindFramebuffer(GL_FRAMEBUFFER, fbo_); }
 	inline void unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
+	void bindTextures(const ShaderProgram *program) const;
+
 	inline void bindColorTexture() const
 	{
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, colorTexture_);
+	}
+
+	inline void bindDepthTexture() const
+	{
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, depthTexture_);
 	}
 
 	inline void bindMaskTexture() const

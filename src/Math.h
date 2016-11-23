@@ -9,6 +9,16 @@ namespace math {
 const float pi{ 3.14159265f };
 
 
+class Size {
+  public:
+	Size();
+	Size(int w, int h);
+
+	int width;
+	int height;
+};
+
+
 class Vec2 {
   public:
 	Vec2();

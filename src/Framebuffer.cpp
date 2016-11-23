@@ -2,7 +2,7 @@
 
 #include "Framebuffer.h"
 #include "Texture.h"
-
+#include "ShaderProgram.h"
 
 const std::string Framebuffer::tag{ "Framebuffer" };
 
@@ -77,4 +77,21 @@ Framebuffer::~Framebuffer()
 	glDeleteTextures(1, &colorTexture_);
 	glDeleteFramebuffers(1, &fbo_);
 	std::cout << "Framebuffer: destroyed\n"; // TODO remove debug log
+}
+
+
+void Framebuffer::bindTextures(const ShaderProgram *shader) const
+{
+	glUniform1i(shader->getLocation("screenTexture"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, colorTexture_);
+	glUniform1i(shader->getLocation("depthTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, depthTexture_);
+	glUniform1i(shader->getLocation("maskTexture"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, maskTexture_);
+	glUniform1i(shader->getLocation("headerTexture"), 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, headerTexture_);
 }

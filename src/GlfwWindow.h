@@ -15,7 +15,7 @@ class GlfwWindow : public Window
 {
   public:
 	static const std::string tag;
-	GlfwWindow(const unsigned width, const unsigned height, const char *title);
+	GlfwWindow(const unsigned width, const unsigned height, const char *title, const bool stereo, const bool decorated);
 	~GlfwWindow();
 
 	void handleMouse(const double x, const double y);
@@ -26,18 +26,19 @@ class GlfwWindow : public Window
 
   protected:
 	const float &computeDeltaTime();
-	void render(const float &deltaTime) const;
+	void render(const float &deltaTime);
 
   private:
-	void render3D(const float &deltaTime) const;
-	void render3DplusDepth(const float &deltaTime) const;
-	void renderQuad(const float &deltaTime) const;
-	void renderStereoscopic(const float &deltaTime) const;
+	void render3D(const float &deltaTime);
+	void render3DplusDepth(const float &deltaTime);
+	void renderQuad(const float &deltaTime);
+	void renderStereoscopic(const float &deltaTime);
 
 	bool rotateY_;
-	GLFWwindow *window_;
+	GLFWmonitor *monitor_;
 	const GLFWvidmode* videoMode_;
+	GLFWwindow *window_;
 	Cursor cursor_;
 };
 
-#endif
+#endif // SST_GLFWWINDOW_H

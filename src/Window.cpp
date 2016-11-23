@@ -11,8 +11,8 @@ Window::Window(const unsigned width, const unsigned height, const char* title)
 	: width_{ width }
 	, height_{ height }
 	, title_{ title }
-	, monitorWidth_{ width }
-	, monitorHeight_{ height }
+	, monitorSize_{ width, height }
+	, frameSize_{ width, height }
 	, currentTime_{ 0.0f }
 	, lastTime_{ 0.0f }
 	, deltaTime_{ 0.0f }

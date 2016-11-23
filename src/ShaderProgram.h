@@ -16,17 +16,6 @@ class ShaderProgram
 	inline void use() const { glUseProgram(baseProgram_); }
 	inline void setDepth() const { glUseProgram(depthProgram_); }
 
-	inline void setUniforms() const
-	{
-	
-		GLint texLoc = glGetUniformLocation(baseProgram_, "screenTexture");
-		glUniform1i(texLoc, 0);
-		texLoc = glGetUniformLocation(baseProgram_, "maskTexture");
-		glUniform1i(texLoc, 1);
-		texLoc = glGetUniformLocation(baseProgram_, "headerTexture");
-		glUniform1i(texLoc, 2);
-	}
-
   private:
 	GLchar *loadShaderSource(const char *path);
 	GLuint compileShader(const GLenum type, const GLchar *source);

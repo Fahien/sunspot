@@ -36,10 +36,7 @@ SdlWindow::SdlWindow(const unsigned width, const unsigned height, const char *ti
 		throw SdlException(tag);
 	}
 
-	int mWidth, mHeight; // Get monitor size
-	SDL_GetWindowSize(window_, &mWidth, &mHeight);
-	monitorWidth_ = static_cast<unsigned>(mWidth);
-	monitorHeight_ = static_cast<unsigned>(mHeight);
+	SDL_GetWindowSize(window_, &monitorSize_.width, &monitorSize_.height); // Get monitor size
 
 	SDL_GL_SetSwapInterval(1); // Syncronize with the monitor's vertical refresh
 
@@ -117,7 +114,7 @@ const float &SdlWindow::computeDeltaTime()
 }
 
 
-void SdlWindow::render(const float &deltaTime) const
+void SdlWindow::render(const float &deltaTime)
 {
 	render3DplusDepth(deltaTime);
 }
@@ -190,10 +187,7 @@ void SdlWindow::renderStereoscopic(const float &deltaTime) const
 	glViewport(0, 0, width, height); // Second pass: render the framebuffer on a quad
 	glDisable(GL_DEPTH_TEST);
 	quadProgram_->use();
-	quadProgram_->setUniforms();
-	framebuffer_->bindColorTexture();
-	framebuffer_->bindMaskTexture();
-	framebuffer_->bindHeaderTexture();
+	framebuffer_->bindTextures(quadProgram_);
 
 	quad_->bind();
 	quad_->render();

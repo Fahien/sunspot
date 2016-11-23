@@ -5,6 +5,7 @@ in vec2 texCoords;
 out vec4 color;
 
 uniform sampler2D screenTexture;
+uniform sampler2D depthTexture;
 uniform sampler2D maskTexture;
 uniform sampler2D headerTexture;
 
@@ -19,4 +20,3 @@ void main()
 	float mask = texture(maskTexture, maskCoords).r;
 	color = mix(color, empty, mask);
 }
-

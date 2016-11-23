@@ -13,11 +13,12 @@
 const std::string GlfwWindow::tag{ "GlfwWindow" };
 
 
-GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *title)
+GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *title, const bool stereo, const bool decorated)
 	: Window::Window{ width, height, title }
 	, rotateY_{ false }
-	, window_{ nullptr }
+	, monitor_{ nullptr }
 	, videoMode_{ nullptr }
+	, window_{ nullptr }
 	, cursor_{}
 {
 	// Initialize GLFW and handle error
@@ -27,16 +28,41 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 		std::cerr << tag << ": " << description << " [" << error << "]\n";
 	});
 
+	monitor_ = glfwGetPrimaryMonitor(); // Get the primary monitor
+	if (monitor_ == nullptr) { // Handle error
+		glfwTerminate();
+		throw GlfwException{ tag, "Could not get primary monitor" };
+	}
+
+	videoMode_ = glfwGetVideoMode(monitor_); // Get the video mode for the monitor
+	if (videoMode_ == nullptr) { // Handle error
+		glfwTerminate();
+		throw GlfwException{ tag, "Could not get video mode" };
+	}
+	monitorSize_.width = videoMode_->width;
+	monitorSize_.height = videoMode_->height;
+	frameSize_.width = videoMode_->width;
+	frameSize_.height = videoMode_->height;
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // TODO refactor magic numbers
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // TODO refactor magic numbers
+
+	// Hard constraints
+	glfwWindowHint(GLFW_STEREO, stereo ? GL_TRUE : GL_FALSE);
+	glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-	glfwWindowHint(GLFW_DECORATED, GL_FALSE);
+	glfwWindowHint(GLFW_DECORATED, decorated ? GL_TRUE : GL_FALSE);
 	glfwWindowHint(GLFW_FOCUSED, GL_TRUE);
-	// Create a full screen window object
-	window_ = glfwCreateWindow(width, height, title, nullptr, nullptr);
+	glfwWindowHint(GLFW_RED_BITS, videoMode_->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, videoMode_->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, videoMode_->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, videoMode_->refreshRate);
+	// Create a window object
+	window_ = glfwCreateWindow(videoMode_->width, videoMode_->height, title, monitor_, nullptr);
 	if (window_ == nullptr) { // Handle window creation error
 		glfwTerminate();
 		throw GlfwException{ tag, "Could not create GLFW window" };
@@ -59,23 +85,12 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 		win->handleInput(key, action);
 	});
 
-	// Get the monitor resolution
-	const GLFWvidmode *videoMode_{ glfwGetVideoMode(glfwGetPrimaryMonitor()) };
-	if (videoMode_ == nullptr) { // Handle error
-		glfwDestroyWindow(window_);
-		glfwTerminate();
-		throw GlfwException{ tag, "Could not get video mode" };
-	}
-	monitorWidth_ = videoMode_->width;
-	monitorHeight_ = videoMode_->height;
-
 	try { Window::initGlew(); } // Initialize glew
 	catch (GlewException &) { // Handle error
 		glfwDestroyWindow(window_);
 		glfwTerminate();
 		throw;
 	}
-
 	glfwSwapInterval(1); // Vsync
 
 	std::cout << tag << ": created\n\tOpenGL " << glGetString(GL_VERSION) << "\n\tGLFW " << glfwGetVersionString() << std::endl;
@@ -129,22 +144,19 @@ void GlfwWindow::handleInput(const int key, const int action) // TODO comment
 
 void GlfwWindow::toggleFullscreen()
 {
+	monitor_ = glfwGetPrimaryMonitor();
+	videoMode_ = glfwGetVideoMode(monitor_);
 	if (fullscreen_) { // Use start-up values for "windowed" mode
-		glfwSetWindowMonitor(window_, nullptr, 0, 0, width_, height_, 0);
-		glfwSwapInterval(1); // Vsync
-		fullscreen_ = false;
+		glfwSetWindowMonitor(window_, nullptr,
+			videoMode_->width / 2 - width_ / 2, // X center
+			videoMode_->height / 2 - height_ / 2, // Y center
+			width_, height_, 0);
 	}
 	else { // Set window size for "fullscreen windowed" mode to the desktop resolution
-		GLFWmonitor *monitor{ glfwGetPrimaryMonitor() };
-		videoMode_ = glfwGetVideoMode(monitor);
-		glfwWindowHint(GLFW_RED_BITS, videoMode_->redBits);
-		glfwWindowHint(GLFW_GREEN_BITS, videoMode_->greenBits);
-		glfwWindowHint(GLFW_BLUE_BITS, videoMode_->blueBits);
-		glfwWindowHint(GLFW_REFRESH_RATE, videoMode_->refreshRate);
-		glfwSetWindowMonitor(window_, monitor, 0, 0, videoMode_->width, videoMode_->height, videoMode_->refreshRate);
-		glfwSwapInterval(1); // Vsync
-		fullscreen_ = true;
+		glfwSetWindowMonitor(window_, monitor_, 0, 0, videoMode_->width, videoMode_->height, videoMode_->refreshRate);
 	}
+	glfwSwapInterval(1); // Vsync
+	fullscreen_ = !fullscreen_;
 }
 
 
@@ -167,19 +179,21 @@ const float &GlfwWindow::computeDeltaTime() // TODO comment
 }
 
 
-void GlfwWindow::render(const float &deltaTime) const // TODO comment
+void GlfwWindow::render(const float &deltaTime) // TODO comment
 {
-	std::cout << "Delta: " << static_cast<int>(1.0f / deltaTime) << std::endl;
-	render3D(deltaTime);
+	std::cout << static_cast<int>(1.0f / deltaTime) << " ";
+	renderStereoscopic(deltaTime);
 }
 
 
-void GlfwWindow::render3D(const float &deltaTime) const // TODO comment
+void GlfwWindow::render3D(const float &deltaTime) // TODO comment
 {
+	glfwGetFramebufferSize(window_, &frameSize_.width, &frameSize_.height);
+
 	float rotationVelocity{ 0.25f };
 	glEnable(GL_DEPTH_TEST);
 	baseProgram_->use();
-	glViewport(0, 0, width_, height_);
+	glViewport(0, 0, frameSize_.width, frameSize_.height);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
@@ -200,9 +214,9 @@ void GlfwWindow::render3D(const float &deltaTime) const // TODO comment
 }
 
 
-void GlfwWindow::render3DplusDepth(const float& deltaTime) const // TODO comment
+void GlfwWindow::render3DplusDepth(const float& deltaTime) // TODO comment
 {
-	glViewport(0, 0, width_, height_);
+	glViewport(0, 0, frameSize_.width, frameSize_.height);
 
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -210,14 +224,14 @@ void GlfwWindow::render3DplusDepth(const float& deltaTime) const // TODO comment
 
 	model_->bind();
 
-	glViewport(0, 0, width_ / 2, height_);
+	glViewport(0, 0, frameSize_.width / 2, frameSize_.height);
 	baseProgram_->use();
 	camera_->update(deltaTime, baseProgram_);
+	light_->update(baseProgram_);
 	if (rotateY_) model_->transform.rotateY(deltaTime);
 	model_->render(baseProgram_);
 
-	glViewport(width_ / 2, 0, width_ / 2, height_);
-	glDisable(GL_DEPTH_TEST);
+	glViewport(frameSize_.width / 2, 0, frameSize_.width / 2, frameSize_.height);
 	depthProgram_->use();
 	camera_->update(deltaTime, depthProgram_);
 	model_->render(depthProgram_);
@@ -226,29 +240,30 @@ void GlfwWindow::render3DplusDepth(const float& deltaTime) const // TODO comment
 }
 
 
-void GlfwWindow::renderQuad(const float &deltaTime) const
+void GlfwWindow::renderQuad(const float &deltaTime)
 {
-	int width, height; // Dimensions from GLFW such that it also works on high DPI screens
-	glfwGetFramebufferSize(window_, &width, &height);
+	glfwGetFramebufferSize(window_, &frameSize_.width, &frameSize_.height);
 
 	quadProgram_->use();
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, frameSize_.width, frameSize_.height);
 
 	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color buffer
 
 	quad_->bind();
 	quad_->render();
 	quad_->unbind();
 }
 
-void GlfwWindow::renderStereoscopic(const float &deltaTime) const
+void GlfwWindow::renderStereoscopic(const float &deltaTime)
 {
-	int width, height; // Dimensions from GLFW such that it also works on high DPI screens
-	glfwGetFramebufferSize(window_, &width, &height);
+	// Dimensions from GLFW such that it also works on high DPI screens
+	glfwGetFramebufferSize(window_, &frameSize_.width, &frameSize_.height);
+	frameSize_.width = width_;
+	frameSize_.height = height_;
 
 	framebuffer_->bind(); // First pass: render the scene on a framebuffer
-	glViewport(0, 0, width, height / 2); // Viewport for color and depth sub-images
+	glViewport(0, 0, frameSize_.width, frameSize_.height / 2); // Viewport for color and depth sub-images
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffer
@@ -257,22 +272,19 @@ void GlfwWindow::renderStereoscopic(const float &deltaTime) const
 	model_->bind();
 	baseProgram_->use();
 	camera_->update(deltaTime, baseProgram_);
-	glViewport(0, 0, width / 2, height / 2); // Render color sub-image
+	light_->update(baseProgram_);
+	glViewport(0, 0, frameSize_.width / 2, frameSize_.height / 2); // Render color sub-image
 	model_->render(baseProgram_);
-	glViewport(width / 2, 0, width / 2, height / 2); // Render depth sub-image
+	glViewport(frameSize_.width / 2, 0, frameSize_.width / 2, frameSize_.height / 2); // Render depth sub-image
 	depthProgram_->use();
 	camera_->update(deltaTime, depthProgram_);
 	model_->render(depthProgram_);
 	model_->unbind();
 	framebuffer_->unbind(); // End first pass
 
-	glViewport(0, 0, width, height); // Second pass: render the framebuffer on a quad
-	glDisable(GL_DEPTH_TEST);
+	glViewport(0, 0, frameSize_.width, frameSize_.height); // Second pass: render the framebuffer on a quad
 	quadProgram_->use();
-	quadProgram_->setUniforms();
-	framebuffer_->bindColorTexture();
-	framebuffer_->bindMaskTexture();
-	framebuffer_->bindHeaderTexture();
+	framebuffer_->bindTextures(quadProgram_);
 
 	quad_->bind();
 	quad_->render();
