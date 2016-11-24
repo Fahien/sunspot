@@ -6,20 +6,21 @@
 #include "Quad.h"
 #include "Camera.h"
 #include "Framebuffer.h"
+#include "Light.h"
 
 
 const std::string SdlWindow::tag{ "SdlWindow" };
 
 
-SdlWindow::SdlWindow(const unsigned width, const unsigned height, const char *title)
-	: Window::Window{ width, height, title }
+SdlWindow::SdlWindow(const char *title, const int width, const int height)
+	: Window::Window{ title, width, height }
 	, window_{ nullptr }
 	, context_{ nullptr }
 {
 	// Initialize SDL video subsystem and handle error
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) { throw SdlException(tag); }
 
-	window_ = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
+	window_ = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALLOW_HIGHDPI);
 	if (window_ == nullptr) { // Handle window creation error
 		SDL_Quit();
 		throw SdlException(tag);
@@ -116,13 +117,13 @@ const float &SdlWindow::computeDeltaTime()
 
 void SdlWindow::render(const float &deltaTime)
 {
-	render3DplusDepth(deltaTime);
+	renderStereoscopic(deltaTime);
 }
 
 
 void SdlWindow::render3DplusDepth(const float &deltaTime) const
 {
-	glViewport(0, 0, width_, height_);
+	glViewport(0, 0, windowSize_.width, windowSize_.height);
 
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -130,13 +131,14 @@ void SdlWindow::render3DplusDepth(const float &deltaTime) const
 
 	model_->bind();
 
-	glViewport(0, 0, width_ / 2, height_);  // Render color sub-image
+	glViewport(0, 0, windowSize_.width / 2, windowSize_.height);  // Render color sub-image
 	baseProgram_->use();
 	camera_->update(deltaTime, baseProgram_);
+	light_->update(baseProgram_);
 	model_->transform.rotateY(0.0025f);
 	model_->render(baseProgram_);
 
-	glViewport(width_ / 2, 0, width_ / 2, height_); // Render depth sub-image
+	glViewport(windowSize_.width / 2, 0, windowSize_.width / 2, windowSize_.height); // Render depth sub-image
 	glDisable(GL_DEPTH_TEST);
 	depthProgram_->use();
 	camera_->update(deltaTime, depthProgram_);
@@ -149,7 +151,7 @@ void SdlWindow::render3DplusDepth(const float &deltaTime) const
 void SdlWindow::renderQuad(const float &deltaTime) const
 {
 	depthProgram_->use();
-	glViewport(0, 0, width_, height_);
+	glViewport(0, 0, windowSize_.width, windowSize_.height);
 
 	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
@@ -175,6 +177,7 @@ void SdlWindow::renderStereoscopic(const float &deltaTime) const
 	model_->transform.rotateY(deltaTime);
 	baseProgram_->use();
 	camera_->update(deltaTime, baseProgram_);
+	light_->update(baseProgram_);
 	glViewport(0, 0, width / 2, height / 2); // Render color sub-image
 	model_->render(baseProgram_);
 	glViewport(width / 2, 0, width / 2, height / 2); // Render depth sub-image

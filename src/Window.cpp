@@ -7,10 +7,9 @@
 const std::string Window::tag{ "Window" };
 
 
-Window::Window(const unsigned width, const unsigned height, const char* title)
-	: width_{ width }
-	, height_{ height }
-	, title_{ title }
+Window::Window(const char* title, const int width, const int height)
+	: title_{ title }
+	, windowSize_{ width, height }
 	, monitorSize_{ width, height }
 	, frameSize_{ width, height }
 	, currentTime_{ 0.0f }
@@ -39,3 +38,4 @@ void Window::render()
 {
 	render(computeDeltaTime());
 }
+

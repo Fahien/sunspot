@@ -16,7 +16,7 @@ class SdlException : public GraphicException {
 class SdlWindow : public Window {
   public:
 	static const std::string tag;
-	SdlWindow(const unsigned width, const unsigned height, const char *title);
+	SdlWindow(const char *title, const int width, const int height);
 	~SdlWindow();
 
 	void toggleFullscreen();
@@ -37,3 +37,4 @@ class SdlWindow : public Window {
 };
 
 #endif // SST_SDLWINDOW_H
+

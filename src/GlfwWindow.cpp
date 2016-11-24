@@ -13,8 +13,8 @@
 const std::string GlfwWindow::tag{ "GlfwWindow" };
 
 
-GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *title, const bool stereo, const bool decorated)
-	: Window::Window{ width, height, title }
+GlfwWindow::GlfwWindow(const char *title, const int width, const int height, const bool stereo, const bool decorated)
+	: Window::Window{title, width, height}
 	, rotateY_{ false }
 	, monitor_{ nullptr }
 	, videoMode_{ nullptr }
@@ -41,8 +41,6 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 	}
 	monitorSize_.width = videoMode_->width;
 	monitorSize_.height = videoMode_->height;
-	frameSize_.width = videoMode_->width;
-	frameSize_.height = videoMode_->height;
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // TODO refactor magic numbers
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // TODO refactor magic numbers
@@ -91,6 +89,7 @@ GlfwWindow::GlfwWindow(const unsigned width, const unsigned height, const char *
 		glfwTerminate();
 		throw;
 	}
+	glfwGetFramebufferSize(window_, &frameSize_.width, &frameSize_.height);
 	glfwSwapInterval(1); // Vsync
 
 	std::cout << tag << ": created\n\tOpenGL " << glGetString(GL_VERSION) << "\n\tGLFW " << glfwGetVersionString() << std::endl;
@@ -148,9 +147,9 @@ void GlfwWindow::toggleFullscreen()
 	videoMode_ = glfwGetVideoMode(monitor_);
 	if (fullscreen_) { // Use start-up values for "windowed" mode
 		glfwSetWindowMonitor(window_, nullptr,
-			videoMode_->width / 2 - width_ / 2, // X center
-			videoMode_->height / 2 - height_ / 2, // Y center
-			width_, height_, 0);
+			videoMode_->width / 2 - windowSize_.width / 2, // X center
+			videoMode_->height / 2 - windowSize_.height / 2, // Y center
+			windowSize_.width, windowSize_.height, 0);
 	}
 	else { // Set window size for "fullscreen windowed" mode to the desktop resolution
 		glfwSetWindowMonitor(window_, monitor_, 0, 0, videoMode_->width, videoMode_->height, videoMode_->refreshRate);
@@ -181,7 +180,7 @@ const float &GlfwWindow::computeDeltaTime() // TODO comment
 
 void GlfwWindow::render(const float &deltaTime) // TODO comment
 {
-	std::cout << static_cast<int>(1.0f / deltaTime) << " ";
+	// std::cout << static_cast<int>(1.0f / deltaTime) << " ";
 	renderStereoscopic(deltaTime);
 }
 
@@ -259,8 +258,6 @@ void GlfwWindow::renderStereoscopic(const float &deltaTime)
 {
 	// Dimensions from GLFW such that it also works on high DPI screens
 	glfwGetFramebufferSize(window_, &frameSize_.width, &frameSize_.height);
-	frameSize_.width = width_;
-	frameSize_.height = height_;
 
 	framebuffer_->bind(); // First pass: render the scene on a framebuffer
 	glViewport(0, 0, frameSize_.width, frameSize_.height / 2); // Viewport for color and depth sub-images
@@ -283,6 +280,7 @@ void GlfwWindow::renderStereoscopic(const float &deltaTime)
 	framebuffer_->unbind(); // End first pass
 
 	glViewport(0, 0, frameSize_.width, frameSize_.height); // Second pass: render the framebuffer on a quad
+	glDisable(GL_DEPTH_TEST);
 	quadProgram_->use();
 	framebuffer_->bindTextures(quadProgram_);
 
@@ -290,3 +288,4 @@ void GlfwWindow::renderStereoscopic(const float &deltaTime)
 	quad_->render();
 	quad_->unbind(); // End second pass
 }
+

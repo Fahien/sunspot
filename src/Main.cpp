@@ -10,9 +10,9 @@
 #include "Camera.h"
 #include "Framebuffer.h"
 
-static constexpr unsigned zoom{ 1 };
-static constexpr unsigned width{ 960 * zoom };
-static constexpr unsigned height{ 540 * zoom };
+static constexpr int zoom{ 2 };
+static constexpr int width{ 960 * zoom };
+static constexpr int height{ 540 * zoom };
 
 static const std::string tag{ "Main" };
 
@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 		bool stereo{ false };
 		if (argc > 1) {
 			std::string firstArg{ argv[1] };
-			if (firstArg == "-SDL") { window = new SdlWindow{ width, height, SST_TITLE }; }
+			if (firstArg == "-SDL") { window = new SdlWindow{ SST_TITLE, width, height }; }
 			else if (firstArg == "-decorated") { decorated = true; }
 
 			if (argc > 2) {
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 				if (secondArg == "-stereo") { stereo = true; }
 			}
 		}
-		if (window == nullptr) { window = new GlfwWindow{ width, height, SST_TITLE, stereo, decorated }; }
+		if (window == nullptr) { window = new GlfwWindow{ SST_TITLE, width, height, stereo, decorated }; }
 
 
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
@@ -45,7 +45,8 @@ int main(int argc, char **argv)
 		Quad quad{};
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
 		Camera camera{ 45.0f, static_cast<float>(width) / height, 0.125f, 8.0f };
-		Framebuffer framebuffer{ width, height / 2 };
+		math::Size frameSize {window->getFrameSize()};
+		Framebuffer framebuffer{ frameSize.width, frameSize.height / 2 };
 
 		window->setBaseProgram(&baseProgram);
 		window->setDepthProgram(&depthProgram);

@@ -18,7 +18,7 @@ class Framebuffer {
   public:
 	static const std::string tag;
 
-	Framebuffer(const unsigned width, const unsigned height);
+	Framebuffer(const int width, const int height);
 	~Framebuffer();
 
 	inline void bind() const { glBindFramebuffer(GL_FRAMEBUFFER, fbo_); }

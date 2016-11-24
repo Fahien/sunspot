@@ -7,7 +7,7 @@
 const std::string Framebuffer::tag{ "Framebuffer" };
 
 
-Framebuffer::Framebuffer(const unsigned width, const unsigned height)
+Framebuffer::Framebuffer(const int width, const int height)
 	: fbo_ {0}
 	, colorTexture_ {0}
 	, depthTexture_ {0}
@@ -95,3 +95,4 @@ void Framebuffer::bindTextures(const ShaderProgram *shader) const
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, headerTexture_);
 }
+

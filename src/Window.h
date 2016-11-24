@@ -28,8 +28,9 @@ class Window {
 public:
 	static const std::string tag;
 
-	Window(const unsigned width, const unsigned height, const char *title);
+	Window(const char *title, const int width, const int height);
 
+	inline math::Size &getFrameSize() { return frameSize_; }
 	inline void setBaseProgram(const ShaderProgram *baseProgram) { baseProgram_ = baseProgram; }
 	inline void setDepthProgram(const ShaderProgram *depthProgram) { depthProgram_ = depthProgram; }
 	inline void setLight(Light *light) { light_ = light; }
@@ -51,9 +52,8 @@ protected:
 	virtual const float &computeDeltaTime() = 0;
 	virtual void render(const float &deltaTime) = 0;
 
-	unsigned width_;
-	unsigned height_;
 	const char* title_;
+	math::Size windowSize_;
 	math::Size monitorSize_;
 	math::Size frameSize_;
 	
@@ -79,3 +79,4 @@ protected:
 };
 
 #endif // SST_WINDOW_H
+

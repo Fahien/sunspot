@@ -15,7 +15,7 @@ class GlfwWindow : public Window
 {
   public:
 	static const std::string tag;
-	GlfwWindow(const unsigned width, const unsigned height, const char *title, const bool stereo, const bool decorated);
+	GlfwWindow(const char *title, const int width, const int height, const bool stereo, const bool decorated);
 	~GlfwWindow();
 
 	void handleMouse(const double x, const double y);
@@ -42,3 +42,4 @@ class GlfwWindow : public Window
 };
 
 #endif // SST_GLFWWINDOW_H
+
