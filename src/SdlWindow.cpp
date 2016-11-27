@@ -12,7 +12,7 @@
 const std::string SdlWindow::tag{ "SdlWindow" };
 
 
-SdlWindow::SdlWindow(const char *title, const int width, const int height)
+SdlWindow::SdlWindow(const char *title, const int width, const int height, const bool decorated)
 	: Window::Window{ title, width, height }
 	, window_{ nullptr }
 	, context_{ nullptr }
@@ -20,7 +20,9 @@ SdlWindow::SdlWindow(const char *title, const int width, const int height)
 	// Initialize SDL video subsystem and handle error
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) { throw SdlException(tag); }
 
-	window_ = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALLOW_HIGHDPI);
+	Uint32 flags{ SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALLOW_HIGHDPI };
+	if (!decorated) { flags |= SDL_WINDOW_BORDERLESS; }
+	window_ = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
 	if (window_ == nullptr) { // Handle window creation error
 		SDL_Quit();
 		throw SdlException(tag);

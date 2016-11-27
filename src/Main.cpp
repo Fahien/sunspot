@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 #include "Config.h"
 #include "SdlWindow.h"
@@ -10,9 +12,9 @@
 #include "Camera.h"
 #include "Framebuffer.h"
 
-static constexpr int zoom{ 2 };
-static constexpr int width{ 960 * zoom };
-static constexpr int height{ 540 * zoom };
+static int zoom{ 2 };
+static int width{ 960 };
+static int height{ 540 };
 
 static const std::string tag{ "Main" };
 
@@ -21,20 +23,33 @@ int main(int argc, char **argv)
 	Window *window{ nullptr };
 
 	try {
-		bool decorated{ false };
-		bool stereo{ false };
-		if (argc > 1) {
-			std::string firstArg{ argv[1] };
-			if (firstArg == "-SDL") { window = new SdlWindow{ SST_TITLE, width, height }; }
-			else if (firstArg == "-decorated") { decorated = true; }
-
-			if (argc > 2) {
-				std::string secondArg{ argv[2] };
-				if (secondArg == "-stereo") { stereo = true; }
-			}
+		// Get command line arguments
+		std::vector<std::string> arguments{};
+		for (int i{ 1 }; i < argc; ++i) {
+			arguments.push_back(std::string{argv[i]});
 		}
-		if (window == nullptr) { window = new GlfwWindow{ SST_TITLE, width, height, stereo, decorated }; }
 
+		// Test window
+		if (std::find(arguments.begin(), arguments.end(), "-test") != arguments.end()) {
+			zoom = 1;
+		}
+		width *= zoom;
+		height *= zoom;
+
+		bool stereo{ false };
+		// Window decorations
+		bool decorated{ false };
+		if (std::find(arguments.begin(), arguments.end(), "-decorated") != arguments.end()) {
+			decorated = true;
+		}
+
+		// Create window
+		if (std::find(arguments.begin(), arguments.end(), "-SDL") != arguments.end()) {
+			window = new SdlWindow{ SST_TITLE, width, height, decorated };
+		}
+		else {
+			window = new GlfwWindow{ SST_TITLE, width, height, stereo, decorated };
+		}
 
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
 		ShaderProgram depthProgram{ "shader/base.vert", "shader/depth.frag" };
