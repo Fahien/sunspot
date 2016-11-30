@@ -78,6 +78,8 @@ set (SOURCES
 	src/Texture.cpp
 	src/Model.h
 	src/Model.cpp
+	src/WavefrontObject.h
+	src/WavefrontObject.cpp
 	src/Color.h
 	src/Color.cpp
 	src/Material.h
