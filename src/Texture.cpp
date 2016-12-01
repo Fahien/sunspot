@@ -3,12 +3,44 @@
 
 #include "Texture.h"
 
+using namespace sunspot;
 
-const std::string Texture::tag{ "Texture" };
+
+const char *sunspot::getTextureTypeName(const TextureType &type)
+{
+	return textureTypeNames[type];
+}
 
 
-Texture::Texture(const std::string &path)
-	: data_{nullptr}
+Texture::Texture(const std::string &path, const TextureType &type)
+	: id_{ 0 }
+	, type_{ type }
+{
+	TextureData data{ path };
+	glGenTextures(1, &id_);
+	glBindTexture(GL_TEXTURE_2D, id_);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data.getWidth(), data.getHeight(),
+		0, GL_RGB, GL_UNSIGNED_BYTE, data.getData());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	std::cout << "Texture: created\n"; // TODO remove debug log
+}
+
+
+Texture::~Texture()
+{
+	glDeleteTextures(1, &id_);
+	std::cout << "Texture: destroyed\n"; // TODO remove debug log
+}
+
+
+const std::string TextureData::tag{ "TextureData" };
+
+
+TextureData::TextureData(const std::string &path)
+	: width_{}
+	, height_{}
+	, data_{nullptr}
 {
 	FILE *file {fopen((path + ".bmp").c_str(), "rb")};
 	if (file == nullptr) { throw TextureException{ tag, "Could not open header bitmap" }; }
@@ -22,15 +54,13 @@ Texture::Texture(const std::string &path)
 		throw TextureException{ tag, "Could not read header from bitmap file" };
 	}
 
-	unsigned width; // Read width
-	nread = fread(&width, 4, 1, file);
+	nread = fread(&width_, 4, 1, file); // Read width
 	if (nread != 1) {
 		fclose(file);
 		throw TextureException{ tag, "Could not read width from bitmap file" };
 	}
 
-	unsigned height; // Read height;
-	nread = fread(&height, 4, 1, file);
+	nread = fread(&height_, 4, 1, file); // Read height;
 	if (nread != 1) {
 		fclose(file);
 		throw TextureException{ tag, "Could not read height from bitmap file" };
@@ -56,12 +86,13 @@ Texture::Texture(const std::string &path)
 		throw TextureException{ tag, message };
 	}
 
-	std::cout << tag.c_str() << ": " << path.c_str() << ", header[" << hlen << "], size[" << width << "x" << height
+	std::cout << tag.c_str() << ": " << path.c_str() << ", header[" << hlen
+		<< "], size[" << width_ << "x" << height_
 		<< "], planes[" << planes << "], bpp[" << bpp << "]\n";
 
 	fseek(file, 24, SEEK_CUR);
 
-	unsigned size{ width * height * 3 }; // Allocate memory for bitmap data
+	int size{ width_ * height_ * 3 }; // Allocate memory for bitmap data
 	data_ = static_cast<GLubyte *>(malloc(size));
 	if (!data_) {
 		fclose(file);
@@ -78,7 +109,7 @@ Texture::Texture(const std::string &path)
 		message += "]";
 		throw TextureException{ tag, message };
 	}
-	for (unsigned i{ 0 }; i < size; i += 3) { // Adjust red and blue
+	for (int i{ 0 }; i < size; i += 3) { // Adjust red and blue
 		GLubyte temp = data_[i];
 		data_[i] = data_[i + 2];
 		data_[i + 2] = temp;
@@ -87,7 +118,7 @@ Texture::Texture(const std::string &path)
 }
 
 
-Texture::~Texture()
+TextureData::~TextureData()
 {
 	if (data_ != nullptr) { free(data_); }
 }

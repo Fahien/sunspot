@@ -2,26 +2,55 @@
 #define SST_TEXTURE_H
 
 #include <exception>
+#include <string>
 #include "Graphics.h"
 
 
+namespace sunspot {
+
+
 class TextureException : public std::runtime_error {
-public:
-	TextureException(const std::string& tag, const std::string& message) : std::runtime_error(tag + ": " + message) {}
+  public:
+	TextureException(const std::string& tag, const std::string& message)
+		: std::runtime_error(tag + ": " + message) {}
 };
+
+
+class TextureData {
+  public:
+	static const std::string tag;
+
+	TextureData(const std::string &path);
+	~TextureData();
+
+	inline GLsizei &getWidth() { return width_; }
+	inline GLsizei &getHeight() { return height_; }
+	inline GLubyte *getData() { return data_; }
+
+  private:
+	GLsizei width_;
+	GLsizei height_;
+	GLubyte *data_;
+};
+
+
+enum TextureType { DIFFUSE, SPECULAR };
+static const char *textureTypeNames[] = { "diffuse", "specular" };
+const char *getTextureTypeName(const TextureType &type);
 
 
 class Texture {
   public:
-	static const std::string tag;
-
-	Texture(const std::string &path);
+	Texture(const std::string &path, const TextureType &type);
 	~Texture();
 
-	inline GLubyte *getData() { return data_; }
-
   private:
-	GLubyte *data_;
+	GLuint id_;
+	TextureType type_;
 };
 
+
+}
+
 #endif // SST_TEXTURE_H
+

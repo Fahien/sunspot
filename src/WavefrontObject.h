@@ -6,59 +6,20 @@
 #include <vector>
 
 #include "Graphics.h"
-#include "Math.h"
+#include "Mesh.h"
 #include "Material.h"
 
-class VertexLoadingException : public std::runtime_error {
+
+namespace sunspot {
+
+
+class LoadingException : public std::runtime_error {
   public:
-	VertexLoadingException(const std::string &message) : std::runtime_error(message) {}
-};
-
-
-class TextureCoordinateLoadingException : public std::runtime_error {
-  public:
-	TextureCoordinateLoadingException(const std::string &message) : std::runtime_error(message) {}
-};
-
-
-class VertexNormalLoadingException : public std::runtime_error {
-  public:
-	VertexNormalLoadingException(const std::string &message) : std::runtime_error(message) {}
-};
-
-
-class FaceLoadingException : public std::runtime_error {
-  public:
-	FaceLoadingException(const std::string &message) : std::runtime_error(message) {};
-};
-
-
-struct Vertex {
-  public:
-	float x;
-	float y;
-	float z;
-	float w;
-};
-
-
-struct TextureCoordinate {
-  public:
-	float u;
-	float v;
-};
-
-
-struct VertexNormal {
-  public:
-	float i;
-	float j;
-	float k;
+	LoadingException(const std::string &message) : std::runtime_error(message) {}
 };
 
 
 struct Face {
-  public:
 	int indices[4];
 	int textures[4];
 	int normals[4];
@@ -70,28 +31,23 @@ class WavefrontObject {
 	WavefrontObject();
 	~WavefrontObject();
 
-	void initialize();
-
-	inline void addVertex(const Vertex v) { vertices_.push_back(v); }
-	inline void addTextureCoordinate(const TextureCoordinate t) { textureCoordinates_.push_back(t); }
-	inline void addVertexNormal(const VertexNormal n) { normals_.push_back(n); }
-	inline void addFace(const Face f) { faces_.push_back(f); }
-
 	friend std::ifstream &operator>>(std::ifstream &in, WavefrontObject &obj);
-
-	math::Math4 transform;
+	void loadPosition(std::stringstream is);
+	void loadTexCoords(std::stringstream is);
+	void loadNormal(std::stringstream is);
+	void loadIndices(std::stringstream is);
 
   private:
-	std::vector<Vertex> vertices_;
-	std::vector<TextureCoordinate> textureCoordinates_;
-	std::vector<VertexNormal> normals_;
-	std::vector<Face> faces_;
+	unsigned positionCount_;
+	unsigned normalCount_;
+	unsigned texCoordsCount_;
 
-	GLuint vbo_;
-	GLuint ebo_;
-	GLuint vao_;
-	Material material_;
+	std::vector<Vertex> vertices_;
+	std::vector<GLuint> indices_;
+	std::vector<Texture> textures_;
 };
+
+}
 
 #endif // SST_WAVEFRONTOBJECT_H
 
