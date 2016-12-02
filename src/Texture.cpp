@@ -14,6 +14,7 @@ const char *sunspot::getTextureTypeName(const TextureType &type)
 
 Texture::Texture(const std::string &path, const TextureType &type)
 	: id_{ 0 }
+	, name_{ path }
 	, type_{ type }
 {
 	TextureData data{ path };
@@ -23,14 +24,13 @@ Texture::Texture(const std::string &path, const TextureType &type)
 		0, GL_RGB, GL_UNSIGNED_BYTE, data.getData());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	std::cout << "Texture: created\n"; // TODO remove debug log
+	std::cout << "Texture: created " << name_ << std::endl; // TODO remove debug log
 }
 
 
 Texture::~Texture()
 {
-	glDeleteTextures(1, &id_);
-	std::cout << "Texture: destroyed\n"; // TODO remove debug log
+	std::cout << "Texture: destroyed " << name_ << std::endl; // TODO remove debug log
 }
 
 

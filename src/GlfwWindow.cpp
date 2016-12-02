@@ -204,9 +204,7 @@ void GlfwWindow::renderMesh(const float &deltaTime) // TODO comment
 	room_->bind();
 	room_->render(baseProgram_);
 	room_->unbind();
-	mesh_->bind();
 	mesh_->draw(baseProgram_);
-	mesh_->unbind();
 }
 
 

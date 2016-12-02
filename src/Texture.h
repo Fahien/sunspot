@@ -44,11 +44,14 @@ class Texture {
 	Texture(const std::string &path, const TextureType &type);
 	~Texture();
 
+	inline void release() const { glDeleteTextures(1, &id_); }
+
 	inline GLuint &getId() { return id_; }
 	inline TextureType &getType() { return type_; }
 
   private:
 	GLuint id_;
+	std::string name_;
 	TextureType type_;
 };
 

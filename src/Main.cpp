@@ -81,9 +81,7 @@ int main(int argc, char **argv)
 		}
 		WavefrontObject obj{};
 		is >> obj;
-		std::vector<Texture> textures{};
-		textures.push_back(Texture{ testTexture, TextureType::DIFFUSE });
-		Mesh mesh{ obj.getVertices(), obj.getIndices(), textures };
+		Mesh mesh{ obj.getVertices(), obj.getIndices(), obj.getTextures() };
 
 		window->setBaseProgram(&baseProgram);
 		window->setDepthProgram(&depthProgram);

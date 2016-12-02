@@ -33,6 +33,7 @@ class WavefrontObject {
 
 	inline std::vector<Vertex> &getVertices() { return vertices_; };
 	inline std::vector<GLuint> &getIndices() { return indices_; };
+	inline std::vector<Texture> &getTextures() { return textures_; };
 
 	void loadPosition(std::stringstream is);
 	void loadTexCoords(std::stringstream is);

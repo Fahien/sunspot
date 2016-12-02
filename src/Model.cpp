@@ -86,14 +86,16 @@ Model::Model(const std::string &path, const float scale)
 	TextureData diffuse{ path };
 	glGenTextures(1, &material_.diffuse); // Create a diffuse map
 	glBindTexture(GL_TEXTURE_2D, material_.diffuse);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, diffuse.getData()); // TODO remove magic numbers
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, diffuse.getWidth(), diffuse.getHeight(),
+		0, GL_RGB, GL_UNSIGNED_BYTE, diffuse.getData());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	TextureData specular{ path + "-s" };
 	glGenTextures(1, &material_.specular); // Create a specular map
 	glBindTexture(GL_TEXTURE_2D, material_.specular);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, specular.getData()); // TODO remove magic numbers
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, specular.getWidth(), specular.getHeight(),
+		0, GL_RGB, GL_UNSIGNED_BYTE, specular.getData());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
