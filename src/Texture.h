@@ -1,7 +1,7 @@
 #ifndef SST_TEXTURE_H
 #define SST_TEXTURE_H
 
-#include <exception>
+#include <stdexcept>
 #include <string>
 #include "Graphics.h"
 
@@ -12,7 +12,7 @@ namespace sunspot {
 class TextureException : public std::runtime_error {
   public:
 	TextureException(const std::string& tag, const std::string& message)
-		: std::runtime_error(tag + ": " + message) {}
+		: std::runtime_error{tag + ": " + message } {}
 };
 
 
@@ -43,6 +43,9 @@ class Texture {
   public:
 	Texture(const std::string &path, const TextureType &type);
 	~Texture();
+
+	inline GLuint &getId() { return id_; }
+	inline TextureType &getType() { return type_; }
 
   private:
 	GLuint id_;

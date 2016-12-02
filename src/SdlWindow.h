@@ -7,6 +7,8 @@
 #include "Window.h"
 
 
+namespace sunspot {
+
 class SdlException : public GraphicException {
   public:
 	SdlException(const std::string &tag) : GraphicException{ tag + ": " + SDL_GetError() } {}
@@ -35,6 +37,8 @@ class SdlWindow : public Window {
 	SDL_Window *window_;
 	SDL_GLContext context_;
 };
+
+}
 
 #endif // SST_SDLWINDOW_H
 

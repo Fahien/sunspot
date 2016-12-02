@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <cstdlib>
 #include <vector>
 #include <algorithm>
 
@@ -12,11 +14,20 @@
 #include "Camera.h"
 #include "Framebuffer.h"
 
+#include "WavefrontObject.h"
+#include "Mesh.h"
+#include "Texture.h"
+
+using namespace sunspot;
+
+
 static int zoom{ 2 };
 static int width{ 960 };
 static int height{ 540 };
 
 static const std::string tag{ "Main" };
+static const std::string objName{ "shader/cube.obj" };
+static const std::string testTexture{ "shader/test" };
 
 int main(int argc, char **argv)
 {
@@ -63,10 +74,22 @@ int main(int argc, char **argv)
 		math::Size frameSize {window->getFrameSize()};
 		Framebuffer framebuffer{ frameSize.width, frameSize.height / 2 };
 
+		std::ifstream is{ objName };
+		if (!is.is_open()) {
+			std::cerr << "Could not find " << objName << std::endl;
+			return EXIT_FAILURE;
+		}
+		WavefrontObject obj{};
+		is >> obj;
+		std::vector<Texture> textures{};
+		textures.push_back(Texture{ testTexture, TextureType::DIFFUSE });
+		Mesh mesh{ obj.getVertices(), obj.getIndices(), textures };
+
 		window->setBaseProgram(&baseProgram);
 		window->setDepthProgram(&depthProgram);
 		window->setLight(&light);
 		window->setModel(&model);
+		window->setMesh(&mesh);
 		window->setRoom(&room);
 		window->setQuadProgram(&quadProgram);
 		window->setQuad(&quad);
@@ -85,3 +108,4 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 }
+

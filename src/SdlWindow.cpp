@@ -8,6 +8,8 @@
 #include "Framebuffer.h"
 #include "Light.h"
 
+using namespace sunspot;
+
 
 const std::string SdlWindow::tag{ "SdlWindow" };
 

@@ -3,6 +3,8 @@
 #include "Graphics.h"
 #include "Window.h"
 
+using namespace sunspot;
+
 
 const std::string Window::tag{ "Window" };
 
@@ -20,6 +22,7 @@ Window::Window(const char* title, const int width, const int height)
 	, light_{ nullptr }
 	, model_{ nullptr }
 	, room_{ nullptr }
+	, mesh_{ nullptr }
 	, quad_{ nullptr }
 	, camera_ { nullptr }
 	, framebuffer_{ nullptr }

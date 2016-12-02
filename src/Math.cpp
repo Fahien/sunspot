@@ -31,7 +31,7 @@ Vec2::Vec2(const float xx, const float yy)
 
 void Vec2::normalize()
 {
-	float length{ sqrt(x * x + y * y) };
+	float length{ static_cast<float>(sqrt(x * x + y * y)) };
 	x /= length;
 	y /= length;
 }
@@ -215,8 +215,8 @@ void Mat4::translateZ(const float amount)
 
 void Mat4::rotateX(const float radians)
 {
-	float cosrad{ cos(radians) };
-	float sinrad{ sin(radians) };
+	float cosrad{ static_cast<float>(cos(radians)) };
+	float sinrad{ static_cast<float>(sin(radians)) };
 	math::Mat4 rotation{
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, cosrad, sinrad, 0.0f,
@@ -228,8 +228,8 @@ void Mat4::rotateX(const float radians)
 
 void Mat4::rotateY(const float radians)
 {
-	float cosrad{ cos(radians) };
-	float sinrad{ sin(radians) };
+	float cosrad{ static_cast<float>(cos(radians)) };
+	float sinrad{ static_cast<float>(sin(radians)) };
 	math::Mat4 rotation{
 		cosrad, 0.0f, -sinrad, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
@@ -241,8 +241,8 @@ void Mat4::rotateY(const float radians)
 
 void Mat4::rotateZ(const float radians)
 {
-	float cosrad{ cos(radians) };
-	float sinrad{ sin(radians) };
+	float cosrad{ static_cast<float>(cos(radians)) };
+	float sinrad{ static_cast<float>(sin(radians)) };
 	math::Mat4 rotation{
 		cosrad, sinrad, 0, 0,
 		-sinrad, cosrad, 0, 0,
@@ -250,3 +250,4 @@ void Mat4::rotateZ(const float radians)
 		0, 0, 0, 1 };
 	*this = rotation * *this;
 }
+

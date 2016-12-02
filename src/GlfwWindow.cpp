@@ -5,9 +5,12 @@
 #include "ShaderProgram.h"
 #include "Light.h"
 #include "Model.h"
+#include "Mesh.h"
 #include "Quad.h"
 #include "Framebuffer.h"
 #include "Camera.h"
+
+using namespace sunspot;
 
 
 const std::string GlfwWindow::tag{ "GlfwWindow" };
@@ -181,7 +184,29 @@ const float &GlfwWindow::computeDeltaTime() // TODO comment
 void GlfwWindow::render(const float &deltaTime) // TODO comment
 {
 	// std::cout << static_cast<int>(1.0f / deltaTime) << " ";
-	renderStereoscopic(deltaTime);
+	renderMesh(deltaTime);
+}
+
+
+void GlfwWindow::renderMesh(const float &deltaTime) // TODO comment
+{
+	glfwGetFramebufferSize(window_, &frameSize_.width, &frameSize_.height);
+
+	glEnable(GL_DEPTH_TEST);
+	baseProgram_->use();
+	glViewport(0, 0, frameSize_.width, frameSize_.height);
+
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	camera_->update(deltaTime, baseProgram_);
+	light_->update(baseProgram_);
+	room_->bind();
+	room_->render(baseProgram_);
+	room_->unbind();
+	mesh_->bind();
+	mesh_->draw(baseProgram_);
+	mesh_->unbind();
 }
 
 

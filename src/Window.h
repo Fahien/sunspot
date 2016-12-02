@@ -2,6 +2,7 @@
 #define SST_WINDOW_H
 
 #include <string>
+#include <exception>
 #include "Math.h"
 
 class ShaderProgram;
@@ -11,6 +12,10 @@ class Quad;
 class Camera;
 class Framebuffer;
 
+
+namespace sunspot {
+
+class Mesh;
 
 class GraphicException : public std::runtime_error {
 public:
@@ -36,6 +41,7 @@ public:
 	inline void setLight(Light *light) { light_ = light; }
 	inline void setModel(Model *model) { model_ = model; }
 	inline void setRoom(Model *room) { room_ = room; }
+	inline void setMesh(Mesh *mesh) { mesh_ = mesh; }
 
 	inline void setQuadProgram(const ShaderProgram *quadProgram) { quadProgram_ = quadProgram; }
 	inline void setQuad(Quad *quad) { quad_ = quad; }
@@ -68,6 +74,8 @@ protected:
 	Model *model_;
 	Model *room_;
 
+	Mesh *mesh_;
+
 	const ShaderProgram *quadProgram_;
 	const Quad *quad_;
 
@@ -77,6 +85,8 @@ protected:
 
 	bool fullscreen_;
 };
+
+}
 
 #endif // SST_WINDOW_H
 

@@ -23,7 +23,9 @@ class Mesh {
 	Mesh(std::vector<Vertex> &vertices, std::vector<GLuint> &indices, std::vector<Texture> &textures);
 	~Mesh();
 
+	inline void bind() const { glBindVertexArray(vao_); }
 	void draw(const ShaderProgram *shader);
+	inline void unbind() const { glBindVertexArray(0); }
 
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;

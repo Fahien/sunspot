@@ -12,6 +12,12 @@ using namespace sunspot;
 
 /// Creates a Wavefront Object
 WavefrontObject::WavefrontObject()
+	: positionCount_{ 0 }
+	, normalCount_{ 0 }
+	, texCoordsCount_{ 0 }
+	, vertices_{}
+	, indices_{}
+	, textures_{}
 {
 	std::cout << "WavefrontObject: created\n"; // TODO remove debug log
 }
@@ -120,10 +126,10 @@ void WavefrontObject::loadIndices(std::stringstream is)
 			if (is.fail()) { f.indices[3] = -1; } // Default to invalid value
 		}
 	}
-	// Pick only first 3 indices, ignoring all the other values.
-	indices_.push_back(f.indices[0]);
-	indices_.push_back(f.indices[1]);
-	indices_.push_back(f.indices[2]);
+	// Pick only first 3 indices, ignoring all the other values. -1 cause obj starts from 1
+	indices_.push_back(f.indices[0] - 1);
+	indices_.push_back(f.indices[1] - 1);
+	indices_.push_back(f.indices[2] - 1);
 }
 
 
@@ -134,6 +140,7 @@ std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj)
 	unsigned lineNumber{ 1 };
 
 	while (std::getline(is, line)) {
+		if (line.length() <= 0) { continue; }
 		switch (line[0]) {
 		case '#': {
 			std::cout << "## Comment\n";
@@ -185,7 +192,6 @@ std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj)
 			break;
 		}}
 		++lineNumber;
-		std::cout << std::endl;
 	}
 	return is;
 }

@@ -31,7 +31,9 @@ class WavefrontObject {
 	WavefrontObject();
 	~WavefrontObject();
 
-	friend std::ifstream &operator>>(std::ifstream &in, WavefrontObject &obj);
+	inline std::vector<Vertex> &getVertices() { return vertices_; };
+	inline std::vector<GLuint> &getIndices() { return indices_; };
+
 	void loadPosition(std::stringstream is);
 	void loadTexCoords(std::stringstream is);
 	void loadNormal(std::stringstream is);
@@ -48,6 +50,8 @@ class WavefrontObject {
 };
 
 }
+
+std::ifstream &operator>>(std::ifstream &in, sunspot::WavefrontObject &obj);
 
 #endif // SST_WAVEFRONTOBJECT_H
 

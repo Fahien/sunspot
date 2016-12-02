@@ -5,6 +5,8 @@
 #include "Cursor.h"
 
 
+namespace sunspot {
+
 class GlfwException : public GraphicException {
 public:
 	GlfwException(const std::string &tag, const std::string &message) : GraphicException{ tag + ": " + message } {}
@@ -29,6 +31,7 @@ class GlfwWindow : public Window
 	void render(const float &deltaTime);
 
   private:
+	void renderMesh(const float &deltaTime);
 	void render3D(const float &deltaTime);
 	void render3DplusDepth(const float &deltaTime);
 	void renderQuad(const float &deltaTime);
@@ -40,6 +43,8 @@ class GlfwWindow : public Window
 	GLFWwindow *window_;
 	Cursor cursor_;
 };
+
+}
 
 #endif // SST_GLFWWINDOW_H
 
