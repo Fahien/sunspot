@@ -52,7 +52,6 @@ void Mesh::draw(const ShaderProgram *shader)
 {
 	GLuint diffuseCount{ 1 };
 	GLuint specularCount{ 1 };
-	std::cout << "Textures: " << textures.size() << std::endl;
 	for (GLuint i{ 0 }; i < textures.size(); ++i) {
 		TextureType type{ textures[i].getType() };
 		std::string name{ getTextureTypeName(type) };

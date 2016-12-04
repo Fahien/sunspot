@@ -194,7 +194,7 @@ void SdlWindow::renderStereoscopic(const float &deltaTime) const
 	glViewport(0, 0, width, height); // Second pass: render the framebuffer on a quad
 	glDisable(GL_DEPTH_TEST);
 	quadProgram_->use();
-	framebuffer_->bindTextures(quadProgram_);
+	framebuffer_->bindColorTexture(quadProgram_);
 
 	quad_->bind();
 	quad_->render();

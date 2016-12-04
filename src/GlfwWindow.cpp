@@ -95,7 +95,9 @@ GlfwWindow::GlfwWindow(const char *title, const int width, const int height, con
 	glfwGetFramebufferSize(window_, &frameSize_.width, &frameSize_.height);
 	glfwSwapInterval(1); // Vsync
 
-	std::cout << tag << ": created\n\tOpenGL " << glGetString(GL_VERSION) << "\n\tGLFW " << glfwGetVersionString() << std::endl;
+	std::cout << tag << ": created\n\tOpenGL " << glGetString(GL_VERSION) << std::endl
+		<< "\tGLFW " << glfwGetVersionString() << std::endl
+		<< "\tFrame size " << frameSize_.width << "x" << frameSize_.height << std::endl;
 }
 
 
@@ -183,8 +185,8 @@ const float &GlfwWindow::computeDeltaTime() // TODO comment
 
 void GlfwWindow::render(const float &deltaTime) // TODO comment
 {
-	// std::cout << static_cast<int>(1.0f / deltaTime) << " ";
-	renderMesh(deltaTime);
+	std::cout << static_cast<int>(1.0f / deltaTime) << " ";
+	renderStereoscopic(deltaTime);
 }
 
 
@@ -246,18 +248,13 @@ void GlfwWindow::render3DplusDepth(const float& deltaTime) // TODO comment
 
 	model_->bind();
 
-	glViewport(0, 0, frameSize_.width / 2, frameSize_.height);
 	baseProgram_->use();
 	camera_->update(deltaTime, baseProgram_);
 	light_->update(baseProgram_);
 	if (rotateY_) model_->transform.rotateY(deltaTime);
+	glViewport(0, 0, frameSize_.width, frameSize_.height);
 	model_->render(baseProgram_);
-
-	glViewport(frameSize_.width / 2, 0, frameSize_.width / 2, frameSize_.height);
-	depthProgram_->use();
-	camera_->update(deltaTime, depthProgram_);
-	model_->render(depthProgram_);
-
+	model_->unbind();
 	model_->unbind();
 }
 
@@ -282,33 +279,37 @@ void GlfwWindow::renderStereoscopic(const float &deltaTime)
 	// Dimensions from GLFW such that it also works on high DPI screens
 	glfwGetFramebufferSize(window_, &frameSize_.width, &frameSize_.height);
 
-	framebuffer_->bind(); // First pass: render the scene on a framebuffer
-	glViewport(0, 0, frameSize_.width, frameSize_.height / 2); // Viewport for color and depth sub-images
+	// First pass
 	glEnable(GL_DEPTH_TEST);
+	framebuffer_->bind(); // Render the scene on a framebuffer
+	glViewport(0, 0, framebuffer_->getWidth(), framebuffer_->getHeight()); // Viewport for framebuffer
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffer
 
 	if (rotateY_) { model_->transform.rotateY(deltaTime); }
-	model_->bind();
 	baseProgram_->use();
+	model_->bind();
 	camera_->update(deltaTime, baseProgram_);
 	light_->update(baseProgram_);
-	glViewport(0, 0, frameSize_.width / 2, frameSize_.height / 2); // Render color sub-image
 	model_->render(baseProgram_);
-	glViewport(frameSize_.width / 2, 0, frameSize_.width / 2, frameSize_.height / 2); // Render depth sub-image
-	depthProgram_->use();
-	camera_->update(deltaTime, depthProgram_);
-	model_->render(depthProgram_);
 	model_->unbind();
-	framebuffer_->unbind(); // End first pass
+	framebuffer_->unbind();
+	// End first pass
 
-	glViewport(0, 0, frameSize_.width, frameSize_.height); // Second pass: render the framebuffer on a quad
+	// Second pass
 	glDisable(GL_DEPTH_TEST);
-	quadProgram_->use();
-	framebuffer_->bindTextures(quadProgram_);
-
 	quad_->bind();
+	quadProgram_->use();
+	framebuffer_->bindColorTexture(quadProgram_);
+	// Render color on the left
+	glViewport(0, 0, frameSize_.width / 2, frameSize_.height);
 	quad_->render();
-	quad_->unbind(); // End second pass
+	depthProgram_->use();
+	framebuffer_->bindDepthTexture(depthProgram_);
+	// Render depth on the right
+	glViewport(frameSize_.width / 2, 0, frameSize_.width / 2, frameSize_.height);
+	quad_->render();
+	quad_->unbind();
+	// End second pass
 }
 

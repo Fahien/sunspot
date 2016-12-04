@@ -2,7 +2,7 @@
 #define SST_WINDOW_H
 
 #include <string>
-#include <exception>
+#include <stdexcept>
 #include "Math.h"
 
 class ShaderProgram;
@@ -10,12 +10,12 @@ class Light;
 class Model;
 class Quad;
 class Camera;
-class Framebuffer;
 
 
 namespace sunspot {
 
 class Mesh;
+class Framebuffer;
 
 class GraphicException : public std::runtime_error {
 public:

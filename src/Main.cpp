@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 		}
 
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
-		ShaderProgram depthProgram{ "shader/base.vert", "shader/depth.frag" };
+		ShaderProgram depthProgram{ "shader/quad.vert", "shader/depth.frag" };
 		Light light{ 0.5f, 0.5f, 0.5f };
 		light.setPosition(2.0f, 1.0f, -1.0f);
 		Model model{ "shader/crate", .25f };
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
 		Camera camera{ 45.0f, static_cast<float>(width) / height, 0.125f, 8.0f };
 		math::Size frameSize {window->getFrameSize()};
-		Framebuffer framebuffer{ frameSize.width, frameSize.height / 2 };
+		Framebuffer framebuffer{ frameSize.width / 2, frameSize.height / 2};
 
 		std::ifstream is{ objName };
 		if (!is.is_open()) {

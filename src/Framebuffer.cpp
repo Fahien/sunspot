@@ -11,12 +11,14 @@ const std::string Framebuffer::tag{ "Framebuffer" };
 
 
 Framebuffer::Framebuffer(const int width, const int height)
-	: fbo_ {0}
-	, colorTexture_ {0}
-	, depthTexture_ {0}
-	, maskTexture_ {0}
-	, headerTexture_ {0}
-	, rbo_ {0}
+	: width_{ width }
+	, height_{ height }
+	, fbo_{ 0 }
+	, colorTexture_{ 0 }
+	, depthTexture_{ 0 }
+	, maskTexture_{ 0 }
+	, headerTexture_{ 0 }
+	, rbo_{ 0 }
 {
 	glGenFramebuffers(1, &fbo_); // Create a framebuffer object
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
@@ -30,7 +32,7 @@ Framebuffer::Framebuffer(const int width, const int height)
 
 	glGenTextures(1, &depthTexture_); // Create a texture for depth
 	glBindTexture(GL_TEXTURE_2D, depthTexture_);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture_, 0);
@@ -49,17 +51,18 @@ Framebuffer::Framebuffer(const int width, const int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+/*
 	glGenRenderbuffers(1, &rbo_); // Create a renderbuffer object
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo_);
-
+*/
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
 		std::cout << "Framebuffer: created\n"; // TODO remove debug log
 	}
 	else {
-		glDeleteRenderbuffers(1, &rbo_);
+		// glDeleteRenderbuffers(1, &rbo_);
 		glDeleteTextures(1, &headerTexture_);
 		glDeleteTextures(1, &maskTexture_);
 		glDeleteTextures(1, &depthTexture_);
@@ -73,7 +76,7 @@ Framebuffer::Framebuffer(const int width, const int height)
 
 Framebuffer::~Framebuffer()
 {
-	glDeleteRenderbuffers(1, &rbo_);
+	// glDeleteRenderbuffers(1, &rbo_);
 	glDeleteTextures(1, &headerTexture_);
 	glDeleteTextures(1, &maskTexture_);
 	glDeleteTextures(1, &depthTexture_);
@@ -83,19 +86,29 @@ Framebuffer::~Framebuffer()
 }
 
 
-void Framebuffer::bindTextures(const ShaderProgram *shader) const
+void Framebuffer::bindColorTexture(const ShaderProgram *shader) const
 {
 	glUniform1i(shader->getLocation("screenTexture"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, colorTexture_);
-	glUniform1i(shader->getLocation("depthTexture"), 1);
+	glUniform1i(shader->getLocation("maskTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, depthTexture_);
-	glUniform1i(shader->getLocation("maskTexture"), 2);
-	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, maskTexture_);
-	glUniform1i(shader->getLocation("headerTexture"), 3);
-	glActiveTexture(GL_TEXTURE3);
+	glUniform1i(shader->getLocation("headerTexture"), 2);
+	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, headerTexture_);
+	glUniform1i(shader->getLocation("height"), height_);
+}
+
+
+void Framebuffer::bindDepthTexture(const ShaderProgram *shader) const
+{
+	glUniform1i(shader->getLocation("depthTexture"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, depthTexture_);
+	glUniform1i(shader->getLocation("maskTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, maskTexture_);
+	glUniform1i(shader->getLocation("height"), height_);
 }
 
