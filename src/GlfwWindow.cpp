@@ -186,7 +186,7 @@ const float &GlfwWindow::computeDeltaTime() // TODO comment
 void GlfwWindow::render(const float &deltaTime) // TODO comment
 {
 	std::cout << static_cast<int>(1.0f / deltaTime) << " ";
-	renderStereoscopic(deltaTime);
+	renderMesh(deltaTime);
 }
 
 

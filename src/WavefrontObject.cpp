@@ -127,9 +127,11 @@ void WavefrontObject::loadIndices(std::stringstream is)
 		}
 	}
 	// Pick only first 3 indices, ignoring all the other values. -1 cause obj starts from 1
-	indices_.push_back(f.indices[0] - 1);
-	indices_.push_back(f.indices[1] - 1);
-	indices_.push_back(f.indices[2] - 1);
+	for (int i{ 0 }; i < 3; ++i) {
+		if (f.indices[i] > 0) { indices_.push_back(f.indices[i] - 1); }
+		else if (f.indices[i] < 0) { indices_.push_back(positionCount_ + f.indices[i]); }
+		else { throw LoadingException{ "Negative index" }; }
+	}
 }
 
 
