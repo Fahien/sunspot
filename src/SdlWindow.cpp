@@ -1,12 +1,7 @@
 #include <iostream>
 
 #include "SdlWindow.h"
-#include "ShaderProgram.h"
-#include "Model.h"
-#include "Quad.h"
 #include "Camera.h"
-#include "Framebuffer.h"
-#include "Light.h"
 
 using namespace sunspot;
 
@@ -18,6 +13,7 @@ SdlWindow::SdlWindow(const char *title, const int width, const int height, const
 	: Window::Window{ title, width, height }
 	, window_{ nullptr }
 	, context_{ nullptr }
+	, event_{}
 {
 	// Initialize SDL video subsystem and handle error
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) { throw SdlException(tag); }
@@ -33,27 +29,26 @@ SdlWindow::SdlWindow(const char *title, const int width, const int height, const
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3); // Request OpenGL 3.3 context
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1); // Turn on double buffering
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16); // Set 16 bit Z buffer
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); // Set 24 bit Z buffer
 	context_ = SDL_GL_CreateContext(window_);
 	if (context_ == nullptr) { // Handle context creation error
 		SDL_DestroyWindow(window_);
 		SDL_Quit();
 		throw SdlException(tag);
 	}
-
 	SDL_GetWindowSize(window_, &monitorSize_.width, &monitorSize_.height); // Get monitor size
+	SDL_SetRelativeMouseMode(SDL_TRUE); // Hide cursor, and report continuous motion
 
-	SDL_GL_SetSwapInterval(1); // Syncronize with the monitor's vertical refresh
-
-	try {
-		Window::initGlew();
-	}
+	try { Window::initGlew(); } // Initialize glew
 	catch (GlewException &) {
 		SDL_GL_DeleteContext(context_);
 		SDL_DestroyWindow(window_);
 		SDL_Quit();
 		throw;
 	}
+
+	updateFrameSize();
+	SDL_GL_SetSwapInterval(1); // Syncronize with the monitor's vertical refresh
 
 	std::cout << tag << ": created\n"; // TODO remove debug log
 }
@@ -74,33 +69,51 @@ void SdlWindow::toggleFullscreen()
 		if (SDL_SetWindowFullscreen(window_, 0) < 0) { // Handle error
 			throw SdlException(tag);
 		}
-		fullscreen_ = false;
 	}
 	else { // Set fullscreen mode
 		if (SDL_SetWindowFullscreen(window_, SDL_WINDOW_FULLSCREEN_DESKTOP) < 0) { // Handle error
 			throw SdlException(tag);
 		}
-		fullscreen_ = true;
 	}
+	fullscreen_ = !fullscreen_;
 }
 
 
 void SdlWindow::loop()
 {
-	SDL_Event sdlEvent;
 	while (true) {
-		while (SDL_PollEvent(&sdlEvent)) { // Processes events that have already been received
-			switch (sdlEvent.type) {
-			case SDL_KEYUP:
-				switch (sdlEvent.key.keysym.sym) {
-				case SDLK_q:
-				case SDLK_ESCAPE: goto EXIT;
-				case SDLK_f: toggleFullscreen(); break;
-				default: break;
+		while (SDL_PollEvent(&event_)) { // Processes events that have already been received
+			float sensitivity{ cursor_.getSensitivity() * deltaTime_ };
+			switch (event_.type) {
+			  case SDL_MOUSEMOTION: // Look around
+				camera_->setYaw(camera_->getYaw() - event_.motion.xrel * sensitivity);
+				camera_->setPitch(camera_->getPitch() + event_.motion.yrel * sensitivity);
+				camera_->updateVectors();
+				break;
+			  case SDL_KEYUP:
+				switch (event_.key.keysym.sym) {
+				  case SDLK_w: camera_->setVelocityZ(0.0f); break;
+				  case SDLK_s: camera_->setVelocityZ(0.0f); break;
+				  case SDLK_a: camera_->setVelocityX(0.0f); break;
+				  case SDLK_d: camera_->setVelocityX(0.0f); break;
+				  case SDLK_f: toggleFullscreen(); break;
+				  case SDLK_q:
+				  case SDLK_ESCAPE: goto EXIT;
+				  default: break;
 				}
-			default: break;
+				break;
+			  case SDL_KEYDOWN:
+				switch (event_.key.keysym.sym) {
+					case SDLK_w: camera_->setVelocityZ(-1.0f); break;
+					case SDLK_s: camera_->setVelocityZ(1.0f); break;
+					case SDLK_a: camera_->setVelocityX(-1.0f); break;
+					case SDLK_d: camera_->setVelocityX(1.0f); break;
+					default: break;
+				}
+				break;
+			  case SDL_QUIT: goto EXIT;
+			  default: break;
 			}
-			if (sdlEvent.type == SDL_QUIT) { goto EXIT; }
 		}
 		Window::render();
 		SDL_GL_SwapWindow(window_); // Swap back buffer to the front
@@ -119,84 +132,9 @@ const float &SdlWindow::computeDeltaTime()
 }
 
 
-void SdlWindow::render(const float &deltaTime)
+void SdlWindow::updateFrameSize()
 {
-	renderStereoscopic(deltaTime);
+	// Get the size of a window's underlying drawable in pixels
+	SDL_GL_GetDrawableSize(window_, &frameSize_.width, &frameSize_.height);
 }
 
-
-void SdlWindow::render3DplusDepth(const float &deltaTime) const
-{
-	glViewport(0, 0, windowSize_.width, windowSize_.height);
-
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
-
-	model_->bind();
-
-	glViewport(0, 0, windowSize_.width / 2, windowSize_.height);  // Render color sub-image
-	baseProgram_->use();
-	camera_->update(deltaTime, baseProgram_);
-	light_->update(baseProgram_);
-	model_->transform.rotateY(0.0025f);
-	model_->render(baseProgram_);
-
-	glViewport(windowSize_.width / 2, 0, windowSize_.width / 2, windowSize_.height); // Render depth sub-image
-	glDisable(GL_DEPTH_TEST);
-	depthProgram_->use();
-	camera_->update(deltaTime, depthProgram_);
-	model_->render(depthProgram_);
-
-	model_->unbind();
-}
-
-
-void SdlWindow::renderQuad(const float &deltaTime) const
-{
-	depthProgram_->use();
-	glViewport(0, 0, windowSize_.width, windowSize_.height);
-
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
-
-	quad_->bind();
-	quad_->render();
-	quad_->unbind();
-}
-
-
-void SdlWindow::renderStereoscopic(const float &deltaTime) const
-{
-	int width, height;
-	SDL_GL_GetDrawableSize(window_, &width, &height);
-
-	framebuffer_->bind(); // First pass: render the scene on a framebuffer
-	glViewport(0, 0, width, height / 2); // Viewport for color and depth sub-images
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color and depth buffer
-
-	model_->bind();
-	model_->transform.rotateY(deltaTime);
-	baseProgram_->use();
-	camera_->update(deltaTime, baseProgram_);
-	light_->update(baseProgram_);
-	glViewport(0, 0, width / 2, height / 2); // Render color sub-image
-	model_->render(baseProgram_);
-	glViewport(width / 2, 0, width / 2, height / 2); // Render depth sub-image
-	depthProgram_->use();
-	camera_->update(deltaTime, depthProgram_);
-	model_->render(depthProgram_);
-	model_->unbind();
-	framebuffer_->unbind(); // End first pass
-
-	glViewport(0, 0, width, height); // Second pass: render the framebuffer on a quad
-	glDisable(GL_DEPTH_TEST);
-	quadProgram_->use();
-	framebuffer_->bindColorTexture(quadProgram_);
-
-	quad_->bind();
-	quad_->render();
-	quad_->unbind(); // End second pass
-}

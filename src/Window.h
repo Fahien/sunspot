@@ -4,6 +4,7 @@
 #include <string>
 #include <stdexcept>
 #include "Math.h"
+#include "Cursor.h"
 
 class ShaderProgram;
 class Light;
@@ -37,14 +38,15 @@ public:
 
 	inline math::Size &getFrameSize() { return frameSize_; }
 	inline void setBaseProgram(const ShaderProgram *baseProgram) { baseProgram_ = baseProgram; }
-	inline void setDepthProgram(const ShaderProgram *depthProgram) { depthProgram_ = depthProgram; }
 	inline void setLight(Light *light) { light_ = light; }
 	inline void setModel(Model *model) { model_ = model; }
 	inline void setRoom(Model *room) { room_ = room; }
 	inline void setMesh(Mesh *mesh) { mesh_ = mesh; }
 
-	inline void setQuadProgram(const ShaderProgram *quadProgram) { quadProgram_ = quadProgram; }
 	inline void setQuad(Quad *quad) { quad_ = quad; }
+	inline void setQuadProgram(const ShaderProgram *quadProgram) { quadProgram_ = quadProgram; }
+	inline void setDepthProgram(const ShaderProgram *depthProgram) { depthProgram_ = depthProgram; }
+
 
 	inline void setCamera(Camera *camera) { camera_ = camera; }
 	inline void setFramebuffer(const Framebuffer *framebuffer) { framebuffer_ = framebuffer; }
@@ -53,37 +55,43 @@ public:
 
 protected:
 	static void initGlew();
+	void render();
 
-	virtual void render();
+	virtual void toggleFullscreen() = 0;
 	virtual const float &computeDeltaTime() = 0;
-	virtual void render(const float &deltaTime) = 0;
+	virtual void updateFrameSize() = 0;
 
 	const char* title_;
 	math::Size windowSize_;
 	math::Size monitorSize_;
 	math::Size frameSize_;
-	
 
 	float currentTime_;
 	float lastTime_;
 	float deltaTime_;
 
+	Cursor cursor_;
+	Camera *camera_;
+
+	bool fullscreen_;
+
+private:
+	void render(const float &deltaTime);
+	void renderMesh(const float &deltaTime);
+	void render3D(const float &deltaTime);
+	void render3DplusDepth(const float &deltaTime);
+	void renderQuad(const float &deltaTime);
+	void renderStereoscopic(const float &deltaTime);
+
 	const ShaderProgram *baseProgram_;
-	const ShaderProgram *depthProgram_;
 	Light *light_;
 	Model *model_;
 	Model *room_;
-
 	Mesh *mesh_;
-
 	const ShaderProgram *quadProgram_;
-	const Quad *quad_;
-
-	Camera *camera_;
-
+	const ShaderProgram *depthProgram_;
 	const Framebuffer *framebuffer_;
-
-	bool fullscreen_;
+	const Quad *quad_;
 };
 
 }

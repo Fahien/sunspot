@@ -21,21 +21,18 @@ class SdlWindow : public Window {
 	SdlWindow(const char *title, const int width, const int height, const bool decorated);
 	~SdlWindow();
 
-	void toggleFullscreen();
-
 	void loop();
 
   protected:
+	void toggleFullscreen();
 	const float &computeDeltaTime();
+	void updateFrameSize();
 	void render(const float &deltaTime);
 
   private:
-	void render3DplusDepth(const float &deltaTime) const;
-	void renderQuad(const float &deltaTime) const;
-	void renderStereoscopic(const float &deltaTime) const;
-
 	SDL_Window *window_;
 	SDL_GLContext context_;
+	SDL_Event event_;
 };
 
 }

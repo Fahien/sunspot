@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 			window = new SdlWindow{ SST_TITLE, width, height, decorated };
 		}
 		else {
-			window = new GlfwWindow{ SST_TITLE, width, height, stereo, decorated };
+			window = new GlfwWindow{ SST_TITLE, width, height, decorated };
 		}
 
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };

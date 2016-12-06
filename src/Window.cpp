@@ -2,6 +2,13 @@
 
 #include "Graphics.h"
 #include "Window.h"
+#include "ShaderProgram.h"
+#include "Camera.h"
+#include "Light.h"
+#include "Model.h"
+#include "Mesh.h"
+#include "Quad.h"
+#include "Framebuffer.h"
 
 using namespace sunspot;
 
@@ -17,16 +24,18 @@ Window::Window(const char* title, const int width, const int height)
 	, currentTime_{ 0.0f }
 	, lastTime_{ 0.0f }
 	, deltaTime_{ 0.0f }
+	, cursor_{}
+	, camera_ { nullptr }
+	, fullscreen_{ true }
 	, baseProgram_{ nullptr }
-	, depthProgram_{ nullptr }
 	, light_{ nullptr }
 	, model_{ nullptr }
 	, room_{ nullptr }
 	, mesh_{ nullptr }
-	, quad_{ nullptr }
-	, camera_ { nullptr }
+	, quadProgram_{ nullptr }
+	, depthProgram_{ nullptr }
 	, framebuffer_{ nullptr }
-	, fullscreen_{ true }
+	, quad_{ nullptr }
 {}
 
 
@@ -42,3 +51,102 @@ void Window::render()
 	render(computeDeltaTime());
 }
 
+
+void Window::render(const float &deltaTime) // TODO comment
+{
+	// std::cout << static_cast<int>(1.0f / deltaTime) << " "; // FPS
+	updateFrameSize();
+	renderMesh(deltaTime);
+}
+
+
+void Window::renderMesh(const float &deltaTime) // TODO comment
+{
+	glEnable(GL_DEPTH_TEST);
+	glViewport(0, 0, frameSize_.width, frameSize_.height);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	baseProgram_->use();
+	camera_->update(deltaTime, baseProgram_);
+	light_->update(baseProgram_);
+	room_->bind();
+	room_->render(baseProgram_);
+	room_->unbind();
+	mesh_->draw(baseProgram_);
+}
+
+
+void Window::render3D(const float &deltaTime) // TODO comment
+{
+	glEnable(GL_DEPTH_TEST);
+	baseProgram_->use();
+	glViewport(0, 0, frameSize_.width, frameSize_.height);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
+	camera_->update(deltaTime, baseProgram_);
+	light_->update(baseProgram_);
+	room_->bind();
+	room_->render(baseProgram_);
+	room_->unbind();
+	model_->bind();
+	model_->render(baseProgram_);
+	model_->unbind();
+}
+
+
+void Window::render3DplusDepth(const float& deltaTime) // TODO comment
+{
+	glEnable(GL_DEPTH_TEST);
+	glViewport(0, 0, frameSize_.width, frameSize_.height);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color buffer
+	baseProgram_->use();
+	camera_->update(deltaTime, baseProgram_);
+	light_->update(baseProgram_);
+	model_->bind();
+	model_->render(baseProgram_);
+	model_->unbind();
+}
+
+
+void Window::renderQuad(const float &deltaTime)
+{
+	glViewport(0, 0, frameSize_.width, frameSize_.height);
+	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color buffer
+	quadProgram_->use();
+	quad_->bind();
+	quad_->render();
+	quad_->unbind();
+}
+
+void Window::renderStereoscopic(const float &deltaTime)
+{
+	// First pass
+	glEnable(GL_DEPTH_TEST);
+	framebuffer_->bind(); // Render the scene on a framebuffer
+	glViewport(0, 0, framebuffer_->getWidth(), framebuffer_->getHeight()); // Viewport for framebuffer
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
+	baseProgram_->use();
+	model_->bind();
+	camera_->update(deltaTime, baseProgram_);
+	light_->update(baseProgram_);
+	model_->render(baseProgram_);
+	model_->unbind();
+	framebuffer_->unbind();
+
+	// Second pass
+	glDisable(GL_DEPTH_TEST);
+	quad_->bind();
+	glViewport(0, 0, frameSize_.width / 2, frameSize_.height);
+	quadProgram_->use();
+	framebuffer_->bindColorTexture(quadProgram_); // Render color on the left
+	quad_->render();
+	glViewport(frameSize_.width / 2, 0, frameSize_.width / 2, frameSize_.height);
+	depthProgram_->use();
+	framebuffer_->bindDepthTexture(depthProgram_); // Render depth on the right
+	quad_->render();
+	quad_->unbind();
+}
