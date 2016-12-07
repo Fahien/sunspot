@@ -7,7 +7,6 @@
 #include "Cursor.h"
 
 class ShaderProgram;
-class Light;
 class Model;
 class Quad;
 class Camera;
@@ -15,6 +14,7 @@ class Camera;
 
 namespace sunspot {
 
+class Light;
 class Mesh;
 class Framebuffer;
 

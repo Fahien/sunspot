@@ -6,6 +6,8 @@
 
 namespace sunspot {
 
+
+/// TODO Comment
 Mesh::Mesh(std::vector<Vertex> &v, std::vector<GLuint> &i, std::vector<Texture> &t)
 	: vertices{ v }
 	, indices{ i }
@@ -36,12 +38,13 @@ Mesh::Mesh(std::vector<Vertex> &v, std::vector<GLuint> &i, std::vector<Texture> 
 	// TODO refactor that SHIT
 	textures.push_back(Texture{"shader/test", TextureType::DIFFUSE});
 	textures.push_back(Texture{"shader/test", TextureType::SPECULAR});
+	material_.diffuseMap = textures[0].getId();
+	material_.specularMap = textures[1].getId();
 }
 
 
 Mesh::~Mesh()
 {
-	for (Texture t : textures) { t.release(); }
 	glDeleteVertexArrays(1, &vao_);
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);
@@ -50,20 +53,7 @@ Mesh::~Mesh()
 
 void Mesh::draw(const ShaderProgram *shader)
 {
-	GLuint diffuseCount{ 1 };
-	GLuint specularCount{ 1 };
-	for (GLuint i{ 0 }; i < textures.size(); ++i) {
-		TextureType type{ textures[i].getType() };
-		std::string name{ getTextureTypeName(type) };
-		std::string number;
-		if (type == DIFFUSE) { number = diffuseCount++; } // Transfer GLuint to stream
-		else if (type == SPECULAR) { number = specularCount++; } // Transfer GLuint to stream
-		std::string location {"material." + name };
-		glUniform1i(shader->getLocation(location.c_str()), i);
-		glActiveTexture(GL_TEXTURE0 + i); // Activate proper texture unit before binding
-		glBindTexture(GL_TEXTURE_2D, textures[i].getId());
-	}
-	glActiveTexture(GL_TEXTURE0); // Reset active texture
+	material_.bind(shader);
 
 	// Draw mesh
 	glBindVertexArray(vao_);

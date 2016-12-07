@@ -84,16 +84,16 @@ Model::Model(const std::string &path, const float scale)
 	glBindVertexArray(0); // Unbind vao
 
 	TextureData diffuse{ path };
-	glGenTextures(1, &material_.diffuse); // Create a diffuse map
-	glBindTexture(GL_TEXTURE_2D, material_.diffuse);
+	glGenTextures(1, &material_.diffuseMap); // Create a diffuse map
+	glBindTexture(GL_TEXTURE_2D, material_.diffuseMap);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, diffuse.getWidth(), diffuse.getHeight(),
 		0, GL_RGB, GL_UNSIGNED_BYTE, diffuse.getData());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	TextureData specular{ path + "-s" };
-	glGenTextures(1, &material_.specular); // Create a specular map
-	glBindTexture(GL_TEXTURE_2D, material_.specular);
+	glGenTextures(1, &material_.specularMap); // Create a specular map
+	glBindTexture(GL_TEXTURE_2D, material_.specularMap);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, specular.getWidth(), specular.getHeight(),
 		0, GL_RGB, GL_UNSIGNED_BYTE, specular.getData());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -105,8 +105,8 @@ Model::Model(const std::string &path, const float scale)
 
 Model::~Model()
 {
-	glDeleteTextures(1, &material_.diffuse);
-	glDeleteTextures(1, &material_.specular);
+	glDeleteTextures(1, &material_.diffuseMap);
+	glDeleteTextures(1, &material_.specularMap);
 	glDeleteVertexArrays(1, &vao_);
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);
@@ -117,16 +117,30 @@ Model::~Model()
 
 void Model::render(const ShaderProgram *program) const
 {
+	// Bind transform matrix
 	glUniformMatrix4fv(program->getLocation("model"), 1, GL_FALSE, transform.matrix);
 
-	glUniform1i(program->getLocation("material.specular"), 1);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, material_.specular);
-	glUniform1i(program->getLocation("material.diffuse"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, material_.diffuse);
+	// Bind ambient color
+	glUniform3f(program->getLocation("material.ambient"),
+		material_.ambient.r, material_.ambient.g, material_.ambient.b);
+	// Bind diffuse color
+	glUniform3f(program->getLocation("material.diffuse"),
+		material_.diffuse.r, material_.diffuse.g, material_.diffuse.b);
+	// Bind specular color
+	glUniform3f(program->getLocation("material.specular"),
+		material_.specular.r, material_.specular.g, material_.specular.b);
+	// Bind shininess
 	glUniform1f(program->getLocation("material.shininess"), material_.shininess);
+	// Bind diffuse map
+	glUniform1i(program->getLocation("material.diffuseMap"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, material_.diffuseMap);
+	// Bind specular map
+	glUniform1i(program->getLocation("material.specularMap"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, material_.specularMap);
 
+	// Eventually, draw
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
 

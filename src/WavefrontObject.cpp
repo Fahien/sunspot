@@ -149,10 +149,7 @@ std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj)
 		if (line.length() <= 0) { continue; }
 		std::stringstream is{ line };
 		switch (line[0]) {
-		case '#': {
-			std::cout << "## Comment\n";
-			break;
-		}
+		case '#': { break; }
 		case 'o': { // Name command
 			try { obj.loadName(is); }
 			catch (const LoadingException &e) {

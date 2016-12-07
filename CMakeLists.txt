@@ -8,7 +8,7 @@ option (CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 # Version number
 set (SST_VERSION_MAJOR 0)
-set (SST_VERSION_MINOR 8)
+set (SST_VERSION_MINOR 9)
 set (SST_TITLE "StereoscopicTest")
 
 # Configure a header file to pass some of the CMake settings to the source code
@@ -78,6 +78,8 @@ set (SOURCES
 	src/Texture.cpp
 	src/Model.h
 	src/Model.cpp
+	src/Material.h
+	src/Material.cpp
 	src/Mesh.h
 	src/Mesh.cpp
 	src/WavefrontObject.h

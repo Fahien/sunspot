@@ -1,5 +1,7 @@
 #include "Color.h"
 
+using namespace sunspot;
+
 
 Color::Color()
 	: r{ 1.0f }

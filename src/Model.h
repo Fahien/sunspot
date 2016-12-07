@@ -1,6 +1,7 @@
 #ifndef SST_MODEL_H
 #define SST_MODEL_H
 
+#include <string>
 #include "Graphics.h"
 #include "Math.h"
 #include "Material.h"
@@ -22,7 +23,7 @@ class Model {
 	GLuint vbo_;
 	GLuint ebo_;
 	GLuint vao_;
-	Material material_;
+	sunspot::Material material_;
 };
 
 #endif // SST_MODEL_H

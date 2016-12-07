@@ -1,6 +1,8 @@
 #ifndef SST_COLOR_H
 #define SST_COLOR_H
 
+namespace sunspot {
+
 struct Color {
 	Color();
 	Color(const float r, const float g, const float b);
@@ -9,6 +11,8 @@ struct Color {
 	float g; // Green
 	float b; // Blue
 };
+
+}
 
 #endif // SST_COLOR_H
 

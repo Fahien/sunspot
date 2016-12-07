@@ -4,9 +4,12 @@ const float zero = 0.0f;
 const float one = 1.0f;
 
 struct Material {
-	sampler2D diffuse;
-	sampler2D specular;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
 	float shininess;
+	sampler2D diffuseMap;
+	sampler2D specularMap;
 };
 
 struct Light {
@@ -32,17 +35,18 @@ out vec4 color;
 
 void main()
 {
-	vec3 fragment = vec3(texture(material.diffuse, texCoords));
-	vec3 ambient = light.ambient * fragment;
+	vec3 fragment = vec3(texture(material.diffuseMap, texCoords));
+	vec3 ambient = light.ambient * material.ambient * fragment;
 
 	vec3 lightDirection = normalize(light.position - position);
 	float diffuseFactor = max(dot(normal, lightDirection), zero);
-	vec3 diffuse = diffuseFactor * light.diffuse * fragment;
+	vec3 diffuse = diffuseFactor * light.diffuse * material.diffuse * fragment;
 
 	vec3 cameraDirection = normalize(camera.position - position);
 	vec3 reflectDirection = reflect(-lightDirection, normal); 
 	float specularFactor = pow(max(dot(cameraDirection, reflectDirection), zero), material.shininess);
-	vec3 specular = specularFactor * light.specular * vec3(texture(material.specular, texCoords));
+	vec3 specular = specularFactor * light.specular * material.specular *
+		vec3(texture(material.specularMap, texCoords));
 
 	color = vec4(ambient + diffuse + specular, one);
 }

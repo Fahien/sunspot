@@ -5,6 +5,7 @@
 #include "Graphics.h"
 #include "Math.h"
 #include "Texture.h"
+#include "Material.h"
 
 class ShaderProgram;
 
@@ -35,6 +36,7 @@ class Mesh {
 	GLuint vao_;
 	GLuint vbo_;
 	GLuint ebo_;
+	Material material_;
 };
 
 
