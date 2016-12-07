@@ -51,18 +51,10 @@ Framebuffer::Framebuffer(const int width, const int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-/*
-	glGenRenderbuffers(1, &rbo_); // Create a renderbuffer object
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo_);
-*/
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
 		std::cout << "Framebuffer: created\n"; // TODO remove debug log
 	}
 	else {
-		// glDeleteRenderbuffers(1, &rbo_);
 		glDeleteTextures(1, &headerTexture_);
 		glDeleteTextures(1, &maskTexture_);
 		glDeleteTextures(1, &depthTexture_);
@@ -76,7 +68,6 @@ Framebuffer::Framebuffer(const int width, const int height)
 
 Framebuffer::~Framebuffer()
 {
-	// glDeleteRenderbuffers(1, &rbo_);
 	glDeleteTextures(1, &headerTexture_);
 	glDeleteTextures(1, &maskTexture_);
 	glDeleteTextures(1, &depthTexture_);

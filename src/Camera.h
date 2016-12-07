@@ -41,6 +41,7 @@ class Camera {
 	math::Vec3 worldUp_;
 
 	math::Vec3 velocity_;
+	float velocityFactor_;
 };
 
 #endif // SST_CAMERA_H

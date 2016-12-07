@@ -6,12 +6,12 @@
 #include <vector>
 
 #include "Graphics.h"
-#include "Mesh.h"
-#include "Material.h"
 
 
 namespace sunspot {
 
+struct Vertex;
+class Texture;
 
 class LoadingException : public std::runtime_error {
   public:
@@ -32,9 +32,9 @@ class WavefrontObject {
 	~WavefrontObject();
 
 	inline std::string &getName() { return name_; }
-	inline std::vector<Vertex> &getVertices() { return vertices_; };
-	inline std::vector<GLuint> &getIndices() { return indices_; };
-	inline std::vector<Texture> &getTextures() { return textures_; };
+	inline std::vector<Vertex> &getVertices() { return vertices_; }
+	inline std::vector<GLuint> &getIndices() { return indices_; }
+	inline std::vector<Texture> &getTextures() { return textures_; }
 
 	void loadName(std::stringstream &is);
 	void loadPosition(std::stringstream &is);
@@ -53,6 +53,7 @@ class WavefrontObject {
 	std::vector<GLuint> indices_;
 	std::vector<Texture> textures_;
 };
+
 
 }
 

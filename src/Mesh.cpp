@@ -3,8 +3,7 @@
 #include "Mesh.h"
 #include "ShaderProgram.h"
 
-
-namespace sunspot {
+using namespace sunspot;
 
 
 /// TODO Comment
@@ -36,8 +35,8 @@ Mesh::Mesh(std::vector<Vertex> &v, std::vector<GLuint> &i, std::vector<Texture> 
 	glBindVertexArray(0); // Unbind vao
 
 	// TODO refactor that SHIT
-	textures.push_back(Texture{"shader/test", TextureType::DIFFUSE});
-	textures.push_back(Texture{"shader/test", TextureType::SPECULAR});
+	textures.push_back(Texture{"data/frigate/frigate-diffuse", TextureType::DIFFUSE});
+	textures.push_back(Texture{"data/frigate/frigate-specular", TextureType::SPECULAR});
 	material_.diffuseMap = textures[0].getId();
 	material_.specularMap = textures[1].getId();
 }
@@ -59,7 +58,5 @@ void Mesh::draw(const ShaderProgram *shader)
 	glBindVertexArray(vao_);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
-}
-
 }
 

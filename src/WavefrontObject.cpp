@@ -5,6 +5,8 @@
 #include <array>
 
 #include "WavefrontObject.h"
+#include "Math.h"
+#include "Mesh.h"
 
 
 using namespace sunspot;

@@ -30,6 +30,7 @@ Camera::Camera(const float fov, const float aspectRatio, const float near, const
 	, right_{ 1.0f, 0.0f, 0.0f }
 	, worldUp_{ 0.0f, 1.0f, 0.0f }
 	, velocity_{}
+	, velocityFactor_{ 8.0f }
 {
 	float cotfov{ 1.0f / tan(fov * math::pi / 180.0f / 2.0f) };
 	projection_[0] = cotfov / aspectRatio;
@@ -79,19 +80,19 @@ void Camera::updateView()
 void Camera::update(const float deltaTime, const ShaderProgram *program)
 {
 	if (velocity_.x != 0.0f) {
-		position_.x += right_.x * velocity_.x * deltaTime;
-		position_.y += right_.y * velocity_.x * deltaTime;
-		position_.z += right_.z * velocity_.x * deltaTime;
+		position_.x += right_.x * velocity_.x * velocityFactor_ * deltaTime;
+		position_.y += right_.y * velocity_.x * velocityFactor_ * deltaTime;
+		position_.z += right_.z * velocity_.x * velocityFactor_ * deltaTime;
 	}
 	if (velocity_.y != 0.0f) {
-		position_.x += up_.x * velocity_.y * deltaTime;
-		position_.y += up_.y * velocity_.y * deltaTime;
-		position_.z += up_.z * velocity_.y * deltaTime;
+		position_.x += up_.x * velocity_.y * velocityFactor_ * deltaTime;
+		position_.y += up_.y * velocity_.y * velocityFactor_ * deltaTime;
+		position_.z += up_.z * velocity_.y * velocityFactor_ * deltaTime;
 	}
 	if (velocity_.z != 0.0f) {
-		position_.x += direction_.x * velocity_.z * deltaTime;
-		position_.y += direction_.y * velocity_.z * deltaTime;
-		position_.z += direction_.z * velocity_.z * deltaTime;
+		position_.x += direction_.x * velocity_.z * velocityFactor_ * deltaTime;
+		position_.y += direction_.y * velocity_.z * velocityFactor_ * deltaTime;
+		position_.z += direction_.z * velocity_.z * velocityFactor_ * deltaTime;
 	}
 	updateView();
 

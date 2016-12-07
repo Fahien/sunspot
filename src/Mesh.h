@@ -6,13 +6,16 @@
 #include "Math.h"
 #include "Texture.h"
 #include "Material.h"
+#include "WavefrontObject.h"
 
 class ShaderProgram;
+
 
 namespace sunspot {
 
 
 struct Vertex {
+  public:
 	math::Vec3 position;
 	math::Vec3 normal;
 	math::Vec2 texCoords;

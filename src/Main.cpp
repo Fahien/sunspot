@@ -26,7 +26,7 @@ static int width{ 960 };
 static int height{ 540 };
 
 static const std::string tag{ "Main" };
-static const std::string objName{ "shader/cube.obj" };
+static const std::string objName{ "data/frigate/frigate.obj" };
 static const std::string testTexture{ "shader/test" };
 
 int main(int argc, char **argv)
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 		Model room{ "shader/wall", 2.0f };
 		Quad quad{};
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
-		Camera camera{ 45.0f, static_cast<float>(width) / height, 0.125f, 8.0f };
+		Camera camera{ 45.0f, static_cast<float>(width) / height, 0.125f, 64.0f };
 		math::Size frameSize {window->getFrameSize()};
 		Framebuffer framebuffer{ frameSize.width / 2, frameSize.height / 2};
 
