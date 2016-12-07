@@ -30,8 +30,18 @@ WavefrontObject::~WavefrontObject()
 }
 
 
+/// Loads the object name
+void WavefrontObject::loadName(std::stringstream &is)
+{
+	std::string command{};
+	is >> command >> name_;
+	if (is.fail()) { throw LoadingException{ "Error loading name" }; }
+	std::cout << "Obj name: " << name_ << std::endl; // TODO remove debug log
+}
+
+
 /// Loads a vertex from a string stream
-void WavefrontObject::loadPosition(std::stringstream is)
+void WavefrontObject::loadPosition(std::stringstream &is)
 {
 	std::string command{};
 	math::Vec3 v{};
@@ -44,16 +54,14 @@ void WavefrontObject::loadPosition(std::stringstream is)
 		v.y /= w;
 		v.z /= w;
 	}
-	if(positionCount_ >= vertices_.size()) { // Add a new vertex
-		vertices_.push_back(Vertex{});
-	}
+	if(positionCount_ >= vertices_.size()) { vertices_.push_back(Vertex{}); } // Add a vertex
 	vertices_[positionCount_].position = v; // Update new vertex
 	++positionCount_;
 }
 
 
 /// Loads a texture coordinate from a string stream
-void WavefrontObject::loadTexCoords(std::stringstream is)
+void WavefrontObject::loadTexCoords(std::stringstream &is)
 {
 	std::string command{};
 	math::Vec2 t{};
@@ -61,24 +69,20 @@ void WavefrontObject::loadTexCoords(std::stringstream is)
 	if (is.fail()) { throw LoadingException{ "Error loading texture coordinate" }; }
 	is >> t.y;
 	if (is.fail()) { t.y = 0.0f; } // Default to 0
-	if(texCoordsCount_ >= vertices_.size()) { // Add a new vertex
-		vertices_.push_back(Vertex{});
-	}
+	if(texCoordsCount_ >= vertices_.size()) { vertices_.push_back(Vertex{}); } // Add a vertex
 	vertices_[texCoordsCount_].texCoords = t; // Update new vertex
 	++texCoordsCount_;
 }
 
 
 /// Loads a vertex normal from a string stream
-void WavefrontObject::loadNormal(std::stringstream is)
+void WavefrontObject::loadNormal(std::stringstream &is)
 {
 	std::string command{};
 	math::Vec3 n{};
 	is >> command >> n.x >> n.y >> n.z;
 	if (is.fail()) { throw LoadingException{ "Error loading vertex normal" }; }
-	if(normalCount_ >= vertices_.size()) { // Add a new vertex
-		vertices_.push_back(Vertex{});
-	}
+	if(normalCount_ >= vertices_.size()) { vertices_.push_back(Vertex{}); } // Add a vertex
 	vertices_[normalCount_].normal= n; // Update new vertex
 	++normalCount_;
 }
@@ -94,7 +98,7 @@ std::istream& expect(std::istream& in)
 
 
 /// Loads a face from a string stream
-void WavefrontObject::loadIndices(std::stringstream is)
+void WavefrontObject::loadIndices(std::stringstream &is)
 {
 	std::string command{};
 	Face f{};
@@ -143,21 +147,29 @@ std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj)
 
 	while (std::getline(is, line)) {
 		if (line.length() <= 0) { continue; }
+		std::stringstream is{ line };
 		switch (line[0]) {
 		case '#': {
 			std::cout << "## Comment\n";
 			break;
 		}
+		case 'o': { // Name command
+			try { obj.loadName(is); }
+			catch (const LoadingException &e) {
+				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+			}
+			break;
+		}
 		case 'v': {
 			if (line.length() < 2) {
-				std::cerr << "Error at line " << lineNumber << ": " << line <<  std::endl;
+				std::cerr << "[" << lineNumber << "] ignored: " << line << std::endl;
 				break;
 			}
 			switch (line[1]) {
 				case ' ': { // Vertex command
-					try { obj.loadPosition(std::stringstream{ line }); }
+					try { obj.loadPosition(is); }
 					catch (LoadingException &e) {
-						std::cerr << "Error at line " << lineNumber << ": " << e.what() <<  std::endl;
+						std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 					}
 					break;
 				}
@@ -166,16 +178,16 @@ std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj)
 					break;
 				}
 				case 'n': { // Vertex Normal command
-					try { obj.loadNormal(std::stringstream{ line }); }
+					try { obj.loadNormal(is); }
 					catch (LoadingException &e) {
-						std::cerr << "Error at line " << lineNumber << ": " << e.what() << std::endl;
+						std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 					}
 					break;
 				}
 				case 't': { // Texture Coordinate command
-					try { obj.loadTexCoords(std::stringstream{ line }); }
+					try { obj.loadTexCoords(is); }
 					catch (LoadingException &e) {
-						std::cerr << "Error at line " << lineNumber << ": " << e.what() << std::endl;
+				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 					}
 					break;
 				}
@@ -183,14 +195,14 @@ std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj)
 			break;
 		}
 		case 'f': { // Face command
-			try { obj.loadIndices(std::stringstream{ line }); }
+			try { obj.loadIndices(is); }
 			catch (LoadingException &e) {
-				std::cerr << "Error at line " << lineNumber << ": " << e.what() << std::endl;
+				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 			}
 			break;
 		}
 		default: {
-			std::cerr << "Line " << lineNumber << " ignored: " << line <<  std::endl;
+			std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
 			break;
 		}}
 		++lineNumber;

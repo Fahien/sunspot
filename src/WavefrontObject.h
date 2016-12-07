@@ -31,16 +31,20 @@ class WavefrontObject {
 	WavefrontObject();
 	~WavefrontObject();
 
+	inline std::string &getName() { return name_; }
 	inline std::vector<Vertex> &getVertices() { return vertices_; };
 	inline std::vector<GLuint> &getIndices() { return indices_; };
 	inline std::vector<Texture> &getTextures() { return textures_; };
 
-	void loadPosition(std::stringstream is);
-	void loadTexCoords(std::stringstream is);
-	void loadNormal(std::stringstream is);
-	void loadIndices(std::stringstream is);
+	void loadName(std::stringstream &is);
+	void loadPosition(std::stringstream &is);
+	void loadTexCoords(std::stringstream &is);
+	void loadNormal(std::stringstream &is);
+	void loadIndices(std::stringstream &is);
 
   private:
+	std::string name_;
+
 	unsigned positionCount_;
 	unsigned normalCount_;
 	unsigned texCoordsCount_;
