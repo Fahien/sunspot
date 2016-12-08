@@ -44,6 +44,7 @@ Mesh::Mesh(std::vector<Vertex> &v, std::vector<GLuint> &i, std::vector<Texture> 
 
 Mesh::~Mesh()
 {
+	for (Texture t : textures) { t.release(); } // TODO refactor
 	glDeleteVertexArrays(1, &vao_);
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);

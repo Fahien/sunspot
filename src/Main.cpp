@@ -100,7 +100,7 @@ int main(int argc, char **argv)
 		delete window;
 		return EXIT_SUCCESS;
 	}
-	catch (GraphicException &e)
+	catch (const GraphicException &e)
 	{
 		std::cerr << tag << ": " << e.what() << std::endl; // TODO remove debug log
 		return EXIT_FAILURE;

@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Graphics.h"
+#include "Math.h"
 
 
 namespace sunspot {
@@ -50,6 +51,8 @@ class WavefrontObject {
 	unsigned texCoordsCount_;
 
 	std::vector<Vertex> vertices_;
+	std::vector<math::Vec2> texCoords_;
+	std::vector<math::Vec3> normals_;
 	std::vector<GLuint> indices_;
 	std::vector<Texture> textures_;
 };

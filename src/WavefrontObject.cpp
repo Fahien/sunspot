@@ -42,7 +42,7 @@ void WavefrontObject::loadName(std::stringstream &is)
 }
 
 
-/// Loads a vertex from a string stream
+/// Loads a vertex position from a string stream
 void WavefrontObject::loadPosition(std::stringstream &is)
 {
 	std::string command{};
@@ -58,7 +58,7 @@ void WavefrontObject::loadPosition(std::stringstream &is)
 	}
 	if(positionCount_ >= vertices_.size()) { vertices_.push_back(Vertex{}); } // Add a vertex
 	vertices_[positionCount_].position = v; // Update new vertex
-	++positionCount_;
+	++positionCount_; // TODO remove?
 }
 
 
@@ -71,9 +71,8 @@ void WavefrontObject::loadTexCoords(std::stringstream &is)
 	if (is.fail()) { throw LoadingException{ "Error loading texture coordinate" }; }
 	is >> t.y;
 	if (is.fail()) { t.y = 0.0f; } // Default to 0
-	if(texCoordsCount_ >= vertices_.size()) { vertices_.push_back(Vertex{}); } // Add a vertex
-	vertices_[texCoordsCount_].texCoords = t; // Update new vertex
-	++texCoordsCount_;
+	texCoords_.push_back(t);
+	++texCoordsCount_; // TODO remove?
 }
 
 
@@ -84,9 +83,8 @@ void WavefrontObject::loadNormal(std::stringstream &is)
 	math::Vec3 n{};
 	is >> command >> n.x >> n.y >> n.z;
 	if (is.fail()) { throw LoadingException{ "Error loading vertex normal" }; }
-	if(normalCount_ >= vertices_.size()) { vertices_.push_back(Vertex{}); } // Add a vertex
-	vertices_[normalCount_].normal= n; // Update new vertex
-	++normalCount_;
+	normals_.push_back(n);
+	++normalCount_; // TODO remove?
 }
 
 
@@ -111,32 +109,55 @@ void WavefrontObject::loadIndices(std::stringstream &is)
 		is >> f.indices[1] >> f.indices[2];
 		if (is.fail()) { throw LoadingException{ "Error loading indices" }; }
 		is >> f.indices[3];
-		if (is.fail()) { f.indices[3] = -1; } // Default to invalid value
+		if (is.fail()) { f.indices[3] = 0; } // Default to invalid value
 	} else if (next == '/') {
 		is.ignore();
 		next = is.peek();
 		if (next == '/') { // Only vertices and normals
 			is.ignore();
-			is >> f.normals[0] >> f.indices[1] >> expect<'/'> >> expect<'/'> >> f.normals[1]
-				>> f.indices[2] >> expect<'/'> >> expect<'/'> >> f.normals[2];
+			is >> f.normals[0]
+			   >> f.indices[1] >> expect<'/'> >> expect<'/'> >> f.normals[1]
+			   >> f.indices[2] >> expect<'/'> >> expect<'/'> >> f.normals[2];
 			if (is.fail()) { throw LoadingException{ "Error loading indices" }; }
 			is >> f.indices[3] >> expect<'/'> >> expect<'/'> >> f.normals[3];
-			if (is.fail()) { f.indices[3] = -1; } // Default to invalid value
+			if (is.fail()) { f.indices[3] = 0; } // Default to invalid value
 		}
-		else { // Vertices, coordinates and normals
-			is >> f.textures[0] >> expect<'/'> >> f.normals[0] >>
-				f.indices[1] >> expect<'/'> >> f.textures[1] >> expect<'/'> >> f.normals[1] >>
-				f.indices[2] >> expect<'/'> >> f.textures[2] >> expect<'/'> >> f.normals[2];
-			if (is.fail()) { throw LoadingException{ "Error loading indices" }; }
-			is >> f.indices[3] >> expect<'/'> >> f.textures[3] >> expect<'/'> >> f.normals[3];
-			if (is.fail()) { f.indices[3] = -1; } // Default to invalid value
+		else { // Vertices, coordinates and (normals)
+			is >> f.textures[0];
+			next = is.peek();
+			if (next == ' ') { // Only vertices and coordinates
+				is >> f.indices[1] >> expect<'/'> >> f.textures[1]
+				   >> f.indices[2] >> expect<'/'> >> f.textures[2];
+				if (is.fail()) { throw LoadingException{ "Error loading indices" }; }
+				is >> f.indices[3] >> expect<'/'> >> f.textures[3];
+				if (is.fail()) { f.indices[3] = 0; } // Default to invalid value
+			}
+			else { // Vertices, coordinates and normals
+				is >> expect<'/'> >> f.normals[0]
+				   >> f.indices[1] >> expect<'/'> >> f.textures[1] >> expect<'/'> >> f.normals[1]
+				   >> f.indices[2] >> expect<'/'> >> f.textures[2] >> expect<'/'> >> f.normals[2];
+				if (is.fail()) { throw LoadingException{ "Error loading indices" }; }
+				is >> f.indices[3] >> expect<'/'> >> f.textures[3] >> expect<'/'> >> f.normals[3];
+				if (is.fail()) { f.indices[3] = 0; } // Default to invalid value
+			}
 		}
 	}
 	// Pick only first 3 indices, ignoring all the other values. -1 cause obj starts from 1
 	for (int i{ 0 }; i < 3; ++i) {
-		if (f.indices[i] > 0) { indices_.push_back(f.indices[i] - 1); }
-		else if (f.indices[i] < 0) { indices_.push_back(positionCount_ + f.indices[i]); }
-		else { throw LoadingException{ "Negative index" }; }
+		if (f.indices[i] == 0) { throw LoadingException{ "Invalid index" }; }
+		// Recalculate index
+		unsigned positionIndex{ (f.indices[i] > 0) ? (f.indices[i] - 1) : (positionCount_ + f.indices[i]) };
+		indices_.push_back(positionIndex);
+		// Put texCoords in vertex
+		unsigned texCoordsIndex{ f.textures[i] > 0 ? (f.textures[i] - 1) : positionIndex };
+		if (texCoordsIndex < texCoordsCount_) {
+			vertices_[texCoordsIndex].texCoords = texCoords_[texCoordsIndex];
+		}
+		// Put normal in vertex
+		unsigned normalIndex{ f.normals[i] > 0 ? (f.normals[i] - 1) : positionIndex };
+		if (normalIndex < normalCount_) {
+			vertices_[positionIndex].normal = normals_[normalIndex];
+		}
 	}
 }
 
@@ -196,7 +217,7 @@ std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj)
 		case 'f': { // Face command
 			try { obj.loadIndices(is); }
 			catch (LoadingException &e) {
-				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+				std::cerr << "[" << lineNumber << "] " << e.what() << ": " << line << std::endl;
 			}
 			break;
 		}

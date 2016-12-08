@@ -4,15 +4,16 @@
 #include <stdexcept>
 #include <string>
 #include "Graphics.h"
+#include "Window.h"
 
 
 namespace sunspot {
 
 
-class TextureException : public std::runtime_error {
+class TextureException : public GraphicException {
   public:
 	TextureException(const std::string& tag, const std::string& message)
-		: std::runtime_error{tag + ": " + message } {}
+		: GraphicException{tag + ": " + message } {}
 };
 
 
