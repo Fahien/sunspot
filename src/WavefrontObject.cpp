@@ -151,7 +151,7 @@ void WavefrontObject::loadIndices(std::stringstream &is)
 		// Put texCoords in vertex
 		unsigned texCoordsIndex{ f.textures[i] > 0 ? (f.textures[i] - 1) : positionIndex };
 		if (texCoordsIndex < texCoordsCount_) {
-			vertices_[texCoordsIndex].texCoords = texCoords_[texCoordsIndex];
+			vertices_[positionIndex].texCoords = texCoords_[texCoordsIndex];
 		}
 		// Put normal in vertex
 		unsigned normalIndex{ f.normals[i] > 0 ? (f.normals[i] - 1) : positionIndex };
