@@ -47,9 +47,11 @@ Framebuffer::Framebuffer(const int width, const int height)
 	TextureData header{ "shader/header" };
 	glGenTextures(1, &headerTexture_); // Create a texture for header
 	glBindTexture(GL_TEXTURE_2D, headerTexture_);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, header.getData());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, header.getWidth(), header.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, header.getData());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
 		std::cout << "Framebuffer: created\n"; // TODO remove debug log
@@ -88,7 +90,7 @@ void Framebuffer::bindColorTexture(const ShaderProgram *shader) const
 	glUniform1i(shader->getLocation("headerTexture"), 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, headerTexture_);
-	glUniform1i(shader->getLocation("height"), height_);
+	glUniform2f(shader->getLocation("frameSize"), width_, height_);
 }
 
 
@@ -100,6 +102,6 @@ void Framebuffer::bindDepthTexture(const ShaderProgram *shader) const
 	glUniform1i(shader->getLocation("maskTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, maskTexture_);
-	glUniform1i(shader->getLocation("height"), height_);
+	glUniform2f(shader->getLocation("frameSize"), width_, height_);
 }
 

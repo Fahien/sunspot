@@ -56,7 +56,7 @@ void Window::render(const float &deltaTime) // TODO comment
 {
 	// std::cout << static_cast<int>(1.0f / deltaTime) << " "; // FPS
 	updateFrameSize();
-	renderMesh(deltaTime);
+	renderStereoscopic(deltaTime);
 }
 
 
