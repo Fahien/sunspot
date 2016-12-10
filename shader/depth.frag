@@ -11,7 +11,7 @@ const float C = 127.5; // Linear function constant
 
 uniform sampler2D depthTexture;
 uniform sampler2D maskTexture;
-uniform int height;
+uniform vec2 frameSize;
 
 in vec2 texCoords;
 
@@ -28,7 +28,7 @@ void main()
 {
 	color = texture(depthTexture, texCoords);
 	color.r = color.g = color.b = disparity(color.r);
-	vec2 maskCoords = vec2(texCoords.x, texCoords.y * height);
+	vec2 maskCoords = vec2(texCoords.x, texCoords.y * frameSize.y);
 	float mask = texture(maskTexture, maskCoords).r;
 	color = mix(color, empty, mask);
 }

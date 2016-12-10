@@ -18,7 +18,7 @@ SdlWindow::SdlWindow(const char *title, const int width, const int height, const
 	// Initialize SDL video subsystem and handle error
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) { throw SdlException(tag); }
 
-	Uint32 flags{ SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALLOW_HIGHDPI };
+	Uint32 flags{ SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI };
 	if (!decorated) { flags |= SDL_WINDOW_BORDERLESS; }
 	window_ = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
 	if (window_ == nullptr) { // Handle window creation error
@@ -40,7 +40,7 @@ SdlWindow::SdlWindow(const char *title, const int width, const int height, const
 	SDL_SetRelativeMouseMode(SDL_TRUE); // Hide cursor, and report continuous motion
 
 	try { Window::initGlew(); } // Initialize glew
-	catch (GlewException &) {
+	catch (const GlewException &) {
 		SDL_GL_DeleteContext(context_);
 		SDL_DestroyWindow(window_);
 		SDL_Quit();
@@ -50,7 +50,11 @@ SdlWindow::SdlWindow(const char *title, const int width, const int height, const
 	updateFrameSize();
 	SDL_GL_SetSwapInterval(1); // Syncronize with the monitor's vertical refresh
 
-	std::cout << tag << ": created\n"; // TODO remove debug log
+	SDL_version version;
+	SDL_GetVersion(&version);
+	std::cout << tag << ": created\n\tOpenGL " << glGetString(GL_VERSION) << std::endl;
+	std::printf("\tSDL %d.%d.%d\n", version.major, version.minor, version.patch);
+	std::cout << "\tFrame size " << frameSize_.width << "x" << frameSize_.height << std::endl;
 }
 
 

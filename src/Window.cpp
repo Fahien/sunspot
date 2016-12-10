@@ -26,7 +26,7 @@ Window::Window(const char* title, const int width, const int height)
 	, deltaTime_{ 0.0f }
 	, cursor_{}
 	, camera_ { nullptr }
-	, fullscreen_{ true }
+	, fullscreen_{ false }
 	, baseProgram_{ nullptr }
 	, light_{ nullptr }
 	, model_{ nullptr }
@@ -97,6 +97,7 @@ void Window::render3D(const float &deltaTime) // TODO comment
 
 void Window::render3DplusDepth(const float& deltaTime) // TODO comment
 {
+	// First pass
 	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, frameSize_.width, frameSize_.height);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -150,3 +151,4 @@ void Window::renderStereoscopic(const float &deltaTime)
 	quad_->render();
 	quad_->unbind();
 }
+

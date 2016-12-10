@@ -54,7 +54,7 @@ Framebuffer::Framebuffer(const int width, const int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "Framebuffer: created\n"; // TODO remove debug log
+		std::cout << "Stereoscopic Framebuffer [" << width_ << "x" << height_ << "]\n";
 	}
 	else {
 		glDeleteTextures(1, &headerTexture_);

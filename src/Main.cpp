@@ -29,8 +29,13 @@ static const std::string tag{ "Main" };
 static const std::string objName{ "data/frigate/frigate.obj" };
 static const std::string testTexture{ "shader/test" };
 
+
+void printLogo();
+
+
 int main(int argc, char **argv)
 {
+	printLogo();
 	Window *window{ nullptr };
 
 	try {
@@ -41,8 +46,13 @@ int main(int argc, char **argv)
 		}
 
 		// Test window
-		if (std::find(arguments.begin(), arguments.end(), "-test") != arguments.end()) {
-			zoom = 1;
+		std::vector<std::string>::iterator it;
+		if ((it = std::find(arguments.begin(), arguments.end(), "-zoom")) != arguments.end()) {
+			if (++it != arguments.end()) {
+				std::cout << "Zoom [" << *it << "]\n";
+				zoom = std::stoi(*it);
+			}
+			else { std::cerr << "Zoom [" << zoom << "(Default)]\n"; }
 		}
 		width *= zoom;
 		height *= zoom;
@@ -105,5 +115,13 @@ int main(int argc, char **argv)
 		std::cerr << tag << ": " << e.what() << std::endl; // TODO remove debug log
 		return EXIT_FAILURE;
 	}
+}
+
+
+void printLogo()
+{
+	std::cout << "┌─┐┬ ┬┌┐┌┌─┐┌─┐┌─┐┌┬┐\n"
+	             "└─┐│ ││││└─┐├─┘│ │ │ \n"
+	             "└─┘└─┘┘└┘└─┘┴  └─┘ ┴ \n";
 }
 

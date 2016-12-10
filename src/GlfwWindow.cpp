@@ -53,7 +53,7 @@ GlfwWindow::GlfwWindow(const char *title, const int width, const int height, con
 	glfwWindowHint(GLFW_BLUE_BITS, videoMode_->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, videoMode_->refreshRate);
 	// Create a window object
-	window_ = glfwCreateWindow(videoMode_->width, videoMode_->height, title_, monitor_, nullptr);
+	window_ = glfwCreateWindow(windowSize_.width, windowSize_.height, title_, nullptr, nullptr);
 	if (window_ == nullptr) { // Handle window creation error
 		glfwTerminate();
 		throw GlfwException{ tag, "Could not create GLFW window" };
@@ -77,7 +77,7 @@ GlfwWindow::GlfwWindow(const char *title, const int width, const int height, con
 	});
 
 	try { Window::initGlew(); } // Initialize glew
-	catch (GlewException &) { // Handle error
+	catch (const GlewException &) { // Handle error
 		glfwDestroyWindow(window_);
 		glfwTerminate();
 		throw;
@@ -143,7 +143,7 @@ void GlfwWindow::toggleFullscreen()
 		glfwSetWindowMonitor(window_, nullptr,
 			videoMode_->width / 2 - windowSize_.width / 2, // X center
 			videoMode_->height / 2 - windowSize_.height / 2, // Y center
-			windowSize_.width, windowSize_.height, 0);
+			windowSize_.width, windowSize_.height, videoMode_->refreshRate);
 	}
 	else { // Set window size for fullscreen-windowed mode to the desktop resolution
 		glfwSetWindowMonitor(window_, monitor_, 0, 0,
