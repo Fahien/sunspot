@@ -9,8 +9,9 @@ using namespace sunspot;
 const std::string SdlWindow::tag{ "SdlWindow" };
 
 
-SdlWindow::SdlWindow(const char *title, const int width, const int height, const bool decorated)
-	: Window::Window{ title, width, height }
+SdlWindow::SdlWindow(const char *title, const math::Size windowSize,
+	const bool decorated, const bool stereoscopic)
+	: Window::Window{ title, windowSize, decorated, stereoscopic }
 	, window_{ nullptr }
 	, context_{ nullptr }
 	, event_{}
@@ -20,7 +21,8 @@ SdlWindow::SdlWindow(const char *title, const int width, const int height, const
 
 	Uint32 flags{ SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI };
 	if (!decorated) { flags |= SDL_WINDOW_BORDERLESS; }
-	window_ = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
+	window_ = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		windowSize_.width, windowSize_.height, flags);
 	if (window_ == nullptr) { // Handle window creation error
 		SDL_Quit();
 		throw SdlException(tag);

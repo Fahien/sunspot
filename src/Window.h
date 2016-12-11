@@ -34,7 +34,7 @@ class Window {
 public:
 	static const std::string tag;
 
-	Window(const char *title, const int width, const int height);
+	Window(const char *title, const math::Size windowSize, const bool decorated, const bool stereoscopic);
 
 	inline math::Size &getFrameSize() { return frameSize_; }
 	inline void setBaseProgram(const ShaderProgram *baseProgram) { baseProgram_ = baseProgram; }
@@ -66,14 +66,16 @@ protected:
 	math::Size monitorSize_;
 	math::Size frameSize_;
 
+	bool decorated_;
+	bool stereoscopic_;
+	bool fullscreen_;
+
 	float currentTime_;
 	float lastTime_;
 	float deltaTime_;
 
 	Cursor cursor_;
 	Camera *camera_;
-
-	bool fullscreen_;
 
 private:
 	void render(const float &deltaTime);

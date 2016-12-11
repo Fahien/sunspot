@@ -20,7 +20,7 @@ class GlfwWindow : public Window
 {
   public:
 	static const std::string tag;
-	GlfwWindow(const char *title, const int width, const int height, const bool decorated);
+	GlfwWindow(const char *title, const math::Size windowSize, const bool decorated, const bool stereoscopic);
 	~GlfwWindow();
 
 	void loop();

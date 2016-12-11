@@ -10,8 +10,9 @@ using namespace sunspot;
 const std::string GlfwWindow::tag{ "GlfwWindow" };
 
 
-GlfwWindow::GlfwWindow(const char *title, const int width, const int height, const bool decorated)
-	: Window::Window{title, width, height}
+GlfwWindow::GlfwWindow(const char *title, const math::Size windowSize,
+	const bool decorated, const bool stereoscopic)
+	: Window::Window{title, windowSize, decorated, stereoscopic}
 	, videoMode_{ nullptr }
 	, window_{ nullptr }
 {

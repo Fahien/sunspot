@@ -17,6 +17,14 @@ Size::Size(int w, int h)
 {}
 
 
+Size &Size::operator*=(const float &f)
+{
+	width *= f;
+	height *= f;
+	return *this;
+}
+
+
 Vec2::Vec2()
 	: x{ 0.0f }
 	, y{ 0.0f }

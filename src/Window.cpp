@@ -16,17 +16,19 @@ using namespace sunspot;
 const std::string Window::tag{ "Window" };
 
 
-Window::Window(const char* title, const int width, const int height)
+Window::Window(const char* title, const math::Size windowSize, const bool decorated, const bool stereoscopic)
 	: title_{ title }
-	, windowSize_{ width, height }
-	, monitorSize_{ width, height }
-	, frameSize_{ width, height }
+	, windowSize_{ windowSize }
+	, monitorSize_{ windowSize }
+	, frameSize_{ windowSize }
+	, decorated_{ decorated }
+	, stereoscopic_{ stereoscopic }
+	, fullscreen_{ false }
 	, currentTime_{ 0.0f }
 	, lastTime_{ 0.0f }
 	, deltaTime_{ 0.0f }
 	, cursor_{}
 	, camera_ { nullptr }
-	, fullscreen_{ false }
 	, baseProgram_{ nullptr }
 	, light_{ nullptr }
 	, model_{ nullptr }
@@ -56,7 +58,8 @@ void Window::render(const float &deltaTime) // TODO comment
 {
 	// std::cout << static_cast<int>(1.0f / deltaTime) << " "; // FPS
 	updateFrameSize();
-	renderStereoscopic(deltaTime);
+	if (stereoscopic_) { renderStereoscopic(deltaTime); }
+	else { render3D(deltaTime); }
 }
 
 
@@ -131,9 +134,12 @@ void Window::renderStereoscopic(const float &deltaTime)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
 	baseProgram_->use();
-	model_->bind();
 	camera_->update(deltaTime, baseProgram_);
 	light_->update(baseProgram_);
+	room_->bind();
+	room_->render(baseProgram_);
+	room_->unbind();
+	model_->bind();
 	model_->render(baseProgram_);
 	model_->unbind();
 	framebuffer_->unbind();

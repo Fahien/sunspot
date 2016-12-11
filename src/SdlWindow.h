@@ -18,7 +18,7 @@ class SdlException : public GraphicException {
 class SdlWindow : public Window {
   public:
 	static const std::string tag;
-	SdlWindow(const char *title, const int width, const int height, const bool decorated);
+	SdlWindow(const char *title, const math::Size windowSize, const bool decorated, const bool stereoscopic);
 	~SdlWindow();
 
 	void loop();
