@@ -14,12 +14,15 @@ using namespace sunspot;
 
 /// Creates a Wavefront Object
 WavefrontObject::WavefrontObject()
-	: positionCount_{ 0 }
+	: name_{}
+	, currentGroupName_{ "default" }
+	, positionCount_{ 0 }
 	, normalCount_{ 0 }
 	, texCoordsCount_{ 0 }
 	, vertices_{}
 	, indices_{}
 	, textures_{}
+	, meshes_{}
 {
 	std::cout << "WavefrontObject: created\n"; // TODO remove debug log
 }
@@ -28,6 +31,7 @@ WavefrontObject::WavefrontObject()
 /// Release resources
 WavefrontObject::~WavefrontObject()
 {
+	for (Mesh *mesh : meshes_) { delete mesh; }
 	std::cout << "WavefrontObject: destroyed\n"; // TODO remove debug log
 }
 
@@ -162,8 +166,31 @@ void WavefrontObject::loadIndices(std::stringstream &is)
 }
 
 
+/// Loads a group
+void WavefrontObject::loadGroup(std::stringstream &is)
+{
+	loadCachedMesh();
+	std::string command{};
+	currentGroupName_ = "default"; // Default name is default
+	is >> command >> currentGroupName_;
+	if (is.fail()) { throw LoadingException{ "Error loading indices" }; }
+
+}
+
+
+/// Loads cached mesh
+void WavefrontObject::loadCachedMesh()
+{
+	if (!vertices_.empty() && !indices_.empty()) {
+		meshes_.push_back( new Mesh{ currentGroupName_, vertices_, indices_, textures_ });
+		vertices_.clear();
+		indices_.clear();
+	}
+}
+
+
 /// Reads a Wavefront Object
-std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj)
+std::ifstream &sunspot::operator>>(std::ifstream &is, WavefrontObject &obj)
 {
 	std::string line;
 	unsigned lineNumber{ 1 };
@@ -221,12 +248,20 @@ std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj)
 			}
 			break;
 		}
+		case 'g': { // Group command
+			try { obj.loadGroup(is); }
+			catch (LoadingException &e) {
+				std::cerr << "[" << lineNumber << "] " << e.what() << ": " << line << std::endl;
+			}
+			break;
+		}
 		default: {
 			std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
 			break;
 		}}
 		++lineNumber;
 	}
+	obj.loadCachedMesh();
 	return is;
 }
 

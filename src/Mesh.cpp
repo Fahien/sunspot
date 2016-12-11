@@ -7,10 +7,12 @@ using namespace sunspot;
 
 
 /// TODO Comment
-Mesh::Mesh(std::vector<Vertex> &v, std::vector<GLuint> &i, std::vector<Texture> &t)
+Mesh::Mesh(const std::string &name,
+	std::vector<Vertex> &v, std::vector<GLuint> &i, std::vector<Texture> &t)
 	: vertices{ v }
 	, indices{ i }
 	, textures{ t }
+	, name_{ name }
 {
 	glGenVertexArrays(1, &vao_);
 	glGenBuffers(1, &vbo_);
@@ -39,6 +41,8 @@ Mesh::Mesh(std::vector<Vertex> &v, std::vector<GLuint> &i, std::vector<Texture> 
 	textures.push_back(Texture{"data/frigate/frigate-specular", TextureType::SPECULAR});
 	material_.diffuseMap = textures[0].getId();
 	material_.specularMap = textures[1].getId();
+
+	std::cout << "Mesh: created " << name_ << std::endl; // TODO remove debug log
 }
 
 
@@ -48,6 +52,7 @@ Mesh::~Mesh()
 	glDeleteVertexArrays(1, &vao_);
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);
+	std::cout << "Mesh: destroyed " << name_ << std::endl; // TODO remove debug log
 }
 
 

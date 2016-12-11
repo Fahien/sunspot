@@ -98,19 +98,20 @@ int main(int argc, char **argv)
 		}
 		WavefrontObject obj{};
 		is >> obj;
-		Mesh mesh{ obj.getVertices(), obj.getIndices(), obj.getTextures() };
+		Mesh *mesh{ obj.getMesh() };
 
 		window->setBaseProgram(&baseProgram);
 		window->setDepthProgram(&depthProgram);
 		window->setLight(&light);
 		window->setModel(&model);
-		window->setMesh(&mesh);
+		window->setMesh(mesh);
 		window->setRoom(&room);
 		window->setQuadProgram(&quadProgram);
 		window->setQuad(&quad);
 		window->setCamera(&camera);
 		window->setFramebuffer(&framebuffer);
 
+		std::cout << "Start looping\n";
 		window->loop();
 		std::cout << "Test version " << SST_VERSION_MAJOR << "." << SST_VERSION_MINOR << " successfull" << std::endl;
 

@@ -7,6 +7,7 @@
 
 #include "Graphics.h"
 #include "Math.h"
+#include "Mesh.h"
 
 
 namespace sunspot {
@@ -33,19 +34,25 @@ class WavefrontObject {
 	~WavefrontObject();
 
 	inline std::string &getName() { return name_; }
+	inline Mesh *getMesh() { return meshes_.front(); }
 	inline std::vector<Vertex> &getVertices() { return vertices_; }
 	inline std::vector<GLuint> &getIndices() { return indices_; }
 	inline std::vector<Texture> &getTextures() { return textures_; }
 
+  private:
 	void loadName(std::stringstream &is);
 	void loadPosition(std::stringstream &is);
 	void loadTexCoords(std::stringstream &is);
 	void loadNormal(std::stringstream &is);
 	void loadIndices(std::stringstream &is);
+	void loadGroup(std::stringstream &is);
+	void loadCachedMesh();
 
-  private:
+	friend std::ifstream &operator>>(std::ifstream &in, WavefrontObject &obj);
+
 	std::string name_;
 
+	std::string currentGroupName_;
 	unsigned positionCount_;
 	unsigned normalCount_;
 	unsigned texCoordsCount_;
@@ -55,12 +62,14 @@ class WavefrontObject {
 	std::vector<math::Vec3> normals_;
 	std::vector<GLuint> indices_;
 	std::vector<Texture> textures_;
+
+	std::vector<Mesh*> meshes_;
 };
 
+std::ifstream &operator>>(std::ifstream &in, WavefrontObject &obj);
 
 }
 
-std::ifstream &operator>>(std::ifstream &in, sunspot::WavefrontObject &obj);
 
 #endif // SST_WAVEFRONTOBJECT_H
 
