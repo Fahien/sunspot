@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "Material.h"
 #include "Graphics.h"
 #include "ShaderProgram.h"
@@ -14,14 +16,11 @@ Material::~Material()
 
 void Material::bind(const ShaderProgram *shader) const {
 	// Bind ambient color
-	glUniform3f(shader->getLocation("material.ambient"),
-		ambient.r, ambient.g, ambient.b);
+	glUniform3f(shader->getLocation("material.ambient"), ambient.r, ambient.g, ambient.b);
 	// Bind diffuse color
-	glUniform3f(shader->getLocation("material.diffuse"),
-		diffuse.r, diffuse.g, diffuse.b);
+	glUniform3f(shader->getLocation("material.diffuse"), diffuse.r, diffuse.g, diffuse.b);
 	// Bind specular color
-	glUniform3f(shader->getLocation("material.specular"),
-		specular.r, specular.g, specular.b);
+	glUniform3f(shader->getLocation("material.specular"), specular.r, specular.g, specular.b);
 	// Bind shininess
 	glUniform1f(shader->getLocation("material.shininess"), shininess);
 	// Bind diffuse map
@@ -32,6 +31,19 @@ void Material::bind(const ShaderProgram *shader) const {
 	glUniform1i(shader->getLocation("material.specularMap"), 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, specularMap);
+}
+
+
+std::ifstream &sunspot::operator>>(std::ifstream &is, Material &mtl)
+{
+	std::string line;
+	unsigned lineNumber{ 1 };
+	while (std::getline(is, line)) {
+		if (line.length() <= 0) { continue; } // Ignore empty lines
+		std::cout << "[" << lineNumber << "] " << line << std::endl;
+		++lineNumber;
+	}
+	return is;
 }
 
 

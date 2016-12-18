@@ -40,15 +40,16 @@ class WavefrontObject {
 	inline std::vector<Texture> &getTextures() { return textures_; }
 
   private:
-	void loadName(std::stringstream &is);
-	void loadPosition(std::stringstream &is);
-	void loadTexCoords(std::stringstream &is);
-	void loadNormal(std::stringstream &is);
-	void loadIndices(std::stringstream &is);
-	void loadGroup(std::stringstream &is);
+	void loadName(std::stringstream &ss);
+	void loadPosition(std::stringstream &ss);
+	void loadTexCoords(std::stringstream &ss);
+	void loadNormal(std::stringstream &ss);
+	void loadIndices(std::stringstream &ss);
+	void loadGroup(std::stringstream &ss);
+	void loadMaterials(std::stringstream &ss);
 	void loadCachedMesh();
 
-	friend std::ifstream &operator>>(std::ifstream &in, WavefrontObject &obj);
+	friend std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj);
 
 	std::string name_;
 
@@ -62,11 +63,12 @@ class WavefrontObject {
 	std::vector<math::Vec3> normals_;
 	std::vector<GLuint> indices_;
 	std::vector<Texture> textures_;
+	std::vector<Material> materials_;
 
 	std::vector<Mesh*> meshes_;
 };
 
-std::ifstream &operator>>(std::ifstream &in, WavefrontObject &obj);
+std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj);
 
 }
 

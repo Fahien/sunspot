@@ -22,6 +22,7 @@ WavefrontObject::WavefrontObject()
 	, vertices_{}
 	, indices_{}
 	, textures_{}
+	, materials_{}
 	, meshes_{}
 {
 	std::cout << "WavefrontObject: created\n"; // TODO remove debug log
@@ -37,25 +38,25 @@ WavefrontObject::~WavefrontObject()
 
 
 /// Loads the object name
-void WavefrontObject::loadName(std::stringstream &is)
+void WavefrontObject::loadName(std::stringstream &ss)
 {
 	std::string command{};
-	is >> command >> name_;
-	if (is.fail()) { throw LoadingException{ "Error loading name" }; }
+	ss >> command >> name_;
+	if (ss.fail()) { throw LoadingException{ "Error loading name" }; }
 	std::cout << "Obj name: " << name_ << std::endl; // TODO remove debug log
 }
 
 
 /// Loads a vertex position from a string stream
-void WavefrontObject::loadPosition(std::stringstream &is)
+void WavefrontObject::loadPosition(std::stringstream &ss)
 {
 	std::string command{};
 	math::Vec3 v{};
-	is >> command >> v.x >> v.y >> v.z;
-	if (is.fail()) { throw LoadingException{ "Error loading vertex" }; }
+	ss >> command >> v.x >> v.y >> v.z;
+	if (ss.fail()) { throw LoadingException{ "Error loading vertex" }; }
 	float w;
-	is >> w;
-	if (!is.fail()) { // Deomogenize
+	ss >> w;
+	if (!ss.fail()) { // Deomogenize
 		v.x /= w;
 		v.y /= w;
 		v.z /= w;
@@ -67,82 +68,82 @@ void WavefrontObject::loadPosition(std::stringstream &is)
 
 
 /// Loads a texture coordinate from a string stream
-void WavefrontObject::loadTexCoords(std::stringstream &is)
+void WavefrontObject::loadTexCoords(std::stringstream &ss)
 {
 	std::string command{};
 	math::Vec2 t{};
-	is >> command >> t.x;
-	if (is.fail()) { throw LoadingException{ "Error loading texture coordinate" }; }
-	is >> t.y;
-	if (is.fail()) { t.y = 0.0f; } // Default to 0
+	ss >> command >> t.x;
+	if (ss.fail()) { throw LoadingException{ "Error loading texture coordinate" }; }
+	ss >> t.y;
+	if (ss.fail()) { t.y = 0.0f; } // Default to 0
 	texCoords_.push_back(t);
 	++texCoordsCount_; // TODO remove?
 }
 
 
 /// Loads a vertex normal from a string stream
-void WavefrontObject::loadNormal(std::stringstream &is)
+void WavefrontObject::loadNormal(std::stringstream &ss)
 {
 	std::string command{};
 	math::Vec3 n{};
-	is >> command >> n.x >> n.y >> n.z;
-	if (is.fail()) { throw LoadingException{ "Error loading vertex normal" }; }
+	ss >> command >> n.x >> n.y >> n.z;
+	if (ss.fail()) { throw LoadingException{ "Error loading vertex normal" }; }
 	normals_.push_back(n);
 	++normalCount_; // TODO remove?
 }
 
 
 template <char C>
-std::istream& expect(std::istream& in)
+std::istream& expect(std::istream& is)
 {
-	if ((in >> std::ws).peek() == C) { in.ignore(); }
-	else { in.setstate(std::ios_base::failbit); }
-	return in;
+	if ((is >> std::ws).peek() == C) { is.ignore(); }
+	else { is.setstate(std::ios_base::failbit); }
+	return is;
 }
 
 
 /// Loads a face from a string stream
-void WavefrontObject::loadIndices(std::stringstream &is)
+void WavefrontObject::loadIndices(std::stringstream &ss)
 {
 	std::string command{};
 	Face f{};
-	is >> command >> f.indices[0];
-	if (is.fail()) { throw LoadingException{ "Error loading indices" }; }
-	char next{ static_cast<char>(is.peek()) };
+	ss >> command >> f.indices[0];
+	if (ss.fail()) { throw LoadingException{ "Error loading indices" }; }
+	char next{ static_cast<char>(ss.peek()) };
 	if (next == ' ') { // Only faces
-		is >> f.indices[1] >> f.indices[2];
-		if (is.fail()) { throw LoadingException{ "Error loading indices" }; }
-		is >> f.indices[3];
-		if (is.fail()) { f.indices[3] = 0; } // Default to invalid value
+		ss >> f.indices[1] >> f.indices[2];
+		if (ss.fail()) { throw LoadingException{ "Error loading indices" }; }
+		ss >> f.indices[3];
+		if (ss.fail()) { f.indices[3] = 0; } // Default to invalid value
 	} else if (next == '/') {
-		is.ignore();
-		next = is.peek();
+		ss.ignore();
+		next = ss.peek();
 		if (next == '/') { // Only vertices and normals
-			is.ignore();
-			is >> f.normals[0]
+			ss.ignore();
+			ss >> f.normals[0]
 			   >> f.indices[1] >> expect<'/'> >> expect<'/'> >> f.normals[1]
 			   >> f.indices[2] >> expect<'/'> >> expect<'/'> >> f.normals[2];
-			if (is.fail()) { throw LoadingException{ "Error loading indices" }; }
-			is >> f.indices[3] >> expect<'/'> >> expect<'/'> >> f.normals[3];
-			if (is.fail()) { f.indices[3] = 0; } // Default to invalid value
+			if (ss.fail()) { throw LoadingException{ "Error loading indices" }; }
+			ss >> f.indices[3] >> expect<'/'> >> expect<'/'> >> f.normals[3];
+			if (ss.fail()) { f.indices[3] = 0; } // Default to invalid value
 		}
 		else { // Vertices, coordinates and (normals)
-			is >> f.textures[0];
-			next = is.peek();
+			ss >> f.textures[0];
+			next = ss.peek();
 			if (next == ' ') { // Only vertices and coordinates
-				is >> f.indices[1] >> expect<'/'> >> f.textures[1]
+				ss >> f.indices[1] >> expect<'/'> >> f.textures[1]
 				   >> f.indices[2] >> expect<'/'> >> f.textures[2];
-				if (is.fail()) { throw LoadingException{ "Error loading indices" }; }
-				is >> f.indices[3] >> expect<'/'> >> f.textures[3];
-				if (is.fail()) { f.indices[3] = 0; } // Default to invalid value
+				if (ss.fail()) { throw LoadingException{ "Error loading indices" }; }
+				ss >> f.indices[3] >> expect<'/'> >> f.textures[3];
+				if (ss.fail()) { f.indices[3] = 0; } // Default to invalid value
 			}
 			else { // Vertices, coordinates and normals
-				is >> expect<'/'> >> f.normals[0]
+				ss >> expect<'/'> >> f.normals[0]
 				   >> f.indices[1] >> expect<'/'> >> f.textures[1] >> expect<'/'> >> f.normals[1]
 				   >> f.indices[2] >> expect<'/'> >> f.textures[2] >> expect<'/'> >> f.normals[2];
-				if (is.fail()) { throw LoadingException{ "Error loading indices" }; }
-				is >> f.indices[3] >> expect<'/'> >> f.textures[3] >> expect<'/'> >> f.normals[3];
-				if (is.fail()) { f.indices[3] = 0; } // Default to invalid value
+				if (ss.fail()) { throw LoadingException{ "Error loading indices" }; }
+				ss >> f.indices[3] >> expect<'/'> >> f.textures[3] >> expect<'/'> >> f.normals[3];
+				if (ss.fail()) { f.indices[3] = 0; } // Default to invalid value
 			}
 		}
 	}
@@ -167,14 +168,13 @@ void WavefrontObject::loadIndices(std::stringstream &is)
 
 
 /// Loads a group
-void WavefrontObject::loadGroup(std::stringstream &is)
+void WavefrontObject::loadGroup(std::stringstream &ss)
 {
 	loadCachedMesh();
 	std::string command{};
 	currentGroupName_ = "default"; // Default name is default
-	is >> command >> currentGroupName_;
-	if (is.fail()) { throw LoadingException{ "Error loading indices" }; }
-
+	ss >> command >> currentGroupName_;
+	if (ss.fail()) { throw LoadingException{ "Error loading indices" }; }
 }
 
 
@@ -189,6 +189,37 @@ void WavefrontObject::loadCachedMesh()
 }
 
 
+/// Loads material library
+void WavefrontObject::loadMaterials(std::stringstream &ss)
+{
+	// Read command
+	std::string command{};
+	ss >> command;
+	if (ss.fail() || command != "mtllib") { throw LoadingException { "Error loading materials" }; }
+	// Read mtl file
+	std::string mtlName{};
+	ss >> mtlName;
+	if (ss.fail()) { throw LoadingException{ "Error loading materials" }; }
+	std::ifstream is{ mtlName };
+	if (!is.is_open()) { throw LoadingException{ "Could not find mtl file" }; }
+	Material material;
+	is >> material;
+	if (is.fail()) { throw LoadingException{ "Error loading mtl" }; }
+	materials_.push_back(material);
+	// Read other optional mtl
+	while (!ss.fail()) {
+		ss >> mtlName;
+		if (!ss.fail()) {
+			std::ifstream is{ mtlName };
+			if (!is.is_open()) { continue; }
+			Material material;
+			is >> material;
+			if (!is.fail()) { materials_.push_back(material); }
+		}
+	}
+}
+
+
 /// Reads a Wavefront Object
 std::ifstream &sunspot::operator>>(std::ifstream &is, WavefrontObject &obj)
 {
@@ -196,7 +227,7 @@ std::ifstream &sunspot::operator>>(std::ifstream &is, WavefrontObject &obj)
 	unsigned lineNumber{ 1 };
 
 	while (std::getline(is, line)) {
-		if (line.length() <= 0) { continue; }
+		if (line.length() <= 0) { continue; } // Ignore empty lines
 		std::stringstream is{ line };
 		switch (line[0]) {
 		case '#': { break; }
@@ -215,7 +246,7 @@ std::ifstream &sunspot::operator>>(std::ifstream &is, WavefrontObject &obj)
 			switch (line[1]) {
 				case ' ': { // Vertex command
 					try { obj.loadPosition(is); }
-					catch (LoadingException &e) {
+					catch (const LoadingException &e) {
 						std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 					}
 					break;
@@ -226,14 +257,14 @@ std::ifstream &sunspot::operator>>(std::ifstream &is, WavefrontObject &obj)
 				}
 				case 'n': { // Vertex Normal command
 					try { obj.loadNormal(is); }
-					catch (LoadingException &e) {
+					catch (const LoadingException &e) {
 						std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 					}
 					break;
 				}
 				case 't': { // Texture Coordinate command
 					try { obj.loadTexCoords(is); }
-					catch (LoadingException &e) {
+					catch (const LoadingException &e) {
 				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 					}
 					break;
@@ -243,14 +274,21 @@ std::ifstream &sunspot::operator>>(std::ifstream &is, WavefrontObject &obj)
 		}
 		case 'f': { // Face command
 			try { obj.loadIndices(is); }
-			catch (LoadingException &e) {
+			catch (const LoadingException &e) {
 				std::cerr << "[" << lineNumber << "] " << e.what() << ": " << line << std::endl;
 			}
 			break;
 		}
 		case 'g': { // Group command
 			try { obj.loadGroup(is); }
-			catch (LoadingException &e) {
+			catch (const LoadingException &e) {
+				std::cerr << "[" << lineNumber << "] " << e.what() << ": " << line << std::endl;
+			}
+			break;
+		}
+		case 'm': { // Material Library Command
+			try { obj.loadMaterials(is); }
+			catch (const LoadingException &e) {
 				std::cerr << "[" << lineNumber << "] " << e.what() << ": " << line << std::endl;
 			}
 			break;

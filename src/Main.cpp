@@ -24,7 +24,7 @@ static int zoom{ 2 };
 static math::Size windowSize{ 960, 540 };
 
 static const std::string tag{ "Main" };
-static const std::string objName{ "data/frigate/frigate.obj" };
+static const std::string objName{ "data/cube/cube.obj" };
 static const std::string testTexture{ "shader/test" };
 
 
@@ -112,6 +112,11 @@ int main(int argc, char **argv)
 		return EXIT_SUCCESS;
 	}
 	catch (const GraphicException &e)
+	{
+		std::cerr << tag << ": " << e.what() << std::endl; // TODO remove debug log
+		return EXIT_FAILURE;
+	}
+	catch (const std::runtime_error &e)
 	{
 		std::cerr << tag << ": " << e.what() << std::endl; // TODO remove debug log
 		return EXIT_FAILURE;

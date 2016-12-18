@@ -1,7 +1,7 @@
 #ifndef SST_MATERIAL_H
 #define SST_MATERIAL_H
 
-#include <istream>
+#include <fstream>
 #include "Graphics.h"
 #include "Color.h"
 
@@ -16,6 +16,9 @@ struct Material {
 
 	void bind(const ShaderProgram *shader) const;
 
+	friend std::ifstream &operator>>(std::ifstream &is, Material &mtl);
+	friend std::ostream &operator<<(std::ostream &os, const Material &mtl);
+
 	Color ambient;
 	Color diffuse;
 	Color specular;
@@ -25,10 +28,11 @@ struct Material {
 	GLuint specularMap;
 };
 
+std::ifstream &operator>>(std::ifstream &is, Material &mtl);
+
+std::ostream &operator<<(std::ostream &os, const Material &mtl);
+
 }
-
-
-std::ostream& operator<<(std::ostream& os, const sunspot::Material& m);
 
 
 #endif // SST_MATERIAL_H
