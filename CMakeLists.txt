@@ -35,10 +35,6 @@ if (${GLFW_FOUND})
 	message("Found GLFW ${GLFW_INCLUDE_DIR} ${GLFW_LIBRARIES}")
 endif()
 
-if (${SDL2_FOUND})
-	message ("Found SDL2 ${SDL2_INCLUDE_DIR} ${SDL2_LIBRARY}")
-endif()
-
 # Add the given directories to those the compiler uses to search for include files
 if (${OPENGL_INCLUDE_DIR})
 	include_directories ("${OPENGL_INCLUDE_DIR}")
@@ -72,8 +68,6 @@ set (SOURCES
 	src/Window.cpp
 	src/GlfwWindow.h
 	src/GlfwWindow.cpp
-	src/SdlWindow.h
-	src/SdlWindow.cpp
 	src/Texture.h
 	src/Texture.cpp
 	src/Model.h
@@ -102,7 +96,6 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
 add_executable (stereoscopic-test ${SOURCES} ${SHADERS})
 
-target_link_libraries (stereoscopic-test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES}
-		${SDL2_LIBRARY})
+target_link_libraries (stereoscopic-test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES})
 
 file(COPY ${PROJECT_SOURCE_DIR}/shader DESTINATION ${PROJECT_BINARY_DIR})

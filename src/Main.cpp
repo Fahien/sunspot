@@ -5,7 +5,6 @@
 #include <algorithm>
 
 #include "Config.h"
-#include "SdlWindow.h"
 #include "GlfwWindow.h"
 #include "Light.h"
 #include "Model.h"
@@ -70,14 +69,8 @@ int main(int argc, char **argv)
 		bool decorated{ contains(arguments, "-decorated") };
 		// Stereoscopic rendering
 		bool stereoscopic{ contains(arguments, "-stereoscopic") };
-
 		// Create window
-		if (contains(arguments, "-SDL")) {
-			window = new SdlWindow{ SST_TITLE, windowSize, decorated, stereoscopic };
-		}
-		else {
-			window = new GlfwWindow{ SST_TITLE, windowSize, decorated, stereoscopic };
-		}
+		window = new GlfwWindow{ SST_TITLE, windowSize, decorated, stereoscopic };
 
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
 		Light light{ 0.5f, 0.5f, 0.5f };
