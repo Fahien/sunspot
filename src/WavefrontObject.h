@@ -1,13 +1,13 @@
 #ifndef SST_WAVEFRONTOBJECT_H
 #define SST_WAVEFRONTOBJECT_H
 
-#include <fstream>
 #include <exception>
 #include <vector>
 
 #include "Graphics.h"
 #include "Math.h"
 #include "Mesh.h"
+#include "Ifstream.h"
 
 
 namespace sunspot {
@@ -46,10 +46,14 @@ class WavefrontObject {
 	void loadNormal(std::stringstream &ss);
 	void loadIndices(std::stringstream &ss);
 	void loadGroup(std::stringstream &ss);
-	void loadMaterials(std::stringstream &ss);
 	void loadCachedMesh();
 
-	friend std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj);
+	void createMaterial(std::stringstream &is);
+	void loadMaterials(std::ifstream &is);
+	void loadMaterialLibrary(std::stringstream &ss, const std::string &path);
+	void loadCachedMaterial();
+
+	friend Ifstream &operator>>(Ifstream &is, WavefrontObject &obj);
 
 	std::string name_;
 
@@ -63,12 +67,13 @@ class WavefrontObject {
 	std::vector<math::Vec3> normals_;
 	std::vector<GLuint> indices_;
 	std::vector<Texture> textures_;
-	std::vector<Material> materials_;
-
-	std::vector<Mesh*> meshes_;
+	std::vector<Mesh *> meshes_;
+	
+	Material *currentMaterial_;
+	std::vector<Material *> materials_;
 };
 
-std::ifstream &operator>>(std::ifstream &is, WavefrontObject &obj);
+Ifstream &operator>>(Ifstream &is, WavefrontObject &obj);
 
 }
 

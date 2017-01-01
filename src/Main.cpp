@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 		math::Size frameSize{ window->getFrameSize() };
 		Framebuffer framebuffer{ frameSize.width / 2, frameSize.height / 2};
 
-		std::ifstream is{ objName };
+		Ifstream is{ objName };
 		if (!is.is_open()) {
 			std::cerr << "Could not find " << objName << std::endl;
 			return EXIT_FAILURE;

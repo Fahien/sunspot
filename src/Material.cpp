@@ -1,10 +1,26 @@
 #include <iostream>
+#include <sstream>
 
 #include "Material.h"
 #include "Graphics.h"
 #include "ShaderProgram.h"
 
 using namespace sunspot;
+
+
+Material::Material()
+	: Material("default")
+{}
+
+
+Material::Material(const char *n)
+	: name{ n }
+{}
+
+
+Material::Material(std::string &n)
+	: name{ n }
+{}
 
 
 Material::~Material()
@@ -31,19 +47,6 @@ void Material::bind(const ShaderProgram *shader) const {
 	glUniform1i(shader->getLocation("material.specularMap"), 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, specularMap);
-}
-
-
-std::ifstream &sunspot::operator>>(std::ifstream &is, Material &mtl)
-{
-	std::string line;
-	unsigned lineNumber{ 1 };
-	while (std::getline(is, line)) {
-		if (line.length() <= 0) { continue; } // Ignore empty lines
-		std::cout << "[" << lineNumber << "] " << line << std::endl;
-		++lineNumber;
-	}
-	return is;
 }
 
 

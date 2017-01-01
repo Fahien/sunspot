@@ -72,6 +72,8 @@ set (SOURCES
 	src/Texture.cpp
 	src/Model.h
 	src/Model.cpp
+	src/Ifstream.h
+	src/Ifstream.cpp
 	src/Material.h
 	src/Material.cpp
 	src/Mesh.h

@@ -5,8 +5,6 @@
 #include <array>
 
 #include "WavefrontObject.h"
-#include "Math.h"
-#include "Mesh.h"
 
 
 using namespace sunspot;
@@ -22,8 +20,9 @@ WavefrontObject::WavefrontObject()
 	, vertices_{}
 	, indices_{}
 	, textures_{}
-	, materials_{}
 	, meshes_{}
+	, currentMaterial_{ nullptr }
+	, materials_{}
 {
 	std::cout << "WavefrontObject: created\n"; // TODO remove debug log
 }
@@ -189,50 +188,103 @@ void WavefrontObject::loadCachedMesh()
 }
 
 
-/// Loads material library
-void WavefrontObject::loadMaterials(std::stringstream &ss)
+/// Creates a new material
+void WavefrontObject::createMaterial(std::stringstream &ss)
 {
-	// Read command
-	std::string command{};
+	loadCachedMaterial();
+	std::string command{}; // Read command
 	ss >> command;
-	if (ss.fail() || command != "mtllib") { throw LoadingException { "Error loading materials" }; }
-	// Read mtl file
-	std::string mtlName{};
-	ss >> mtlName;
-	if (ss.fail()) { throw LoadingException{ "Error loading materials" }; }
-	std::ifstream is{ mtlName };
-	if (!is.is_open()) { throw LoadingException{ "Could not find mtl file" }; }
-	Material material;
-	is >> material;
-	if (is.fail()) { throw LoadingException{ "Error loading mtl" }; }
-	materials_.push_back(material);
-	// Read other optional mtl
-	while (!ss.fail()) {
-		ss >> mtlName;
-		if (!ss.fail()) {
-			std::ifstream is{ mtlName };
-			if (!is.is_open()) { continue; }
-			Material material;
-			is >> material;
-			if (!is.fail()) { materials_.push_back(material); }
-		}
-	}
+	if (ss.fail() || command != "newmtl") { throw LoadingException{ "Error reading newmtl command" }; }
+	
+	std::string name{}; // Read material name
+	ss >> name;
+	if (ss.fail()) { throw LoadingException{ "Error reading material name" }; }
+	if (currentMaterial_ != nullptr) { throw LoadingException{ "Current material is not null" }; }
+	currentMaterial_ = new Material{ name };
+	std::cout << "WavefrontObject: Created material " << currentMaterial_->name << std::endl;
 }
 
 
-/// Reads a Wavefront Object
-std::ifstream &sunspot::operator>>(std::ifstream &is, WavefrontObject &obj)
+/// Loads cached material
+void WavefrontObject::loadCachedMaterial()
+{
+	if (currentMaterial_ == nullptr) { throw LoadingException{ "Current material is null" }; }
+	materials_.push_back(currentMaterial_);
+	currentMaterial_ = nullptr;
+}
+
+
+/// Read materials from material library
+void WavefrontObject::loadMaterials(std::ifstream &is)
 {
 	std::string line;
 	unsigned lineNumber{ 1 };
 
 	while (std::getline(is, line)) {
 		if (line.length() <= 0) { continue; } // Ignore empty lines
-		std::stringstream is{ line };
+		std::stringstream ss{ line };
 		switch (line[0]) {
-		case '#': { break; }
+		case '#': { break; } // Ignore comment
+		case 'n': { // New material command
+			try { createMaterial(ss); }
+			catch (const LoadingException &e) {
+				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+			}
+			break;
+		}
+		default: {
+			std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
+			break;
+		}
+		}
+		std::cout << "[" << lineNumber << "] " << line << std::endl;
+		++lineNumber;
+	}
+	try { loadCachedMaterial(); }
+	catch (const LoadingException &e) {
+		std::cerr << "WavefrontObject: No materials loaded: " << e.what() << std::endl;
+	}
+}
+
+
+/// Loads material library
+void WavefrontObject::loadMaterialLibrary(std::stringstream &ss, const std::string &path)
+{
+	std::string command{}; // Read command
+	ss >> command;
+	if (ss.fail() || command != "mtllib") { throw LoadingException{ "Error reading mtllib command" }; }
+	
+	std::string mtlName{}; // Read mtl file
+	ss >> mtlName;
+	if (ss.fail()) { throw LoadingException{ "Error reading mtl name" }; }
+	std::ifstream is{ path + '/' + mtlName };
+	if (!is.is_open()) { throw LoadingException{ "Could not find mtl file: " + path + mtlName }; }
+	loadMaterials(is);
+	
+	while (!ss.fail()) { // Read other optional mtl
+		ss >> mtlName;
+		if (!ss.fail()) {
+			std::ifstream is{ path + '/' + mtlName };
+			if (!is.is_open()) { continue; }
+			loadMaterials(is);	
+		}
+	}
+}
+
+
+/// Reads a Wavefront Object
+Ifstream &sunspot::operator>>(Ifstream &is, WavefrontObject &obj)
+{
+	std::string line;
+	unsigned lineNumber{ 1 };
+
+	while (std::getline(is, line)) {
+		if (line.length() <= 0) { continue; } // Ignore empty lines
+		std::stringstream ss{ line };
+		switch (line[0]) {
+		case '#': { break; } // Ignore comment
 		case 'o': { // Name command
-			try { obj.loadName(is); }
+			try { obj.loadName(ss); }
 			catch (const LoadingException &e) {
 				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 			}
@@ -245,7 +297,7 @@ std::ifstream &sunspot::operator>>(std::ifstream &is, WavefrontObject &obj)
 			}
 			switch (line[1]) {
 				case ' ': { // Vertex command
-					try { obj.loadPosition(is); }
+					try { obj.loadPosition(ss); }
 					catch (const LoadingException &e) {
 						std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 					}
@@ -256,16 +308,16 @@ std::ifstream &sunspot::operator>>(std::ifstream &is, WavefrontObject &obj)
 					break;
 				}
 				case 'n': { // Vertex Normal command
-					try { obj.loadNormal(is); }
+					try { obj.loadNormal(ss); }
 					catch (const LoadingException &e) {
 						std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 					}
 					break;
 				}
 				case 't': { // Texture Coordinate command
-					try { obj.loadTexCoords(is); }
+					try { obj.loadTexCoords(ss); }
 					catch (const LoadingException &e) {
-				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+						std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 					}
 					break;
 				}
@@ -273,23 +325,23 @@ std::ifstream &sunspot::operator>>(std::ifstream &is, WavefrontObject &obj)
 			break;
 		}
 		case 'f': { // Face command
-			try { obj.loadIndices(is); }
+			try { obj.loadIndices(ss); }
 			catch (const LoadingException &e) {
 				std::cerr << "[" << lineNumber << "] " << e.what() << ": " << line << std::endl;
 			}
 			break;
 		}
 		case 'g': { // Group command
-			try { obj.loadGroup(is); }
+			try { obj.loadGroup(ss); }
 			catch (const LoadingException &e) {
 				std::cerr << "[" << lineNumber << "] " << e.what() << ": " << line << std::endl;
 			}
 			break;
 		}
 		case 'm': { // Material Library Command
-			try { obj.loadMaterials(is); }
+			try { obj.loadMaterialLibrary(ss, is.getPath()); }
 			catch (const LoadingException &e) {
-				std::cerr << "[" << lineNumber << "] " << e.what() << ": " << line << std::endl;
+				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 			}
 			break;
 		}

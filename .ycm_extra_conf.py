@@ -38,7 +38,7 @@ flags = [
     '-isystem/usr/include/c++/6.2.1/x86_64-pc-linux-gnu',
     '-isystem/usr/include/c++/6.2.1/backward',
     '-isystem/usr/local/include',
-    '-isystem/usr/lib/clang/3.9.0/include',
+    '-isystem/usr/lib/clang/3.9.1/include',
     '-isystem/usr/include',
 ]
 
