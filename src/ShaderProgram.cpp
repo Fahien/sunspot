@@ -103,7 +103,12 @@ GLuint ShaderProgram::compileShader(const GLenum type, const GLchar *source)
 
 GLchar *ShaderProgram::loadShaderSource(const char *path)
 {
+#ifdef WIN32
+	FILE *file{};
+	fopen_s(&file, path, "r");
+#elif
 	FILE *file {fopen(path, "r")};
+#endif
 	if (file == nullptr) { // TODO should throw exception
 		std::cerr << "Could not open shader file: " << path << std::endl;;
 	}

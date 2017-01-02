@@ -90,7 +90,7 @@ void Framebuffer::bindColorTexture(const ShaderProgram *shader) const
 	glUniform1i(shader->getLocation("headerTexture"), 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, headerTexture_);
-	glUniform2f(shader->getLocation("frameSize"), width_, height_);
+	glUniform2i(shader->getLocation("frameSize"), width_, height_);
 }
 
 
@@ -102,6 +102,5 @@ void Framebuffer::bindDepthTexture(const ShaderProgram *shader) const
 	glUniform1i(shader->getLocation("maskTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, maskTexture_);
-	glUniform2f(shader->getLocation("frameSize"), width_, height_);
+	glUniform2i(shader->getLocation("frameSize"), width_, height_);
 }
-

@@ -14,6 +14,7 @@ class Size {
 	Size();
 	Size(int w, int h);
 
+	Size &operator*=(const int &f);
 	Size &operator*=(const float &f);
 
 	int width;
