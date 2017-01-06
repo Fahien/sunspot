@@ -181,7 +181,7 @@ void WavefrontObject::loadGroup(std::stringstream &ss)
 void WavefrontObject::loadCachedMesh()
 {
 	if (!vertices_.empty() && !indices_.empty()) {
-		meshes_.push_back( new Mesh{ currentGroupName_, vertices_, indices_, textures_ });
+		meshes_.push_back( new Mesh{ currentGroupName_, vertices_, indices_, currentMaterial_ });
 		vertices_.clear();
 		indices_.clear();
 	}
@@ -191,18 +191,57 @@ void WavefrontObject::loadCachedMesh()
 /// Creates a new material
 void WavefrontObject::createMaterial(std::stringstream &ss)
 {
-	loadCachedMaterial();
+	if (currentMaterial_ != nullptr) { loadCachedMaterial(); }
+
 	std::string command{}; // Read command
 	ss >> command;
 	if (ss.fail() || command != "newmtl") { throw LoadingException{ "Error reading newmtl command" }; }
-	
+
 	std::string name{}; // Read material name
 	ss >> name;
 	if (ss.fail()) { throw LoadingException{ "Error reading material name" }; }
+	// Create new current material
 	if (currentMaterial_ != nullptr) { throw LoadingException{ "Current material is not null" }; }
 	currentMaterial_ = new Material{ name };
 	std::cout << "WavefrontObject: Created material " << currentMaterial_->name << std::endl;
 }
+
+
+/// Loads ambient reflectivity
+void WavefrontObject::loadAmbient(std::stringstream &ss)
+{
+	std::string command{}; // Read command
+	ss >> command;
+	if (ss.fail() || command != "Ka") { throw LoadingException{ "Error reading Ka command" }; }
+	// Load the color into the current material
+	ss >> currentMaterial_->ambient.r >> currentMaterial_->ambient.g >> currentMaterial_->ambient.b;
+	if (ss.fail()) { throw LoadingException{ "Error loading material ambient" }; }
+}
+
+
+/// Loads diffuse reflectivity
+void WavefrontObject::loadDiffuse(std::stringstream &ss)
+{
+	std::string command{}; // Read command
+	ss >> command;
+	if (ss.fail() || command != "Kd") { throw LoadingException{ "Error loading Kd command" }; }
+	// Load the color into the current material
+	ss >> currentMaterial_->diffuse.r >> currentMaterial_->diffuse.g >> currentMaterial_->diffuse.b;
+	if (ss.fail()) { throw LoadingException{ "Error loading material diffuse" }; }
+}
+
+
+/// Loads specular reflectivity
+void WavefrontObject::loadSpecular(std::stringstream &ss)
+{
+	std::string command{}; // Read command
+	ss >> command;
+	if (ss.fail() || command != "Ks") { throw LoadingException{ "Error loading Ks command" }; }
+	// Load the color into the current material
+	ss >> currentMaterial_->specular.r >> currentMaterial_->specular.g >> currentMaterial_->specular.b;
+	if (ss.fail()) { throw LoadingException{ "Error loading material specular" }; }
+}
+
 
 
 /// Loads cached material
@@ -232,12 +271,45 @@ void WavefrontObject::loadMaterials(std::ifstream &is)
 			}
 			break;
 		}
+		case 'K': { // K statement
+			if (line.length() <= 1) {
+				std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
+				break;
+			}
+			switch (line[1]) {
+			case 'a': { // Ambient
+				try { loadAmbient(ss); }
+				catch (const LoadingException &e) {
+					std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+				}
+				break;
+			}
+			case 'd': { // Diffuse
+				try { loadDiffuse(ss); }
+				catch (const LoadingException &e) {
+					std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+				}
+				break;
+			}
+			case 's': { // Specular
+				try { loadSpecular(ss); }
+				catch (const LoadingException &e) {
+					std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+				}
+				break;
+			}
+			default: {
+				std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
+				break;
+			}
+			} // End switch line[1]
+			break;
+		}
 		default: {
 			std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
 			break;
 		}
-		}
-		std::cout << "[" << lineNumber << "] " << line << std::endl;
+		} // End switch line[0]
 		++lineNumber;
 	}
 	try { loadCachedMaterial(); }
@@ -267,6 +339,25 @@ void WavefrontObject::loadMaterialLibrary(std::stringstream &ss, const std::stri
 			std::ifstream is{ path + '/' + mtlName };
 			if (!is.is_open()) { continue; }
 			loadMaterials(is);	
+		}
+	}
+}
+
+
+/// Uses a material
+void WavefrontObject::useMaterial(std::stringstream &ss)
+{
+	std::string command{}; // Read command
+	ss >> command;
+	if (ss.fail() || command != "usemtl") { throw LoadingException{ "Error reading usemtl command"}; }
+
+	std::string materialName{}; // Read material name
+	ss >> materialName;
+	if (ss.fail()) { throw LoadingException{ "Error reading material name" }; }
+
+	for (Material *m : materials_) {
+		if (m->name == materialName) {
+			currentMaterial_ = m;
 		}
 	}
 }
@@ -340,6 +431,13 @@ Ifstream &sunspot::operator>>(Ifstream &is, WavefrontObject &obj)
 		}
 		case 'm': { // Material Library Command
 			try { obj.loadMaterialLibrary(ss, is.getPath()); }
+			catch (const LoadingException &e) {
+				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+			}
+			break;
+		}
+		case 'u': { // Use material command
+			try { obj.useMaterial(ss); }
 			catch (const LoadingException &e) {
 				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
 			}

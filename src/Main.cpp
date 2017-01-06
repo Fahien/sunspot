@@ -45,7 +45,7 @@ bool contains(const std::vector<std::string> &arguments, const char *s)
 int main(int argc, char **argv)
 {
 	printLogo();
-	Window *window{ nullptr };
+	GlfwWindow *window{ nullptr };
 
 	try {
 		// Get command line arguments

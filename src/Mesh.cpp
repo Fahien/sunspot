@@ -7,12 +7,11 @@ using namespace sunspot;
 
 
 /// TODO Comment
-Mesh::Mesh(const std::string &name,
-	std::vector<Vertex> &v, std::vector<GLuint> &i, std::vector<Texture> &t)
+Mesh::Mesh(const std::string &name, std::vector<Vertex> &v, std::vector<GLuint> &i, Material *material)
 	: vertices{ v }
 	, indices{ i }
-	, textures{ t }
 	, name_{ name }
+	, material_{ material }
 {
 	glGenVertexArrays(1, &vao_);
 	glGenBuffers(1, &vbo_);
@@ -37,10 +36,10 @@ Mesh::Mesh(const std::string &name,
 	glBindVertexArray(0); // Unbind vao
 
 	// TODO refactor that SHIT
-	textures.push_back(Texture{"data/frigate/frigate-diffuse", TextureType::DIFFUSE});
-	textures.push_back(Texture{"data/frigate/frigate-specular", TextureType::SPECULAR});
-	material_.diffuseMap = textures[0].getId();
-	material_.specularMap = textures[1].getId();
+	Texture diffuse {"data/frigate/frigate-diffuse", TextureType::DIFFUSE};
+	Texture specular{"data/frigate/frigate-specular", TextureType::SPECULAR};
+	material_->diffuseMap = diffuse.getId();
+	material_->specularMap = specular.getId();
 
 	std::cout << "Mesh: created " << name_ << std::endl; // TODO remove debug log
 }
@@ -48,7 +47,7 @@ Mesh::Mesh(const std::string &name,
 
 Mesh::~Mesh()
 {
-	for (Texture t : textures) { t.release(); } // TODO refactor
+	delete material_;
 	glDeleteVertexArrays(1, &vao_);
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);
@@ -58,7 +57,7 @@ Mesh::~Mesh()
 
 void Mesh::draw(const ShaderProgram *shader)
 {
-	material_.bind(shader);
+	material_->bind(shader);
 
 	// Draw mesh
 	glBindVertexArray(vao_);

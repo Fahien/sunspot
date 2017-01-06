@@ -24,8 +24,7 @@ struct Vertex {
 
 class Mesh {
   public:
-	Mesh(const std::string &name,
-		std::vector<Vertex> &vertices, std::vector<GLuint> &indices, std::vector<Texture> &textures);
+	Mesh(const std::string &name, std::vector<Vertex> &vertices, std::vector<GLuint> &indices, Material *m);
 	~Mesh();
 
 	inline void bind() const { glBindVertexArray(vao_); }
@@ -42,7 +41,7 @@ class Mesh {
 	GLuint vao_;
 	GLuint vbo_;
 	GLuint ebo_;
-	Material material_;
+	Material *material_;
 };
 
 

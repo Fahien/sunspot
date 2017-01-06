@@ -2,6 +2,7 @@
 o Cube
 
 mtllib cube.mtl
+usemtl red
 
 v -1.000000 -1.000000 1.000000
 v -1.000000 1.000000 1.000000

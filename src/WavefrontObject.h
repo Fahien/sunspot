@@ -48,9 +48,13 @@ class WavefrontObject {
 	void loadGroup(std::stringstream &ss);
 	void loadCachedMesh();
 
-	void createMaterial(std::stringstream &is);
+	void createMaterial(std::stringstream &ss);
+	void loadAmbient(std::stringstream &ss);
+	void loadDiffuse(std::stringstream &ss);
+	void loadSpecular(std::stringstream &ss);
 	void loadMaterials(std::ifstream &is);
 	void loadMaterialLibrary(std::stringstream &ss, const std::string &path);
+	void useMaterial(std::stringstream &ss);
 	void loadCachedMaterial();
 
 	friend Ifstream &operator>>(Ifstream &is, WavefrontObject &obj);
