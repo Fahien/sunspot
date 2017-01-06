@@ -45,7 +45,7 @@ TextureData::TextureData(const std::string &path)
 #ifdef WIN32
 	FILE *file{};
 	fopen_s(&file, (path + ".bmp").c_str(), "rb");
-#elif
+#else
 	FILE *file {fopen((path + ".bmp").c_str(), "rb")};
 #endif
 	if (file == nullptr) { throw TextureException{ tag, "Could not open header bitmap" }; }

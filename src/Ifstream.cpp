@@ -1,7 +1,7 @@
 #include "Ifstream.h"
 #ifdef WIN32
 #include <cstdlib>
-#elif
+#else
 #include <libgen.h>
 #endif
 
@@ -13,7 +13,7 @@ Ifstream::Ifstream(char *name)
 	: std::ifstream{ name }
 #ifdef WIN32
 	, path_{}
-#elif
+#else
 	, path_{ dirname(name) }
 #endif
 {
@@ -29,7 +29,7 @@ Ifstream::Ifstream(const std::string &name)
 	: std::ifstream{ name }
 #ifdef WIN32
 	, path_{}
-#elif
+#else
 	, path_{ dirname(const_cast<char *>(name.c_str())) }
 #endif
 {

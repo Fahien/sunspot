@@ -32,7 +32,7 @@ Camera::Camera(const float fov, const float aspectRatio, const float near, const
 	, velocity_{}
 	, velocityFactor_{ 8.0f }
 {
-	float cotfov{ 1.0f / tan(fov * math::pi / 180.0f / 2.0f) };
+	float cotfov{ 1.0f / static_cast<float>(tan(fov * math::pi / 180.0f / 2.0f)) };
 	projection_[0] = cotfov / aspectRatio;
 	projection_[5] = cotfov;
 	projection_[10] = (near + far) / (near - far);
@@ -44,10 +44,10 @@ Camera::Camera(const float fov, const float aspectRatio, const float near, const
 
 void Camera::updateVectors()
 {
-	float cospitch{ cos(pitch_) };
-	float sinpitch{ sin(pitch_) };
-	float cosyaw{ cos(yaw_) };
-	float sinyaw{ sin(yaw_) };
+	float cospitch{ static_cast<float>(cos(pitch_)) };
+	float sinpitch{ static_cast<float>(sin(pitch_)) };
+	float cosyaw{ static_cast<float>(cos(yaw_)) };
+	float sinyaw{ static_cast<float>(sin(yaw_)) };
 	direction_.x = cospitch * cosyaw;
 	direction_.y = sinpitch;
 	direction_.z = cospitch * sinyaw;

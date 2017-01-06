@@ -106,7 +106,7 @@ GLchar *ShaderProgram::loadShaderSource(const char *path)
 #ifdef WIN32
 	FILE *file{};
 	fopen_s(&file, path, "r");
-#elif
+#else
 	FILE *file {fopen(path, "r")};
 #endif
 	if (file == nullptr) { // TODO should throw exception
