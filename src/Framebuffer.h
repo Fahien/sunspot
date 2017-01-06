@@ -23,8 +23,8 @@ class Framebuffer {
 	Framebuffer(const int width, const int height);
 	~Framebuffer();
 
-	inline int getWidth() const { return width_; }
-	inline int getHeight() const { return height_; }
+	inline GLsizei getWidth() const { return width_; }
+	inline GLsizei getHeight() const { return height_; }
 	inline void bind() const { glBindFramebuffer(GL_FRAMEBUFFER, fbo_); }
 	inline void unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
@@ -32,8 +32,8 @@ class Framebuffer {
 	void bindDepthTexture(const ShaderProgram *program) const;
 
   private:
-	const int width_;
-	const int height_;
+	const GLsizei width_;
+	const GLsizei height_;
 	GLuint fbo_;
 	GLuint colorTexture_;
 	GLuint depthTexture_;

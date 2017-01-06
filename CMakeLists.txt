@@ -21,7 +21,6 @@ find_package (OpenGL REQUIRED)
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${PROJECT_SOURCE_DIR}" )
 find_package (GLEW REQUIRED)
 find_package (GLFW REQUIRED)
-find_package (SDL2 REQUIRED)
 
 if (${OPENGL_FOUND})
 	message("Found OpenGL ${OPENGL_INCLUDE_DIR} ${OPENGL_LIBRARIES}")
@@ -42,7 +41,6 @@ endif()
 include_directories (
 	"${GLEW_INCLUDE_DIR}"
 	"${GLFW_INCLUDE_DIR}"
-	"${SDL2_INCLUDE_DIR}"
 	"${PROJECT_SOURCE_DIR}/include"
 	"${PROJECT_SOURCE_DIR}/shader")
 

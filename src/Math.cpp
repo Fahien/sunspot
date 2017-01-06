@@ -17,10 +17,18 @@ Size::Size(int w, int h)
 {}
 
 
-Size &Size::operator*=(const float &f)
+Size &Size::operator*=(const int &f)
 {
 	width *= f;
 	height *= f;
+	return *this;
+}
+
+
+Size &Size::operator*=(const float &f)
+{
+	width = static_cast<int>(width * f);
+	height = static_cast<int>(height * f);
 	return *this;
 }
 

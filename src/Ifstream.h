@@ -15,10 +15,9 @@ public:
 	inline const std::string &getPath() const { return path_; }
 
 private:
-	const std::string path_;
+	std::string path_;
 };
 
 }
 
 #endif // SST_IFSTREAM_H
-
