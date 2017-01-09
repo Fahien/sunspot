@@ -69,10 +69,12 @@ class WavefrontObject {
 	unsigned positionCount_;
 	unsigned normalCount_;
 	unsigned texCoordsCount_;
+	unsigned vertexCount_;
 
-	std::vector<Vertex> vertices_;
+	std::vector<math::Vec3> positions_;
 	std::vector<math::Vec2> texCoords_;
 	std::vector<math::Vec3> normals_;
+	std::vector<Vertex> vertices_;
 	std::vector<GLuint> indices_;
 	std::vector<Texture> textures_;
 	std::vector<Mesh *> meshes_;

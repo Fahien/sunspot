@@ -24,7 +24,7 @@ static int zoom{ 2 };
 static math::Size windowSize{ 960, 540 };
 
 static const std::string tag{ "Main" };
-static const std::string objName{ "data/cube/cube.obj" };
+static const std::string objName{ "data/frigate/frigate-blender.obj" };
 static const std::string testTexture{ "shader/test.bmp" };
 
 

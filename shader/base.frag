@@ -50,4 +50,3 @@ void main()
 
 	color = vec4(ambient + diffuse + specular, one);
 }
-

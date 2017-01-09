@@ -2,6 +2,7 @@
 #define SST_MATH_H
 
 #include <initializer_list>
+#include <iostream>
 
 namespace math {
 
@@ -36,6 +37,8 @@ class Vec2 {
 	float y;
 };
 
+std::ostream &operator<<(std::ostream &os, const Vec2 &v);
+
 
 class Vec3 {
   public:
@@ -52,6 +55,8 @@ class Vec3 {
 	float y;
 	float z;
 };
+
+std::ostream &operator<<(std::ostream &os, const Vec3 &v);
 
 
 class Mat4 {

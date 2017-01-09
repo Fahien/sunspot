@@ -17,6 +17,10 @@ WavefrontObject::WavefrontObject()
 	, positionCount_{ 0 }
 	, normalCount_{ 0 }
 	, texCoordsCount_{ 0 }
+	, vertexCount_{ 0 }
+	, positions_{}
+	, texCoords_{}
+	, normals_{}
 	, vertices_{}
 	, indices_{}
 	, textures_{}
@@ -52,7 +56,7 @@ void WavefrontObject::loadPosition(std::stringstream &ss)
 	std::string command{};
 	math::Vec3 v{};
 	ss >> command >> v.x >> v.y >> v.z;
-	if (ss.fail()) { throw LoadingException{ "Error loading vertex" }; }
+	if (ss.fail()) { throw LoadingException{ "Error loading vertex position" }; }
 	float w;
 	ss >> w;
 	if (!ss.fail()) { // Deomogenize
@@ -60,9 +64,8 @@ void WavefrontObject::loadPosition(std::stringstream &ss)
 		v.y /= w;
 		v.z /= w;
 	}
-	if(positionCount_ >= vertices_.size()) { vertices_.push_back(Vertex{}); } // Add a vertex
-	vertices_[positionCount_].position = v; // Update new vertex
-	++positionCount_; // TODO remove?
+	positions_.push_back(v);
+	++positionCount_;
 }
 
 
@@ -76,7 +79,7 @@ void WavefrontObject::loadTexCoords(std::stringstream &ss)
 	ss >> t.y;
 	if (ss.fail()) { t.y = 0.0f; } // Default to 0
 	texCoords_.push_back(t);
-	++texCoordsCount_; // TODO remove?
+	++texCoordsCount_;
 }
 
 
@@ -88,7 +91,7 @@ void WavefrontObject::loadNormal(std::stringstream &ss)
 	ss >> command >> n.x >> n.y >> n.z;
 	if (ss.fail()) { throw LoadingException{ "Error loading vertex normal" }; }
 	normals_.push_back(n);
-	++normalCount_; // TODO remove?
+	++normalCount_;
 }
 
 
@@ -149,19 +152,22 @@ void WavefrontObject::loadIndices(std::stringstream &ss)
 	// Pick only first 3 indices, ignoring all the other values. -1 cause obj starts from 1
 	for (int i{ 0 }; i < 3; ++i) {
 		if (f.indices[i] == 0) { throw LoadingException{ "Invalid index" }; }
-		// Recalculate index
+		Vertex v{};
+		// Recalculate index and put position in vertex
 		unsigned positionIndex{ (f.indices[i] > 0) ? (f.indices[i] - 1) : (positionCount_ + f.indices[i]) };
-		indices_.push_back(positionIndex);
+		v.position = positions_[positionIndex];
 		// Put texCoords in vertex
-		unsigned texCoordsIndex{ f.textures[i] > 0 ? (f.textures[i] - 1) : positionIndex };
+		unsigned texCoordsIndex{ f.textures[i] > 0 ? (f.textures[i] - 1) : (texCoordsCount_ + f.indices[i]) };
 		if (texCoordsIndex < texCoordsCount_) {
-			vertices_[positionIndex].texCoords = texCoords_[texCoordsIndex];
+			v.texCoords = texCoords_[texCoordsIndex];
 		}
 		// Put normal in vertex
-		unsigned normalIndex{ f.normals[i] > 0 ? (f.normals[i] - 1) : positionIndex };
+		unsigned normalIndex{ f.normals[i] > 0 ? (f.normals[i] - 1) : (normalCount_ + f.indices[i]) };
 		if (normalIndex < normalCount_) {
-			vertices_[positionIndex].normal = normals_[normalIndex];
+			v.normal = normals_[normalIndex];
 		}
+		indices_.push_back(vertexCount_++);
+		vertices_.push_back(v);
 	}
 }
 
@@ -405,7 +411,7 @@ void WavefrontObject::loadMaterialLibrary(std::stringstream &ss, const std::stri
 	ss >> mtlName;
 	if (ss.fail()) { throw LoadingException{ "Error reading mtl name" }; }
 	Ifstream is{ path + '/' + mtlName };
-	if (!is.is_open()) { throw LoadingException{ "Could not find mtl file: " + path + mtlName }; }
+	if (!is.is_open()) { throw LoadingException{ "Could not find mtl file: " + path + "/" + mtlName }; }
 	loadMaterials(is);
 	
 	while (!ss.fail()) { // Read other optional mtl

@@ -35,12 +35,6 @@ Mesh::Mesh(const std::string &name, std::vector<Vertex> &v, std::vector<GLuint> 
 
 	glBindVertexArray(0); // Unbind vao
 
-	// TODO refactor that SHIT
-	//Texture diffuse {"data/frigate/frigate-diffuse", TextureType::DIFFUSE};
-	//Texture specular{"data/frigate/frigate-specular", TextureType::SPECULAR};
-	//material_->diffuseMap = diffuse.getId();
-	//material_->specularMap = specular.getId();
-
 	std::cout << "Mesh: created " << name_ << std::endl; // TODO remove debug log
 }
 
@@ -59,7 +53,6 @@ void Mesh::draw(const ShaderProgram *shader)
 {
 	material_->bind(shader);
 
-	// Draw mesh
 	glBindVertexArray(vao_);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);

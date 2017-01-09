@@ -76,6 +76,12 @@ const Vec2 Vec2::operator+(const Vec2 &other) const
 }
 
 
+std::ostream &math::operator<<(std::ostream &os, const Vec2 &v)
+{
+	return os << "[" << v.x << ", " << v.y << "]";
+}
+
+
 Vec3::Vec3()
 	: x{ 0.0f }
 	, y{ 0.0f }
@@ -124,6 +130,12 @@ Vec3 &Vec3::operator+=(const Vec3 &other)
 	y += other.y;
 	z += other.z;
 	return *this;
+}
+
+
+std::ostream &math::operator<<(std::ostream &os, const Vec3 &v)
+{
+	return os << "[" << v.x << ", " << v.y << ", " << v.z << "]";
 }
 
 

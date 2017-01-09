@@ -72,7 +72,7 @@ GlfwWindow::GlfwWindow(const char *title, const math::Size windowSize,
 	});
 
 	// Listen to keyboard events
-	glfwSetKeyCallback(window_, [](GLFWwindow* window, int key, int scancode, int action, int mode) {
+	glfwSetKeyCallback(window_, [](GLFWwindow* window, int key, int /* scancode */, int action, int /* mode */) {
 		GlfwWindow *win{ static_cast<GlfwWindow *>(glfwGetWindowUserPointer(window)) };
 		win->handleInput(key, action);
 	});
@@ -157,6 +157,8 @@ void GlfwWindow::toggleFullscreen()
 
 void GlfwWindow::loop() // TODO comment
 {
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
 	while (!glfwWindowShouldClose(window_)) {
 		glfwPollEvents();
 		Window::render();
