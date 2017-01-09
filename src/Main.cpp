@@ -25,7 +25,7 @@ static math::Size windowSize{ 960, 540 };
 
 static const std::string tag{ "Main" };
 static const std::string objName{ "data/cube/cube.obj" };
-static const std::string testTexture{ "shader/test" };
+static const std::string testTexture{ "shader/test.bmp" };
 
 
 void printLogo()
@@ -75,7 +75,6 @@ int main(int argc, char **argv)
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
 		Light light{ 0.5f, 0.5f, 0.5f };
 		light.setPosition(2.0f, 1.0f, -1.0f);
-		Model model{ "shader/crate", .25f };
 		Model room{ "shader/wall", 2.0f };
 		Quad quad{};
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
@@ -96,7 +95,6 @@ int main(int argc, char **argv)
 		window->setBaseProgram(&baseProgram);
 		window->setDepthProgram(&depthProgram);
 		window->setLight(&light);
-		window->setModel(&model);
 		window->setMesh(mesh);
 		window->setRoom(&room);
 		window->setQuadProgram(&quadProgram);

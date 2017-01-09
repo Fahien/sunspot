@@ -44,11 +44,11 @@ TextureData::TextureData(const std::string &path)
 {
 #ifdef WIN32
 	FILE *file{};
-	fopen_s(&file, (path + ".bmp").c_str(), "rb");
+	fopen_s(&file, (path).c_str(), "rb");
 #else
-	FILE *file {fopen((path + ".bmp").c_str(), "rb")};
+	FILE *file {fopen((path).c_str(), "rb")};
 #endif
-	if (file == nullptr) { throw TextureException{ tag, "Could not open header bitmap" }; }
+	if (file == nullptr) { throw TextureException{ tag, "Could not open header bitmap for " + path }; }
 
 	fseek(file, 14, SEEK_CUR);
 

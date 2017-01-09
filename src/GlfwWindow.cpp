@@ -179,4 +179,3 @@ void GlfwWindow::updateFrameSize()
 	// Dimensions from GLFW such that it also works on high DPI screens
 	glfwGetFramebufferSize(window_, &frameSize_.width, &frameSize_.height);
 }
-

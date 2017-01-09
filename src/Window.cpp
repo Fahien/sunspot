@@ -31,7 +31,6 @@ Window::Window(const char* title, const math::Size windowSize, const bool decora
 	, camera_ { nullptr }
 	, baseProgram_{ nullptr }
 	, light_{ nullptr }
-	, model_{ nullptr }
 	, room_{ nullptr }
 	, mesh_{ nullptr }
 	, quadProgram_{ nullptr }
@@ -83,18 +82,16 @@ void Window::renderMesh(const float &deltaTime) // TODO comment
 void Window::render3D(const float &deltaTime) // TODO comment
 {
 	glEnable(GL_DEPTH_TEST);
-	baseProgram_->use();
 	glViewport(0, 0, frameSize_.width, frameSize_.height);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
+	baseProgram_->use();
 	camera_->update(deltaTime, baseProgram_);
 	light_->update(baseProgram_);
 	room_->bind();
 	room_->render(baseProgram_);
 	room_->unbind();
-	model_->bind();
-	model_->render(baseProgram_);
-	model_->unbind();
+	mesh_->draw(baseProgram_);
 }
 
 
@@ -108,13 +105,11 @@ void Window::render3DplusDepth(const float& deltaTime) // TODO comment
 	baseProgram_->use();
 	camera_->update(deltaTime, baseProgram_);
 	light_->update(baseProgram_);
-	model_->bind();
-	model_->render(baseProgram_);
-	model_->unbind();
+	mesh_->draw(baseProgram_);
 }
 
 
-void Window::renderQuad(const float &deltaTime)
+void Window::renderQuad(const float & /* deltaTime */)
 {
 	glViewport(0, 0, frameSize_.width, frameSize_.height);
 	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
@@ -124,6 +119,7 @@ void Window::renderQuad(const float &deltaTime)
 	quad_->render();
 	quad_->unbind();
 }
+
 
 void Window::renderStereoscopic(const float &deltaTime)
 {
@@ -139,9 +135,7 @@ void Window::renderStereoscopic(const float &deltaTime)
 	room_->bind();
 	room_->render(baseProgram_);
 	room_->unbind();
-	model_->bind();
-	model_->render(baseProgram_);
-	model_->unbind();
+	mesh_->draw(baseProgram_);
 	framebuffer_->unbind();
 
 	// Second pass
@@ -157,4 +151,3 @@ void Window::renderStereoscopic(const float &deltaTime)
 	quad_->render();
 	quad_->unbind();
 }
-

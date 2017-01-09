@@ -52,7 +52,11 @@ class WavefrontObject {
 	void loadAmbient(std::stringstream &ss);
 	void loadDiffuse(std::stringstream &ss);
 	void loadSpecular(std::stringstream &ss);
-	void loadMaterials(std::ifstream &is);
+	void loadAmbientMap(std::stringstream &ss, const std::string &path);
+	void loadDiffuseMap(std::stringstream &ss, const std::string &path);
+	void loadSpecularMap(std::stringstream &ss, const std::string &path);
+
+	void loadMaterials(Ifstream &is);
 	void loadMaterialLibrary(std::stringstream &ss, const std::string &path);
 	void useMaterial(std::stringstream &ss);
 	void loadCachedMaterial();

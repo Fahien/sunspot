@@ -243,6 +243,47 @@ void WavefrontObject::loadSpecular(std::stringstream &ss)
 }
 
 
+/// Loads ambient map
+void WavefrontObject::loadAmbientMap(std::stringstream &ss, const std::string & /* path */)
+{
+	std::string command{}; // Read command
+	ss >> command;
+	if (ss.fail() || command != "map_Ka") { throw LoadingException{ "Error reading map_Ka command" }; }
+	// Do nothing
+}
+
+
+/// Loads diffuse map
+void WavefrontObject::loadDiffuseMap(std::stringstream &ss, const std::string &path)
+{
+	std::string command{}; // Read command
+	ss >> command;
+	if (ss.fail() || command != "map_Kd") { throw LoadingException{ "Error loading map_Kd command" }; }
+
+	std::string textureName{};
+	ss >> textureName; // Load the texture name
+	if (ss.fail()) { throw LoadingException{ "Error loading diffuse map name" }; }
+
+	Texture texture {path + '/' + textureName, TextureType::DIFFUSE};
+	currentMaterial_->diffuseMap = texture.getId();
+}
+
+
+/// Loads specular map
+void WavefrontObject::loadSpecularMap(std::stringstream &ss, const std::string &path)
+{
+	std::string command{}; // Read command
+	ss >> command;
+	if (ss.fail() || command != "map_Ks") { throw LoadingException{ "Error loading map_Ks command" }; }
+
+	std::string textureName{};
+	ss >> textureName; // Load the texture name
+	if (ss.fail()) { throw LoadingException{ "Error loading specular map name" }; }
+
+	Texture texture {path + '/' + textureName, TextureType::SPECULAR};
+	currentMaterial_->specularMap = texture.getId();
+}
+
 
 /// Loads cached material
 void WavefrontObject::loadCachedMaterial()
@@ -254,7 +295,7 @@ void WavefrontObject::loadCachedMaterial()
 
 
 /// Read materials from material library
-void WavefrontObject::loadMaterials(std::ifstream &is)
+void WavefrontObject::loadMaterials(Ifstream &is)
 {
 	std::string line;
 	unsigned lineNumber{ 1 };
@@ -305,6 +346,40 @@ void WavefrontObject::loadMaterials(std::ifstream &is)
 			} // End switch line[1]
 			break;
 		}
+		case 'm': { // Map statement
+			if (line.length() <= 6) {
+				std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
+				break;
+			}
+			switch (line[5]) {
+			case 'a': { // Ambient map
+				try { loadAmbientMap(ss, is.getPath()); }
+				catch (const LoadingException &e) {
+					std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+				}
+				break;
+			}
+			case 'd': { // Diffuse map
+				try { loadDiffuseMap(ss, is.getPath()); }
+				catch (const LoadingException &e) {
+					std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+				}
+				break;
+			}
+			case 's': { // Specular map
+				try { loadSpecularMap(ss, is.getPath()); }
+				catch (const LoadingException &e) {
+					std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+				}
+				break;
+			}
+			default: {
+				std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
+				break;
+			}
+			} // End switch line[5]
+			break;
+		}
 		default: {
 			std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
 			break;
@@ -329,14 +404,14 @@ void WavefrontObject::loadMaterialLibrary(std::stringstream &ss, const std::stri
 	std::string mtlName{}; // Read mtl file
 	ss >> mtlName;
 	if (ss.fail()) { throw LoadingException{ "Error reading mtl name" }; }
-	std::ifstream is{ path + '/' + mtlName };
+	Ifstream is{ path + '/' + mtlName };
 	if (!is.is_open()) { throw LoadingException{ "Could not find mtl file: " + path + mtlName }; }
 	loadMaterials(is);
 	
 	while (!ss.fail()) { // Read other optional mtl
 		ss >> mtlName;
 		if (!ss.fail()) {
-			std::ifstream is{ path + '/' + mtlName };
+			Ifstream is{ path + '/' + mtlName };
 			if (!is.is_open()) { continue; }
 			loadMaterials(is);	
 		}
@@ -452,4 +527,3 @@ Ifstream &sunspot::operator>>(Ifstream &is, WavefrontObject &obj)
 	obj.loadCachedMesh();
 	return is;
 }
-

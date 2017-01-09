@@ -39,7 +39,6 @@ public:
 	inline math::Size &getFrameSize() { return frameSize_; }
 	inline void setBaseProgram(const ShaderProgram *baseProgram) { baseProgram_ = baseProgram; }
 	inline void setLight(Light *light) { light_ = light; }
-	inline void setModel(Model *model) { model_ = model; }
 	inline void setRoom(Model *room) { room_ = room; }
 	inline void setMesh(Mesh *mesh) { mesh_ = mesh; }
 
@@ -87,7 +86,6 @@ private:
 
 	const ShaderProgram *baseProgram_;
 	Light *light_;
-	Model *model_;
 	Model *room_;
 	Mesh *mesh_;
 	const ShaderProgram *quadProgram_;
