@@ -15,11 +15,17 @@ Material::Material()
 
 Material::Material(const char *n)
 	: name{ n }
+	, ambient{}
+	, diffuse{}
+	, specular{}
 {}
 
 
 Material::Material(std::string &n)
 	: name{ n }
+	, ambient{}
+	, diffuse{}
+	, specular{}
 {}
 
 
@@ -50,8 +56,7 @@ void Material::bind(const ShaderProgram *shader) const {
 }
 
 
-std::ostream& operator<<(std::ostream& os, const Material& m)
+std::ostream& sunspot::operator<<(std::ostream& os, const Material& m)
 {
 	return os << "[" << m.ambient.r << ", " << m.ambient.g << ", " << m.ambient.b << "]";
 }
-

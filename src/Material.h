@@ -19,7 +19,6 @@ struct Material {
 
 	void bind(const ShaderProgram *shader) const;
 
-	friend std::ifstream &operator>>(std::ifstream &is, Material &mtl);
 	friend std::ostream &operator<<(std::ostream &os, const Material &mtl);
 
 	std::string name;
@@ -32,10 +31,7 @@ struct Material {
 	GLuint specularMap;
 };
 
-std::ostream &operator<<(std::ostream &os, const Material &mtl);
-
 }
 
 
 #endif // SST_MATERIAL_H
-

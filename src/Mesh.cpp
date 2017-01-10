@@ -41,7 +41,7 @@ Mesh::Mesh(const std::string &name, std::vector<Vertex> &v, std::vector<GLuint> 
 
 Mesh::~Mesh()
 {
-	delete material_;
+	if (material_ != nullptr) { delete material_; }
 	glDeleteVertexArrays(1, &vao_);
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);
@@ -51,7 +51,7 @@ Mesh::~Mesh()
 
 void Mesh::draw(const ShaderProgram *shader)
 {
-	material_->bind(shader);
+	if (material_ != nullptr) { material_->bind(shader); }
 
 	glBindVertexArray(vao_);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
