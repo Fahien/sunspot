@@ -7,54 +7,60 @@ message("Searching modules in ${CMAKE_MODULE_PATH}")
 option (CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 # Version number
-set (SST_VERSION_MAJOR 0)
-set (SST_VERSION_MINOR 10)
-set (SST_TITLE "StereoscopicTest")
+set(SST_VERSION_MAJOR 0)
+set(SST_VERSION_MINOR 10)
+set(SST_TITLE "StereoscopicTest")
 
 # Configure a header file to pass some of the CMake settings to the source code
-configure_file (
+configure_file(
 	"${PROJECT_SOURCE_DIR}/src/Config.h.in"
 	"${PROJECT_SOURCE_DIR}/include/Config.h")
 
-find_package (OpenGL REQUIRED)
+find_package(OpenGL REQUIRED)
 
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${PROJECT_SOURCE_DIR}" )
-find_package (GLEW REQUIRED)
-find_package (GLFW REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(GLFW REQUIRED)
+find_package(SOIL REQUIRED)
 
-if (${OPENGL_FOUND})
+if(${OPENGL_FOUND})
 	message("Found OpenGL ${OPENGL_INCLUDE_DIR} ${OPENGL_LIBRARIES}")
 endif()
 
-if (${GLEW_FOUND})
-	message("Found GLEW ${GLEW_INCLUDE_DIR} ${GLEW_LIBRARIES}")
+if(${GLEW_FOUND})
+	message ("Found GLEW ${GLEW_INCLUDE_DIR} ${GLEW_LIBRARIES}")
 endif()
 
-if (${GLFW_FOUND})
-	message("Found GLFW ${GLFW_INCLUDE_DIR} ${GLFW_LIBRARIES}")
+if(${GLFW_FOUND})
+	message ("Found GLFW ${GLFW_INCLUDE_DIR} ${GLFW_LIBRARIES}")
+endif()
+
+if(${SOIL_FOUND})
+	message ("Found SOIL ${SOIL_INCLUDE_DIR} ${SOIL_LIBRARIES}")
 endif()
 
 # Add the given directories to those the compiler uses to search for include files
-if (${OPENGL_INCLUDE_DIR})
+if(${OPENGL_INCLUDE_DIR})
 	include_directories ("${OPENGL_INCLUDE_DIR}")
 endif()
-include_directories (
+include_directories(
 	"${GLEW_INCLUDE_DIR}"
 	"${GLFW_INCLUDE_DIR}"
+	"${SOIL_INCLUDE_DIR}"
 	"${PROJECT_SOURCE_DIR}/include"
 	"${PROJECT_SOURCE_DIR}/shader")
 
 # Specify the paths in which the linker should search for libraries
 
-set (SHADERS
+set(SHADERS
 	shader/base.vert
 	shader/base.frag
 	shader/depth.frag
 	shader/quad.vert
 	shader/quad.frag)
-source_group ("Shaders" FILES ${SHADERS} )
+source_group("Shaders" FILES ${SHADERS} )
 
-set (SOURCES
+set(SOURCES
 	src/Graphics.h
 	src/ShaderProgram.h
 	src/ShaderProgram.cpp
@@ -90,12 +96,12 @@ set (SOURCES
 	src/Camera.h
 	src/Camera.cpp
 	src/Main.cpp)
-source_group ("Sources" FILES ${SOURCES})
+source_group("Sources" FILES ${SOURCES})
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
-add_executable (stereoscopic-test ${SOURCES} ${SHADERS})
+add_executable(stereoscopic-test ${SOURCES} ${SHADERS})
 
-target_link_libraries (stereoscopic-test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES})
+target_link_libraries(stereoscopic-test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${SOIL_LIBRARIES})
 
 file(COPY ${PROJECT_SOURCE_DIR}/shader DESTINATION ${PROJECT_BINARY_DIR})

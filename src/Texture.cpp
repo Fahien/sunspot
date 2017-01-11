@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdio>
+#include <SOIL.h>
 
 #include "Texture.h"
 
@@ -17,11 +18,12 @@ Texture::Texture(const std::string &path, const TextureType &type)
 	, name_{ path }
 	, type_{ type }
 {
-	TextureData data{ path };
+	SoilData data{ path };
 	glGenTextures(1, &id_);
 	glBindTexture(GL_TEXTURE_2D, id_);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data.getWidth(), data.getHeight(),
 		0, GL_RGB, GL_UNSIGNED_BYTE, data.getData());
+	glGenerateMipmap(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	std::cout << "Texture: created " << name_ << std::endl; // TODO remove debug log
@@ -34,19 +36,39 @@ Texture::~Texture()
 }
 
 
+const std::string SoilData::tag{ "SoilData" };
+
+
+SoilData::SoilData(const std::string &path)
+	: width_{ 0 }
+	, height_{ 0 }
+	, data_{ nullptr }
+{
+	data_ = SOIL_load_image(path.c_str(), &width_, &height_, 0, SOIL_LOAD_RGB);
+	if (data_ == nullptr || data_ == 0) { throw TextureException{ tag, "Could not load " + path + ": " + SOIL_last_result() }; }
+	std::cout << "SoilData: loaded " << path << ": " << SOIL_last_result();
+}
+
+
+SoilData::~SoilData()
+{
+	if (data_ != nullptr && data_ != 0) { SOIL_free_image_data(data_); }
+}
+
+
 const std::string TextureData::tag{ "TextureData" };
 
 
 TextureData::TextureData(const std::string &path)
-	: width_{}
-	, height_{}
-	, data_{nullptr}
+	: width_{ 0 }
+	, height_{ 0 }
+	, data_{ nullptr }
 {
 #ifdef WIN32
 	FILE *file{};
 	fopen_s(&file, (path).c_str(), "rb");
 #else
-	FILE *file {fopen((path).c_str(), "rb")};
+	FILE *file{ fopen((path).c_str(), "rb") };
 #endif
 	if (file == nullptr) { throw TextureException{ tag, "Could not open header bitmap for " + path }; }
 
@@ -104,7 +126,7 @@ TextureData::TextureData(const std::string &path)
 		std::string message{ "Could not not allocate " };
 		message += size;
 		message += " memory for bitmap data\n";
-		throw TextureException{ tag, message};
+		throw TextureException{ tag, message };
 	}
 	nread = fread(data_, size, 1, file); // Read bitmap data
 	if (nread <= 0) {

@@ -270,7 +270,12 @@ void WavefrontObject::loadDiffuseMap(std::stringstream &ss, const std::string &p
 	ss >> textureName; // Load the texture name
 	if (ss.fail()) { throw LoadingException{ "Error loading diffuse map name" }; }
 
-	Texture texture {path + '/' + textureName, TextureType::DIFFUSE};
+	std::cout << "WavefrontObject: Loading " << path << " " << textureName << std::endl; // TODO remove debug log
+	Texture texture {path
+#ifndef WIN32
+		+ '/'
+#endif
+		+ textureName, TextureType::DIFFUSE};
 	currentMaterial_->diffuseMap = texture.getId();
 }
 
@@ -286,7 +291,11 @@ void WavefrontObject::loadSpecularMap(std::stringstream &ss, const std::string &
 	ss >> textureName; // Load the texture name
 	if (ss.fail()) { throw LoadingException{ "Error loading specular map name" }; }
 
-	Texture texture {path + '/' + textureName, TextureType::SPECULAR};
+	Texture texture {path
+#ifndef WIN32
+		+ '/'
+#endif
+		+ textureName, TextureType::SPECULAR};
 	currentMaterial_->specularMap = texture.getId();
 }
 
@@ -410,14 +419,26 @@ void WavefrontObject::loadMaterialLibrary(std::stringstream &ss, const std::stri
 	std::string mtlName{}; // Read mtl file
 	ss >> mtlName;
 	if (ss.fail()) { throw LoadingException{ "Error reading mtl name" }; }
-	Ifstream is{ path + '/' + mtlName };
-	if (!is.is_open()) { throw LoadingException{ "Could not find mtl file: " + path + "/" + mtlName }; }
+	Ifstream is{ path
+#ifndef WIN32
+		+ '/'
+#endif
+		+ mtlName };
+	if (!is.is_open()) { throw LoadingException{ "Could not find mtl file: " + path
+#ifndef WIN32
+		+ '/'
+#endif
+		+ mtlName }; }
 	loadMaterials(is);
 	
 	while (!ss.fail()) { // Read other optional mtl
 		ss >> mtlName;
 		if (!ss.fail()) {
-			Ifstream is{ path + '/' + mtlName };
+			Ifstream is{ path
+#ifndef WIN32
+				+ '/'
+#endif
+				+ mtlName };
 			if (!is.is_open()) { continue; }
 			loadMaterials(is);	
 		}

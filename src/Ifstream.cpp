@@ -1,6 +1,7 @@
 #include "Ifstream.h"
 #ifdef WIN32
 #include <cstdlib>
+#include <iostream>
 #else
 #include <libgen.h>
 #endif
@@ -21,6 +22,7 @@ Ifstream::Ifstream(char *name)
 	char path[32];
 	_splitpath_s(name, nullptr, 0, path, 32, nullptr, 0, nullptr, 0);
 	path_ = path;
+	std::cout << "Ifstream char*: path[" << path << "]\n";
 #endif
 }
 
@@ -37,5 +39,6 @@ Ifstream::Ifstream(const std::string &name)
 	char path[32];
 	_splitpath_s(name.c_str(), nullptr, 0, path, 32, nullptr, 0, nullptr, 0);
 	path_ = path;
+	std::cout << "Ifstream string: path[" << path << "]\n";
 #endif
 }

@@ -278,4 +278,3 @@ void Mat4::rotateZ(const float radians)
 		0, 0, 0, 1 };
 	*this = rotation * *this;
 }
-

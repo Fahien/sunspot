@@ -17,6 +17,24 @@ class TextureException : public GraphicException {
 };
 
 
+class SoilData {
+  public:
+	static const std::string tag;
+
+	SoilData(const std::string &path);
+	~SoilData();
+
+	inline GLsizei &getWidth() { return width_; }
+	inline GLsizei &getHeight() { return height_; }
+	inline GLubyte *getData() { return data_; }
+
+private:
+	GLsizei width_;
+	GLsizei height_;
+	GLubyte *data_;
+};
+
+
 class TextureData {
   public:
 	static const std::string tag;

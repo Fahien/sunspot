@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 		Quad quad{};
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
 		ShaderProgram depthProgram{ "shader/quad.vert", "shader/depth.frag" };
-		Camera camera{ 45.0f, static_cast<float>(windowSize.width) / windowSize.height, 0.125f, 64.0f };
+		Camera camera{ 45.0f, static_cast<float>(windowSize.width) / windowSize.height, 0.125f, 256.0f };
 		math::Size frameSize{ window->getFrameSize() };
 		Framebuffer framebuffer{ frameSize.width / 2, frameSize.height / 2};
 
