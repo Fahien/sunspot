@@ -10,9 +10,8 @@ using namespace sunspot;
 const std::string Framebuffer::tag{ "Framebuffer" };
 
 
-Framebuffer::Framebuffer(const int width, const int height)
-	: width_{ width }
-	, height_{ height }
+Framebuffer::Framebuffer(const math::Size &size)
+	: size_{ size }
 	, fbo_{ 0 }
 	, colorTexture_{ 0 }
 	, depthTexture_{ 0 }
@@ -27,14 +26,14 @@ Framebuffer::Framebuffer(const int width, const int height)
 
 	glGenTextures(1, &colorTexture_); // Create a texture for colors
 	glBindTexture(GL_TEXTURE_2D, colorTexture_);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size_.width, size_.height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture_, 0);
 
 	glGenTextures(1, &depthTexture_); // Create a texture for depth
 	glBindTexture(GL_TEXTURE_2D, depthTexture_);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size_.width, size_.height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture_, 0);
@@ -46,7 +45,7 @@ Framebuffer::Framebuffer(const int width, const int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	SoilData header{ "shader/header.bmp" };
+	TextureData header{ "data/stereoscopic/header.bmp" };
 	glGenTextures(1, &headerTexture_); // Create a texture for header
 	glBindTexture(GL_TEXTURE_2D, headerTexture_);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, header.getWidth(), header.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, header.getData());
@@ -56,7 +55,7 @@ Framebuffer::Framebuffer(const int width, const int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "Stereoscopic Framebuffer [" << width_ << "x" << height_ << "]\n";
+		std::cout << "Stereoscopic Framebuffer [" << size_.width << "x" << size_.height << "]\n";
 	}
 	else {
 		glDeleteTextures(1, &headerTexture_);
@@ -92,7 +91,7 @@ void Framebuffer::bindColorTexture(const ShaderProgram *shader) const
 	glUniform1i(shader->getLocation("headerTexture"), 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, headerTexture_);
-	glUniform2i(shader->getLocation("frameSize"), width_, height_);
+	glUniform2i(shader->getLocation("frameSize"), size_.width, size_.height);
 }
 
 
@@ -104,5 +103,5 @@ void Framebuffer::bindDepthTexture(const ShaderProgram *shader) const
 	glUniform1i(shader->getLocation("maskTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, maskTexture_);
-	glUniform2i(shader->getLocation("frameSize"), width_, height_);
+	glUniform2i(shader->getLocation("frameSize"), size_.width, size_.height);
 }

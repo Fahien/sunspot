@@ -10,6 +10,7 @@ using namespace sunspot;
 Mesh::Mesh(const std::string &name, std::vector<Vertex> &v, std::vector<GLuint> &i, Material *material)
 	: vertices{ v }
 	, indices{ i }
+	, transform{ math::Mat4::identity }
 	, name_{ name }
 	, material_{ material }
 {
@@ -51,6 +52,9 @@ Mesh::~Mesh()
 
 void Mesh::draw(const ShaderProgram *shader)
 {
+	// Bind transform matrix
+	glUniformMatrix4fv(shader->getLocation("model"), 1, GL_FALSE, transform.matrix);
+
 	if (material_ != nullptr) { material_->bind(shader); }
 
 	glBindVertexArray(vao_);

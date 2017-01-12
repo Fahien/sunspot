@@ -78,9 +78,7 @@ protected:
 
 private:
 	void render(const float &deltaTime);
-	void renderMesh(const float &deltaTime);
 	void render3D(const float &deltaTime);
-	void render3DplusDepth(const float &deltaTime);
 	void renderQuad(const float &deltaTime);
 	void renderStereoscopic(const float &deltaTime);
 

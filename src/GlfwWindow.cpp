@@ -157,8 +157,8 @@ void GlfwWindow::toggleFullscreen()
 
 void GlfwWindow::loop() // TODO comment
 {
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	// glEnable(GL_CULL_FACE);
+	// glCullFace(GL_FRONT);
 	while (!glfwWindowShouldClose(window_)) {
 		glfwPollEvents();
 		Window::render();

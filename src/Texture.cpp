@@ -18,7 +18,7 @@ Texture::Texture(const std::string &path, const TextureType &type)
 	, name_{ path }
 	, type_{ type }
 {
-	SoilData data{ path };
+	TextureData data{ path };
 	glGenTextures(1, &id_);
 	glBindTexture(GL_TEXTURE_2D, id_);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data.getWidth(), data.getHeight(),
@@ -46,7 +46,8 @@ SoilData::SoilData(const std::string &path)
 {
 	data_ = SOIL_load_image(path.c_str(), &width_, &height_, 0, SOIL_LOAD_RGB);
 	if (data_ == nullptr || data_ == 0) { throw TextureException{ tag, "Could not load " + path + ": " + SOIL_last_result() }; }
-	std::cout << "SoilData: loaded " << path << ": " << SOIL_last_result();
+
+	std::cout << "SoilData: loaded " << path << ": " << SOIL_last_result() << std::endl; // TODO remove debug log
 }
 
 

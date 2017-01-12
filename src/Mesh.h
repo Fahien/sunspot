@@ -33,6 +33,8 @@ class Mesh {
 	std::vector<GLuint> indices;
 	std::vector<Texture> textures;
 
+	math::Mat4 transform;
+
   private:
 	std::string name_;
 
@@ -46,4 +48,3 @@ class Mesh {
 }
 
 #endif // SST_MESH_H
-

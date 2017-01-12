@@ -24,7 +24,7 @@ static int zoom{ 2 };
 static math::Size windowSize{ 960, 540 };
 
 static const std::string tag{ "Main" };
-static const std::string objName{ "data/farmhouse/farmhouse.obj" };
+static const std::string objName{ "data/frigate/frigate-blender.obj" };
 static const std::string testTexture{ "shader/test.bmp" };
 
 
@@ -72,16 +72,29 @@ int main(int argc, char **argv)
 		// Create window
 		window = new GlfwWindow{ SST_TITLE, windowSize, decorated, stereoscopic };
 
+		Camera camera{ 45.0f, static_cast<float>(windowSize.width) / windowSize.height, 0.125f, 256.0f };
+		window->setCamera(&camera);
+
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
+		window->setBaseProgram(&baseProgram);
+
 		Light light{ 0.5f, 0.5f, 0.5f };
-		light.setPosition(2.0f, 1.0f, -1.0f);
+		light.setPosition(4.0f, 2.0f, -2.0f);
+		window->setLight(&light);
+
 		Model room{ "shader/wall", 2.0f };
-		Quad quad{};
+		window->setRoom(&room);
+
+		Framebuffer framebuffer{ window->getFrameSize() / 2 };
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
 		ShaderProgram depthProgram{ "shader/quad.vert", "shader/depth.frag" };
-		Camera camera{ 45.0f, static_cast<float>(windowSize.width) / windowSize.height, 0.125f, 256.0f };
-		math::Size frameSize{ window->getFrameSize() };
-		Framebuffer framebuffer{ frameSize.width / 2, frameSize.height / 2};
+		Quad quad{};
+		if (stereoscopic) {
+			window->setQuadProgram(&quadProgram);
+			window->setDepthProgram(&depthProgram);
+			window->setQuad(&quad);
+			window->setFramebuffer(&framebuffer);
+		}
 
 		Ifstream is{ objName };
 		if (!is.is_open()) {
@@ -91,16 +104,7 @@ int main(int argc, char **argv)
 		WavefrontObject obj{};
 		is >> obj;
 		Mesh *mesh{ obj.getMesh() };
-
-		window->setBaseProgram(&baseProgram);
-		window->setDepthProgram(&depthProgram);
-		window->setLight(&light);
 		window->setMesh(mesh);
-		window->setRoom(&room);
-		window->setQuadProgram(&quadProgram);
-		window->setQuad(&quad);
-		window->setCamera(&camera);
-		window->setFramebuffer(&framebuffer);
 
 		std::cout << "Start looping\n";
 		window->loop();

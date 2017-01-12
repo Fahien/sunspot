@@ -10,11 +10,7 @@ using namespace sunspot;
 
 
 Model::Model(const std::string &path, const float scale)
-	: transform{
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1 }
+	: transform{ math::Mat4::identity }
 	, vbo_ {0}
 	, ebo_ {0}
 	, vao_ {0}
@@ -83,7 +79,7 @@ Model::Model(const std::string &path, const float scale)
 	glEnableVertexAttribArray(2);
 	glBindVertexArray(0); // Unbind vao
 
-	TextureData diffuse{ path + ".bmp" };
+	SoilData diffuse{ path + ".bmp" };
 	glGenTextures(1, &material_.diffuseMap); // Create a diffuse map
 	glBindTexture(GL_TEXTURE_2D, material_.diffuseMap);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, diffuse.getWidth(), diffuse.getHeight(),
@@ -91,7 +87,7 @@ Model::Model(const std::string &path, const float scale)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	TextureData specular{ path + "-s.bmp" };
+	SoilData specular{ path + "-s.bmp" };
 	glGenTextures(1, &material_.specularMap); // Create a specular map
 	glBindTexture(GL_TEXTURE_2D, material_.specularMap);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, specular.getWidth(), specular.getHeight(),
@@ -143,4 +139,3 @@ void Model::render(const ShaderProgram *program) const
 	// Eventually, draw
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
-

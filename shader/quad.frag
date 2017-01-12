@@ -18,9 +18,10 @@ void main()
 		texCoords.y * frameSize.y / headerSize.y - frameSize.y / headerSize.y + 1.0f);
 	vec4 header = texture(headerTexture, headerCoords);
 	color = texture(screenTexture, texCoords);
+	/*
 	color.b = header.r != 1.0 ? header.b : color.b;
 	vec2 maskCoords = vec2(texCoords.x, texCoords.y * frameSize.y);
 	float mask = texture(maskTexture, maskCoords).r;
 	color = mix(color, empty, mask);
+	*/
 }
-

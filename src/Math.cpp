@@ -33,6 +33,21 @@ Size &Size::operator*=(const float &f)
 }
 
 
+Size &Size::operator/=(const int &i)
+{
+	width /= i;
+	height /= i;
+	return *this;
+}
+
+
+const Size Size::operator/(const int &i) const
+{
+	Size result = *this;
+	return result /= i;
+}
+
+
 Vec2::Vec2()
 	: x{ 0.0f }
 	, y{ 0.0f }
@@ -137,6 +152,15 @@ std::ostream &math::operator<<(std::ostream &os, const Vec3 &v)
 {
 	return os << "[" << v.x << ", " << v.y << ", " << v.z << "]";
 }
+
+
+Mat4 Mat4::identity
+{
+	1, 0, 0, 0,
+	0, 1, 0, 0,
+	0, 0, 1, 0,
+	0, 0, 0, 1
+};
 
 
 Mat4::Mat4()

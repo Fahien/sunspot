@@ -17,6 +17,8 @@ class Size {
 
 	Size &operator*=(const int &f);
 	Size &operator*=(const float &f);
+	Size &operator/=(const int &i);
+	const Size operator/(const int &i) const;
 
 	int width;
 	int height;
@@ -65,6 +67,8 @@ class Mat4 {
 	Mat4(std::initializer_list<float>);
 	Mat4(float *matrix);
 
+	static Mat4 identity;
+
 	float &operator[](const int index);
 	float operator[](const int index) const;
 	Mat4 &operator=(const Mat4 &matrix);
@@ -83,6 +87,8 @@ class Mat4 {
 	float matrix[16];
 };
 
+
 }
+
 
 #endif // SST_MATH_H

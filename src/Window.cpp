@@ -58,24 +58,7 @@ void Window::render(const float &deltaTime) // TODO comment
 	// std::cout << static_cast<int>(1.0f / deltaTime) << " "; // FPS
 	updateFrameSize();
 	if (stereoscopic_) { renderStereoscopic(deltaTime); }
-	else { renderMesh(deltaTime); }
-}
-
-
-void Window::renderMesh(const float &deltaTime) // TODO comment
-{
-	glEnable(GL_DEPTH_TEST);
-	glViewport(0, 0, frameSize_.width, frameSize_.height);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	baseProgram_->use();
-	camera_->update(deltaTime, baseProgram_);
-	light_->update(baseProgram_);
-	room_->bind();
-	room_->render(baseProgram_);
-	room_->unbind();
-	mesh_->draw(baseProgram_);
+	else { render3D(deltaTime); }
 }
 
 
@@ -85,23 +68,6 @@ void Window::render3D(const float &deltaTime) // TODO comment
 	glViewport(0, 0, frameSize_.width, frameSize_.height);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
-	baseProgram_->use();
-	camera_->update(deltaTime, baseProgram_);
-	light_->update(baseProgram_);
-	room_->bind();
-	room_->render(baseProgram_);
-	room_->unbind();
-	mesh_->draw(baseProgram_);
-}
-
-
-void Window::render3DplusDepth(const float& deltaTime) // TODO comment
-{
-	// First pass
-	glEnable(GL_DEPTH_TEST);
-	glViewport(0, 0, frameSize_.width, frameSize_.height);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the color buffer
 	baseProgram_->use();
 	camera_->update(deltaTime, baseProgram_);
 	light_->update(baseProgram_);
@@ -132,9 +98,6 @@ void Window::renderStereoscopic(const float &deltaTime)
 	baseProgram_->use();
 	camera_->update(deltaTime, baseProgram_);
 	light_->update(baseProgram_);
-	room_->bind();
-	room_->render(baseProgram_);
-	room_->unbind();
 	mesh_->draw(baseProgram_);
 	framebuffer_->unbind();
 

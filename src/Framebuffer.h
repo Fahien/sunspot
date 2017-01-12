@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Graphics.h"
+#include "Math.h"
 
 class ShaderProgram;
 
@@ -20,11 +21,11 @@ class Framebuffer {
   public:
 	static const std::string tag;
 
-	Framebuffer(const int width, const int height);
+	Framebuffer(const math::Size &size);
 	~Framebuffer();
 
-	inline GLsizei getWidth() const { return width_; }
-	inline GLsizei getHeight() const { return height_; }
+	inline GLsizei getWidth() const { return size_.width; }
+	inline GLsizei getHeight() const { return size_.height; }
 	inline void bind() const { glBindFramebuffer(GL_FRAMEBUFFER, fbo_); }
 	inline void unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
@@ -32,8 +33,7 @@ class Framebuffer {
 	void bindDepthTexture(const ShaderProgram *program) const;
 
   private:
-	const GLsizei width_;
-	const GLsizei height_;
+	const math::Size size_;
 	GLuint fbo_;
 	GLuint colorTexture_;
 	GLuint depthTexture_;
