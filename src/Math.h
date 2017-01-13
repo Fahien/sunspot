@@ -20,6 +20,8 @@ class Size {
 	Size &operator/=(const int &i);
 	const Size operator/(const int &i) const;
 
+	friend std::ostream &operator<<(std::ostream &os, const Size &v);
+
 	int width;
 	int height;
 };
@@ -35,11 +37,12 @@ class Vec2 {
 	Vec2 &operator+=(const Vec2 &other);
 	const Vec2 operator+(const Vec2 &other) const;
 
+	friend std::ostream &operator<<(std::ostream &os, const Vec2 &v);
+
 	float x;
 	float y;
 };
 
-std::ostream &operator<<(std::ostream &os, const Vec2 &v);
 
 
 class Vec3 {

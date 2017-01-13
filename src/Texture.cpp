@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cstdio>
-#include <SOIL.h>
+#include <SOIL/SOIL.h>
 
 #include "Texture.h"
 
@@ -18,7 +18,7 @@ Texture::Texture(const std::string &path, const TextureType &type)
 	, name_{ path }
 	, type_{ type }
 {
-	TextureData data{ path };
+	SoilData data{ path };
 	glGenTextures(1, &id_);
 	glBindTexture(GL_TEXTURE_2D, id_);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data.getWidth(), data.getHeight(),

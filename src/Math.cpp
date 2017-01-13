@@ -41,6 +41,12 @@ Size &Size::operator/=(const int &i)
 }
 
 
+std::ostream &math::operator<<(std::ostream &os, const Size &s)
+{
+	return os << "[" << s.width << ", " << s.height << "]";
+}
+
+
 const Size Size::operator/(const int &i) const
 {
 	Size result = *this;

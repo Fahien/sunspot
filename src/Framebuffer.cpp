@@ -38,14 +38,14 @@ Framebuffer::Framebuffer(const math::Size &size)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture_, 0);
 
-	GLubyte mask[1][2][3] = { {{255, 255, 255}, {0, 0, 0}} };
+	GLubyte mask[1][2][3] = { {{0, 0, 0}, {255, 255, 255}} };
 	glGenTextures(1, &maskTexture_); // Create a texture for mask
 	glBindTexture(GL_TEXTURE_2D, maskTexture_);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 2, 0, GL_RGB, GL_UNSIGNED_BYTE, mask); 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	TextureData header{ "data/stereoscopic/header.bmp" };
+	SoilData header{ "data/stereoscopic/header.png" };
 	glGenTextures(1, &headerTexture_); // Create a texture for header
 	glBindTexture(GL_TEXTURE_2D, headerTexture_);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, header.getWidth(), header.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, header.getData());
@@ -91,7 +91,8 @@ void Framebuffer::bindColorTexture(const ShaderProgram *shader) const
 	glUniform1i(shader->getLocation("headerTexture"), 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, headerTexture_);
-	glUniform2i(shader->getLocation("frameSize"), size_.width, size_.height);
+	glUniform2iv(shader->getLocation("frameSize"), 1, &size_.width);
+	std::cout << "Binded size " << size_ << std::endl;
 }
 
 

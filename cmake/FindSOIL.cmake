@@ -12,7 +12,7 @@
 #
 # revisions: github.com/zwookie
 
-find_path(SOIL_INCLUDE_DIR SOIL.h
+find_path(SOIL_INCLUDE_DIR SOIL/SOIL.h
 	/usr/include
 	/usr/local/include
 	/opt/local/include
