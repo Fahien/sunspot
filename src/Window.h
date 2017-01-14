@@ -3,6 +3,7 @@
 
 #include <string>
 #include <stdexcept>
+#include <vector>
 #include "Math.h"
 #include "Cursor.h"
 
@@ -15,7 +16,7 @@ class Camera;
 namespace sunspot {
 
 class Light;
-class Mesh;
+class WavefrontObject;
 class Framebuffer;
 
 class GraphicException : public std::runtime_error {
@@ -40,7 +41,7 @@ public:
 	inline void setBaseProgram(const ShaderProgram *baseProgram) { baseProgram_ = baseProgram; }
 	inline void setLight(Light *light) { light_ = light; }
 	inline void setRoom(Model *room) { room_ = room; }
-	inline void setMesh(Mesh *mesh) { mesh_ = mesh; }
+	inline void addObj(WavefrontObject *obj) { objs_.push_back(obj); }
 
 	inline void setQuad(Quad *quad) { quad_ = quad; }
 	inline void setQuadProgram(const ShaderProgram *quadProgram) { quadProgram_ = quadProgram; }
@@ -85,7 +86,7 @@ private:
 	const ShaderProgram *baseProgram_;
 	Light *light_;
 	Model *room_;
-	Mesh *mesh_;
+	std::vector<WavefrontObject *> objs_;
 	const ShaderProgram *quadProgram_;
 	const ShaderProgram *depthProgram_;
 	const Framebuffer *framebuffer_;

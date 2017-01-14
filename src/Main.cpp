@@ -24,15 +24,22 @@ static int zoom{ 2 };
 static math::Size windowSize{ 960, 540 };
 
 static const std::string tag{ "Main" };
-static const std::string objName{ "data/frigate/frigate-blender.obj" };
+static const std::string crateName{ "data/cube/crate.obj" };
 static const std::string testTexture{ "shader/test.bmp" };
 
 
 void printLogo()
 {
-	std::cout << "┌─┐┬ ┬┌┐┌┌─┐┌─┐┌─┐┌┬┐\n"
-	             "└─┐│ ││││└─┐├─┘│ │ │ \n"
-	             "└─┘└─┘┘└┘└─┘┴  └─┘ ┴ \n";
+	std::cout <<
+R"( ________  ___  ___  ________   ________  ________  ________  _________   
+|\   ____\|\  \|\  \|\   ___  \|\   ____\|\   __  \|\   __  \|\___   ___\ 
+\ \  \___|\ \  \\\  \ \  \\ \  \ \  \___|\ \  \|\  \ \  \|\  \|___ \  \_| 
+ \ \_____  \ \  \\\  \ \  \\ \  \ \_____  \ \   ____\ \  \\\  \   \ \  \  
+  \|____|\  \ \  \\\  \ \  \\ \  \|____|\  \ \  \___|\ \  \\\  \   \ \  \ 
+    ____\_\  \ \_______\ \__\\ \__\____\_\  \ \__\    \ \_______\   \ \  \
+   |\_________\|_______|\|__| \|__|\_________\|__|     \|_______|    \ \__\
+    \|_________|                   \|_________|                       \|__| )"
+		<< std::endl << std::endl;
 }
 
 
@@ -95,16 +102,15 @@ int main(int argc, char **argv)
 			window->setQuad(&quad);
 			window->setFramebuffer(&framebuffer);
 		}
-
-		Ifstream is{ objName };
+		
+		Ifstream is{ crateName };
 		if (!is.is_open()) {
-			std::cerr << "Could not find " << objName << std::endl;
+			std::cerr << "Could not find " << crateName << std::endl;
 			return EXIT_FAILURE;
 		}
 		WavefrontObject obj{};
 		is >> obj;
-		Mesh *mesh{ obj.getMesh() };
-		window->setMesh(mesh);
+		window->addObj(&obj);
 
 		std::cout << "Start looping\n";
 		window->loop();

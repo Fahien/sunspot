@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "Model.h"
-#include "Mesh.h"
+#include "WavefrontObject.h"
 #include "Quad.h"
 #include "Framebuffer.h"
 
@@ -32,7 +32,7 @@ Window::Window(const char* title, const math::Size windowSize, const bool decora
 	, baseProgram_{ nullptr }
 	, light_{ nullptr }
 	, room_{ nullptr }
-	, mesh_{ nullptr }
+	, objs_{}
 	, quadProgram_{ nullptr }
 	, depthProgram_{ nullptr }
 	, framebuffer_{ nullptr }
@@ -71,7 +71,7 @@ void Window::render3D(const float &deltaTime) // TODO comment
 	baseProgram_->use();
 	camera_->update(deltaTime, baseProgram_);
 	light_->update(baseProgram_);
-	mesh_->draw(baseProgram_);
+	for (WavefrontObject *obj : objs_) { obj->draw(baseProgram_); }
 }
 
 
@@ -98,7 +98,7 @@ void Window::renderStereoscopic(const float &deltaTime)
 	baseProgram_->use();
 	camera_->update(deltaTime, baseProgram_);
 	light_->update(baseProgram_);
-	mesh_->draw(baseProgram_);
+	for (WavefrontObject *obj : objs_) { obj->draw(baseProgram_); }
 	framebuffer_->unbind();
 
 	// Second pass

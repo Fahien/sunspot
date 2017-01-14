@@ -10,10 +10,14 @@
 #include "Ifstream.h"
 
 
+class ShaderProgram;
+
+
 namespace sunspot {
 
 struct Vertex;
 class Texture;
+class Mesh;
 
 class LoadingException : public std::runtime_error {
   public:
@@ -34,10 +38,11 @@ class WavefrontObject {
 	~WavefrontObject();
 
 	inline std::string &getName() { return name_; }
-	inline Mesh *getMesh() { return meshes_.front(); }
 	inline std::vector<Vertex> &getVertices() { return vertices_; }
 	inline std::vector<GLuint> &getIndices() { return indices_; }
 	inline std::vector<Texture> &getTextures() { return textures_; }
+
+	void draw(const ShaderProgram *shader) const;
 
   private:
 	void loadName(std::stringstream &ss);

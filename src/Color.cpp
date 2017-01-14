@@ -15,3 +15,9 @@ Color::Color(const float rr, const float gg, const float bb)
 	, g{ gg }
 	, b{ bb }
 {}
+
+
+std::ostream &sunspot::operator<<(std::ostream &os, const Color &c)
+{
+	return os << "[" << c.r << ", " << c.g << ", " << c.b << "]";
+}

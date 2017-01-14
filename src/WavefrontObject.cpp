@@ -36,7 +36,14 @@ WavefrontObject::WavefrontObject()
 WavefrontObject::~WavefrontObject()
 {
 	for (Mesh *mesh : meshes_) { delete mesh; }
-	std::cout << "WavefrontObject: destroyed\n"; // TODO remove debug log
+	std::cout << "WavefrontObject: destroyed " << name_ << std::endl; // TODO remove debug log
+}
+
+
+/// Draw the object
+void WavefrontObject::draw(const ShaderProgram *shader) const
+{
+	for (Mesh *mesh : meshes_) { mesh->draw(shader); }
 }
 
 
@@ -179,7 +186,7 @@ void WavefrontObject::loadGroup(std::stringstream &ss)
 	std::string command{};
 	currentGroupName_ = "default"; // Default name is default
 	ss >> command >> currentGroupName_;
-	if (ss.fail()) { throw LoadingException{ "Error loading indices" }; }
+	if (ss.fail()) { throw LoadingException{ "Error loading group name" }; }
 }
 
 
@@ -189,27 +196,9 @@ void WavefrontObject::loadCachedMesh()
 	if (!vertices_.empty() && !indices_.empty()) {
 		meshes_.push_back( new Mesh{ currentGroupName_, vertices_, indices_, currentMaterial_ });
 		vertices_.clear();
+		vertexCount_ = 0;
 		indices_.clear();
 	}
-}
-
-
-/// Creates a new material
-void WavefrontObject::createMaterial(std::stringstream &ss)
-{
-	if (currentMaterial_ != nullptr) { loadCachedMaterial(); }
-
-	std::string command{}; // Read command
-	ss >> command;
-	if (ss.fail() || command != "newmtl") { throw LoadingException{ "Error reading newmtl command" }; }
-
-	std::string name{}; // Read material name
-	ss >> name;
-	if (ss.fail()) { throw LoadingException{ "Error reading material name" }; }
-	// Create new current material
-	if (currentMaterial_ != nullptr) { throw LoadingException{ "Current material is not null" }; }
-	currentMaterial_ = new Material{ name };
-	std::cout << "WavefrontObject: Created material " << currentMaterial_->name << std::endl;
 }
 
 
@@ -306,6 +295,24 @@ void WavefrontObject::loadCachedMaterial()
 	if (currentMaterial_ == nullptr) { throw LoadingException{ "Current material is null" }; }
 	materials_.push_back(currentMaterial_);
 	currentMaterial_ = nullptr;
+}
+
+
+/// Creates a new material
+void WavefrontObject::createMaterial(std::stringstream &ss)
+{
+	if (currentMaterial_ != nullptr) { loadCachedMaterial(); }
+
+	std::string command{}; // Read command
+	ss >> command;
+	if (ss.fail() || command != "newmtl") { throw LoadingException{ "Error reading newmtl command" }; }
+
+	std::string name{}; // Read material name
+	ss >> name;
+	if (ss.fail()) { throw LoadingException{ "Error reading material name" }; }
+	// Create new current material
+	if (currentMaterial_ != nullptr) { throw LoadingException{ "Current material is not null" }; }
+	currentMaterial_ = new Material{ name };
 }
 
 

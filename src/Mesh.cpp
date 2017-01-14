@@ -54,9 +54,7 @@ void Mesh::draw(const ShaderProgram *shader)
 {
 	// Bind transform matrix
 	glUniformMatrix4fv(shader->getLocation("model"), 1, GL_FALSE, transform.matrix);
-
 	if (material_ != nullptr) { material_->bind(shader); }
-
 	glBindVertexArray(vao_);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);

@@ -18,7 +18,9 @@ Material::Material(const char *n)
 	, ambient{}
 	, diffuse{}
 	, specular{}
-{}
+{
+	std::cout << "Material: created " << name << std::endl; // TODO remove debug log
+}
 
 
 Material::Material(std::string &n)
@@ -26,13 +28,17 @@ Material::Material(std::string &n)
 	, ambient{}
 	, diffuse{}
 	, specular{}
-{}
+{
+	std::cout << "Material: created " << name << std::endl; // TODO remove debug log
+}
 
 
 Material::~Material()
 {
 	glDeleteTextures(1, &diffuseMap);
 	glDeleteTextures(1, &specularMap);
+
+	std::cout << "Material: destroyed " << name << std::endl; // TODO remove debug log
 }
 
 
@@ -56,7 +62,12 @@ void Material::bind(const ShaderProgram *shader) const {
 }
 
 
-std::ostream& sunspot::operator<<(std::ostream& os, const Material& m)
+std::ostream &sunspot::operator<<(std::ostream &os, const Material &m)
 {
-	return os << "[" << m.ambient.r << ", " << m.ambient.g << ", " << m.ambient.b << "]";
+	return os << "Material[" << m.name << "]\n"
+			  << "\tambient[" << m.ambient << "]\n"
+			  << "\tdiffuse[" << m.diffuse << "]\n"
+			  << "\tspecular[" << m.specular << "]\n"
+			  << "\tdiffuseMap[" << m.diffuseMap << "]\n"
+			  << "\tspecularMap[" << m.specularMap << "]";
 }
