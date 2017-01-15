@@ -8,7 +8,6 @@
 #include "Cursor.h"
 
 class ShaderProgram;
-class Model;
 class Quad;
 class Camera;
 
@@ -40,7 +39,6 @@ public:
 	inline math::Size &getFrameSize() { return frameSize_; }
 	inline void setBaseProgram(const ShaderProgram *baseProgram) { baseProgram_ = baseProgram; }
 	inline void setLight(Light *light) { light_ = light; }
-	inline void setRoom(Model *room) { room_ = room; }
 	inline void addObj(WavefrontObject *obj) { objs_.push_back(obj); }
 
 	inline void setQuad(Quad *quad) { quad_ = quad; }
@@ -85,7 +83,6 @@ private:
 
 	const ShaderProgram *baseProgram_;
 	Light *light_;
-	Model *room_;
 	std::vector<WavefrontObject *> objs_;
 	const ShaderProgram *quadProgram_;
 	const ShaderProgram *depthProgram_;
@@ -96,4 +93,3 @@ private:
 }
 
 #endif // SST_WINDOW_H
-

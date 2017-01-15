@@ -1,47 +1,31 @@
-cmake_minimum_required (VERSION 2.8)
-project (sunspot)
+cmake_minimum_required(VERSION 2.8)
+project(SunSpoT)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/cmake")
 message("Searching modules in ${CMAKE_MODULE_PATH}")
 
-option (CMAKE_EXPORT_COMPILE_COMMANDS "ON")
+option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 # Version number
 set(SST_VERSION_MAJOR 0)
 set(SST_VERSION_MINOR 11)
-set(SST_TITLE "sunspot")
+set(SST_TITLE "SunSpoT")
 
 # Configure a header file to pass some of the CMake settings to the source code
 configure_file(
 	"${PROJECT_SOURCE_DIR}/src/Config.h.in"
 	"${PROJECT_SOURCE_DIR}/include/Config.h")
 
+# Specify the paths in which the linker should search for libraries
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${PROJECT_SOURCE_DIR}")
 find_package(OpenGL REQUIRED)
-
-set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${PROJECT_SOURCE_DIR}" )
 find_package(GLEW REQUIRED)
 find_package(GLFW REQUIRED)
 find_package(SOIL REQUIRED)
 
-if(${OPENGL_FOUND})
-	message("Found OpenGL ${OPENGL_INCLUDE_DIR} ${OPENGL_LIBRARIES}")
-endif()
-
-if(${GLEW_FOUND})
-	message ("Found GLEW ${GLEW_INCLUDE_DIR} ${GLEW_LIBRARIES}")
-endif()
-
-if(${GLFW_FOUND})
-	message ("Found GLFW ${GLFW_INCLUDE_DIR} ${GLFW_LIBRARIES}")
-endif()
-
-if(${SOIL_FOUND})
-	message ("Found SOIL ${SOIL_INCLUDE_DIR} ${SOIL_LIBRARIES}")
-endif()
-
 # Add the given directories to those the compiler uses to search for include files
 if(${OPENGL_INCLUDE_DIR})
-	include_directories ("${OPENGL_INCLUDE_DIR}")
+	include_directories("${OPENGL_INCLUDE_DIR}")
 endif()
 include_directories(
 	"${GLEW_INCLUDE_DIR}"
@@ -49,8 +33,6 @@ include_directories(
 	"${SOIL_INCLUDE_DIR}"
 	"${PROJECT_SOURCE_DIR}/include"
 	"${PROJECT_SOURCE_DIR}/shader")
-
-# Specify the paths in which the linker should search for libraries
 
 set(SHADERS
 	shader/base.vert
@@ -74,8 +56,6 @@ set(SOURCES
 	src/GlfwWindow.cpp
 	src/Texture.h
 	src/Texture.cpp
-	src/Model.h
-	src/Model.cpp
 	src/Ifstream.h
 	src/Ifstream.cpp
 	src/Material.h

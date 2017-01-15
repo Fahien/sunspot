@@ -5,7 +5,6 @@
 #include "ShaderProgram.h"
 #include "Camera.h"
 #include "Light.h"
-#include "Model.h"
 #include "WavefrontObject.h"
 #include "Quad.h"
 #include "Framebuffer.h"
@@ -31,7 +30,6 @@ Window::Window(const char* title, const math::Size windowSize, const bool decora
 	, camera_ { nullptr }
 	, baseProgram_{ nullptr }
 	, light_{ nullptr }
-	, room_{ nullptr }
 	, objs_{}
 	, quadProgram_{ nullptr }
 	, depthProgram_{ nullptr }

@@ -7,7 +7,6 @@
 #include "Config.h"
 #include "GlfwWindow.h"
 #include "Light.h"
-#include "Model.h"
 #include "ShaderProgram.h"
 #include "Quad.h"
 #include "Camera.h"
@@ -52,7 +51,6 @@ bool contains(const std::vector<std::string> &arguments, const char *s)
 int main(int argc, char **argv)
 {
 	printLogo();
-	GlfwWindow *window{ nullptr };
 
 	try {
 		// Get command line arguments
@@ -77,30 +75,27 @@ int main(int argc, char **argv)
 		// Stereoscopic rendering
 		bool stereoscopic{ contains(arguments, "-stereoscopic") };
 		// Create window
-		window = new GlfwWindow{ SST_TITLE, windowSize, decorated, stereoscopic };
+		GlfwWindow window{ SST_TITLE, windowSize, decorated, stereoscopic };
 
 		Camera camera{ 45.0f, static_cast<float>(windowSize.width) / windowSize.height, 0.125f, 256.0f };
-		window->setCamera(&camera);
+		window.setCamera(&camera);
 
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
-		window->setBaseProgram(&baseProgram);
+		window.setBaseProgram(&baseProgram);
 
 		Light light{ 0.5f, 0.5f, 0.5f };
 		light.setPosition(4.0f, 2.0f, -2.0f);
-		window->setLight(&light);
+		window.setLight(&light);
 
-		Model room{ "shader/wall", 2.0f };
-		window->setRoom(&room);
-
-		Framebuffer framebuffer{ window->getFrameSize() / 2 };
+		Framebuffer framebuffer{ window.getFrameSize() / 2 };
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
 		ShaderProgram depthProgram{ "shader/quad.vert", "shader/depth.frag" };
 		Quad quad{};
 		if (stereoscopic) {
-			window->setQuadProgram(&quadProgram);
-			window->setDepthProgram(&depthProgram);
-			window->setQuad(&quad);
-			window->setFramebuffer(&framebuffer);
+			window.setQuadProgram(&quadProgram);
+			window.setDepthProgram(&depthProgram);
+			window.setQuad(&quad);
+			window.setFramebuffer(&framebuffer);
 		}
 		
 		Ifstream is{ crateName };
@@ -110,13 +105,11 @@ int main(int argc, char **argv)
 		}
 		WavefrontObject obj{};
 		is >> obj;
-		window->addObj(&obj);
+		window.addObj(&obj);
 
-		std::cout << "Start looping\n";
-		window->loop();
-		std::cout << "Test version " << SST_VERSION_MAJOR << "." << SST_VERSION_MINOR << " successfull" << std::endl;
+		window.loop();
 
-		delete window;
+		std::cout << SST_TITLE << " version " << SST_VERSION_MAJOR << "." << SST_VERSION_MINOR << " successfull" << std::endl;
 		return EXIT_SUCCESS;
 	}
 	catch (const GraphicException &e)

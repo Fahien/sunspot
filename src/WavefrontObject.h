@@ -88,10 +88,7 @@ class WavefrontObject {
 	std::vector<Material *> materials_;
 };
 
-Ifstream &operator>>(Ifstream &is, WavefrontObject &obj);
-
 }
 
 
 #endif // SST_WAVEFRONTOBJECT_H
-
