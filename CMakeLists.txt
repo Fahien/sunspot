@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8)
-project (StereoscopicTest)
+project (sunspot)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/cmake")
 message("Searching modules in ${CMAKE_MODULE_PATH}")
@@ -8,8 +8,8 @@ option (CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 # Version number
 set(SST_VERSION_MAJOR 0)
-set(SST_VERSION_MINOR 10)
-set(SST_TITLE "StereoscopicTest")
+set(SST_VERSION_MINOR 11)
+set(SST_TITLE "sunspot")
 
 # Configure a header file to pass some of the CMake settings to the source code
 configure_file(
@@ -58,7 +58,7 @@ set(SHADERS
 	shader/depth.frag
 	shader/quad.vert
 	shader/quad.frag)
-source_group("Shaders" FILES ${SHADERS} )
+source_group("Shaders" FILES ${SHADERS})
 
 set(SOURCES
 	src/Graphics.h
@@ -100,8 +100,8 @@ source_group("Sources" FILES ${SOURCES})
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
-add_executable(stereoscopic-test ${SOURCES} ${SHADERS})
+add_executable(sunspot ${SOURCES} ${SHADERS})
 
-target_link_libraries(stereoscopic-test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${SOIL_LIBRARIES})
+target_link_libraries(sunspot ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${SOIL_LIBRARIES})
 
 file(COPY ${PROJECT_SOURCE_DIR}/shader DESTINATION ${PROJECT_BINARY_DIR})
