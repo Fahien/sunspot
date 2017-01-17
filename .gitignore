@@ -1,4 +1,5 @@
 bin
 include
 lib
+data
 .ycm_extra_conf.pyc

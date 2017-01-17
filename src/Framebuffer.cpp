@@ -92,7 +92,6 @@ void Framebuffer::bindColorTexture(const ShaderProgram *shader) const
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, headerTexture_);
 	glUniform2iv(shader->getLocation("frameSize"), 1, &size_.width);
-	std::cout << "Binded size " << size_ << std::endl;
 }
 
 

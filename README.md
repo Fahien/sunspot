@@ -1,8 +1,9 @@
-![SunSpoT](https://bitbucket.org/Fahien/sunspot/avatar/256/?ts=1484573664)
+<img align="right" alt="SunSpoT"
+src="https://bitbucket.org/Fahien/sunspot/avatar/256/?ts=1484573664" />
 # SunSpoT
 SunSpoT is a 3D engine capable of stereoscopic rendering, developed as a Computer Graphics project for my
-Computer Science thesis at [ISISlab](http://www.isislab.it/), [Università degli Studi di
-Salerno](http://www.unisa.it).
+Computer Science thesis at <a href="http://www.isislab.it/" target="_blank">ISISlab</a>, <a
+href="http://www.unisa.it" target="_blank">Università degli Studi di Salerno</a>.
 
 ## Getting Started
 SunSpoT is **open-source** and **cross-platform**, built and tested on Windows and Linux.
@@ -10,29 +11,32 @@ SunSpoT is **open-source** and **cross-platform**, built and tested on Windows a
 ### Prerequisites
 In order to build and run a SunSpoT application, you will need the following dependencies:
 
-- [CMake](https://cmake.org/), Cross-Platform Make;
-- [GLEW](http://glew.sourceforge.net/), The OpenGL Extension Wrangler Library;
-- [GLFW](http://www.glfw.org/), OpenGL FrameWork;
-- [SOIL](http://www.lonesock.net/soil.html), Simple OpenGL Image Library.
+- <a href="https://cmake.org/" target="_blank">CMake</a>, Cross-Platform Make;
+- <a href="http://glew.sourceforge.net/" target="_blank">GLEW</a>, The OpenGL Extension Wrangler Library;
+- <a href="http://www.glfw.org/" target="_blank">GLFW</a>, OpenGL FrameWork;
+- <a href="http://www.lonesock.net/soil.html" target="_blank">SOIL</a>, Simple OpenGL Image Library.
 
 ### Install
 Create a project for your platform with cmake:
 
 ```
-cmake -Hsunspot -Bsunspot-build
+cmake -H. -Bbin
 ```
 
 If you would you can compile with cmake:
 
 ```
-cmake --build sunspot-build --config Release
+cmake --build bin --config Release
 ```
 
-Eventually, you can run the generated executable: `sunspot-build\Release\sunspot.exe` on Windows or
-`sunspot-build/./sunspot` on Linux.
+Eventually, you can run the generated executable `bin\Release\sunspot.exe` on Windows or
+`bin/./sunspot` on Linux.
 
 ## Thanks
-[All the ISISlab people](http://www.isislab.it/), in particular [Vittorio Scarano](http://www.unisa.it/docenti/vittorioscarano/index?nv=docenti.unisa.it/vittorio.scarano), [Daniele Monaco](#), and [Armando Faggiano](#).
+<a href="http://www.isislab.it/" target="_blank">All ISISlab people</a>, in particular <a
+href="http://www.unisa.it/docenti/vittorioscarano/index?nv=docenti.unisa.it/vittorio.scarano"
+target="_blank">Vittorio Scarano</a>, <a href="#" target="_blank">Daniele Monaco</a>, and <a href="#"
+target="_blank">Armando Faggiano</a>.
 
 ## License
-Apache License © 2017 [Antonio Caggiano](http://www.fahien.me)
+Apache License © 2017 <a href="http://www.fahien.me/" target="_blank">Antonio Caggiano</a>

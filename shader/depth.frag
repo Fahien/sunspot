@@ -21,15 +21,11 @@ out vec4 color;
 float disparity(float z)
 {
 	z = (z + one) / 2.0;
-	return (M * (1 - vz / (z - Zd + vz)) + C) / 24.0;
+	return (M * (1 - vz / (z - Zd + vz)) + C);
 }
 
 void main()
 {
 	color = texture(depthTexture, texCoords);
 	color.r = color.g = color.b = disparity(color.r);
-	
-	vec2 maskCoords = vec2(texCoords.x, texCoords.y * frameSize.y);
-	float mask = texture(maskTexture, maskCoords).r;
-	color = mix(color, empty, mask);
 }

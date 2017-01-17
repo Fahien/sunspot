@@ -19,12 +19,15 @@
 using namespace sunspot;
 
 
-static int zoom{ 2 };
+static int scale{ 2 };
 static math::Size windowSize{ 960, 540 };
+
+static float fov{ 45.0f };
+static float near{ 0.125f };
+static float far{ 32.0f };
 
 static const std::string tag{ "Main" };
 static const std::string crateName{ "data/cube/crate.obj" };
-static const std::string testTexture{ "shader/test.bmp" };
 
 
 void printLogo()
@@ -59,25 +62,24 @@ int main(int argc, char **argv)
 			arguments.push_back(std::string{argv[i]});
 		}
 
-		// Test window
+		// Window scale
 		std::vector<std::string>::iterator it;
-		if ((it = std::find(arguments.begin(), arguments.end(), "-zoom")) != arguments.end()) {
+		if ((it = std::find(arguments.begin(), arguments.end(), "-scale")) != arguments.end()) {
 			if (++it != arguments.end()) {
-				std::cout << "Zoom [" << *it << "]\n";
-				zoom = std::stoi(*it);
+				std::cout << "Scale [" << *it << "]\n";
+				scale = std::stoi(*it);
 			}
-			else { std::cerr << "Zoom [" << zoom << "] (Default)\n"; }
+			else { std::cerr << "Scale [" << scale << "] (Default)\n"; }
 		}
-		windowSize *= zoom;
+		windowSize *= scale;
 
-		// Window decorations
-		bool decorated{ contains(arguments, "-decorated") };
-		// Stereoscopic rendering
-		bool stereoscopic{ contains(arguments, "-stereoscopic") };
-		// Create window
+		
+		bool decorated{ contains(arguments, "-decorated") }; // Window decorations
+		bool stereoscopic{ contains(arguments, "-stereoscopic") }; // Stereoscopic rendering
+
 		GlfwWindow window{ SST_TITLE, windowSize, decorated, stereoscopic };
 
-		Camera camera{ 45.0f, static_cast<float>(windowSize.width) / windowSize.height, 0.125f, 256.0f };
+		Camera camera{ fov, static_cast<float>(windowSize.width) / windowSize.height, near, far };
 		window.setCamera(&camera);
 
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
@@ -87,6 +89,7 @@ int main(int argc, char **argv)
 		light.setPosition(4.0f, 2.0f, -2.0f);
 		window.setLight(&light);
 
+		// Inject dependencies into window
 		Framebuffer framebuffer{ window.getFrameSize() / 2 };
 		ShaderProgram quadProgram{ "shader/quad.vert", "shader/quad.frag" };
 		ShaderProgram depthProgram{ "shader/quad.vert", "shader/depth.frag" };
@@ -97,7 +100,8 @@ int main(int argc, char **argv)
 			window.setQuad(&quad);
 			window.setFramebuffer(&framebuffer);
 		}
-		
+
+		// Load Wavefront Object
 		Ifstream is{ crateName };
 		if (!is.is_open()) {
 			std::cerr << "Could not find " << crateName << std::endl;
@@ -107,9 +111,11 @@ int main(int argc, char **argv)
 		is >> obj;
 		window.addObj(&obj);
 
-		window.loop();
+		window.loop(); // Game loop
 
-		std::cout << SST_TITLE << " version " << SST_VERSION_MAJOR << "." << SST_VERSION_MINOR << " successfull" << std::endl;
+		std::cout << SST_TITLE
+			<< " version " << SST_VERSION_MAJOR << "." << SST_VERSION_MINOR
+			<< " successfull" << std::endl;
 		return EXIT_SUCCESS;
 	}
 	catch (const GraphicException &e)
