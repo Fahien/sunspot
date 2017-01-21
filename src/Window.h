@@ -7,16 +7,19 @@
 #include "Math.h"
 #include "Cursor.h"
 
-class ShaderProgram;
+
 class Quad;
 class Camera;
 
 
 namespace sunspot {
 
+
+class ShaderProgram;
 class Light;
 class WavefrontObject;
 class Framebuffer;
+
 
 class GraphicException : public std::runtime_error {
 public:
@@ -90,6 +93,8 @@ private:
 	const Quad *quad_;
 };
 
+
 }
+
 
 #endif // SST_WINDOW_H

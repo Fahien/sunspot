@@ -68,7 +68,7 @@ Vec2::Vec2(const float xx, const float yy)
 
 void Vec2::normalize()
 {
-	float length{ static_cast<float>(sqrt(x * x + y * y)) };
+	float length{ sqrtf(x * x + y * y) };
 	x /= length;
 	y /= length;
 }
@@ -185,10 +185,10 @@ Mat4::Mat4(std::initializer_list<float> list)
 }
 
 
-Mat4::Mat4(float *matrix)
+Mat4::Mat4(float *m)
 {
 	for (int i{ 0 }; i < 16; ++i) {
-		matrix[i] = matrix[i];
+		matrix[i] = m[i];
 	}
 }
 
@@ -273,38 +273,38 @@ void Mat4::translateZ(const float amount)
 
 void Mat4::rotateX(const float radians)
 {
-	float cosrad{ static_cast<float>(cos(radians)) };
-	float sinrad{ static_cast<float>(sin(radians)) };
+	float cosrad{ static_cast<float>(std::cos(radians)) };
+	float sinrad{ static_cast<float>(std::sin(radians)) };
 	math::Mat4 rotation{
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, cosrad, sinrad, 0.0f,
+		1.0f, 0.0f,    0.0f,   0.0f,
+		0.0f, cosrad,  sinrad, 0.0f,
 		0.0f, -sinrad, cosrad, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f };
+		0.0f, 0.0f,    0.0f,   1.0f };
 	*this = rotation * *this;
 }
 
 
 void Mat4::rotateY(const float radians)
 {
-	float cosrad{ static_cast<float>(cos(radians)) };
-	float sinrad{ static_cast<float>(sin(radians)) };
+	float cosrad{ static_cast<float>(std::cos(radians)) };
+	float sinrad{ static_cast<float>(std::sin(radians)) };
 	math::Mat4 rotation{
 		cosrad, 0.0f, -sinrad, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		sinrad, 0.0f, cosrad, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f };
+		0.0f,   1.0f, 0.0f,    0.0f,
+		sinrad, 0.0f, cosrad,  0.0f,
+		0.0f,   0.0f, 0.0f,    1.0f };
 	*this = rotation * *this;
 }
 
 
 void Mat4::rotateZ(const float radians)
 {
-	float cosrad{ static_cast<float>(cos(radians)) };
-	float sinrad{ static_cast<float>(sin(radians)) };
+	float cosrad{ static_cast<float>(std::cos(radians)) };
+	float sinrad{ static_cast<float>(std::sin(radians)) };
 	math::Mat4 rotation{
-		cosrad, sinrad, 0, 0,
-		-sinrad, cosrad, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1 };
+		cosrad,  sinrad, 0.0f, 0.0f,
+		-sinrad, cosrad, 0.0f, 0.0f,
+		0.0f,    0.0f,   1.0f, 0.0f,
+		0.0f,    0.0f,   0.0f, 1.0f };
 	*this = rotation * *this;
 }

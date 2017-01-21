@@ -5,10 +5,12 @@
 #include "Graphics.h"
 #include "Color.h"
 
-class ShaderProgram;
-
 
 namespace sunspot {
+
+
+class ShaderProgram;
+
 
 struct Material {
   public:
@@ -30,6 +32,7 @@ struct Material {
 	GLuint diffuseMap;
 	GLuint specularMap;
 };
+
 
 }
 

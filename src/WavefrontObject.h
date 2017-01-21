@@ -10,14 +10,13 @@
 #include "Ifstream.h"
 
 
-class ShaderProgram;
-
-
 namespace sunspot {
 
+class ShaderProgram;
 struct Vertex;
 class Texture;
 class Mesh;
+
 
 class LoadingException : public std::runtime_error {
   public:
@@ -87,6 +86,7 @@ class WavefrontObject {
 	Material *currentMaterial_;
 	std::vector<Material *> materials_;
 };
+
 
 }
 

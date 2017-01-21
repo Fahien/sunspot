@@ -4,23 +4,13 @@
 #include "Graphics.h"
 #include "ShaderProgram.h"
 
+using namespace sunspot;
+
 
 Camera::Camera(const float fov, const float aspectRatio, const float near, const float far)
-	: rotation_{
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f }
-	, translation_{
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, -3.0f, 1.0f }
-	, view_{
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 3.0f, 1.0f }
+	: rotation_{ math::Mat4::identity }
+	, translation_{ math::Mat4::identity }
+	, view_{ math::Mat4::identity }
 	, projection_{}
 	, pitch_{ 0.0f }
 	, yaw_{ -math::pi / 2.0f }
@@ -32,7 +22,7 @@ Camera::Camera(const float fov, const float aspectRatio, const float near, const
 	, velocity_{}
 	, velocityFactor_{ 8.0f }
 {
-	float cotfov{ 1.0f / static_cast<float>(tan(fov * math::pi / 180.0f / 2.0f)) };
+	float cotfov{ 1.0f / static_cast<float>(std::tan(fov * math::pi / 360.0f)) };
 	projection_[0] = cotfov / aspectRatio;
 	projection_[5] = cotfov;
 	projection_[10] = (near + far) / (near - far);
@@ -44,10 +34,10 @@ Camera::Camera(const float fov, const float aspectRatio, const float near, const
 
 void Camera::updateVectors()
 {
-	float cospitch{ static_cast<float>(cos(pitch_)) };
-	float sinpitch{ static_cast<float>(sin(pitch_)) };
-	float cosyaw{ static_cast<float>(cos(yaw_)) };
-	float sinyaw{ static_cast<float>(sin(yaw_)) };
+	float cospitch{ static_cast<float>(std::cos(pitch_)) };
+	float sinpitch{ static_cast<float>(std::sin(pitch_)) };
+	float cosyaw{ static_cast<float>(std::cos(yaw_)) };
+	float sinyaw{ static_cast<float>(std::sin(yaw_)) };
 	direction_.x = cospitch * cosyaw;
 	direction_.y = sinpitch;
 	direction_.z = cospitch * sinyaw;

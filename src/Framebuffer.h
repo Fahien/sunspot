@@ -7,9 +7,12 @@
 #include "Graphics.h"
 #include "Math.h"
 
-class ShaderProgram;
 
 namespace sunspot {
+
+
+class ShaderProgram;
+
 
 class FramebufferException : public std::runtime_error {
   public:
@@ -42,7 +45,8 @@ class Framebuffer {
 	GLuint rbo_;
 };
 
+
 }
 
-#endif // SST_FRAMEBUFFER_H
 
+#endif // SST_FRAMEBUFFER_H

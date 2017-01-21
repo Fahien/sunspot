@@ -5,10 +5,12 @@
 #include "Math.h"
 #include "Color.h"
 
-class ShaderProgram;
-
 
 namespace sunspot {
+
+
+class ShaderProgram;
+
 
 class Light {
   public:
@@ -25,7 +27,8 @@ class Light {
 	Color color_;
 };
 
+
 }
 
-#endif // SST_LIGHT_H
 
+#endif // SST_LIGHT_H

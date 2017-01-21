@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <iostream>
 
+
 namespace math {
 
 
@@ -68,7 +69,7 @@ class Mat4 {
   public:
 	Mat4();
 	Mat4(std::initializer_list<float>);
-	Mat4(float *matrix);
+	Mat4(float *m);
 
 	static Mat4 identity;
 

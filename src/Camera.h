@@ -3,7 +3,12 @@
 
 #include "Math.h"
 
+
+namespace sunspot {
+
 class ShaderProgram;
+
+}
 
 class Camera {
   public:
@@ -18,7 +23,7 @@ class Camera {
 	void updateVectors();
 	void updateView();
 
-	void update(const float deltaTime, const ShaderProgram *program);
+	void update(const float deltaTime, const sunspot::ShaderProgram *program);
 
 	inline void setVelocityX(const float x) { velocity_.x = x; }
 	inline void setVelocityY(const float y) { velocity_.y = y; }

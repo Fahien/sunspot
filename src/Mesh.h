@@ -8,10 +8,10 @@
 #include "Material.h"
 #include "WavefrontObject.h"
 
-class ShaderProgram;
-
-
 namespace sunspot {
+
+
+class ShaderProgram;
 
 
 struct Vertex {
@@ -37,7 +37,6 @@ class Mesh {
 
   private:
 	std::string name_;
-
 	GLuint vao_;
 	GLuint vbo_;
 	GLuint ebo_;
@@ -46,5 +45,6 @@ class Mesh {
 
 
 }
+
 
 #endif // SST_MESH_H
