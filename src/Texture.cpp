@@ -18,11 +18,11 @@ Texture::Texture(const std::string &path, const TextureType &type)
 	, name_{ path }
 	, type_{ type }
 {
-	SoilData data{ path };
 	glGenTextures(1, &id_);
 	glBindTexture(GL_TEXTURE_2D, id_);
+	SoilData data{ path };
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data.getWidth(), data.getHeight(),
-		0, GL_RGB, GL_UNSIGNED_BYTE, data.getData());
+		0, GL_RGB, GL_UNSIGNED_BYTE, data.getHandle());
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -42,10 +42,12 @@ const std::string SoilData::tag{ "SoilData" };
 SoilData::SoilData(const std::string &path)
 	: width_{ 0 }
 	, height_{ 0 }
-	, data_{ nullptr }
+	, handle_{ nullptr }
 {
-	data_ = SOIL_load_image(path.c_str(), &width_, &height_, 0, SOIL_LOAD_RGB);
-	if (data_ == nullptr || data_ == 0) { throw TextureException{ tag, "Could not load " + path + ": " + SOIL_last_result() }; }
+	handle_ = SOIL_load_image(path.c_str(), &width_, &height_, 0, SOIL_LOAD_RGB);
+	if (handle_ == nullptr || handle_ == 0) {
+		throw TextureException{ tag, "Could not load " + path + ": " + SOIL_last_result() };
+	}
 
 	std::cout << "SoilData: loaded " << path << ": " << SOIL_last_result() << std::endl; // TODO remove debug log
 }
@@ -53,7 +55,7 @@ SoilData::SoilData(const std::string &path)
 
 SoilData::~SoilData()
 {
-	if (data_ != nullptr && data_ != 0) { SOIL_free_image_data(data_); }
+	if (handle_ != nullptr && handle_ != 0) { SOIL_free_image_data(handle_); }
 }
 
 

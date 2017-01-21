@@ -24,14 +24,14 @@ class SoilData {
 	SoilData(const std::string &path);
 	~SoilData();
 
-	inline GLsizei &getWidth() { return width_; }
-	inline GLsizei &getHeight() { return height_; }
-	inline GLubyte *getData() { return data_; }
+	inline GLsizei getWidth() { return width_; }
+	inline GLsizei getHeight() { return height_; }
+	inline GLubyte *getHandle() { return handle_; }
 
 private:
 	GLsizei width_;
 	GLsizei height_;
-	GLubyte *data_;
+	GLubyte *handle_;
 };
 
 
