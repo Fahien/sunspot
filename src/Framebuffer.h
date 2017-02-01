@@ -40,7 +40,6 @@ class Framebuffer {
 	GLuint fbo_;
 	GLuint colorTexture_;
 	GLuint depthTexture_;
-	GLuint maskTexture_;
 	GLuint headerTexture_;
 	GLuint rbo_;
 };
