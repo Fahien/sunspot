@@ -4,6 +4,7 @@
 #include <fstream>
 #include "Graphics.h"
 #include "Color.h"
+#include "Logger.h"
 
 
 namespace sunspot {
@@ -14,6 +15,7 @@ class ShaderProgram;
 
 struct Material {
   public:
+	static const Logger log;
 	Material();
 	Material(const char *n);
 	Material(std::string &n);

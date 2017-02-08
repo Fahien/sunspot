@@ -6,6 +6,7 @@
 
 #include "Graphics.h"
 #include "Math.h"
+#include "Logger.h"
 
 
 namespace sunspot {
@@ -22,6 +23,7 @@ class FramebufferException : public std::runtime_error {
 
 class Framebuffer {
   public:
+	static const Logger log;
 	static const std::string tag;
 
 	Framebuffer(const math::Size &size);

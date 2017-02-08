@@ -7,6 +7,7 @@
 #include "Texture.h"
 #include "Material.h"
 #include "WavefrontObject.h"
+#include "Logger.h"
 
 namespace sunspot {
 
@@ -24,6 +25,7 @@ struct Vertex {
 
 class Mesh {
   public:
+	static const Logger log;
 	Mesh(const std::string &name, std::vector<Vertex> &vertices, std::vector<GLuint> &indices, Material *m);
 	~Mesh();
 

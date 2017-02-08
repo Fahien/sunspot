@@ -36,6 +36,7 @@ out vec4 color;
 void main()
 {
 	vec3 fragment = vec3(texture(material.diffuseMap, texCoords));
+
 	vec3 ambient = light.ambient * material.ambient * fragment;
 
 	vec3 lightDirection = normalize(light.position - position);
@@ -49,4 +50,5 @@ void main()
 		vec3(texture(material.specularMap, texCoords));
 
 	color = vec4(ambient + diffuse + specular, one);
+
 }

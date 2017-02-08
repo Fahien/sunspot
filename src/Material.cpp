@@ -8,6 +8,9 @@
 using namespace sunspot;
 
 
+const Logger Material::log{};
+
+
 Material::Material()
 	: Material("default")
 {}
@@ -19,7 +22,7 @@ Material::Material(const char *n)
 	, diffuse{}
 	, specular{}
 {
-	std::cout << "Material: created " << name << std::endl; // TODO remove debug log
+	log.info("Material: created %s\n", n); // TODO remove debug log
 }
 
 
@@ -29,7 +32,7 @@ Material::Material(std::string &n)
 	, diffuse{}
 	, specular{}
 {
-	std::cout << "Material: created " << name << std::endl; // TODO remove debug log
+	log.info("Material: created %s\n", name.c_str()); // TODO remove debug log
 }
 
 
@@ -38,7 +41,7 @@ Material::~Material()
 	glDeleteTextures(1, &diffuseMap);
 	glDeleteTextures(1, &specularMap);
 
-	std::cout << "Material: destroyed " << name << std::endl; // TODO remove debug log
+	log.info("Material: destroyed %s\n", name.c_str()); // TODO remove debug log
 }
 
 

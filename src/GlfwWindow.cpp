@@ -7,6 +7,8 @@
 using namespace sunspot;
 
 
+const Logger GlfwWindow::log{};
+
 const std::string GlfwWindow::tag{ "GlfwWindow" };
 
 
@@ -86,9 +88,8 @@ GlfwWindow::GlfwWindow(const char *title, const math::Size windowSize,
 	updateFrameSize();
 	glfwSwapInterval(1); // Vsync
 
-	std::cout << tag << ": created\n\tOpenGL " << glGetString(GL_VERSION) << std::endl
-		<< "\tGLFW " << glfwGetVersionString() << std::endl
-		<< "\tFrame size " << frameSize_.width << "x" << frameSize_.height << std::endl;
+	log.info("%s created\n\tOpenGL %s\n\tGLFW %s\n\tFrame size %dx%d\n",
+		tag.c_str(), glGetString(GL_VERSION), glfwGetVersionString(), frameSize_.width, frameSize_.height);
 }
 
 
@@ -96,7 +97,7 @@ GlfwWindow::~GlfwWindow()
 {
 	if (window_ != nullptr) { glfwDestroyWindow(window_); }
 	glfwTerminate();
-	std::cout << tag << ": destroyed\n"; // TODO remove debug log
+	log.info("%s: destroyed\n", tag.c_str()); // TODO remove debug log
 }
 
 

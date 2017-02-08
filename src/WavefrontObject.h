@@ -8,6 +8,7 @@
 #include "Math.h"
 #include "Mesh.h"
 #include "Ifstream.h"
+#include "Logger.h"
 
 
 namespace sunspot {
@@ -33,6 +34,7 @@ struct Face {
 
 class WavefrontObject {
   public:
+	static const Logger log;
 	WavefrontObject();
 	~WavefrontObject();
 

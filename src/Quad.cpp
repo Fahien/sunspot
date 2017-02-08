@@ -1,12 +1,15 @@
-#include <iostream>
-
 #include "Quad.h"
+
+using namespace sunspot;
+
+
+const Logger Quad::log{};
 
 
 Quad::Quad()
-	: vbo_ {0}
-	, ebo_ {0}
-	, vao_ {0}
+	: vbo_{ 0 }
+	, ebo_{ 0 }
+	, vao_{ 0 }
 {
 	GLfloat vertices[] = {
 		// Positions  // TexCoords
@@ -34,7 +37,7 @@ Quad::Quad()
 	glEnableVertexAttribArray(1);
 	glBindVertexArray(0); // Unbind vao
 
-	std::cout << "Quad: created\n"; // TODO remove debug log
+	log.info("Quad: created\n"); // TODO remove debug log
 }
 
 
@@ -44,5 +47,5 @@ Quad::~Quad()
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);
 
-	std::cout << "Quad: destroyed\n"; // TODO remove debuf log
+	log.info("Quad: destroyed\n"); // TODO remove debuf log
 }

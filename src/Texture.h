@@ -5,6 +5,7 @@
 #include <string>
 #include "Graphics.h"
 #include "Window.h"
+#include "Logger.h"
 
 
 namespace sunspot {
@@ -60,6 +61,7 @@ const char *getTextureTypeName(const TextureType &type);
 
 class Texture {
   public:
+	const static Logger log;
 	Texture(const std::string &path, const TextureType &type);
 	~Texture();
 
@@ -78,4 +80,3 @@ class Texture {
 }
 
 #endif // SST_TEXTURE_H
-

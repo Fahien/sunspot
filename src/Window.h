@@ -8,13 +8,12 @@
 #include "Cursor.h"
 
 
-class Quad;
 class Camera;
 
 
 namespace sunspot {
 
-
+class Quad;
 class ShaderProgram;
 class Light;
 class WavefrontObject;

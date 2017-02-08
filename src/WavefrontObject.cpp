@@ -10,6 +10,9 @@
 using namespace sunspot;
 
 
+const Logger WavefrontObject::log{};
+
+
 /// Creates a Wavefront Object
 WavefrontObject::WavefrontObject()
 	: name_{}
@@ -28,7 +31,7 @@ WavefrontObject::WavefrontObject()
 	, currentMaterial_{ nullptr }
 	, materials_{}
 {
-	std::cout << "WavefrontObject: created\n"; // TODO remove debug log
+	log.info("WavefrontObject: created\n"); // TODO remove debug log
 }
 
 
@@ -36,7 +39,7 @@ WavefrontObject::WavefrontObject()
 WavefrontObject::~WavefrontObject()
 {
 	for (Mesh *mesh : meshes_) { delete mesh; }
-	std::cout << "WavefrontObject: destroyed " << name_ << std::endl; // TODO remove debug log
+	log.info("WavefrontObject: destroyed %s\n", name_.c_str()); // TODO remove debug log
 }
 
 
@@ -53,7 +56,7 @@ void WavefrontObject::loadName(std::stringstream &ss)
 	std::string command{};
 	ss >> command >> name_;
 	if (ss.fail()) { throw LoadingException{ "Error loading name" }; }
-	std::cout << "Obj name: " << name_ << std::endl; // TODO remove debug log
+	log.info("Obj name: %s\n", name_.c_str()); // TODO remove debug log
 }
 
 
@@ -259,12 +262,12 @@ void WavefrontObject::loadDiffuseMap(std::stringstream &ss, const std::string &p
 	ss >> textureName; // Load the texture name
 	if (ss.fail()) { throw LoadingException{ "Error loading diffuse map name" }; }
 
-	std::cout << "WavefrontObject: Loading " << path << " " << textureName << std::endl; // TODO remove debug log
-	Texture texture {path
+	log.info("WavefrontObject: Loading %s %s\n", path.c_str(), textureName.c_str()); // TODO remove debug log
+	Texture texture{ path
 #ifndef WIN32
 		+ '/'
 #endif
-		+ textureName, TextureType::DIFFUSE};
+		+ textureName, TextureType::DIFFUSE };
 	currentMaterial_->diffuseMap = texture.getId();
 }
 
@@ -330,80 +333,79 @@ void WavefrontObject::loadMaterials(Ifstream &is)
 		case 'n': { // New material command
 			try { createMaterial(ss); }
 			catch (const LoadingException &e) {
-				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+				log.error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		case 'K': { // K statement
 			if (line.length() <= 1) {
-				std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
+				log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 				break;
 			}
 			switch (line[1]) {
 			case 'a': { // Ambient
 				try { loadAmbient(ss); }
 				catch (const LoadingException &e) {
-					std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+					log.error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			case 'd': { // Diffuse
 				try { loadDiffuse(ss); }
 				catch (const LoadingException &e) {
-					std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+					log.error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			case 's': { // Specular
 				try { loadSpecular(ss); }
 				catch (const LoadingException &e) {
-					std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+					log.error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			default: {
-				std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
-				break;
+				log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 			}
 			} // End switch line[1]
 			break;
 		}
 		case 'm': { // Map statement
 			if (line.length() <= 6) {
-				std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
+				log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 				break;
 			}
 			switch (line[5]) {
 			case 'a': { // Ambient map
 				try { loadAmbientMap(ss, is.getPath()); }
 				catch (const LoadingException &e) {
-					std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+					log.error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			case 'd': { // Diffuse map
 				try { loadDiffuseMap(ss, is.getPath()); }
 				catch (const LoadingException &e) {
-					std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+					log.error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			case 's': { // Specular map
 				try { loadSpecularMap(ss, is.getPath()); }
 				catch (const LoadingException &e) {
-					std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+					log.error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			default: {
-				std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
+				log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 				break;
 			}
 			} // End switch line[5]
 			break;
 		}
 		default: {
-			std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
+			log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 			break;
 		}
 		} // End switch line[0]
@@ -411,7 +413,7 @@ void WavefrontObject::loadMaterials(Ifstream &is)
 	}
 	try { loadCachedMaterial(); }
 	catch (const LoadingException &e) {
-		std::cerr << "WavefrontObject: No materials loaded: " << e.what() << std::endl;
+		log.error("WavefrontObject: No materials loaded, %s\n", e.what());
 	}
 }
 
@@ -486,38 +488,37 @@ Ifstream &sunspot::operator>>(Ifstream &is, WavefrontObject &obj)
 		case 'o': { // Name command
 			try { obj.loadName(ss); }
 			catch (const LoadingException &e) {
-				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+				WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		case 'v': {
 			if (line.length() < 2) {
-				std::cerr << "[" << lineNumber << "] ignored: " << line << std::endl;
+				WavefrontObject::log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 				break;
 			}
 			switch (line[1]) {
 				case ' ': { // Vertex command
 					try { obj.loadPosition(ss); }
 					catch (const LoadingException &e) {
-						std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+						WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
 					}
 					break;
 				}
-				case 'p': {
-					std::cout << "Point in the parameter space of a curve or a surface not supported\n";
+				case 'p': {	WavefrontObject::log.info("Point in the parameter space of a curve or a surface not supported\n");
 					break;
 				}
 				case 'n': { // Vertex Normal command
 					try { obj.loadNormal(ss); }
 					catch (const LoadingException &e) {
-						std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+						WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
 					}
 					break;
 				}
 				case 't': { // Texture Coordinate command
 					try { obj.loadTexCoords(ss); }
 					catch (const LoadingException &e) {
-						std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+						WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
 					}
 					break;
 				}
@@ -527,33 +528,33 @@ Ifstream &sunspot::operator>>(Ifstream &is, WavefrontObject &obj)
 		case 'f': { // Face command
 			try { obj.loadIndices(ss); }
 			catch (const LoadingException &e) {
-				std::cerr << "[" << lineNumber << "] " << e.what() << ": " << line << std::endl;
+				WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		case 'g': { // Group command
 			try { obj.loadGroup(ss); }
 			catch (const LoadingException &e) {
-				std::cerr << "[" << lineNumber << "] " << e.what() << ": " << line << std::endl;
+				WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		case 'm': { // Material Library Command
 			try { obj.loadMaterialLibrary(ss, is.getPath()); }
 			catch (const LoadingException &e) {
-				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+				WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		case 'u': { // Use material command
 			try { obj.useMaterial(ss); }
 			catch (const LoadingException &e) {
-				std::cerr << "[" << lineNumber << "] " << e.what() << std::endl;
+				WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		default: {
-			std::cerr << "[" << lineNumber << "] ignored: " << line <<  std::endl;
+			WavefrontObject::log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 			break;
 		}}
 		++lineNumber;

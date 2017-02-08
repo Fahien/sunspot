@@ -7,6 +7,9 @@
 using namespace sunspot;
 
 
+const Logger ShaderProgram::log{};
+
+
 ShaderProgram::ShaderProgram(const char *depth)
 	: baseProgram_{ glCreateProgram() }
 	, depthProgram_{ glCreateProgram() }
@@ -30,7 +33,7 @@ ShaderProgram::ShaderProgram(const char *depth)
 
 	// TODO Handle some errors like vertexShader == 0, baseProgram_ == 0, etc.
 
-	std::cout << "ShaderProgram: created\n"; // TODO remove debug log
+	log.info("ShaderProgram: created\n"); // TODO remove debug log
 }
 
 
@@ -49,7 +52,7 @@ ShaderProgram::ShaderProgram(const char *vertex, const char *fragment)
 	
 	// TODO Handle some errors like vertexShader == 0, baseProgram_ == 0, etc.
 
-	std::cout << "ShaderProgram: created\n"; // TODO remove debug log
+	log.info("ShaderProgram: created\n"); // TODO remove debug log
 }
 
 
@@ -57,7 +60,7 @@ ShaderProgram::~ShaderProgram()
 {
 	glDeleteProgram(depthProgram_);
 	glDeleteProgram(baseProgram_);
-	std::cout << "ShaderProgram: destroyed\n"; // TODO remove debug log
+	log.info("ShaderProgram: destroyed\n"); // TODO remove debug log
 }
 
 

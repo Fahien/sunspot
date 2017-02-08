@@ -31,6 +31,13 @@ Camera::Camera(const float fov, const float aspectRatio, const float near, const
 	updateVectors();
 }
 
+void Camera::setPosition(const float x, const float y, const float z)
+{
+	position_.x = x;
+	position_.y = y;
+	position_.z = z;
+}
+
 
 void Camera::updateVectors()
 {

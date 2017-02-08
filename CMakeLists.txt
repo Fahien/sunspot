@@ -8,7 +8,7 @@ option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 # Version number
 set(SST_VERSION_MAJOR 0)
-set(SST_VERSION_MINOR 12)
+set(SST_VERSION_MINOR 13)
 set(SST_TITLE "SunSpoT")
 
 # Configure a header file to pass some of the CMake settings to the source code
@@ -43,6 +43,8 @@ set(SHADERS
 source_group("Shaders" FILES ${SHADERS})
 
 set(SOURCES
+	src/Logger.h
+	src/Logger.cpp
 	src/Graphics.h
 	src/ShaderProgram.h
 	src/ShaderProgram.cpp

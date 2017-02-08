@@ -1,5 +1,10 @@
 #include <iostream>
 
+#include "Config.h"
+#ifdef SST_PROFILING
+#include <chrono>
+#endif
+
 #include "Graphics.h"
 #include "Window.h"
 #include "ShaderProgram.h"
@@ -57,6 +62,7 @@ void Window::render(const float &deltaTime) // TODO comment
 	updateFrameSize();
 	if (stereoscopic_) { renderStereoscopic(deltaTime); }
 	else { render3D(deltaTime); }
+
 }
 
 
@@ -76,7 +82,7 @@ void Window::render3D(const float &deltaTime) // TODO comment
 void Window::renderQuad(const float & /* deltaTime */)
 {
 	glViewport(0, 0, frameSize_.width, frameSize_.height);
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color buffer
 	quadProgram_->use();
 	quad_->bind();
@@ -87,6 +93,10 @@ void Window::renderQuad(const float & /* deltaTime */)
 
 void Window::renderStereoscopic(const float &deltaTime)
 {
+#ifdef SST_PROFILING
+	auto t1 = std::chrono::high_resolution_clock::now();
+#endif
+
 	// First pass
 	glEnable(GL_DEPTH_TEST);
 	framebuffer_->bind(); // Render the scene on a framebuffer
@@ -98,6 +108,11 @@ void Window::renderStereoscopic(const float &deltaTime)
 	light_->update(baseProgram_);
 	for (WavefrontObject *obj : objs_) { obj->draw(baseProgram_); }
 	framebuffer_->unbind();
+	// End First pass
+
+#ifdef SST_PROFILING
+	auto t2 = std::chrono::high_resolution_clock::now();
+#endif
 
 	// Second pass
 	glDisable(GL_DEPTH_TEST);
@@ -106,9 +121,23 @@ void Window::renderStereoscopic(const float &deltaTime)
 	quadProgram_->use();
 	framebuffer_->bindColorTexture(quadProgram_); // Render color on the left
 	quad_->render();
+
+#ifdef SST_PROFILING
+	auto t3 = std::chrono::high_resolution_clock::now();
+#endif
+
 	glViewport(frameSize_.width / 2, 0, frameSize_.width / 2, frameSize_.height);
 	depthProgram_->use();
 	framebuffer_->bindDepthTexture(depthProgram_); // Render depth on the right
 	quad_->render();
 	quad_->unbind();
+	// End Second pass
+
+#ifdef SST_PROFILING
+	auto t4 = std::chrono::high_resolution_clock::now();
+
+	float pass1 = (t2 - t1).count();
+	float pass2 = (t4 - t2).count();
+	std::cout << (t2 - t1).count() << " " << (t3 - t2).count() << " " << (t4 - t3).count() << std::endl;
+#endif
 }

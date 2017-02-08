@@ -2,10 +2,17 @@
 #define SST_QUAD_H
 
 #include "Graphics.h"
+#include "Logger.h"
+
+
+namespace sunspot
+{
+
 
 class Quad
 {
   public:
+	const static Logger log;
 	Quad();
 	~Quad();
 
@@ -18,5 +25,8 @@ class Quad
 	GLuint ebo_;
 	GLuint vao_;
 };
+
+
+}
 
 #endif // SST_QUAD_H

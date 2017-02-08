@@ -2,7 +2,9 @@
 #define SST_SHADERPROGRAM_H
 
 #include <stdexcept>
+
 #include "Graphics.h"
+#include "Logger.h"
 
 
 namespace sunspot {
@@ -26,6 +28,7 @@ class ShaderSource {
 
 class ShaderProgram {
   public:
+	static const Logger log;
 	ShaderProgram(const char *depth);
 	ShaderProgram(const char *vertex, const char *fragment);
 	~ShaderProgram();

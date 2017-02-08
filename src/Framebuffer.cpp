@@ -7,6 +7,8 @@
 using namespace sunspot;
 
 
+const Logger Framebuffer::log{};
+
 const std::string Framebuffer::tag{ "Framebuffer" };
 
 
@@ -18,8 +20,6 @@ Framebuffer::Framebuffer(const math::Size &size)
 	, headerTexture_{ 0 }
 	, rbo_{ 0 }
 {
-	std::cout << "Framebuffer: creating\n"; // TODO remove debug log
-
 	glGenFramebuffers(1, &fbo_); // Create a framebuffer object
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
 
@@ -47,7 +47,7 @@ Framebuffer::Framebuffer(const math::Size &size)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "Stereoscopic Framebuffer [" << size_.width << "x" << size_.height << "]\n";
+		log.info("Stereoscopic Framebuffer [%dx%d]\n", size_.width, size_.height);
 	}
 	else {
 		glDeleteTextures(1, &headerTexture_);
@@ -66,7 +66,7 @@ Framebuffer::~Framebuffer()
 	glDeleteTextures(1, &depthTexture_);
 	glDeleteTextures(1, &colorTexture_);
 	glDeleteFramebuffers(1, &fbo_);
-	std::cout << "Framebuffer: destroyed\n"; // TODO remove debug log
+	log.info("Framebuffer: destroyed\n"); // TODO remove debug log
 }
 
 

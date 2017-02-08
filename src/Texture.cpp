@@ -7,6 +7,9 @@
 using namespace sunspot;
 
 
+const Logger Texture::log{};
+
+
 const char *sunspot::getTextureTypeName(const TextureType &type)
 {
 	return textureTypeNames[type];
@@ -26,13 +29,13 @@ Texture::Texture(const std::string &path, const TextureType &type)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	std::cout << "Texture: created " << name_ << std::endl; // TODO remove debug log
+	log.info("Texture: created %s\n", name_.c_str()); // TODO remove debug log
 }
 
 
 Texture::~Texture()
 {
-	std::cout << "Texture: destroyed " << name_ << std::endl; // TODO remove debug log
+	log.info("Texture: destroyed %s\n", name_.c_str()); // TODO remove debug log
 }
 
 
@@ -49,7 +52,7 @@ SoilData::SoilData(const std::string &path)
 		throw TextureException{ tag, "Could not load " + path + ": " + SOIL_last_result() };
 	}
 
-	std::cout << "SoilData: loaded " << path << ": " << SOIL_last_result() << std::endl; // TODO remove debug log
+	Texture::log.info("SoilData: %s %s\n", path.c_str(), SOIL_last_result()); // TODO remove debug log
 }
 
 

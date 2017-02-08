@@ -14,6 +14,8 @@ class Camera {
   public:
 	Camera(const float fov, const float aspectRatio, const float near, const float far);
 
+	void setPosition(const float x, const float y, const float z);
+
 	inline float &getPitch() { return pitch_; }
 	inline void setPitch(const float &pitch) { pitch_ = pitch; }
 

@@ -3,6 +3,7 @@
 
 #include "Window.h"
 #include "Cursor.h"
+#include "Logger.h"
 
 
 struct GLFWmonitor;
@@ -19,6 +20,7 @@ public:
 class GlfwWindow : public Window
 {
   public:
+	static const Logger log;
 	static const std::string tag;
 	GlfwWindow(const char *title, const math::Size windowSize, const bool decorated, const bool stereoscopic);
 	~GlfwWindow();
@@ -49,4 +51,3 @@ class GlfwWindow : public Window
 }
 
 #endif // SST_GLFWWINDOW_H
-

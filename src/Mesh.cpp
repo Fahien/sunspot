@@ -6,6 +6,9 @@
 using namespace sunspot;
 
 
+const Logger Mesh::log{};
+
+
 /// TODO Comment
 Mesh::Mesh(const std::string &name, std::vector<Vertex> &v, std::vector<GLuint> &i, Material *material)
 	: vertices{ v }
@@ -36,7 +39,7 @@ Mesh::Mesh(const std::string &name, std::vector<Vertex> &v, std::vector<GLuint> 
 
 	glBindVertexArray(0); // Unbind vao
 
-	std::cout << "Mesh: created " << name_ << std::endl; // TODO remove debug log
+	log.info("Mesh: created %s\n", name_.c_str()); // TODO remove debug log
 }
 
 
@@ -46,7 +49,7 @@ Mesh::~Mesh()
 	glDeleteVertexArrays(1, &vao_);
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);
-	std::cout << "Mesh: destroyed " << name_ << std::endl; // TODO remove debug log
+	log.info("Mesh: destroyed %s\n", name_.c_str()); // TODO remove debug log
 }
 
 
