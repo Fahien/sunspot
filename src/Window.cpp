@@ -90,6 +90,9 @@ void Window::renderQuad(const float & /* deltaTime */)
 	quad_->unbind();
 }
 
+#ifdef SST_PROFILING
+static int profiling_line{ 0 };
+#endif
 
 void Window::renderStereoscopic(const float &deltaTime)
 {
@@ -138,6 +141,11 @@ void Window::renderStereoscopic(const float &deltaTime)
 
 	float pass1 = (t2 - t1).count();
 	float pass2 = (t4 - t2).count();
-	std::cout << (t2 - t1).count() << " " << (t3 - t2).count() << " " << (t4 - t3).count() << std::endl;
+	float total = pass1 + pass2;
+	std::cout << ++profiling_line << " "
+		<< total << " " // Pass 1+2
+		<< pass1 << " " // Pass 1
+		<< pass2 / total * 100.0f // Overhead
+		<< std::endl;
 #endif
 }
