@@ -139,12 +139,16 @@ void Window::renderStereoscopic(const float &deltaTime)
 #ifdef SST_PROFILING
 	auto t4 = std::chrono::high_resolution_clock::now();
 
-	float pass1 = (t2 - t1).count();
-	float pass2 = (t4 - t2).count();
-	float total = pass1 + pass2;
-	std::cout << ++profiling_line << " "
-		<< total << " " // Pass 1+2
-		<< pass1 << " " // Pass 1
+	float pass1 = (t2 - t1).count(); // Pass 1
+	float pass2_1 = (t3 - t2).count(); // Pass 2.1
+	float pass2_2 = (t4 - t3).count(); // Pass 2.2
+	float pass2 = pass2_1 + pass2_2;
+	float total = pass1 + pass2_1 + pass2_2;
+	std::cout << ++profiling_line << "\t" // Frame number
+		<< pass1 << "\t" // Pass 1
+		<< pass2_1 << "\t" // Pass 2.1
+		<< pass2_2 << "\t" // Pass 2.2
+		<< total << "\t" // Total
 		<< pass2 / total * 100.0f // Overhead
 		<< std::endl;
 #endif
