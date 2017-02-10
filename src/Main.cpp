@@ -18,7 +18,7 @@
 
 using namespace sunspot;
 
-static Logger log{};
+static Logger logger{};
 
 static int scale{ 2 };
 static math::Size windowSize{ 960, 540 };
@@ -28,12 +28,12 @@ static float near{ 0.125f };
 static float far{ 32.0f };
 
 static const std::string tag{ "Main" };
-static const std::string crateName{ "data/frigate/frigate-blender.obj" };
+static const std::string crateName{ "data/cube/crate.obj" };
 
 
 void printLogo()
 {
-	log.info("%s\n",
+	logger.info("%s\n",
 R"( ________  ___  ___  ________   ________  ________  ________  _________   
 |\   ____\|\  \|\  \|\   ___  \|\   ____\|\   __  \|\   __  \|\___   ___\ 
 \ \  \___|\ \  \\\  \ \  \\ \  \ \  \___|\ \  \|\  \ \  \|\  \|___ \  \_| 
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 		if ((it = std::find(arguments.begin(), arguments.end(), "-scale")) != arguments.end()) {
 			if (++it != arguments.end()) {
 				scale = std::stoi(*it);
-				log.info("Scale [%d]\n", scale);
+				logger.info("Scale [%d]\n", scale);
 			}
 			else { std::cerr << "Scale [" << scale << "] (Default)\n"; }
 		}
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 		// Load Wavefront Object
 		Ifstream is{ crateName };
 		if (!is.is_open()) {
-			log.error("Could not find %s\n", crateName.c_str());
+			logger.error("Could not find %s\n", crateName.c_str());
 			return EXIT_FAILURE;
 		}
 		WavefrontObject obj{};
@@ -114,17 +114,17 @@ int main(int argc, char **argv)
 
 		window.loop(); // Game loop
 
-		log.info("%s version %d.%d successful\n", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
+		logger.info("%s version %d.%d successful\n", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
 		return EXIT_SUCCESS;
 	}
 	catch (const GraphicException &e)
 	{
-		log.error("%s: %s\n", tag.c_str(), e.what());
+		logger.error("%s: %s\n", tag.c_str(), e.what());
 		return EXIT_FAILURE;
 	}
 	catch (const std::runtime_error &e)
 	{
-		log.error("%s: %s\n", tag.c_str(), e.what());
+		logger.error("%s: %s\n", tag.c_str(), e.what());
 		return EXIT_FAILURE;
 	}
 }
