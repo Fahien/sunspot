@@ -33,8 +33,8 @@ A SunSpoT executable accepts the following command line arguments:
 Scarano](http://www.unisa.it/docenti/vittorioscarano/index?nv=docenti.unisa.it/vittorio.scarano), [Daniele
 Monaco](#), and [Armando Faggiano](#).
 
-A *special* thanks goes to [Angelo Theodorou](http://encelo.netsons.org/about/) for his guidance,
-[Giovanni R. Ferrante](#) for the awesome SunSpoT logo, and [Maria Rosaria Minichiello](#) for her daily support.
+A *special* thanks goes to [Angelo Theodorou](http://encelo.netsons.org/about/) for his guidance, and
+[Giovanni R. Ferrante](#) for the awesome SunSpoT logo.
 
 ## License
 Apache License © 2017 [Antonio Caggiano](http://www.fahien.me/)

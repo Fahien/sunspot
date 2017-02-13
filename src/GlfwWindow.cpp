@@ -161,7 +161,7 @@ void GlfwWindow::loop() // TODO comment
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_FRONT);
 #ifdef SST_PROFILING
-log.info("#Frame\tPass1\tPass2.1\tPass2.2\tTotal\tOverhead\n");
+	std::cout << "#Frame\tPass1\tPass2.1\tPass2.2\tTotal\tOverhead\n";
 #endif
 	while (!glfwWindowShouldClose(window_)) {
 		glfwPollEvents();
