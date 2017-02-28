@@ -1,7 +1,7 @@
-<img align="right" alt="SunSpoT" src="https://github.com/Fahien/sunspot/raw/master/sunspot.png" />
-# SunSpoT
-SunSpoT is a 3D engine capable of stereoscopic rendering, developed as a Computer Graphics project for my
-Computer Science thesis at [ISISlab](http://www.isislab.it/), [Università degli Studi di Salerno](http://www.unisa.it/).
+# SunSpoT<img align="right" alt="SunSpoT" src="https://github.com/Fahien/sunspot/raw/master/sunspot.png" />
+SunSpoT is a 3D engine capable of [stereoscopic rendering](https://github.com/Fahien/stereoscopic-rendering),
+developed as a Computer Graphics project for my Computer Science thesis at [ISISlab](http://www.isislab.it/),
+[Università degli Studi di Salerno](http://www.unisa.it/).
 
 ## Getting Started
 SunSpoT is **open-source** and **cross-platform**, built and tested on Windows and Linux.
