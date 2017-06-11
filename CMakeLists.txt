@@ -23,17 +23,6 @@ find_package(GLEW REQUIRED)
 find_package(GLFW REQUIRED)
 find_package(SOIL REQUIRED)
 
-# Add the given directories to those the compiler uses to search for include files
-if(${OPENGL_INCLUDE_DIR})
-	include_directories("${OPENGL_INCLUDE_DIR}")
-endif()
-include_directories(
-	"${GLEW_INCLUDE_DIR}"
-	"${GLFW_INCLUDE_DIR}"
-	"${SOIL_INCLUDE_DIR}"
-	"${PROJECT_SOURCE_DIR}/include"
-	"${PROJECT_SOURCE_DIR}/shader")
-
 set(SHADERS
 	shader/base.vert
 	shader/base.frag
@@ -50,6 +39,10 @@ set(SOURCES
 	src/ShaderProgram.cpp
 	src/Math.h
 	src/Math.cpp
+	src/collision/BoundingBox.h
+	src/collision/BoundingBox.cpp
+	src/collision/CollisionSystem.h
+	src/collision/CollisionSystem.cpp
 	src/Cursor.h
 	src/Cursor.cpp
 	src/Window.h
@@ -83,6 +76,21 @@ source_group("Sources" FILES ${SOURCES})
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
 add_executable(sunspot ${SOURCES} ${SHADERS})
+
+# Add the given directories to those the compiler uses to search for include files
+if(${OPENGL_INCLUDE_DIR})
+	target_include_directories(sunspot PUBLIC "${OPENGL_INCLUDE_DIR}")
+endif()
+target_include_directories(sunspot PUBLIC
+	"${GLEW_INCLUDE_DIR}"
+	"${GLFW_INCLUDE_DIR}"
+	"${SOIL_INCLUDE_DIR}"
+	"${PROJECT_SOURCE_DIR}/include"
+	"${PROJECT_SOURCE_DIR}/shader")
+
+if(WIN32)
+	set_target_properties(sunspot PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt")
+endif(WIN32)
 
 target_link_libraries(sunspot ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${SOIL_LIBRARIES})
 

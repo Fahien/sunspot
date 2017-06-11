@@ -13,13 +13,14 @@ namespace sunspot {
 
 class GlfwException : public GraphicException {
 public:
-	GlfwException(const std::string &tag, const std::string &message) : GraphicException{ tag + ": " + message } {}
+	GlfwException(const std::string &tag, const std::string &message)
+		: GraphicException{ tag + ": " + message } {}
 };
 
 
 class GlfwWindow : public Window
 {
-  public:
+public:
 	static const Logger log;
 	static const std::string tag;
 	GlfwWindow(const char *title, const math::Size windowSize, const bool decorated, const bool stereoscopic);
@@ -27,13 +28,13 @@ class GlfwWindow : public Window
 
 	void loop();
 
-  protected:
+protected:
 	void toggleFullscreen();
 	const float &computeDeltaTime();
 	void updateFrameSize();
 	void render(const float &deltaTime);
 
-  private:
+private:
 	void handleMouse(const double x, const double y);
 	void handleInput(const int key, const int action);
 
@@ -43,9 +44,9 @@ class GlfwWindow : public Window
 	void renderQuad(const float &deltaTime);
 	void renderStereoscopic(const float &deltaTime);
 
-	GLFWmonitor *monitor_;
-	const GLFWvidmode* videoMode_;
-	GLFWwindow *window_;
+	GLFWmonitor       *monitor_;
+	const GLFWvidmode *videoMode_;
+	GLFWwindow        *window_;
 };
 
 }

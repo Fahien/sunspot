@@ -12,7 +12,7 @@ const float pi{ 3.14159265f };
 
 
 class Size {
-  public:
+public:
 	Size();
 	Size(int w, int h);
 
@@ -29,7 +29,7 @@ class Size {
 
 
 class Vec2 {
-  public:
+public:
 	Vec2();
 	Vec2(const float xx, const float yy);
 
@@ -47,7 +47,7 @@ class Vec2 {
 
 
 class Vec3 {
-  public:
+public:
 	Vec3();
 	Vec3(const float xx, const float yy, const float zz);
 
@@ -66,7 +66,7 @@ std::ostream &operator<<(std::ostream &os, const Vec3 &v);
 
 
 class Mat4 {
-  public:
+public:
 	Mat4();
 	Mat4(std::initializer_list<float>);
 	Mat4(float *m);
@@ -91,6 +91,25 @@ class Mat4 {
 	float matrix[16];
 };
 
+
+class Rectangle
+{
+public:
+	Rectangle();
+
+	/// Tests whether (x, y) is inside the rectangle
+	bool contains(float x, float y);
+
+	/// Tests whether this box intersects another rectangle
+	bool intersects(const Rectangle &box);
+	/// Tests whether this box intersects another rectangle
+	bool intersects(const Rectangle *box);
+
+	float x;
+	float y;
+	float width;
+	float height;
+};
 
 }
 

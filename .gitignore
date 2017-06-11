@@ -4,3 +4,4 @@ lib
 data
 output.dat
 .ycm_extra_conf.pyc
+.vscode

@@ -12,7 +12,7 @@ Size::Size()
 
 
 Size::Size(int w, int h)
-	: width{ w }
+	: width { w }
 	, height{ h }
 {}
 
@@ -307,4 +307,29 @@ void Mat4::rotateZ(const float radians)
 		0.0f,    0.0f,   1.0f, 0.0f,
 		0.0f,    0.0f,   0.0f, 1.0f };
 	*this = rotation * *this;
+}
+
+
+Rectangle::Rectangle()
+	: x     { 0.0f }
+	, y     { 0.0f }
+	, width { 0.0f }
+	, height{ 0.0f }
+{}
+
+
+bool Rectangle::contains(float xx, float yy)
+{
+	return (x <= xx && xx <= (x + width) && y <= yy && yy <= (y + height));
+}
+
+
+bool Rectangle::intersects(const Rectangle &other)
+{
+	return (fabs(x - other.x) * 2 < (width + other.width)) && (fabs(y - other.y) * 2 < (height + other.height));
+}
+
+bool Rectangle::intersects(const Rectangle *other)
+{
+	return (fabs(x - other->x) * 2 < (width + other->width)) && (fabs(y - other->y) * 2 < (height + other->height));
 }
