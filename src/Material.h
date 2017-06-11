@@ -21,6 +21,7 @@ struct Material {
 	Material(std::string &n);
 	~Material();
 
+	/// Bind the material to the shader
 	void bind(const ShaderProgram *shader) const;
 
 	friend std::ostream &operator<<(std::ostream &os, const Material &mtl);
@@ -30,8 +31,11 @@ struct Material {
 	Color diffuse;
 	Color specular;
 	float shininess = 32.0f;
+	bool hasAmbientMap;
 	GLuint ambientMap;
+	bool hasDiffuseMap;
 	GLuint diffuseMap;
+	bool hasSpecularMap;
 	GLuint specularMap;
 };
 

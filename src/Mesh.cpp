@@ -45,7 +45,8 @@ Mesh::Mesh(const std::string &name, std::vector<Vertex> &v, std::vector<GLuint> 
 
 Mesh::~Mesh()
 {
-	if (material_ != nullptr) { delete material_; }
+	if (material_ != nullptr)
+		delete material_;
 	glDeleteVertexArrays(1, &vao_);
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);

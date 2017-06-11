@@ -15,31 +15,30 @@ Material::Material()
 	: Material("default")
 {}
 
+Material::Material(std::string &n)
+	: Material{ n.c_str() }
+{}
+
 
 Material::Material(const char *n)
 	: name{ n }
-	, ambient{}
-	, diffuse{}
+	, ambient {}
+	, diffuse {}
 	, specular{}
+	, hasAmbientMap { false }
+	, hasDiffuseMap { false }
+	, hasSpecularMap{ false }
 {
 	log.info("Material: created %s\n", n); // TODO remove debug log
 }
 
 
-Material::Material(std::string &n)
-	: name{ n }
-	, ambient{}
-	, diffuse{}
-	, specular{}
-{
-	log.info("Material: created %s\n", name.c_str()); // TODO remove debug log
-}
-
-
 Material::~Material()
 {
-	glDeleteTextures(1, &diffuseMap);
-	glDeleteTextures(1, &specularMap);
+	if (hasDiffuseMap)
+		glDeleteTextures(1, &diffuseMap);
+	if (hasSpecularMap)
+		glDeleteTextures(1, &specularMap);
 
 	log.info("Material: destroyed %s\n", name.c_str()); // TODO remove debug log
 }
@@ -54,23 +53,32 @@ void Material::bind(const ShaderProgram *shader) const {
 	glUniform3f(shader->getLocation("material.specular"), specular.r, specular.g, specular.b);
 	// Bind shininess
 	glUniform1f(shader->getLocation("material.shininess"), shininess);
+	// TODO ambient flag and map
+	// Bind diffuse flag
+	glUniform1i(shader->getLocation("material.hasDiffuseMap"), hasDiffuseMap);
 	// Bind diffuse map
-	glUniform1i(shader->getLocation("material.diffuseMap"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, diffuseMap);
+	if (hasDiffuseMap) {
+		glUniform1i(shader->getLocation("material.diffuseMap"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, diffuseMap);
+	}
+	// Bind specular flag
+	glUniform1i(shader->getLocation("material.hasSpecularMap"), hasSpecularMap);
 	// Bind specular map
-	glUniform1i(shader->getLocation("material.specularMap"), 1);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, specularMap);
+	if (hasSpecularMap) {
+		glUniform1i(shader->getLocation("material.specularMap"), 1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specularMap);
+	}
 }
 
 
 std::ostream &sunspot::operator<<(std::ostream &os, const Material &m)
 {
 	return os << "Material[" << m.name << "]\n"
-			  << "\tambient[" << m.ambient << "]\n"
-			  << "\tdiffuse[" << m.diffuse << "]\n"
-			  << "\tspecular[" << m.specular << "]\n"
-			  << "\tdiffuseMap[" << m.diffuseMap << "]\n"
-			  << "\tspecularMap[" << m.specularMap << "]";
+	          << "\tambient["     << m.ambient     << "]\n"
+	          << "\tdiffuse["     << m.diffuse     << "]\n"
+	          << "\tspecular["    << m.specular    << "]\n"
+	          << "\tdiffuseMap["  << m.diffuseMap  << "]\n"
+	          << "\tspecularMap[" << m.specularMap << "]";
 }
