@@ -461,7 +461,7 @@ void WavefrontObject::loadMaterialLibrary(std::stringstream &ss, const std::stri
 #ifndef WIN32
 			+ '/'
 #endif
-			+ mtlName }; }
+			+ mtlName };
 	loadMaterials(is);
 	
 	while (!ss.fail()) { // Read other optional mtl

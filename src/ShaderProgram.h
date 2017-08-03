@@ -6,18 +6,18 @@
 #include "Graphics.h"
 #include "Logger.h"
 
+namespace sunspot
+{
 
-namespace sunspot {
-
-
-class ShaderException : public std::runtime_error {
-  public:
-	ShaderException(const std::string& message) : std::runtime_error(message) {}
+class ShaderException : public std::runtime_error
+{
+public:
+	ShaderException(const std::string &message) : std::runtime_error(message) {}
 };
 
-
-class ShaderSource {
-  public:
+class ShaderSource
+{
+public:
 	ShaderSource(const char *path);
 	~ShaderSource();
 
@@ -25,9 +25,9 @@ class ShaderSource {
 	GLchar *handle;
 };
 
-
-class ShaderProgram {
-  public:
+class ShaderProgram
+{
+public:
 	static const Logger log;
 	ShaderProgram(const char *depth);
 	ShaderProgram(const char *vertex, const char *fragment);
@@ -38,14 +38,13 @@ class ShaderProgram {
 	inline void use() const { glUseProgram(baseProgram_); }
 	inline void setDepth() const { glUseProgram(depthProgram_); }
 
-  private:
+private:
 	GLuint compileShader(const GLenum type, const ShaderSource &source);
 	void linkProgram(const GLuint program, const GLuint vertex, const GLuint fragment);
 
 	GLuint baseProgram_;
 	GLuint depthProgram_;
 };
-
 
 }
 

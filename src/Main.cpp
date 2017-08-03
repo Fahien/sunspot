@@ -18,8 +18,6 @@
 
 using namespace sunspot;
 
-static Logger logger{};
-
 static int scale{ 2 };
 static math::Size windowSize{ 960, 540 };
 
@@ -33,7 +31,7 @@ static const std::string crateName{ "data/monument/monument.obj" };
 
 void printLogo()
 {
-	logger.info("%s\n",
+	Logger::log.info("%s\n",
 R"( ________  ___  ___  ________   ________  ________  ________  _________   
 |\   ____\|\  \|\  \|\   ___  \|\   ____\|\   __  \|\   __  \|\___   ___\ 
 \ \  \___|\ \  \\\  \ \  \\ \  \ \  \___|\ \  \|\  \ \  \|\  \|___ \  \_| 
@@ -67,7 +65,7 @@ int main(int argc, char **argv)
 		if ((it = std::find(arguments.begin(), arguments.end(), "-scale")) != arguments.end()) {
 			if (++it != arguments.end()) {
 				scale = std::stoi(*it);
-				logger.info("Scale [%d]\n", scale);
+				Logger::log.info("Scale [%d]\n", scale);
 			}
 			else { std::cerr << "Scale [" << scale << "] (Default)\n"; }
 		}
@@ -105,7 +103,7 @@ int main(int argc, char **argv)
 		// Load Wavefront Object
 		Ifstream is{ crateName };
 		if (!is.is_open()) {
-			logger.error("Could not find %s\n", crateName.c_str());
+			Logger::log.error("Could not find %s\n", crateName.c_str());
 			return EXIT_FAILURE;
 		}
 		WavefrontObject obj{};
@@ -114,17 +112,17 @@ int main(int argc, char **argv)
 
 		window.loop(); // Game loop
 
-		logger.info("%s version %d.%d successful\n", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
+		Logger::log.info("%s version %d.%d successful\n", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
 		return EXIT_SUCCESS;
 	}
 	catch (const GraphicException &e)
 	{
-		logger.error("%s: %s\n", tag.c_str(), e.what());
+		Logger::log.error("%s: %s\n", tag.c_str(), e.what());
 		return EXIT_FAILURE;
 	}
 	catch (const std::runtime_error &e)
 	{
-		logger.error("%s: %s\n", tag.c_str(), e.what());
+		Logger::log.error("%s: %s\n", tag.c_str(), e.what());
 		return EXIT_FAILURE;
 	}
 }

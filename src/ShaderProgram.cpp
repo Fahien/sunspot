@@ -11,7 +11,7 @@ const Logger ShaderProgram::log{};
 
 
 ShaderProgram::ShaderProgram(const char *depth)
-	: baseProgram_{ glCreateProgram() }
+	: baseProgram_ { glCreateProgram() }
 	, depthProgram_{ glCreateProgram() }
 {
 	ShaderSource vertexSource{ "shader/base.vert" };
@@ -38,13 +38,15 @@ ShaderProgram::ShaderProgram(const char *depth)
 
 
 ShaderProgram::ShaderProgram(const char *vertex, const char *fragment)
-	: baseProgram_{ glCreateProgram() }
+	: baseProgram_ { glCreateProgram() }
 	, depthProgram_{ glCreateProgram() }
 {
-	ShaderSource vertexSource{ vertex };
-	GLuint vertexShader{ compileShader(GL_VERTEX_SHADER, vertexSource) };
+	ShaderSource vertexSource  { vertex   };
 	ShaderSource fragmentSource{ fragment };
+
+	GLuint vertexShader  { compileShader(GL_VERTEX_SHADER,   vertexSource)   };
 	GLuint fragmentShader{ compileShader(GL_FRAGMENT_SHADER, fragmentSource) };
+
 	linkProgram(baseProgram_, vertexShader, fragmentShader);
 	
 	glDeleteShader(vertexShader);
@@ -72,7 +74,8 @@ void ShaderProgram::linkProgram(const GLuint program, const GLuint vertex, const
 
 	GLint success;
 	glGetProgramiv(program, GL_LINK_STATUS, &success);
-	if (!success) {
+	if (!success)
+	{
 		GLchar infoLog[512];
 		glGetProgramInfoLog(program, 512, nullptr, infoLog);
 		std::string message{ "Error linking shader program: " };
@@ -91,12 +94,12 @@ GLuint ShaderProgram::compileShader(const GLenum type, const ShaderSource &sourc
 
 	GLint success;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-	if (!success) {
+	if (!success)
+	{
 		GLchar infoLog[512];
 		glGetShaderInfoLog(shader, 512, nullptr, infoLog);
 		std::string message{ "Error compiling "};
-		throw ShaderException{ message
-			+ source.path + ": " + infoLog };
+		throw ShaderException{ message + source.path + ": " + infoLog };
 	}
 	return shader;
 }
@@ -121,7 +124,8 @@ ShaderSource::ShaderSource(const char *p)
 	fseek(file, 0, SEEK_SET);
 	handle = static_cast<GLchar *>(malloc(length * sizeof(GLchar)));
 	fread(handle, 1, length, file);
-	if (ferror(file)) {
+	if (ferror(file))
+	{
 		std::string message{ "Could not read shader file: " };
 		throw ShaderException{ message + path };
 	}
