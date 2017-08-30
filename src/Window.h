@@ -4,6 +4,8 @@
 #include <string>
 #include <stdexcept>
 #include <vector>
+
+#include "Graphics.h"
 #include "Math.h"
 #include "Cursor.h"
 
@@ -18,12 +20,6 @@ class ShaderProgram;
 class Light;
 class WavefrontObject;
 class Framebuffer;
-
-
-class GraphicException : public std::runtime_error {
-public:
-	GraphicException(const std::string& message) : std::runtime_error(message) {}
-};
 
 
 class GlewException : public GraphicException {

@@ -9,13 +9,13 @@ namespace sunspot
 class Ifstream : public std::ifstream
 {
 public:
-	Ifstream(char *name);
-	Ifstream(const std::string &name);
+	Ifstream(char* name);
+	Ifstream(const std::string& name);
 
-	inline const std::string &getPath() const { return path_; }
+	inline const std::string& getPath() const { return mPath; }
 
 private:
-	std::string path_;
+	std::string mPath;
 };
 
 }

@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <string>
 #include "Graphics.h"
-#include "Window.h"
 #include "Logger.h"
 
 
