@@ -22,7 +22,6 @@ set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${PROJECT_SOURCE_DIR}")
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLFW REQUIRED)
-find_package(SOIL REQUIRED)
 
 set(SHADERS
 	shader/base.vert
@@ -78,16 +77,22 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
 add_executable(sunspot ${SOURCES} ${SHADERS})
 
+# SOIL
+set(SOIL soil)
+add_subdirectory(${SOIL})
+set(SOIL_INCLUDE_DIR ${SOIL}/src)
+set(SOIL_LIBRARIES SOIL)
+
 # Add the given directories to those the compiler uses to search for include files
 if(${OPENGL_INCLUDE_DIR})
 	target_include_directories(sunspot PUBLIC "${OPENGL_INCLUDE_DIR}")
 endif()
 target_include_directories(sunspot PUBLIC
-	"${GLEW_INCLUDE_DIR}"
-	"${GLFW_INCLUDE_DIR}"
-	"${SOIL_INCLUDE_DIR}"
-	"${PROJECT_SOURCE_DIR}/include"
-	"${PROJECT_SOURCE_DIR}/shader")
+	${GLEW_INCLUDE_DIR}
+	${GLFW_INCLUDE_DIR}
+	${SOIL_INCLUDE_DIR}
+	${PROJECT_SOURCE_DIR}/include
+	${PROJECT_SOURCE_DIR}/shader)
 
 if(WIN32)
 	set_target_properties(sunspot PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt")

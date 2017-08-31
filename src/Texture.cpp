@@ -1,118 +1,123 @@
 #include <iostream>
 #include <cstdio>
-#include <SOIL/SOIL.h>
+#include <cstdlib>
+#include <SOIL.h>
 
 #include "Texture.h"
+#include "Logger.h"
 
 using namespace sunspot;
 
 
-const Logger Texture::log{};
-
-
-const char *sunspot::getTextureTypeName(const TextureType &type)
+const char* sunspot::getTextureTypeName(const TextureType& type)
 {
 	return textureTypeNames[type];
 }
 
 
-Texture::Texture(const std::string &path, const TextureType &type)
-	: id_{ 0 }
-	, name_{ path }
-	, type_{ type }
+Texture::Texture(const std::string& path, const TextureType& type)
+	: mId  { 0 }
+	, mName{ path }
+	, mType{ type }
 {
-	glGenTextures(1, &id_);
-	glBindTexture(GL_TEXTURE_2D, id_);
+	glGenTextures(1, &mId);
+	glBindTexture(GL_TEXTURE_2D, mId);
 	SoilData data{ path };
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data.getWidth(), data.getHeight(),
-		0, GL_RGB, GL_UNSIGNED_BYTE, data.getHandle());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, data.getWidth(), data.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, data.getHandle());
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	log.info("Texture: created %s\n", name_.c_str()); // TODO remove debug log
+	Logger::log.info("Texture: created %s\n", mName.c_str()); // TODO remove debug log
 }
 
 
 Texture::~Texture()
 {
-	log.info("Texture: destroyed %s\n", name_.c_str()); // TODO remove debug log
+	Logger::log.info("Texture: destroyed %s\n", mName.c_str()); // TODO remove debug log
 }
 
 
 const std::string SoilData::tag{ "SoilData" };
 
 
-SoilData::SoilData(const std::string &path)
-	: width_{ 0 }
-	, height_{ 0 }
-	, handle_{ nullptr }
+SoilData::SoilData(const std::string& path)
+	: mWidth { 0 }
+	, mHeight{ 0 }
+	, mHandle{ nullptr }
 {
-	handle_ = SOIL_load_image(path.c_str(), &width_, &height_, 0, SOIL_LOAD_RGB);
-	if (handle_ == nullptr || handle_ == 0) {
+	mHandle = SOIL_load_image(path.c_str(), &mWidth, &mHeight, 0, SOIL_LOAD_RGB);
+	if (mHandle == nullptr || mHandle == 0)
 		throw TextureException{ tag, "Could not load " + path + ": " + SOIL_last_result() };
-	}
 
-	Texture::log.info("SoilData: %s %s\n", path.c_str(), SOIL_last_result()); // TODO remove debug log
+	Logger::log.info("SoilData: %s %s\n", path.c_str(), SOIL_last_result()); // TODO remove debug log
 }
 
 
 SoilData::~SoilData()
 {
-	if (handle_ != nullptr && handle_ != 0) { SOIL_free_image_data(handle_); }
+	if (mHandle != nullptr && mHandle != 0)
+		SOIL_free_image_data(mHandle);
 }
 
 
 const std::string TextureData::tag{ "TextureData" };
 
 
-TextureData::TextureData(const std::string &path)
-	: width_{ 0 }
-	, height_{ 0 }
-	, data_{ nullptr }
+TextureData::TextureData(const std::string& path)
+	: mWidth { 0 }
+	, mHeight{ 0 }
+	, mData  { nullptr }
 {
 #ifdef WIN32
-	FILE *file{};
+	FILE* file{};
 	fopen_s(&file, (path).c_str(), "rb");
 #else
-	FILE *file{ fopen((path).c_str(), "rb") };
+	FILE* file{ fopen((path).c_str(), "rb") };
 #endif
-	if (file == nullptr) { throw TextureException{ tag, "Could not open header bitmap for " + path }; }
+	if (file == nullptr)
+		throw TextureException{ tag, "Could not open header bitmap for " + path };
 
 	fseek(file, 14, SEEK_CUR);
 
 	unsigned hlen;
 	size_t nread{ fread(&hlen, 4, 1, file) };
-	if (nread != 1) {
+	if (nread != 1)
+	{
 		fclose(file);
 		throw TextureException{ tag, "Could not read header from bitmap file" };
 	}
 
-	nread = fread(&width_, 4, 1, file); // Read width
-	if (nread != 1) {
+	nread = fread(&mWidth, 4, 1, file); // Read width
+	if (nread != 1)
+	{
 		fclose(file);
 		throw TextureException{ tag, "Could not read width from bitmap file" };
 	}
 
-	nread = fread(&height_, 4, 1, file); // Read height;
-	if (nread != 1) {
+	nread = fread(&mHeight, 4, 1, file); // Read height;
+	if (nread != 1)
+	{
 		fclose(file);
 		throw TextureException{ tag, "Could not read height from bitmap file" };
 	}
 
 	unsigned short planes; // Read planes
 	nread = fread(&planes, 2, 1, file);
-	if (nread != 1) {
+	if (nread != 1)
+	{
 		fclose(file);
 		throw TextureException{ tag, "Could not read planes from bitmap file" };
 	}
 
 	unsigned short bpp; // Read bit per pixel
 	nread = fread(&bpp, 2, 1, file);
-	if (nread != 1) {
+	if (nread != 1)
+	{
 		fclose(file);
 		throw TextureException{ tag, "Could not read bpp from bitmap file" };
 	}
-	if (bpp != 24) {
+	if (bpp != 24)
+	{
 		fclose(file);
 		std::string message{ "Bpp is not 24: " };
 		message += static_cast<char>(bpp);
@@ -120,32 +125,36 @@ TextureData::TextureData(const std::string &path)
 	}
 
 	std::cout << tag.c_str() << ": " << path.c_str() << ", header[" << hlen
-		<< "], size[" << width_ << "x" << height_
-		<< "], planes[" << planes << "], bpp[" << bpp << "]\n";
+	          << "], size[" << mWidth << "x" << mHeight
+	          << "], planes[" << planes << "], bpp[" << bpp << "]\n";
 
 	fseek(file, 24, SEEK_CUR);
 
-	int size{ width_ * height_ * 3 }; // Allocate memory for bitmap data
-	data_ = static_cast<GLubyte *>(malloc(size));
-	if (!data_) {
+	int size{ mWidth * mHeight * 3 }; // Allocate memory for bitmap data
+	mData = static_cast<GLubyte *>(malloc(size));
+	if (!mData)
+	{
 		fclose(file);
 		std::string message{ "Could not not allocate " };
 		message += size;
 		message += " memory for bitmap data\n";
 		throw TextureException{ tag, message };
 	}
-	nread = fread(data_, size, 1, file); // Read bitmap data
-	if (nread <= 0) {
+	nread = fread(mData, size, 1, file); // Read bitmap data
+	if (nread <= 0)
+	{
 		fclose(file);
 		std::string message{ "Could not read bitmap data: nread[" };
 		message += static_cast<char>(nread);
 		message += "]";
 		throw TextureException{ tag, message };
 	}
-	for (int i{ 0 }; i < size; i += 3) { // Adjust red and blue
-		GLubyte temp = data_[i];
-		data_[i] = data_[i + 2];
-		data_[i + 2] = temp;
+	// Adjust red and blue
+	for (int i{ 0 }; i < size; i += 3)
+	{
+		GLubyte temp = mData[i];
+		mData[i] = mData[i + 2];
+		mData[i + 2] = temp;
 	}
 	fclose(file);
 }
@@ -153,5 +162,6 @@ TextureData::TextureData(const std::string &path)
 
 TextureData::~TextureData()
 {
-	if (data_ != nullptr) { free(data_); }
+	if (mData != nullptr)
+		free(mData);
 }
