@@ -1,12 +1,14 @@
 #ifndef SST_COLOR_H
 #define SST_COLOR_H
 
-#include<iostream>
+#include <iostream>
 
 
-namespace sunspot {
+namespace sunspot
+{
 
-struct Color {
+struct Color
+{
 	Color();
 	Color(const float r, const float g, const float b);
 
@@ -14,7 +16,7 @@ struct Color {
 	float g; // Green
 	float b; // Blue
 
-	friend std::ostream &operator<<(std::ostream &os, const Color &c);
+	friend std::ostream& operator<<(std::ostream& os, const Color& c);
 };
 
 }
