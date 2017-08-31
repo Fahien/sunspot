@@ -77,6 +77,12 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
 add_executable(sunspot ${SOURCES} ${SHADERS})
 
+# MathSpoT
+set(MATHSPOT mathspot)
+add_subdirectory(${MATHSPOT})
+set(MATHSPOT_INCLUDE_DIR ${MATHSPOT}/include)
+set(MATHSPOT_LIBRARIES mathspot)
+
 # SOIL
 set(SOIL soil)
 add_subdirectory(${SOIL})
@@ -90,6 +96,7 @@ endif()
 target_include_directories(sunspot PUBLIC
 	${GLEW_INCLUDE_DIR}
 	${GLFW_INCLUDE_DIR}
+	${MATHSPOT_INCLUDE_DIR}
 	${SOIL_INCLUDE_DIR}
 	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/shader)
@@ -98,6 +105,6 @@ if(WIN32)
 	set_target_properties(sunspot PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt")
 endif(WIN32)
 
-target_link_libraries(sunspot ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${SOIL_LIBRARIES})
+target_link_libraries(sunspot ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${MATHSPOT_LIBRARIES} ${SOIL_LIBRARIES})
 
 file(COPY ${PROJECT_SOURCE_DIR}/shader DESTINATION ${PROJECT_BINARY_DIR})

@@ -2,12 +2,13 @@
 #define SST_MESH_H
 
 #include <vector>
+#include <MathSpot.h>
+
 #include "Graphics.h"
-#include "Math.h"
 #include "Texture.h"
 #include "Material.h"
-#include "WavefrontObject.h"
-#include "Logger.h"
+
+namespace mst = mathspot;
 
 namespace sunspot {
 
@@ -15,34 +16,34 @@ namespace sunspot {
 class ShaderProgram;
 
 
-struct Vertex {
-  public:
-	math::Vec3 position;
-	math::Vec3 normal;
-	math::Vec2 texCoords;
+struct Vertex
+{
+	mst::Vec3 position;
+	mst::Vec3 normal;
+	mst::Vec2 texCoords;
 };
 
 
-class Mesh {
-  public:
-	static const Logger log;
-	Mesh(const std::string &name, std::vector<Vertex> &vertices, std::vector<GLuint> &indices, Material *m);
+class Mesh
+{
+public:
+	Mesh(const std::string& name, std::vector<Vertex>& vertices, std::vector<GLuint>& indices, Material* m);
 	~Mesh();
 
-	void draw(const ShaderProgram *shader);
+	void draw(const ShaderProgram& shader);
 
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
 	std::vector<Texture> textures;
 
-	math::Mat4 transform;
+	mst::Mat4 transform;
 
-  private:
-	std::string name_;
-	GLuint vao_;
-	GLuint vbo_;
-	GLuint ebo_;
-	Material *material_;
+private:
+	std::string mName;
+	GLuint mVao;
+	GLuint mVbo;
+	GLuint mEbo;
+	Material* mMaterial;
 };
 
 

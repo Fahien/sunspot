@@ -1,65 +1,64 @@
 #include <iostream>
 #include <string>
+
 #include "Mesh.h"
 #include "ShaderProgram.h"
 
-using namespace sunspot;
-
-
-const Logger Mesh::log{};
+namespace mst = mathspot;
+namespace sst = sunspot;
 
 
 /// TODO Comment
-Mesh::Mesh(const std::string &name, std::vector<Vertex> &v, std::vector<GLuint> &i, Material *material)
-	: vertices{ v }
-	, indices{ i }
-	, transform{ math::Mat4::identity }
-	, name_{ name }
-	, material_{ material }
+sst::Mesh::Mesh(const std::string& name, std::vector<sst::Vertex>& v, std::vector<GLuint>& i, sst::Material* material)
+:	vertices { v }
+,	indices  { i }
+,	transform{ mst::Mat4::identity }
+,	mName    { name }
+,	mMaterial{ material }
 {
-	glGenVertexArrays(1, &vao_);
-	glGenBuffers(1, &vbo_);
-	glGenBuffers(1, &ebo_);
+	glGenVertexArrays(1, &mVao);
+	glGenBuffers(1, &mVbo);
+	glGenBuffers(1, &mEbo);
 
-	glBindVertexArray(vao_);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+	glBindVertexArray(mVao);
+	glBindBuffer(GL_ARRAY_BUFFER, mVbo);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(sst::Vertex), &vertices[0], GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0); // Vertex Positions
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(sst::Vertex), (GLvoid*)0);
 
 	glEnableVertexAttribArray(1); // Vertex Normals
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, normal));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(sst::Vertex), (GLvoid*)offsetof(sst::Vertex, normal));
 
 	glEnableVertexAttribArray(2); // Vertex Texture Coords
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoords));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(sst::Vertex), (GLvoid*)offsetof(sst::Vertex, texCoords));
 
 	glBindVertexArray(0); // Unbind vao
 
-	log.info("Mesh: created %s\n", name_.c_str()); // TODO remove debug log
+	sst::Logger::log.info("Mesh: created %s\n", mName.c_str()); // TODO remove debug log
 }
 
 
-Mesh::~Mesh()
+sst::Mesh::~Mesh()
 {
-	if (material_ != nullptr)
-		delete material_;
-	glDeleteVertexArrays(1, &vao_);
-	glDeleteBuffers(1, &ebo_);
-	glDeleteBuffers(1, &vbo_);
-	log.info("Mesh: destroyed %s\n", name_.c_str()); // TODO remove debug log
+	if (mMaterial != nullptr)
+		delete mMaterial;
+	glDeleteVertexArrays(1, &mVao);
+	glDeleteBuffers(1, &mEbo);
+	glDeleteBuffers(1, &mVbo);
+	sst::Logger::log.info("Mesh: destroyed %s\n", mName.c_str()); // TODO remove debug log
 }
 
 
-void Mesh::draw(const ShaderProgram *shader)
+void sst::Mesh::draw(const sst::ShaderProgram& shader)
 {
 	// Bind transform matrix
-	glUniformMatrix4fv(shader->getLocation("model"), 1, GL_FALSE, transform.matrix);
-	if (material_ != nullptr) { material_->bind(shader); }
-	glBindVertexArray(vao_);
+	glUniformMatrix4fv(shader.getLocation("model"), 1, GL_FALSE, transform.matrix);
+	if (mMaterial != nullptr) { mMaterial->bind(shader); }
+	glBindVertexArray(mVao);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

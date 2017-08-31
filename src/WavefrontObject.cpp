@@ -45,7 +45,7 @@ WavefrontObject::~WavefrontObject()
 
 
 /// Draw the object
-void WavefrontObject::draw(const ShaderProgram *shader) const
+void WavefrontObject::draw(const ShaderProgram& shader) const
 {
 	for (Mesh *mesh : meshes_)
 		mesh->draw(shader);
@@ -67,7 +67,7 @@ void WavefrontObject::loadName(std::stringstream &ss)
 void WavefrontObject::loadPosition(std::stringstream &ss)
 {
 	std::string command{};
-	math::Vec3 v{};
+	mst::Vec3 v{};
 	ss >> command >> v.x >> v.y >> v.z;
 	if (ss.fail()) { throw LoadingException{ "Error loading vertex position" }; }
 	float w;
@@ -86,7 +86,7 @@ void WavefrontObject::loadPosition(std::stringstream &ss)
 void WavefrontObject::loadTexCoords(std::stringstream &ss)
 {
 	std::string command{};
-	math::Vec2 t{};
+	mst::Vec2 t{};
 	ss >> command >> t.x;
 	if (ss.fail())
 		throw LoadingException{ "Error loading texture coordinate" };
@@ -102,7 +102,7 @@ void WavefrontObject::loadTexCoords(std::stringstream &ss)
 void WavefrontObject::loadNormal(std::stringstream &ss)
 {
 	std::string command{};
-	math::Vec3 n{};
+	mst::Vec3 n{};
 	ss >> command >> n.x >> n.y >> n.z;
 	if (ss.fail())
 		throw LoadingException{ "Error loading vertex normal" };

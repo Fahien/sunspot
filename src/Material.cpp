@@ -43,32 +43,32 @@ sst::Material::~Material()
 }
 
 
-void sst::Material::bind(const sst::ShaderProgram* shader) const
+void sst::Material::bind(const sst::ShaderProgram& shader) const
 {
 	// Bind ambient color
-	glUniform3f(shader->getLocation("material.ambient"),  ambient.r,  ambient.g,  ambient.b);
+	glUniform3f(shader.getLocation("material.ambient"),  ambient.r,  ambient.g,  ambient.b);
 	// Bind diffuse color
-	glUniform3f(shader->getLocation("material.diffuse"),  diffuse.r,  diffuse.g,  diffuse.b);
+	glUniform3f(shader.getLocation("material.diffuse"),  diffuse.r,  diffuse.g,  diffuse.b);
 	// Bind specular color
-	glUniform3f(shader->getLocation("material.specular"), specular.r, specular.g, specular.b);
+	glUniform3f(shader.getLocation("material.specular"), specular.r, specular.g, specular.b);
 	// Bind shininess
-	glUniform1f(shader->getLocation("material.shininess"), shininess);
+	glUniform1f(shader.getLocation("material.shininess"), shininess);
 	// TODO ambient flag and map
 	// Bind diffuse flag
-	glUniform1i(shader->getLocation("material.hasDiffuseMap"), hasDiffuseMap);
+	glUniform1i(shader.getLocation("material.hasDiffuseMap"), hasDiffuseMap);
 	// Bind diffuse map
 	if (hasDiffuseMap)
 	{
-		glUniform1i(shader->getLocation("material.diffuseMap"), 0);
+		glUniform1i(shader.getLocation("material.diffuseMap"), 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
 	}
 	// Bind specular flag
-	glUniform1i(shader->getLocation("material.hasSpecularMap"), hasSpecularMap);
+	glUniform1i(shader.getLocation("material.hasSpecularMap"), hasSpecularMap);
 	// Bind specular map
 	if (hasSpecularMap)
 	{
-		glUniform1i(shader->getLocation("material.specularMap"), 1);
+		glUniform1i(shader.getLocation("material.specularMap"), 1);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
 	}

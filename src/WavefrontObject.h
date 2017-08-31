@@ -3,13 +3,14 @@
 
 #include <exception>
 #include <vector>
+#include <MathSpot.h>
 
 #include "Graphics.h"
-#include "Math.h"
 #include "Mesh.h"
 #include "Ifstream.h"
 #include "Logger.h"
 
+namespace mst = mathspot;
 
 namespace sunspot {
 
@@ -33,7 +34,7 @@ struct Face {
 
 
 class WavefrontObject {
-  public:
+public:
 	static const Logger log;
 	WavefrontObject();
 	~WavefrontObject();
@@ -43,9 +44,9 @@ class WavefrontObject {
 	inline std::vector<GLuint> &getIndices() { return indices_; }
 	inline std::vector<Texture> &getTextures() { return textures_; }
 
-	void draw(const ShaderProgram *shader) const;
+	void draw(const ShaderProgram& shader) const;
 
-  private:
+private:
 	void loadName(std::stringstream &ss);
 	void loadPosition(std::stringstream &ss);
 	void loadTexCoords(std::stringstream &ss);
@@ -77,9 +78,9 @@ class WavefrontObject {
 	unsigned texCoordsCount_;
 	unsigned vertexCount_;
 
-	std::vector<math::Vec3> positions_;
-	std::vector<math::Vec2> texCoords_;
-	std::vector<math::Vec3> normals_;
+	std::vector<mst::Vec3> positions_;
+	std::vector<mst::Vec2> texCoords_;
+	std::vector<mst::Vec3> normals_;
 	std::vector<Vertex> vertices_;
 	std::vector<GLuint> indices_;
 	std::vector<Texture> textures_;

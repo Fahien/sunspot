@@ -21,7 +21,7 @@ public:
 	~Material();
 
 	/// Bind the material to the shader
-	void bind(const ShaderProgram* shader) const;
+	void bind(const ShaderProgram& shader) const;
 
 	friend std::ostream& operator<<(std::ostream& os, const Material& mtl);
 
