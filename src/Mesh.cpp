@@ -3,6 +3,7 @@
 
 #include "Mesh.h"
 #include "ShaderProgram.h"
+#include "Logger.h"
 
 namespace mst = mathspot;
 namespace sst = sunspot;

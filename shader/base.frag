@@ -29,7 +29,7 @@ uniform Light light;
 uniform Camera camera;
 uniform Material material;
 
-in vec3 position; 
+in vec3 position;
 in vec3 normal;
 in vec2 texCoords;
 
@@ -39,7 +39,7 @@ void main()
 {
 	vec3 fragment = material.hasDiffuseMap ? vec3(texture(material.diffuseMap, texCoords)) : vec3(one);
 
-	vec3 ambient = light.ambient * material.diffuse * fragment;
+	vec3 ambient = light.ambient * material.ambient * fragment;
 
 	vec3 lightDirection = normalize(light.position - position);
 	float diffuseFactor = max(dot(normal, lightDirection), zero);

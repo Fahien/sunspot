@@ -4,97 +4,110 @@
 #include <sstream>
 #include <array>
 
+#include "Logger.h"
 #include "WavefrontObject.h"
 
 
 using namespace sunspot;
-
-
-const Logger WavefrontObject::log{};
+namespace mst = mathspot;
 
 
 /// Creates a Wavefront Object
 WavefrontObject::WavefrontObject()
-	: name_{}
-	, currentGroupName_{ "default" }
-	, positionCount_{ 0 }
-	, normalCount_{ 0 }
-	, texCoordsCount_{ 0 }
-	, vertexCount_{ 0 }
-	, positions_{}
-	, texCoords_{}
-	, normals_{}
-	, vertices_{}
-	, indices_{}
-	, textures_{}
-	, meshes_{}
-	, currentMaterial_{ nullptr }
-	, materials_{}
+	: mName{}
+	, mCurrentGroupName{ "default" }
+	, mPositionCount{ 0 }
+	, mNormalCount{ 0 }
+	, mTexCoordsCount{ 0 }
+	, mVertexCount{ 0 }
+	, mPositions{}
+	, mTexCoords{}
+	, mNormals{}
+	, mVertices{}
+	, mIndices{}
+	, mTextures{}
+	, mMeshes{}
+	, mCurrentMaterial{ nullptr }
+	, mMaterials{}
 {
-	log.info("WavefrontObject: created\n"); // TODO remove debug log
+	Logger::log.info("WavefrontObject: created\n"); // TODO remove debug log
 }
 
 
 /// Release resources
 WavefrontObject::~WavefrontObject()
 {
-	for (Mesh *mesh : meshes_)
+	for (Mesh* mesh : mMeshes)
+	{
 		delete mesh;
-	log.info("WavefrontObject: destroyed %s\n", name_.c_str()); // TODO remove debug log
+	}
+	Logger::log.info("WavefrontObject: destroyed %s\n", mName.c_str()); // TODO remove debug log
 }
 
 
 /// Draw the object
 void WavefrontObject::draw(const ShaderProgram& shader) const
 {
-	for (Mesh *mesh : meshes_)
+	for (Mesh *mesh : mMeshes)
+	{
 		mesh->draw(shader);
+	}
 }
 
 
 /// Loads the object name
-void WavefrontObject::loadName(std::stringstream &ss)
+void WavefrontObject::loadName(std::stringstream& ss)
 {
 	std::string command{};
-	ss >> command >> name_;
+	ss >> command >> mName;
 	if (ss.fail())
+	{
 		throw LoadingException{ "Error loading name" };
-	log.info("Obj name: %s\n", name_.c_str()); // TODO remove debug log
+	}
+	Logger::log.info("Obj name: %s\n", mName.c_str()); // TODO remove debug Logger::log
 }
 
 
 /// Loads a vertex position from a string stream
-void WavefrontObject::loadPosition(std::stringstream &ss)
+void WavefrontObject::loadPosition(std::stringstream& ss)
 {
 	std::string command{};
 	mst::Vec3 v{};
 	ss >> command >> v.x >> v.y >> v.z;
-	if (ss.fail()) { throw LoadingException{ "Error loading vertex position" }; }
+	if (ss.fail())
+	{
+		throw LoadingException{ "Error loading vertex position" };
+	}
 	float w;
 	ss >> w;
-	if (!ss.fail()) { // Deomogenize
+	if (!ss.fail()) // Deomogenize
+	{
 		v.x /= w;
 		v.y /= w;
 		v.z /= w;
 	}
-	positions_.push_back(v);
-	++positionCount_;
+	mPositions.push_back(v);
+	++mPositionCount;
 }
 
 
 /// Loads a texture coordinate from a string stream
-void WavefrontObject::loadTexCoords(std::stringstream &ss)
+void WavefrontObject::loadTexCoords(std::stringstream& ss)
 {
 	std::string command{};
 	mst::Vec2 t{};
 	ss >> command >> t.x;
 	if (ss.fail())
+	{
 		throw LoadingException{ "Error loading texture coordinate" };
+	}
 	ss >> t.y;
-	if (ss.fail()) 
+	if (ss.fail())
+	{
 		t.y = 0.0f; // Default to 0
-	texCoords_.push_back(t);
-	++texCoordsCount_;
+	}
+	mTexCoords.push_back(t);
+	++mTexCoordsCount;
 }
 
 
@@ -105,445 +118,616 @@ void WavefrontObject::loadNormal(std::stringstream &ss)
 	mst::Vec3 n{};
 	ss >> command >> n.x >> n.y >> n.z;
 	if (ss.fail())
+	{
 		throw LoadingException{ "Error loading vertex normal" };
-	normals_.push_back(n);
-	++normalCount_;
+	}
+	mNormals.push_back(n);
+	++mNormalCount;
 }
 
 
 template <char C>
-std::istream& expect(std::istream& is)
+std::istream& expect(std::istream &is)
 {
 	if ((is >> std::ws).peek() == C)
+	{
 		is.ignore();
+	}
 	else
+	{
 		is.setstate(std::ios_base::failbit);
+	}
 	return is;
 }
 
 
 /// Loads a face from a string stream
-void WavefrontObject::loadIndices(std::stringstream &ss)
+void WavefrontObject::loadIndices(std::stringstream& ss)
 {
 	std::string command{};
 	Face f{};
 	ss >> command >> f.indices[0];
 	if (ss.fail())
+	{
 		throw LoadingException{ "Error loading indices" };
+	}
 	char next{ static_cast<char>(ss.peek()) };
-	if (next == ' ') { // Only faces
+	if (next == ' ') // Only faces
+	{
 		ss >> f.indices[1] >> f.indices[2];
 		if (ss.fail())
+		{
 			throw LoadingException{ "Error loading indices" };
+		}
 		ss >> f.indices[3];
-		if (ss.fail()) { f.indices[3] = 0; } // Default to invalid value
-	} else if (next == '/') {
+		if (ss.fail()) // Default to invalid value
+		{
+			f.indices[3] = 0;
+		}
+	}
+	else if (next == '/')
+	{
 		ss.ignore();
 		next = ss.peek();
-		if (next == '/') { // Only vertices and normals
+		if (next == '/') // Only vertices and normals
+		{
 			ss.ignore();
 			ss >> f.normals[0]
 			   >> f.indices[1] >> expect<'/'> >> expect<'/'> >> f.normals[1]
 			   >> f.indices[2] >> expect<'/'> >> expect<'/'> >> f.normals[2];
-			if (ss.fail()) { throw LoadingException{ "Error loading indices" }; }
+			if (ss.fail())
+			{
+				throw LoadingException{ "Error loading indices" };
+			}
 			ss >> f.indices[3] >> expect<'/'> >> expect<'/'> >> f.normals[3];
-			if (ss.fail()) { f.indices[3] = 0; } // Default to invalid value
+			if (ss.fail()) // Default to invalid value
+			{
+				f.indices[3] = 0;
+			}
 		}
-		else { // Vertices, coordinates and (normals)
+		else // Vertices, coordinates and (normals)
+		{
 			ss >> f.textures[0];
 			next = ss.peek();
-			if (next == ' ') { // Only vertices and coordinates
+			if (next == ' ') // Only vertices and coordinates
+			{
 				ss >> f.indices[1] >> expect<'/'> >> f.textures[1]
 				   >> f.indices[2] >> expect<'/'> >> f.textures[2];
-				if (ss.fail()) { throw LoadingException{ "Error loading indices" }; }
+				if (ss.fail())
+				{
+					throw LoadingException{ "Error loading indices" };
+				}
 				ss >> f.indices[3] >> expect<'/'> >> f.textures[3];
-				if (ss.fail()) { f.indices[3] = 0; } // Default to invalid value
+				if (ss.fail()) // Default to invalid value
+				{
+					f.indices[3] = 0;
+				}
 			}
-			else { // Vertices, coordinates and normals
+			else // Vertices, coordinates and normals
+			{
 				ss >> expect<'/'> >> f.normals[0]
 				   >> f.indices[1] >> expect<'/'> >> f.textures[1] >> expect<'/'> >> f.normals[1]
 				   >> f.indices[2] >> expect<'/'> >> f.textures[2] >> expect<'/'> >> f.normals[2];
-				if (ss.fail()) { throw LoadingException{ "Error loading indices" }; }
+				if (ss.fail())
+				{
+					throw LoadingException{ "Error loading indices" };
+				}
 				ss >> f.indices[3] >> expect<'/'> >> f.textures[3] >> expect<'/'> >> f.normals[3];
-				if (ss.fail()) { f.indices[3] = 0; } // Default to invalid value
+				if (ss.fail()) // Default to invalid value
+				{
+					f.indices[3] = 0;
+				}
 			}
 		}
 	}
 	// Pick only first 3 indices, ignoring all the other values. -1 cause obj starts from 1
-	for (int i{ 0 }; i < 3; ++i) {
-		if (f.indices[i] == 0) { throw LoadingException{ "Invalid index" }; }
+	for (int i{ 0 }; i < 3; ++i)
+	{
+		if (f.indices[i] == 0)
+		{
+			throw LoadingException{ "Invalid index" };
+		}
 		Vertex v{};
 		// Recalculate index and put position in vertex
-		unsigned positionIndex{ (f.indices[i] > 0) ? (f.indices[i] - 1) : (positionCount_ + f.indices[i]) };
-		v.position = positions_[positionIndex];
+		unsigned positionIndex{ (f.indices[i] > 0) ? (f.indices[i] - 1) : (mPositionCount + f.indices[i]) };
+		v.position = mPositions[positionIndex];
 		// Put texCoords in vertex
-		unsigned texCoordsIndex{ f.textures[i] > 0 ? (f.textures[i] - 1) : (texCoordsCount_ + f.indices[i]) };
-		if (texCoordsIndex < texCoordsCount_)
-			v.texCoords = texCoords_[texCoordsIndex];
+		unsigned texCoordsIndex{ f.textures[i] > 0 ? (f.textures[i] - 1) : (mTexCoordsCount + f.indices[i]) };
+		if (texCoordsIndex < mTexCoordsCount)
+		{
+			v.texCoords = mTexCoords[texCoordsIndex];
+		}
 		// Put normal in vertex
-		unsigned normalIndex{ f.normals[i] > 0 ? (f.normals[i] - 1) : (normalCount_ + f.indices[i]) };
-		if (normalIndex < normalCount_)
-			v.normal = normals_[normalIndex];
-		indices_.push_back(vertexCount_++);
-		vertices_.push_back(v);
+		unsigned normalIndex{ f.normals[i] > 0 ? (f.normals[i] - 1) : (mNormalCount + f.indices[i]) };
+		if (normalIndex < mNormalCount)
+		{
+			v.normal = mNormals[normalIndex];
+		}
+		mIndices.push_back(mVertexCount++);
+		mVertices.push_back(v);
 	}
 }
 
 
 /// Loads a group
-void WavefrontObject::loadGroup(std::stringstream &ss)
+void WavefrontObject::loadGroup(std::stringstream& ss)
 {
 	loadCachedMesh();
 	std::string command{};
-	currentGroupName_ = "default"; // Default name is default
-	ss >> command >> currentGroupName_;
+	mCurrentGroupName = "default"; // Default name is default
+	ss >> command >> mCurrentGroupName;
 	if (ss.fail())
+	{
 		throw LoadingException{ "Error loading group name" };
+	}
 }
 
 
 /// Loads cached mesh
 void WavefrontObject::loadCachedMesh()
 {
-	if (!vertices_.empty() && !indices_.empty()) {
-		meshes_.push_back( new Mesh{ currentGroupName_, vertices_, indices_, currentMaterial_ });
-		vertices_.clear();
-		vertexCount_ = 0;
-		indices_.clear();
+	if (!mVertices.empty() && !mIndices.empty())
+	{
+		mMeshes.push_back( new Mesh{ mCurrentGroupName, mVertices, mIndices, mCurrentMaterial });
+		mVertices.clear();
+		mVertexCount = 0;
+		mIndices.clear();
 	}
 }
 
 
 /// Loads ambient reflectivity
-void WavefrontObject::loadAmbient(std::stringstream &ss)
+void WavefrontObject::loadAmbient(std::stringstream& ss)
 {
 	std::string command{}; // Read command
 	ss >> command;
-	if (ss.fail() || command != "Ka") { throw LoadingException{ "Error reading Ka command" }; }
+	if (ss.fail() || command != "Ka")
+	{
+		throw LoadingException{ "Error reading Ka command" };
+	}
 	// Load the color into the current material
-	ss >> currentMaterial_->ambient.r >> currentMaterial_->ambient.g >> currentMaterial_->ambient.b;
-	if (ss.fail()) { throw LoadingException{ "Error loading material ambient" }; }
+	ss >> mCurrentMaterial->ambient.r >> mCurrentMaterial->ambient.g >> mCurrentMaterial->ambient.b;
+	if (ss.fail())
+	{
+		throw LoadingException{ "Error loading material ambient" };
+	}
 }
 
 
 /// Loads diffuse reflectivity
-void WavefrontObject::loadDiffuse(std::stringstream &ss)
+void WavefrontObject::loadDiffuse(std::stringstream& ss)
 {
 	std::string command{}; // Read command
 	ss >> command;
-	if (ss.fail() || command != "Kd") { throw LoadingException{ "Error loading Kd command" }; }
+	if (ss.fail() || command != "Kd")
+	{
+		throw LoadingException{ "Error loading Kd command" };
+	}
 	// Load the color into the current material
-	ss >> currentMaterial_->diffuse.r >> currentMaterial_->diffuse.g >> currentMaterial_->diffuse.b;
-	if (ss.fail()) { throw LoadingException{ "Error loading material diffuse" }; }
+	ss >> mCurrentMaterial->diffuse.r >> mCurrentMaterial->diffuse.g >> mCurrentMaterial->diffuse.b;
+	if (ss.fail())
+	{
+		throw LoadingException{ "Error loading material diffuse" };
+	}
 }
 
 
 /// Loads specular reflectivity
-void WavefrontObject::loadSpecular(std::stringstream &ss)
+void WavefrontObject::loadSpecular(std::stringstream& ss)
 {
 	std::string command{}; // Read command
 	ss >> command;
-	if (ss.fail() || command != "Ks") { throw LoadingException{ "Error loading Ks command" }; }
+	if (ss.fail() || command != "Ks")
+	{
+		throw LoadingException{ "Error loading Ks command" };
+	}
 	// Load the color into the current material
-	ss >> currentMaterial_->specular.r >> currentMaterial_->specular.g >> currentMaterial_->specular.b;
-	if (ss.fail()) { throw LoadingException{ "Error loading material specular" }; }
+	ss >> mCurrentMaterial->specular.r >> mCurrentMaterial->specular.g >> mCurrentMaterial->specular.b;
+	if (ss.fail())
+	{
+		throw LoadingException{ "Error loading material specular" };
+	}
 }
 
 
 /// Loads ambient map
-void WavefrontObject::loadAmbientMap(std::stringstream &ss, const std::string & /* path */)
+void WavefrontObject::loadAmbientMap(std::stringstream& ss, const std::string& /* path */)
 {
 	std::string command{}; // Read command
 	ss >> command;
-	if (ss.fail() || command != "map_Ka") { throw LoadingException{ "Error reading map_Ka command" }; }
+	if (ss.fail() || command != "map_Ka")
+	{
+		throw LoadingException{ "Error reading map_Ka command" };
+	}
 	// Do nothing
 }
 
 
 /// Loads diffuse map
-void WavefrontObject::loadDiffuseMap(std::stringstream &ss, const std::string &path)
+void WavefrontObject::loadDiffuseMap(std::stringstream& ss, const std::string& path)
 {
 	std::string command{}; // Read command
 	ss >> command;
 	if (ss.fail() || command != "map_Kd")
+	{
 		throw LoadingException{ "Error loading map_Kd command" };
+	}
 
 	std::string textureName{};
 	ss >> textureName; // Load the texture name
 	if (ss.fail())
+	{
 		throw LoadingException{ "Error loading diffuse map name" };
+	}
 
-	log.info("WavefrontObject: Loading %s %s\n", path.c_str(), textureName.c_str()); // TODO remove debug log
+	Logger::log.info("WavefrontObject: Loading %s %s\n", path.c_str(), textureName.c_str()); // TODO remove debug Logger::log
 	Texture texture{ path
 #ifndef WIN32
 		+ '/'
 #endif
 		+ textureName, TextureType::DIFFUSE };
-	currentMaterial_->diffuseMap    = texture.getId();
-	currentMaterial_->hasDiffuseMap = true;
+	mCurrentMaterial->diffuseMap    = texture.getId();
+	mCurrentMaterial->hasDiffuseMap = true;
 }
 
 
 /// Loads specular map
-void WavefrontObject::loadSpecularMap(std::stringstream &ss, const std::string &path)
+void WavefrontObject::loadSpecularMap(std::stringstream& ss, const std::string& path)
 {
 	std::string command{}; // Read command
 	ss >> command;
 	if (ss.fail() || command != "map_Ks")
+	{
 		throw LoadingException{ "Error loading map_Ks command" };
+	}
 
 	std::string textureName{};
 	ss >> textureName; // Load the texture name
 	if (ss.fail())
+	{
 		throw LoadingException{ "Error loading specular map name" };
+	}
 
 	Texture texture {path
 #ifndef WIN32
 		+ '/'
 #endif
 		+ textureName, TextureType::SPECULAR};
-	currentMaterial_->specularMap    = texture.getId();
-	currentMaterial_->hasSpecularMap = true;
+	mCurrentMaterial->specularMap    = texture.getId();
+	mCurrentMaterial->hasSpecularMap = true;
 }
 
 
 /// Loads cached material
 void WavefrontObject::loadCachedMaterial()
 {
-	if (currentMaterial_ == nullptr)
+	if (mCurrentMaterial == nullptr)
+	{
 		throw LoadingException{ "Current material is null" };
-	materials_.push_back(currentMaterial_);
-	currentMaterial_ = nullptr;
+	}
+	mMaterials.push_back(mCurrentMaterial);
+	mCurrentMaterial = nullptr;
 }
 
 
 /// Creates a new material
-void WavefrontObject::createMaterial(std::stringstream &ss)
+void WavefrontObject::createMaterial(std::stringstream& ss)
 {
-	if (currentMaterial_ != nullptr) { loadCachedMaterial(); }
+	if (mCurrentMaterial != nullptr)
+	{
+		loadCachedMaterial();
+	}
 
 	std::string command{}; // Read command
 	ss >> command;
 	if (ss.fail() || command != "newmtl")
+	{
 		throw LoadingException{ "Error reading newmtl command" };
+	}
 
 	std::string name{}; // Read material name
 	ss >> name;
 	if (ss.fail())
+	{
 		throw LoadingException{ "Error reading material name" };
+	}
 	// Create new current material
-	if (currentMaterial_ != nullptr)
+	if (mCurrentMaterial != nullptr)
+	{
 		throw LoadingException{ "Current material is not null" };
-	currentMaterial_ = new Material{ name };
+	}
+	mCurrentMaterial = new Material{ name };
 }
 
 
 /// Read materials from material library
-void WavefrontObject::loadMaterials(Ifstream &is)
+void WavefrontObject::loadMaterials(Ifstream& is)
 {
 	std::string line;
 	unsigned lineNumber{ 1 };
 
-	while (std::getline(is, line)) {
-		if (line.length() <= 0) { continue; } // Ignore empty lines
+	while (!is.IsEof())
+	{
+		line = is.GetLine();
+		if (line.length() <= 0) // Ignore empty lines
+		{
+			continue;
+		}
 		std::stringstream ss{ line };
-		switch (line[0]) {
+		switch (line[0])
+		{
 		case '#': { break; } // Ignore comment
 		case 'n': { // New material command
-			try { createMaterial(ss); }
-			catch (const LoadingException &e) {
-				log.error("[%d] error: %s\n", lineNumber, e.what());
+			try
+			{
+				createMaterial(ss);
+			}
+			catch (const LoadingException &e)
+			{
+				Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		case 'K': { // K statement
-			if (line.length() <= 1) {
-				log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
+			if (line.length() <= 1)
+			{
+				Logger::log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 				break;
 			}
 			switch (line[1]) {
 			case 'a': { // Ambient
-				try { loadAmbient(ss); }
-				catch (const LoadingException &e) {
-					log.error("[%d] error: %s\n", lineNumber, e.what());
+				try
+				{
+					loadAmbient(ss);
+				}
+				catch (const LoadingException &e)
+				{
+					Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			case 'd': { // Diffuse
-				try { loadDiffuse(ss); }
-				catch (const LoadingException &e) {
-					log.error("[%d] error: %s\n", lineNumber, e.what());
+				try
+				{
+					loadDiffuse(ss);
+				}
+				catch (const LoadingException &e)
+				{
+					Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			case 's': { // Specular
-				try { loadSpecular(ss); }
-				catch (const LoadingException &e) {
-					log.error("[%d] error: %s\n", lineNumber, e.what());
+				try
+				{
+					loadSpecular(ss);
+				}
+				catch (const LoadingException &e)
+				{
+					Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			default: {
-				log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
+				Logger::log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 			}
 			} // End switch line[1]
 			break;
 		}
 		case 'm': { // Map statement
-			if (line.length() <= 6) {
-				log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
+			if (line.length() <= 6)
+			{
+				Logger::log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 				break;
 			}
-			switch (line[5]) {
+			switch (line[5])
+			{
 			case 'a': { // Ambient map
-				try { loadAmbientMap(ss, is.getPath()); }
-				catch (const LoadingException &e) {
-					log.error("[%d] error: %s\n", lineNumber, e.what());
+				try
+				{
+					loadAmbientMap(ss, is.getPath());
+				}
+				catch (const LoadingException &e)
+				{
+					Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			case 'd': { // Diffuse map
-				try { loadDiffuseMap(ss, is.getPath()); }
-				catch (const LoadingException &e) {
-					log.error("[%d] error: %s\n", lineNumber, e.what());
+				try
+				{
+					loadDiffuseMap(ss, is.getPath());
+				}
+				catch (const LoadingException &e)
+				{
+					Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			case 's': { // Specular map
-				try { loadSpecularMap(ss, is.getPath()); }
-				catch (const LoadingException &e) {
-					log.error("[%d] error: %s\n", lineNumber, e.what());
+				try
+				{
+					loadSpecularMap(ss, is.getPath());
+				}
+				catch (const LoadingException &e)
+				{
+					Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			default: {
-				log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
+				Logger::log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 				break;
 			}
 			} // End switch line[5]
 			break;
 		}
 		default: {
-			log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
+			Logger::log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 			break;
 		}
 		} // End switch line[0]
 		++lineNumber;
 	}
-	try {
+	try
+	{
 		loadCachedMaterial();
 	}
-	catch (const LoadingException &e) {
-		log.error("WavefrontObject: No materials loaded, %s\n", e.what());
+	catch (const LoadingException& e)
+	{
+		Logger::log.error("WavefrontObject: No materials loaded, %s\n", e.what());
 	}
 }
 
 
 /// Loads material library
-void WavefrontObject::loadMaterialLibrary(std::stringstream &ss, const std::string &path)
+void WavefrontObject::loadMaterialLibrary(std::stringstream& ss, const std::string& path)
 {
 	std::string command{}; // Read command
 	ss >> command;
 	if (ss.fail() || command != "mtllib")
+	{
 		throw LoadingException{ "Error reading mtllib command" };
+	}
 	
 	std::string mtlName{}; // Read mtl file
 	ss >> mtlName;
 	if (ss.fail())
+	{
 		throw LoadingException{ "Error reading mtl name" };
+	}
 	Ifstream is{ path
 #ifndef WIN32
 		+ '/'
 #endif
 		+ mtlName };
-	if (!is.is_open())
+	if (!is.IsOpen())
+	{
 		throw LoadingException{ "Could not find mtl file: " + path
 #ifndef WIN32
 			+ '/'
 #endif
 			+ mtlName };
+	}
 	loadMaterials(is);
-	
-	while (!ss.fail()) { // Read other optional mtl
+
+	while (!ss.fail()) // Read other optional mtl
+	{
 		ss >> mtlName;
-		if (!ss.fail()) {
+		if (!ss.fail())
+		{
 			Ifstream is{ path
 #ifndef WIN32
 				+ '/'
 #endif
 				+ mtlName };
-			if (!is.is_open())
+			if (!is.IsOpen())
+			{
 				continue;
-			loadMaterials(is);	
+			}
+			loadMaterials(is);
 		}
 	}
 }
 
 
 /// Uses a material
-void WavefrontObject::useMaterial(std::stringstream &ss)
+void WavefrontObject::useMaterial(std::stringstream& ss)
 {
 	std::string command{}; // Read command
 	ss >> command;
 	if (ss.fail() || command != "usemtl")
+	{
 		throw LoadingException{ "Error reading usemtl command"};
+	}
 
 	std::string materialName{}; // Read material name
 	ss >> materialName;
 	if (ss.fail())
+	{
 		throw LoadingException{ "Error reading material name" };
+	}
 
-	for (Material *m : materials_)
+	for (Material* m : mMaterials)
+	{
 		if (m->name == materialName)
-			currentMaterial_ = m;
+		{
+			mCurrentMaterial = m;
+		}
+	}
 }
 
 
 /// Reads a Wavefront Object
-Ifstream &sunspot::operator>>(Ifstream &is, WavefrontObject &obj)
+Ifstream &sunspot::operator>>(Ifstream& is, WavefrontObject& obj)
 {
 	std::string line;
 	unsigned lineNumber{ 1 };
 
-	while (std::getline(is, line)) {
-		if (line.length() <= 0) { continue; } // Ignore empty lines
+	while (!is.IsEof())
+	{
+		line = is.GetLine();
+		if (line.length() <= 0) // Ignore empty lines
+		{
+			continue;
+		}
 		std::stringstream ss{ line };
-		switch (line[0]) {
+		switch (line[0])
+		{
 		case '#': { break; } // Ignore comment
 		case 'o': { // Name command
-			try { obj.loadName(ss); }
-			catch (const LoadingException &e) {
-				WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
+			try
+			{
+				obj.loadName(ss);
+			}
+			catch (const LoadingException& e)
+			{
+				Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		case 'v': {
-			if (line.length() < 2) {
-				WavefrontObject::log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
+			if (line.length() < 2)
+			{
+				Logger::log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 				break;
 			}
-			switch (line[1]) {
+			switch (line[1])
+			{
 				case ' ': { // Vertex command
-					try { obj.loadPosition(ss); }
-					catch (const LoadingException &e) {
-						WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
+					try
+					{
+						obj.loadPosition(ss);
+					}
+					catch (const LoadingException& e)
+					{
+						Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 					}
 					break;
 				}
-				case 'p': {	WavefrontObject::log.info("Point in the parameter space of a curve or a surface not supported\n");
+				case 'p': {
+					Logger::log.info("Point in the parameter space of a curve or a surface not supported\n");
 					break;
 				}
 				case 'n': { // Vertex Normal command
-					try { obj.loadNormal(ss); }
-					catch (const LoadingException &e) {
-						WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
+					try
+					{
+						obj.loadNormal(ss);
+					}
+					catch (const LoadingException& e)
+					{
+						Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 					}
 					break;
 				}
 				case 't': { // Texture Coordinate command
-					try { obj.loadTexCoords(ss); }
-					catch (const LoadingException &e) {
-						WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
+					try
+					{
+						obj.loadTexCoords(ss);
+					}
+					catch (const LoadingException& e)
+					{
+						Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 					}
 					break;
 				}
@@ -551,35 +735,51 @@ Ifstream &sunspot::operator>>(Ifstream &is, WavefrontObject &obj)
 			break;
 		}
 		case 'f': { // Face command
-			try { obj.loadIndices(ss); }
-			catch (const LoadingException &e) {
-				WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
+			try
+			{
+				obj.loadIndices(ss);
+			}
+			catch (const LoadingException& e)
+			{
+				Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		case 'g': { // Group command
-			try { obj.loadGroup(ss); }
-			catch (const LoadingException &e) {
-				WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
+			try
+			{
+				obj.loadGroup(ss);
+			}
+			catch (const LoadingException& e)
+			{
+				Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		case 'm': { // Material Library Command
-			try { obj.loadMaterialLibrary(ss, is.getPath()); }
-			catch (const LoadingException &e) {
-				WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
+			try
+			{
+				obj.loadMaterialLibrary(ss, is.getPath());
+			}
+			catch (const LoadingException& e)
+			{
+				Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		case 'u': { // Use material command
-			try { obj.useMaterial(ss); }
-			catch (const LoadingException &e) {
-				WavefrontObject::log.error("[%d] error: %s\n", lineNumber, e.what());
+			try
+			{
+				obj.useMaterial(ss);
+			}
+			catch (const LoadingException& e)
+			{
+				Logger::log.error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		default: {
-			WavefrontObject::log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
+			Logger::log.error("[%d] ignored: %s\n", lineNumber, line.c_str());
 			break;
 		}}
 		++lineNumber;

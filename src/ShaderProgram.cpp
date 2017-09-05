@@ -2,44 +2,51 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "Logger.h"
 #include "ShaderProgram.h"
+#include "android/AssetManager.h"
 
 using namespace sunspot;
 
 
-const Logger ShaderProgram::log{};
+static const char VERTEX_SHADER[]   = "shaders/base.vert";
+static const char FRAGMENT_SHADER[] = "shaders/base.frag";
 
-
-ShaderProgram::ShaderProgram(const char *depth)
-	: baseProgram_ { glCreateProgram() }
-	, depthProgram_{ glCreateProgram() }
+ShaderProgram::ShaderProgram(const char* depth)
+:	mBaseProgram { glCreateProgram() }
+,	mDepthProgram{ glCreateProgram() }
 {
-	ShaderSource vertexSource{ "shader/base.vert" };
-	GLuint vertexShader{ compileShader(GL_VERTEX_SHADER, vertexSource) };
+	ShaderSource vertexSource  { VERTEX_SHADER   };
+	ShaderSource fragmentSource{ FRAGMENT_SHADER };
 
-	ShaderSource fragmentSource{ "shader/base.frag" };
+	GLuint vertexShader  { compileShader(GL_VERTEX_SHADER,   vertexSource)   };
 	GLuint fragmentShader{ compileShader(GL_FRAGMENT_SHADER, fragmentSource) };
 
-	linkProgram(baseProgram_, vertexShader, fragmentShader);
+	linkProgram(mBaseProgram, vertexShader, fragmentShader);
 
 	ShaderSource depthSource{ depth };
 	GLuint depthShader{ compileShader(GL_FRAGMENT_SHADER, depthSource) };
-	
-	linkProgram(depthProgram_, vertexShader, depthShader);
+
+	linkProgram(mDepthProgram, vertexShader, depthShader);
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 	glDeleteShader(depthShader);
 
-	// TODO Handle some errors like vertexShader == 0, baseProgram_ == 0, etc.
+	// TODO Handle some errors like vertexShader == 0, mBaseProgram == 0, etc.
 
-	log.info("ShaderProgram: created\n"); // TODO remove debug log
+	Logger::log.info("ShaderProgram: created\n"); // TODO remove debug log
 }
 
 
-ShaderProgram::ShaderProgram(const char *vertex, const char *fragment)
-	: baseProgram_ { glCreateProgram() }
-	, depthProgram_{ glCreateProgram() }
+ShaderProgram::ShaderProgram()
+:	ShaderProgram{ VERTEX_SHADER, FRAGMENT_SHADER }
+{}
+
+
+ShaderProgram::ShaderProgram(const char* vertex, const char* fragment)
+:	mBaseProgram { glCreateProgram() }
+,	mDepthProgram{ glCreateProgram() }
 {
 	ShaderSource vertexSource  { vertex   };
 	ShaderSource fragmentSource{ fragment };
@@ -47,22 +54,22 @@ ShaderProgram::ShaderProgram(const char *vertex, const char *fragment)
 	GLuint vertexShader  { compileShader(GL_VERTEX_SHADER,   vertexSource)   };
 	GLuint fragmentShader{ compileShader(GL_FRAGMENT_SHADER, fragmentSource) };
 
-	linkProgram(baseProgram_, vertexShader, fragmentShader);
-	
+	linkProgram(mBaseProgram, vertexShader, fragmentShader);
+
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
-	
-	// TODO Handle some errors like vertexShader == 0, baseProgram_ == 0, etc.
 
-	log.info("ShaderProgram: created\n"); // TODO remove debug log
+	// TODO Handle some errors like vertexShader == 0, mBaseProgram == 0, etc.
+
+	Logger::log.info("ShaderProgram: created\n"); // TODO remove debug log
 }
 
 
 ShaderProgram::~ShaderProgram()
 {
-	glDeleteProgram(depthProgram_);
-	glDeleteProgram(baseProgram_);
-	log.info("ShaderProgram: destroyed\n"); // TODO remove debug log
+	glDeleteProgram(mDepthProgram);
+	glDeleteProgram(mBaseProgram);
+	Logger::log.info("ShaderProgram: destroyed\n"); // TODO remove debug log
 }
 
 
@@ -86,7 +93,7 @@ void ShaderProgram::linkProgram(const GLuint program, const GLuint vertex, const
 }
 
 
-GLuint ShaderProgram::compileShader(const GLenum type, const ShaderSource &source)
+GLuint ShaderProgram::compileShader(const GLenum type, const ShaderSource& source)
 {
 	GLuint shader{ glCreateShader(type) }; // Create a shader object
 	glShaderSource(shader, 1, &source.handle, nullptr);
@@ -105,17 +112,25 @@ GLuint ShaderProgram::compileShader(const GLenum type, const ShaderSource &sourc
 }
 
 
-ShaderSource::ShaderSource(const char *p)
-	: path{ p }
-	, handle{ nullptr }
+ShaderSource::ShaderSource(const char* p)
+:	path{ p }
+,	handle{ nullptr }
 {
-#ifdef WIN32
+#ifdef ANDROID
+	Asset file{ AssetManager::assets.Open(p) };
+	char* content{ file.GetContent() };
+	size_t length{ file.GetLength() };
+	handle = static_cast<GLchar*>(malloc(length * sizeof(char)));
+	memcpy(handle, content, length);
+#else // other systems
+	#ifdef WIN32
 	FILE *file{};
 	fopen_s(&file, path, "r");
-#else
+	#else
 	FILE *file {fopen(path, "r")};
-#endif
-	if (file == nullptr) {
+	#endif
+	if (file == nullptr)
+	{
 		std::string message{ "Could not open shader file: " };
 		throw ShaderException{ message + path };
 	}
@@ -131,6 +146,7 @@ ShaderSource::ShaderSource(const char *p)
 	}
 	handle[length - 1] = 0;
 	fclose(file);
+#endif // ANDROID
 }
 
 ShaderSource::~ShaderSource()

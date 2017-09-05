@@ -8,21 +8,19 @@
 #include "Graphics.h"
 #include "Mesh.h"
 #include "Ifstream.h"
-#include "Logger.h"
 
-namespace mst = mathspot;
 
 namespace sunspot {
 
-class ShaderProgram;
+class  ShaderProgram;
 struct Vertex;
-class Texture;
-class Mesh;
+class  Texture;
+class  Mesh;
 
 
 class LoadingException : public std::runtime_error {
-  public:
-	LoadingException(const std::string &message) : std::runtime_error(message) {}
+public:
+	LoadingException(const std::string& message) : std::runtime_error(message) {}
 };
 
 
@@ -35,59 +33,58 @@ struct Face {
 
 class WavefrontObject {
 public:
-	static const Logger log;
 	WavefrontObject();
 	~WavefrontObject();
 
-	inline std::string &getName() { return name_; }
-	inline std::vector<Vertex> &getVertices() { return vertices_; }
-	inline std::vector<GLuint> &getIndices() { return indices_; }
-	inline std::vector<Texture> &getTextures() { return textures_; }
+	inline std::string& getName() { return mName; }
+	inline std::vector<Vertex>& getVertices()  { return mVertices; }
+	inline std::vector<GLuint>& getIndices()   { return mIndices;  }
+	inline std::vector<Texture>& getTextures() { return mTextures; }
 
 	void draw(const ShaderProgram& shader) const;
 
 private:
-	void loadName(std::stringstream &ss);
-	void loadPosition(std::stringstream &ss);
-	void loadTexCoords(std::stringstream &ss);
-	void loadNormal(std::stringstream &ss);
-	void loadIndices(std::stringstream &ss);
-	void loadGroup(std::stringstream &ss);
+	void loadName(std::stringstream& ss);
+	void loadPosition(std::stringstream& ss);
+	void loadTexCoords(std::stringstream& ss);
+	void loadNormal(std::stringstream& ss);
+	void loadIndices(std::stringstream& ss);
+	void loadGroup(std::stringstream& ss);
 	void loadCachedMesh();
 
-	void createMaterial(std::stringstream &ss);
-	void loadAmbient(std::stringstream &ss);
-	void loadDiffuse(std::stringstream &ss);
-	void loadSpecular(std::stringstream &ss);
-	void loadAmbientMap(std::stringstream &ss, const std::string &path);
-	void loadDiffuseMap(std::stringstream &ss, const std::string &path);
-	void loadSpecularMap(std::stringstream &ss, const std::string &path);
+	void createMaterial(std::stringstream& ss);
+	void loadAmbient(std::stringstream& ss);
+	void loadDiffuse(std::stringstream& ss);
+	void loadSpecular(std::stringstream& ss);
+	void loadAmbientMap(std::stringstream& ss, const std::string& path);
+	void loadDiffuseMap(std::stringstream& ss, const std::string& path);
+	void loadSpecularMap(std::stringstream& ss, const std::string& path);
 
-	void loadMaterials(Ifstream &is);
-	void loadMaterialLibrary(std::stringstream &ss, const std::string &path);
-	void useMaterial(std::stringstream &ss);
+	void loadMaterials(Ifstream& is);
+	void loadMaterialLibrary(std::stringstream& ss, const std::string& path);
+	void useMaterial(std::stringstream& ss);
 	void loadCachedMaterial();
 
-	friend Ifstream &operator>>(Ifstream &is, WavefrontObject &obj);
+	friend Ifstream& operator>>(Ifstream& is, WavefrontObject& obj);
 
-	std::string name_;
+	std::string mName;
 
-	std::string currentGroupName_;
-	unsigned positionCount_;
-	unsigned normalCount_;
-	unsigned texCoordsCount_;
-	unsigned vertexCount_;
+	std::string mCurrentGroupName;
+	unsigned mPositionCount;
+	unsigned mNormalCount;
+	unsigned mTexCoordsCount;
+	unsigned mVertexCount;
 
-	std::vector<mst::Vec3> positions_;
-	std::vector<mst::Vec2> texCoords_;
-	std::vector<mst::Vec3> normals_;
-	std::vector<Vertex> vertices_;
-	std::vector<GLuint> indices_;
-	std::vector<Texture> textures_;
-	std::vector<Mesh *> meshes_;
+	std::vector<mst::Vec3> mPositions;
+	std::vector<mst::Vec2> mTexCoords;
+	std::vector<mst::Vec3> mNormals;
+	std::vector<Vertex>    mVertices;
+	std::vector<GLuint>    mIndices;
+	std::vector<Texture>   mTextures;
+	std::vector<Mesh*>     mMeshes;
 	
-	Material *currentMaterial_;
-	std::vector<Material *> materials_;
+	Material* mCurrentMaterial;
+	std::vector<Material*> mMaterials;
 };
 
 

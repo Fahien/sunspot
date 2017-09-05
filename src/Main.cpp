@@ -26,7 +26,7 @@ static float near{ 0.125f };
 static float far{ 32.0f };
 
 static const std::string tag{ "Main" };
-static const std::string crateName{ "data/monument/monument.obj" };
+static const std::string crateName{ "data/cube/room.obj" };
 
 
 void printLogo()
