@@ -4,13 +4,12 @@
 #include <string>
 #include <stdexcept>
 #include <vector>
+#include <MathSpot.h>
 
 #include "Graphics.h"
-#include "Math.h"
 #include "Cursor.h"
 
-
-class Camera;
+namespace mst = mathspot;
 
 
 namespace sunspot {
@@ -20,6 +19,7 @@ class ShaderProgram;
 class Light;
 class WavefrontObject;
 class Framebuffer;
+class Camera;
 
 
 class GlewException : public GraphicException {
@@ -32,9 +32,9 @@ class Window {
 public:
 	static const std::string tag;
 
-	Window(const char *title, const math::Size windowSize, const bool decorated, const bool stereoscopic);
+	Window(const char *title, const mst::Size windowSize, const bool decorated, const bool stereoscopic);
 
-	inline math::Size &getFrameSize() { return frameSize_; }
+	inline mst::Size &getFrameSize() { return frameSize_; }
 	inline void setBaseProgram(const ShaderProgram *baseProgram) { baseProgram_ = baseProgram; }
 	inline void setLight(Light *light) { light_ = light; }
 	inline void addObj(WavefrontObject *obj) { objs_.push_back(obj); }
@@ -58,9 +58,9 @@ protected:
 	virtual void updateFrameSize() = 0;
 
 	const char* title_;
-	math::Size windowSize_;
-	math::Size monitorSize_;
-	math::Size frameSize_;
+	mst::Size windowSize_;
+	mst::Size monitorSize_;
+	mst::Size frameSize_;
 
 	bool decorated_;
 	bool stereoscopic_;
@@ -71,7 +71,7 @@ protected:
 	float deltaTime_;
 
 	Cursor cursor_;
-	Camera *camera_;
+	Camera* camera_;
 
 private:
 	void render(const float &deltaTime);

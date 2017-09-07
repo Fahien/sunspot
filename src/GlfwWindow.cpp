@@ -12,8 +12,8 @@ const Logger GlfwWindow::log{};
 const std::string GlfwWindow::tag{ "GlfwWindow" };
 
 
-GlfwWindow::GlfwWindow(const char *title,
-                       const math::Size windowSize,
+GlfwWindow::GlfwWindow(const char* title,
+                       const mst::Size windowSize,
                        const bool decorated,
                        const bool stereoscopic)
 	: Window::Window{ title, windowSize, decorated, stereoscopic }

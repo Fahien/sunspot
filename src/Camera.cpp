@@ -5,98 +5,100 @@
 #include "ShaderProgram.h"
 
 using namespace sunspot;
-
+namespace mst = mathspot;
 
 Camera::Camera(const float fov, const float aspectRatio, const float near, const float far)
-	: rotation_{ math::Mat4::identity }
-	, translation_{ math::Mat4::identity }
-	, view_{ math::Mat4::identity }
-	, projection_{}
-	, pitch_{ 0.0f }
-	, yaw_{ -math::pi / 2.0f }
-	, position_{ 0.0f, 0.0f, -1.0f }
-	, direction_{ 0.0f, 0.0f, 1.0f }
-	, up_{ 0.0f, 1.0f, 0.0f }
-	, right_{ 1.0f, 0.0f, 0.0f }
-	, worldUp_{ 0.0f, 1.0f, 0.0f }
-	, velocity_{}
-	, velocityFactor_{ 8.0f }
+	: mRotation{ mst::Mat4::identity }
+	, mTranslation{ mst::Mat4::identity }
+	, mView{ mst::Mat4::identity }
+	, mProjection{}
+	, mPitch{ 0.0f }
+	, mYaw{ -mst::pi / 2.0f }
+	, mPosition{ 0.0f, 0.0f, -1.0f }
+	, mDirection{ 0.0f, 0.0f, 1.0f }
+	, mUp{ 0.0f, 1.0f, 0.0f }
+	, mRight{ 1.0f, 0.0f, 0.0f }
+	, mWorldUp{ 0.0f, 1.0f, 0.0f }
+	, mVelocity{}
+	, mVelocityFactor{ 8.0f }
 {
-	float cotfov{ 1.0f / static_cast<float>(std::tan(fov * math::pi / 360.0f)) };
-	projection_[0] = cotfov / aspectRatio;
-	projection_[5] = cotfov;
-	projection_[10] = (near + far) / (near - far);
-	projection_[14] = 2 * near * far / (near - far);
-	projection_[11] = -1;
+	float cotfov{ 1.0f / static_cast<float>(std::tan(fov * mst::pi / 360.0f)) };
+	mProjection[0] = cotfov / aspectRatio;
+	mProjection[5] = cotfov;
+	mProjection[10] = (near + far) / (near - far);
+	mProjection[14] = 2 * near * far / (near - far);
+	mProjection[11] = -1;
 	updateVectors();
 }
 
 void Camera::setPosition(const float x, const float y, const float z)
 {
-	position_.x = x;
-	position_.y = y;
-	position_.z = z;
+	mPosition.x = x;
+	mPosition.y = y;
+	mPosition.z = z;
 }
 
 
 void Camera::updateVectors()
 {
-	float cospitch{ static_cast<float>(std::cos(pitch_)) };
-	float sinpitch{ static_cast<float>(std::sin(pitch_)) };
-	float cosyaw{ static_cast<float>(std::cos(yaw_)) };
-	float sinyaw{ static_cast<float>(std::sin(yaw_)) };
-	direction_.x = cospitch * cosyaw;
-	direction_.y = sinpitch;
-	direction_.z = cospitch * sinyaw;
-	direction_.normalize();
-	right_ = math::Vec3::cross(direction_, worldUp_);
-	right_.normalize();
-	up_ = math::Vec3::cross(right_, direction_);
-	up_.normalize();
+	float cospitch{ static_cast<float>(std::cos(mPitch)) };
+	float sinpitch{ static_cast<float>(std::sin(mPitch)) };
+	float cosyaw{ static_cast<float>(std::cos(mYaw)) };
+	float sinyaw{ static_cast<float>(std::sin(mYaw)) };
+	mDirection.x = cospitch * cosyaw;
+	mDirection.y = sinpitch;
+	mDirection.z = cospitch * sinyaw;
+	mDirection.normalize();
+	mRight = mst::Vec3::cross(mDirection, mWorldUp);
+	mRight.normalize();
+	mUp = mst::Vec3::cross(mRight, mDirection);
+	mUp.normalize();
 }
 
 
 void Camera::updateView()
 {
-	rotation_[0] = right_.x;
-	rotation_[1] = up_.x;
-	rotation_[2] = direction_.x;
-	rotation_[4] = right_.y;
-	rotation_[5] = up_.y;
-	rotation_[6] = direction_.y;
-	rotation_[8] = right_.z;
-	rotation_[9] = up_.z;
-	rotation_[10] = direction_.z;
-	translation_[12] = -position_.x;
-	translation_[13] = -position_.y;
-	translation_[14] = -position_.z;
-	view_ = rotation_ * translation_;
+	mRotation[0] = mRight.x;
+	mRotation[1] = mUp.x;
+	mRotation[2] = mDirection.x;
+	mRotation[4] = mRight.y;
+	mRotation[5] = mUp.y;
+	mRotation[6] = mDirection.y;
+	mRotation[8] = mRight.z;
+	mRotation[9] = mUp.z;
+	mRotation[10] = mDirection.z;
+	mTranslation[12] = -mPosition.x;
+	mTranslation[13] = -mPosition.y;
+	mTranslation[14] = -mPosition.z;
+	mView = mRotation * mTranslation;
 }
 
 
-void Camera::update(const float deltaTime, const ShaderProgram *program)
+void Camera::update(const float deltaTime, const ShaderProgram& program)
 {
-	if (velocity_.x != 0.0f) {
-		position_.x += right_.x * velocity_.x * velocityFactor_ * deltaTime;
-		position_.y += right_.y * velocity_.x * velocityFactor_ * deltaTime;
-		position_.z += right_.z * velocity_.x * velocityFactor_ * deltaTime;
+	if (mVelocity.x != 0.0f) {
+		mPosition.x += mRight.x * mVelocity.x * mVelocityFactor * deltaTime;
+		mPosition.y += mRight.y * mVelocity.x * mVelocityFactor * deltaTime;
+		mPosition.z += mRight.z * mVelocity.x * mVelocityFactor * deltaTime;
 	}
-	if (velocity_.y != 0.0f) {
-		position_.x += up_.x * velocity_.y * velocityFactor_ * deltaTime;
-		position_.y += up_.y * velocity_.y * velocityFactor_ * deltaTime;
-		position_.z += up_.z * velocity_.y * velocityFactor_ * deltaTime;
+	if (mVelocity.y != 0.0f) {
+		mPosition.x += mUp.x * mVelocity.y * mVelocityFactor * deltaTime;
+		mPosition.y += mUp.y * mVelocity.y * mVelocityFactor * deltaTime;
+		mPosition.z += mUp.z * mVelocity.y * mVelocityFactor * deltaTime;
 	}
-	if (velocity_.z != 0.0f) {
-		position_.x += direction_.x * velocity_.z * velocityFactor_ * deltaTime;
-		position_.y += direction_.y * velocity_.z * velocityFactor_ * deltaTime;
-		position_.z += direction_.z * velocity_.z * velocityFactor_ * deltaTime;
+	if (mVelocity.z != 0.0f) {
+		mPosition.x += mDirection.x * mVelocity.z * mVelocityFactor * deltaTime;
+		mPosition.y += mDirection.y * mVelocity.z * mVelocityFactor * deltaTime;
+		mPosition.z += mDirection.z * mVelocity.z * mVelocityFactor * deltaTime;
 	}
 	updateView();
 
-	GLuint location{ program->getLocation("view") };
-	glUniformMatrix4fv(location, 1, GL_FALSE, view_.matrix);
-	location = program->getLocation("projection");
-	glUniformMatrix4fv(location, 1, GL_FALSE, projection_.matrix);
-	location = program->getLocation("camera.position");
-	glUniform3fv(location, 1, &position_.x);
+	GLuint location{ program.getLocation("view") };
+	glUniformMatrix4fv(location, 1, GL_FALSE, mView.matrix);
+
+	location = program.getLocation("projection");
+	glUniformMatrix4fv(location, 1, GL_FALSE, mProjection.matrix);
+
+	location = program.getLocation("camera.position");
+	glUniform3fv(location, 1, &mPosition.x);
 };

@@ -23,7 +23,7 @@ class GlfwWindow : public Window
 public:
 	static const Logger log;
 	static const std::string tag;
-	GlfwWindow(const char *title, const math::Size windowSize, const bool decorated, const bool stereoscopic);
+	GlfwWindow(const char *title, const mst::Size windowSize, const bool decorated, const bool stereoscopic);
 	~GlfwWindow();
 
 	void loop();

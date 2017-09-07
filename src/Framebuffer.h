@@ -3,10 +3,11 @@
 
 #include <stdexcept>
 #include <string>
+#include <MathSpot.h>
 
 #include "Graphics.h"
-#include "Math.h"
-#include "Logger.h"
+
+namespace mst = mathspot;
 
 
 namespace sunspot {
@@ -16,34 +17,34 @@ class ShaderProgram;
 
 
 class FramebufferException : public std::runtime_error {
-  public:
+public:
 	FramebufferException(const std::string& tag, const std::string& message) : std::runtime_error(tag + ": " + message) {}
 };
 
 
 class Framebuffer {
-  public:
-	static const Logger log;
+public:
 	static const std::string tag;
 
-	Framebuffer(const math::Size &size);
+	Framebuffer(const mst::Size& size);
 	~Framebuffer();
 
-	inline GLsizei getWidth() const { return size_.width; }
-	inline GLsizei getHeight() const { return size_.height; }
-	inline void bind() const { glBindFramebuffer(GL_FRAMEBUFFER, fbo_); }
-	inline void unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+	inline GLsizei getWidth()  const { return mSize.width;  }
+	inline GLsizei getHeight() const { return mSize.height; }
 
-	void bindColorTexture(const ShaderProgram *program) const;
-	void bindDepthTexture(const ShaderProgram *program) const;
+	inline void bind()   const { glBindFramebuffer(GL_FRAMEBUFFER, mFbo); }
+	inline void unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0);    }
 
-  private:
-	const math::Size size_;
-	GLuint fbo_;
-	GLuint colorTexture_;
-	GLuint depthTexture_;
-	GLuint headerTexture_;
-	GLuint rbo_;
+	void bindColorTexture(const ShaderProgram& program) const;
+	void bindDepthTexture(const ShaderProgram& program) const;
+
+private:
+	const mst::Size mSize;
+	GLuint mFbo;
+	GLuint mColorTexture;
+	GLuint mDepthTexture;
+	GLuint mHeaderTexture;
+	GLuint mRbo;
 };
 
 

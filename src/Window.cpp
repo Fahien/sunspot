@@ -20,7 +20,7 @@ using namespace sunspot;
 const std::string Window::tag{ "Window" };
 
 
-Window::Window(const char* title, const math::Size windowSize, const bool decorated, const bool stereoscopic)
+Window::Window(const char* title, const mst::Size windowSize, const bool decorated, const bool stereoscopic)
 	: title_{ title }
 	, windowSize_{ windowSize }
 	, monitorSize_{ windowSize }
@@ -73,7 +73,7 @@ void Window::render3D(const float &deltaTime) // TODO comment
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
 	baseProgram_->use();
-	camera_->update(deltaTime, baseProgram_);
+	camera_->update(deltaTime, *baseProgram_);
 	light_->update(baseProgram_);
 	for (WavefrontObject *obj : objs_) { obj->draw(*baseProgram_); }
 }
@@ -107,7 +107,7 @@ void Window::renderStereoscopic(const float &deltaTime)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
 	baseProgram_->use();
-	camera_->update(deltaTime, baseProgram_);
+	camera_->update(deltaTime, *baseProgram_);
 	light_->update(baseProgram_);
 	for (WavefrontObject *obj : objs_) { obj->draw(*baseProgram_); }
 	framebuffer_->unbind();
@@ -122,7 +122,7 @@ void Window::renderStereoscopic(const float &deltaTime)
 	quad_->bind();
 	glViewport(0, 0, frameSize_.width / 2, frameSize_.height);
 	quadProgram_->use();
-	framebuffer_->bindColorTexture(quadProgram_); // Render color on the left
+	framebuffer_->bindColorTexture(*quadProgram_); // Render color on the left
 	quad_->render();
 
 #ifdef SST_PROFILING
@@ -131,7 +131,7 @@ void Window::renderStereoscopic(const float &deltaTime)
 
 	glViewport(frameSize_.width / 2, 0, frameSize_.width / 2, frameSize_.height);
 	depthProgram_->use();
-	framebuffer_->bindDepthTexture(depthProgram_); // Render depth on the right
+	framebuffer_->bindDepthTexture(*depthProgram_); // Render depth on the right
 	quad_->render();
 	quad_->unbind();
 	// End Second pass
