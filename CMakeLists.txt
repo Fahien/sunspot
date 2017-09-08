@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7.2)
+cmake_minimum_required(VERSION 3.4.1)
 include(CMakeToolsHelpers OPTIONAL)
 project(SunSpoT)
 
@@ -14,7 +14,7 @@ set(SST_TITLE "SunSpoT")
 
 # Configure a header file to pass some of the CMake settings to the source code
 configure_file(
-	"${PROJECT_SOURCE_DIR}/src/Config.h.in"
+	"${PROJECT_SOURCE_DIR}/source/Config.h.in"
 	"${PROJECT_SOURCE_DIR}/include/Config.h")
 
 # Specify the paths in which the linker should search for libraries
@@ -32,45 +32,43 @@ set(SHADERS
 source_group("Shaders" FILES ${SHADERS})
 
 set(SOURCES
-	src/Logger.h
-	src/Logger.cpp
-	src/Graphics.h
-	src/ShaderProgram.h
-	src/ShaderProgram.cpp
-	src/Math.h
-	src/Math.cpp
-	src/collision/BoundingBox.h
-	src/collision/BoundingBox.cpp
-	src/collision/CollisionSystem.h
-	src/collision/CollisionSystem.cpp
-	src/Cursor.h
-	src/Cursor.cpp
-	src/Window.h
-	src/Window.cpp
-	src/GlfwWindow.h
-	src/GlfwWindow.cpp
-	src/Texture.h
-	src/Texture.cpp
-	src/Ifstream.h
-	src/Ifstream.cpp
-	src/Material.h
-	src/Material.cpp
-	src/Mesh.h
-	src/Mesh.cpp
-	src/WavefrontObject.h
-	src/WavefrontObject.cpp
-	src/Color.h
-	src/Color.cpp
-	src/Material.h
-	src/Light.h
-	src/Light.cpp
-	src/Quad.h
-	src/Quad.cpp
-	src/Framebuffer.h
-	src/Framebuffer.cpp
-	src/Camera.h
-	src/Camera.cpp
-	src/Main.cpp)
+	source/Logger.h
+	source/Logger.cpp
+	source/Graphics.h
+	source/ShaderProgram.h
+	source/ShaderProgram.cpp
+	source/collision/BoundingBox.h
+	source/collision/BoundingBox.cpp
+	source/collision/CollisionSystem.h
+	source/collision/CollisionSystem.cpp
+	source/Cursor.h
+	source/Cursor.cpp
+	source/Window.h
+	source/Window.cpp
+	source/GlfwWindow.h
+	source/GlfwWindow.cpp
+	source/Texture.h
+	source/Texture.cpp
+	source/Ifstream.h
+	source/Ifstream.cpp
+	source/Material.h
+	source/Material.cpp
+	source/Mesh.h
+	source/Mesh.cpp
+	source/WavefrontObject.h
+	source/WavefrontObject.cpp
+	source/Color.h
+	source/Color.cpp
+	source/Material.h
+	source/Light.h
+	source/Light.cpp
+	source/Quad.h
+	source/Quad.cpp
+	source/Framebuffer.h
+	source/Framebuffer.cpp
+	source/Camera.h
+	source/Camera.cpp
+	source/Main.cpp)
 source_group("Sources" FILES ${SOURCES})
 
 set(CMAKE_C_STANDARD 11)

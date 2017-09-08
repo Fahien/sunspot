@@ -74,7 +74,7 @@ void Window::render3D(const float &deltaTime) // TODO comment
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
 	baseProgram_->use();
 	camera_->update(deltaTime, *baseProgram_);
-	light_->update(baseProgram_);
+	light_->update(*baseProgram_);
 	for (WavefrontObject *obj : objs_) { obj->draw(*baseProgram_); }
 }
 
@@ -108,7 +108,7 @@ void Window::renderStereoscopic(const float &deltaTime)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
 	baseProgram_->use();
 	camera_->update(deltaTime, *baseProgram_);
-	light_->update(baseProgram_);
+	light_->update(*baseProgram_);
 	for (WavefrontObject *obj : objs_) { obj->draw(*baseProgram_); }
 	framebuffer_->unbind();
 	// End First pass

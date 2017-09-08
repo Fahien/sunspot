@@ -3,13 +3,14 @@
 
 #include <vector>
 #include <functional>
-#include "../Math.h"
+#include <MathSpot.h>
 
+namespace mst = mathspot;
 
 namespace sunspot
 {
 
-class BoundingBox : public math::Rectangle
+class BoundingBox : public mst::Rectangle
 {
 public:
 	BoundingBox();
