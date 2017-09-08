@@ -1,6 +1,12 @@
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 3.6)
 include(CMakeToolsHelpers OPTIONAL)
 project(SunSpoT)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES Android)
+	set(ANDROID TRUE)
+else()
+	set(ANDROID FALSE)
+endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/cmake")
 message("Searching modules in ${CMAKE_MODULE_PATH}")
@@ -19,9 +25,27 @@ configure_file(
 
 # Specify the paths in which the linker should search for libraries
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${PROJECT_SOURCE_DIR}")
-find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(GLFW REQUIRED)
+
+set(DEPENDENCY_INCLUDE_DIRECTORIES
+	${PROJECT_SOURCE_DIR}/include
+	${PROJECT_SOURCE_DIR}/source/android
+	${PROJECT_SOURCE_DIR}/source)
+
+if(${ANDROID})
+	set(DEPENDENCY_LIBRARIES "GLESv3 android EGL log m ndk-helper")
+else()
+	find_package(OpenGL REQUIRED)
+	find_package(GLEW REQUIRED)
+	find_package(GLFW REQUIRED)
+	set(DEPENDENCY_LIBRARIES
+		${OPENGL_LIBRARIES}
+		${GLEW_LIBRARIES}
+		${GLFW_LIBRARIES})
+	set(DEPENCENDY_INCLUDE_DIRECTORIES
+		${OPENGL_INCLUDE_DIR}
+		${GLEW_INCLUDE_DIR}
+		${GLFW_INCLUDE_DIR})
+endif()
 
 set(SHADERS
 	shader/base.vert
@@ -35,18 +59,14 @@ set(SOURCES
 	source/Logger.h
 	source/Logger.cpp
 	source/Graphics.h
-	source/ShaderProgram.h
-	source/ShaderProgram.cpp
+	source/android/ShaderProgram.h
+	source/android/ShaderProgram.cpp
 	source/collision/BoundingBox.h
 	source/collision/BoundingBox.cpp
 	source/collision/CollisionSystem.h
 	source/collision/CollisionSystem.cpp
 	source/Cursor.h
 	source/Cursor.cpp
-	source/Window.h
-	source/Window.cpp
-	source/GlfwWindow.h
-	source/GlfwWindow.cpp
 	source/Texture.h
 	source/Texture.cpp
 	source/Ifstream.h
@@ -67,13 +87,26 @@ set(SOURCES
 	source/Framebuffer.h
 	source/Framebuffer.cpp
 	source/Camera.h
-	source/Camera.cpp
-	source/Main.cpp)
+	source/Camera.cpp)
+
+if(NOT ${ANDROID})
+	set(SOURCES ${SOURCES}
+		source/Window.h
+		source/Window.cpp
+		source/GlfwWindow.h
+		source/GlfwWindow.cpp
+		source/Main.cpp)
+endif()
+
 source_group("Sources" FILES ${SOURCES})
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
-add_executable(sunspot ${SOURCES} ${SHADERS})
+if(${ANDROID})
+	add_library(sunspot ${SOURCES} ${SHADERS})
+else()
+	add_executable(sunspot ${SOURCES} ${SHADERS})
+endif()
 
 # MathSpoT
 set(MATHSPOT mathspot)
@@ -88,21 +121,16 @@ set(SOIL_INCLUDE_DIR ${SOIL}/src)
 set(SOIL_LIBRARIES SOIL)
 
 # Add the given directories to those the compiler uses to search for include files
-if(${OPENGL_INCLUDE_DIR})
-	target_include_directories(sunspot PUBLIC "${OPENGL_INCLUDE_DIR}")
-endif()
+
 target_include_directories(sunspot PUBLIC
-	${GLEW_INCLUDE_DIR}
-	${GLFW_INCLUDE_DIR}
 	${MATHSPOT_INCLUDE_DIR}
 	${SOIL_INCLUDE_DIR}
-	${PROJECT_SOURCE_DIR}/include
-	${PROJECT_SOURCE_DIR}/shader)
+	${DEPENDENCY_INCLUDE_DIRECTORIES})
 
 if(WIN32)
 	set_target_properties(sunspot PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt")
 endif(WIN32)
 
-target_link_libraries(sunspot ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES} ${MATHSPOT_LIBRARIES} ${SOIL_LIBRARIES})
+target_link_libraries(sunspot ${DEPENDENCY_LIBRARIES} ${MATHSPOT_LIBRARIES} ${SOIL_LIBRARIES})
 
 file(COPY ${PROJECT_SOURCE_DIR}/shader DESTINATION ${PROJECT_BINARY_DIR})
