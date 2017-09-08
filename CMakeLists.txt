@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.6)
 include(CMakeToolsHelpers OPTIONAL)
 project(SunSpoT)
 
+set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti -Wall")
+
 if(${CMAKE_SYSTEM_NAME} MATCHES Android)
 	set(ANDROID TRUE)
 else()
@@ -32,7 +35,7 @@ set(DEPENDENCY_INCLUDE_DIRECTORIES
 	${PROJECT_SOURCE_DIR}/source)
 
 if(${ANDROID})
-	set(DEPENDENCY_LIBRARIES "GLESv3 android EGL log m ndk-helper")
+	set(DEPENDENCY_LIBRARIES GLESv3 android EGL log m)
 else()
 	find_package(OpenGL REQUIRED)
 	find_package(GLEW REQUIRED)
@@ -59,6 +62,8 @@ set(SOURCES
 	source/Logger.h
 	source/Logger.cpp
 	source/Graphics.h
+	source/android/AssetManager.h
+	source/android/AssetManager.cpp
 	source/android/ShaderProgram.h
 	source/android/ShaderProgram.cpp
 	source/collision/BoundingBox.h
