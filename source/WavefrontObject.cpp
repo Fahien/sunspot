@@ -360,7 +360,7 @@ void WavefrontObject::loadDiffuseMap(std::stringstream& ss, const std::string& p
 		throw LoadingException{ "Error loading diffuse map name" };
 	}
 
-	Logger::log.info("WavefrontObject: Loading %s %s\n", path.c_str(), textureName.c_str()); // TODO remove debug Logger::log
+	Logger::log.info("WavefrontObject: Loading %s/%s\n", path.c_str(), textureName.c_str()); // TODO remove debug Logger::log
 	Texture texture{ path
 #ifndef WIN32
 		+ '/'

@@ -3,8 +3,9 @@
 
 #include <stdexcept>
 #include <string>
-
-#include "Graphics.h"
+#include <Graphics.h>
+#include <Logger.h>
+#include <AssetManager.h>
 
 
 namespace sunspot {
@@ -34,6 +35,9 @@ private:
 	GLsizei  mWidth;
 	GLsizei  mHeight;
 	GLubyte* mHandle;
+#ifdef ANDROID
+	Asset    mAsset;
+#endif
 };
 
 
@@ -49,7 +53,7 @@ public:
 	inline GLsizei& getHeight() { return mHeight; }
 	inline GLubyte* getData()   { return mData;   }
 
-private:
+  private:
 	GLsizei  mWidth;
 	GLsizei  mHeight;
 	GLubyte* mData;

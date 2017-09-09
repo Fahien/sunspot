@@ -3,8 +3,8 @@
 #include <cstdlib>
 #include <SOIL.h>
 
-#include "Texture.h"
-#include "Logger.h"
+#include <Texture.h>
+#include <Logger.h>
 
 using namespace sunspot;
 
@@ -16,9 +16,9 @@ const char* sunspot::getTextureTypeName(const TextureType& type)
 
 
 Texture::Texture(const std::string& path, const TextureType& type)
-	: mId  { 0 }
-	, mName{ path }
-	, mType{ type }
+:	mId  { 0 }
+,	mName{ path }
+,	mType{ type }
 {
 	glGenTextures(1, &mId);
 	glBindTexture(GL_TEXTURE_2D, mId);
@@ -41,13 +41,22 @@ const std::string SoilData::tag{ "SoilData" };
 
 
 SoilData::SoilData(const std::string& path)
-	: mWidth { 0 }
-	, mHeight{ 0 }
-	, mHandle{ nullptr }
+:	mWidth { 0 }
+,	mHeight{ 0 }
+,	mHandle{ nullptr }
+#ifdef ANDROID
+,	mAsset{ AssetManager::assets.Open(path) }
+#endif
 {
+#ifdef ANDROID
+	mHandle = SOIL_load_image_from_memory(reinterpret_cast<const unsigned char *const>(mAsset.GetContent()), mAsset.GetLength(), &mWidth, &mHeight, 0, SOIL_LOAD_RGB);
+#else
 	mHandle = SOIL_load_image(path.c_str(), &mWidth, &mHeight, 0, SOIL_LOAD_RGB);
+#endif
 	if (mHandle == nullptr || mHandle == 0)
+	{
 		throw TextureException{ tag, "Could not load " + path + ": " + SOIL_last_result() };
+	}
 
 	Logger::log.info("SoilData: %s %s\n", path.c_str(), SOIL_last_result()); // TODO remove debug log
 }
@@ -56,7 +65,9 @@ SoilData::SoilData(const std::string& path)
 SoilData::~SoilData()
 {
 	if (mHandle != nullptr && mHandle != 0)
+	{
 		SOIL_free_image_data(mHandle);
+	}
 }
 
 
@@ -64,9 +75,9 @@ const std::string TextureData::tag{ "TextureData" };
 
 
 TextureData::TextureData(const std::string& path)
-	: mWidth { 0 }
-	, mHeight{ 0 }
-	, mData  { nullptr }
+:	mWidth { 0 }
+,	mHeight{ 0 }
+,	mData  { nullptr }
 {
 #ifdef WIN32
 	FILE* file{};
@@ -75,7 +86,9 @@ TextureData::TextureData(const std::string& path)
 	FILE* file{ fopen((path).c_str(), "rb") };
 #endif
 	if (file == nullptr)
+	{
 		throw TextureException{ tag, "Could not open header bitmap for " + path };
+	}
 
 	fseek(file, 14, SEEK_CUR);
 
@@ -163,5 +176,7 @@ TextureData::TextureData(const std::string& path)
 TextureData::~TextureData()
 {
 	if (mData != nullptr)
+	{
 		free(mData);
+	}
 }
