@@ -27,13 +27,15 @@ public:
 	SoilData(const std::string& path);
 	~SoilData();
 
-	inline GLsizei  getWidth () { return mWidth;  }
-	inline GLsizei  getHeight() { return mHeight; }
-	inline GLubyte* getHandle() { return mHandle; }
+	inline GLsizei  getWidth ()   { return mWidth;    }
+	inline GLsizei  getHeight()   { return mHeight;   }
+	inline int      getChannels() { return mChannels; }
+	inline GLubyte* getHandle()   { return mHandle;   }
 
 private:
 	GLsizei  mWidth;
 	GLsizei  mHeight;
+	int      mChannels;
 	GLubyte* mHandle;
 #ifdef ANDROID
 	Asset    mAsset;

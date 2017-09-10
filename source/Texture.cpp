@@ -41,9 +41,10 @@ const std::string SoilData::tag{ "SoilData" };
 
 
 SoilData::SoilData(const std::string& path)
-:	mWidth { 0 }
-,	mHeight{ 0 }
-,	mHandle{ nullptr }
+:	mWidth   { 0 }
+,	mHeight  { 0 }
+,	mChannels{ 0 }
+,	mHandle  { nullptr }
 #ifdef ANDROID
 ,	mAsset{ AssetManager::assets.Open(path) }
 #endif
@@ -51,7 +52,7 @@ SoilData::SoilData(const std::string& path)
 #ifdef ANDROID
 	mHandle = SOIL_load_image_from_memory(reinterpret_cast<const unsigned char *const>(mAsset.GetContent()), mAsset.GetLength(), &mWidth, &mHeight, 0, SOIL_LOAD_RGB);
 #else
-	mHandle = SOIL_load_image(path.c_str(), &mWidth, &mHeight, 0, SOIL_LOAD_RGB);
+	mHandle = SOIL_load_image(path.c_str(), &mWidth, &mHeight, &mChannels, SOIL_LOAD_RGB);
 #endif
 	if (mHandle == nullptr || mHandle == 0)
 	{

@@ -62,7 +62,7 @@ GlfwWindow::GlfwWindow(const char* title,
 	glfwWindowHint(GLFW_REFRESH_RATE, videoMode_->refreshRate);
 
 	// Create a window object
-	window_ = glfwCreateWindow(windowSize_.width, windowSize_.height, title_, monitor_, nullptr);
+	window_ = glfwCreateWindow(windowSize_.width, windowSize_.height, title_, nullptr, nullptr);
 	if (window_ == nullptr) { // Handle window creation error
 		glfwTerminate();
 		throw GlfwException{ tag, "Could not create GLFW window" };

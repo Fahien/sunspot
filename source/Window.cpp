@@ -27,7 +27,7 @@ Window::Window(const char* title, const mst::Size windowSize, const bool decorat
 	, frameSize_{ windowSize }
 	, decorated_{ decorated }
 	, stereoscopic_{ stereoscopic }
-	, fullscreen_{ true }
+	, fullscreen_{ false }
 	, currentTime_{ 0.0f }
 	, lastTime_{ 0.0f }
 	, deltaTime_{ 0.0f }
