@@ -37,9 +37,11 @@ public:
 	~WavefrontObject();
 
 	inline std::string& getName() { return mName; }
-	inline std::vector<Vertex>& getVertices()  { return mVertices; }
-	inline std::vector<GLuint>& getIndices()   { return mIndices;  }
-	inline std::vector<Texture>& getTextures() { return mTextures; }
+	inline std::vector<Vertex>&    getVertices()  { return mVertices;  }
+	inline std::vector<GLuint>&    getIndices()   { return mIndices;   }
+	inline std::vector<Texture>&   getTextures()  { return mTextures;  }
+	inline std::vector<Material*>& GetMaterials() { return mMaterials; }
+	inline std::vector<Mesh*>&     GetMeshes()    { return mMeshes;    }
 
 	void draw(const ShaderProgram& shader) const;
 
