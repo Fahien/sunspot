@@ -6,8 +6,8 @@
 #include <vector>
 #include <MathSpot.h>
 
-#include "Graphics.h"
-#include "Cursor.h"
+#include <Graphics.h>
+#include <Cursor.h>
 
 namespace mst = mathspot;
 
@@ -22,30 +22,32 @@ class Framebuffer;
 class Camera;
 
 
-class GlewException : public GraphicException {
+class GlewException : public GraphicException
+{
 public:
 	GlewException(const std::string& tag) : GraphicException{ tag + ": Could not initialize GLEW" } {}
 };
 
 
-class Window {
+class Window
+{
 public:
 	static const std::string tag;
 
-	Window(const char *title, const mst::Size windowSize, const bool decorated, const bool stereoscopic);
+	Window(const char* title, const mst::Size windowSize, const bool decorated, const bool stereoscopic);
 
-	inline mst::Size &getFrameSize() { return frameSize_; }
-	inline void setBaseProgram(const ShaderProgram *baseProgram) { baseProgram_ = baseProgram; }
-	inline void setLight(Light *light) { light_ = light; }
-	inline void addObj(WavefrontObject *obj) { objs_.push_back(obj); }
+	inline mst::Size& getFrameSize() { return mFrameSize; }
+	inline void setBaseProgram(const ShaderProgram* baseProgram) { mBaseProgram = baseProgram; }
+	inline void setLight(Light* light) { mLight = light; }
+	inline void addObj(WavefrontObject* obj) { mObjs.push_back(obj); }
 
-	inline void setQuad(Quad *quad) { quad_ = quad; }
-	inline void setQuadProgram(const ShaderProgram *quadProgram) { quadProgram_ = quadProgram; }
-	inline void setDepthProgram(const ShaderProgram *depthProgram) { depthProgram_ = depthProgram; }
+	inline void setQuad(Quad* quad) { mQuad = quad; }
+	inline void setQuadProgram(const ShaderProgram* quadProgram) { mQuadProgram = quadProgram; }
+	inline void setDepthProgram(const ShaderProgram* depthProgram) { mDepthProgram = depthProgram; }
 
 
-	inline void setCamera(Camera *camera) { camera_ = camera; }
-	inline void setFramebuffer(const Framebuffer *framebuffer) { framebuffer_ = framebuffer; }
+	inline void setCamera(Camera* camera) { mCamera = camera; }
+	inline void setFramebuffer(const Framebuffer* framebuffer) { mFramebuffer = framebuffer; }
 
 	virtual void loop() = 0;
 
@@ -54,38 +56,38 @@ protected:
 	void render();
 
 	virtual void toggleFullscreen() = 0;
-	virtual const float &computeDeltaTime() = 0;
+	virtual const float& computeDeltaTime() = 0;
 	virtual void updateFrameSize() = 0;
 
-	const char* title_;
-	mst::Size windowSize_;
-	mst::Size monitorSize_;
-	mst::Size frameSize_;
+	const char* mTitle;
+	mst::Size mWindowSize;
+	mst::Size mMonitorSize;
+	mst::Size mFrameSize;
 
-	bool decorated_;
-	bool stereoscopic_;
-	bool fullscreen_;
+	bool mDecorated;
+	bool mStereoscopic;
+	bool mFullscreen;
 
-	float currentTime_;
-	float lastTime_;
-	float deltaTime_;
+	float mCurrentTime;
+	float mLastTime;
+	float mDeltaTime;
 
-	Cursor cursor_;
-	Camera* camera_;
+	Cursor  mCursor;
+	Camera* mCamera;
 
 private:
 	void render(const float &deltaTime);
-	void render3D(const float &deltaTime);
-	void renderQuad(const float &deltaTime);
-	void renderStereoscopic(const float &deltaTime);
+	void render3D(const float& deltaTime);
+	void renderQuad(const float& deltaTime);
+	void renderStereoscopic(const float& deltaTime);
 
-	const ShaderProgram *baseProgram_;
-	Light *light_;
-	std::vector<WavefrontObject *> objs_;
-	const ShaderProgram *quadProgram_;
-	const ShaderProgram *depthProgram_;
-	const Framebuffer *framebuffer_;
-	const Quad *quad_;
+	const ShaderProgram* mBaseProgram;
+	Light* mLight;
+	std::vector<WavefrontObject*> mObjs;
+	const ShaderProgram* mQuadProgram;
+	const ShaderProgram* mDepthProgram;
+	const Framebuffer* mFramebuffer;
+	const Quad* mQuad;
 };
 
 
