@@ -27,7 +27,7 @@ static float near{ 0.125f };
 static float far{ 32.0f };
 
 static const std::string tag{ "Main" };
-static const std::string crateName{ "data/earth/earth.obj" };
+static const std::string crateName{ "data/frigate/frigate-blender.obj" };
 
 
 void printLogo()
@@ -57,18 +57,24 @@ int main(int argc, char **argv)
 	try {
 		// Get command line arguments
 		std::vector<std::string> arguments{};
-		for (int i{ 1 }; i < argc; ++i) {
+		for (int i{ 1 }; i < argc; ++i)
+		{
 			arguments.push_back(std::string{argv[i]});
 		}
 
 		// Window scale
 		std::vector<std::string>::iterator it;
-		if ((it = std::find(arguments.begin(), arguments.end(), "-scale")) != arguments.end()) {
-			if (++it != arguments.end()) {
+		if ((it = std::find(arguments.begin(), arguments.end(), "-scale")) != arguments.end())
+		{
+			if (++it != arguments.end())
+			{
 				scale = std::stoi(*it);
 				sst::Logger::log.info("Scale [%d]\n", scale);
 			}
-			else { std::cerr << "Scale [" << scale << "] (Default)\n"; }
+			else
+			{
+				std::cerr << "Scale [" << scale << "] (Default)\n";
+			}
 		}
 		windowSize *= scale;
 
@@ -103,7 +109,8 @@ int main(int argc, char **argv)
 		sst::ShaderProgram quadProgram { "shader/quad.vert", "shader/quad.frag" };
 		sst::ShaderProgram depthProgram{ "shader/quad.vert", "shader/depth.frag" };
 		sst::Quad quad{};
-		if (stereoscopic) {
+		if (stereoscopic)
+		{
 			window.setQuadProgram(&quadProgram);
 			window.setDepthProgram(&depthProgram);
 			window.setQuad(&quad);
@@ -112,7 +119,8 @@ int main(int argc, char **argv)
 
 		// Load Wavefront Object
 		sst::Ifstream is{ crateName };
-		if (!is.is_open()) {
+		if (!is.is_open())
+		{
 			sst::Logger::log.error("Could not find %s\n", crateName.c_str());
 			return EXIT_FAILURE;
 		}

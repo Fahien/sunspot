@@ -18,20 +18,23 @@ class  Texture;
 class  Mesh;
 
 
-class LoadingException : public std::runtime_error {
+class LoadingException : public std::runtime_error
+{
 public:
 	LoadingException(const std::string& message) : std::runtime_error(message) {}
 };
 
 
-struct Face {
+struct Face
+{
 	int indices[4];
 	int textures[4];
 	int normals[4];
 };
 
 
-class WavefrontObject {
+class WavefrontObject
+{
 public:
 	WavefrontObject();
 	~WavefrontObject();
