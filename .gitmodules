@@ -4,3 +4,6 @@
 [submodule "mathspot"]
 	path = mathspot
 	url = https://github.com/Fahien/mathspot.git
+[submodule "pyspot"]
+	path = pyspot
+	url = https://github.com/Fahien/pyspot.git

@@ -37,9 +37,9 @@ WavefrontObject::WavefrontObject()
 /// Release resources
 WavefrontObject::~WavefrontObject()
 {
-	for (Mesh* mesh : mMeshes)
+	for (auto& mesh : mMeshes)
 	{
-		delete mesh;
+		//delete mesh;
 	}
 	Logger::log.info("WavefrontObject: destroyed %s\n", mName.c_str()); // TODO remove debug log
 }
@@ -48,9 +48,9 @@ WavefrontObject::~WavefrontObject()
 /// Draw the object
 void WavefrontObject::draw(const ShaderProgram& shader) const
 {
-	for (Mesh *mesh : mMeshes)
+	for (auto& mesh : mMeshes)
 	{
-		mesh->draw(shader);
+		mesh->Draw(shader);
 	}
 }
 
@@ -268,7 +268,7 @@ void WavefrontObject::loadCachedMesh()
 {
 	if (!mVertices.empty() && !mIndices.empty())
 	{
-		mMeshes.push_back( new Mesh{ mCurrentGroupName, mVertices, mIndices, mCurrentMaterial });
+		mMeshes.push_back( std::unique_ptr<Mesh>{ new Mesh{ mCurrentGroupName, mVertices, mIndices, mCurrentMaterial } });
 		mVertices.clear();
 		mVertexCount = 0;
 		mIndices.clear();

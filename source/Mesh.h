@@ -30,7 +30,10 @@ public:
 	Mesh(const std::string& name, std::vector<Vertex>& vertices, std::vector<GLuint>& indices, Material* m);
 	~Mesh();
 
-	void draw(const ShaderProgram& shader);
+	/// Returns the name of the mesh
+	std::string& GetName() { return mName; }
+
+	void Draw(const ShaderProgram& shader) const;
 
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;

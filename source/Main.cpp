@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "Config.h"
+#include "SunSpotConfig.h"
 #include "Logger.h"
 #include "GlfwWindow.h"
 #include "Light.h"
@@ -15,6 +15,7 @@
 #include "WavefrontObject.h"
 #include "Mesh.h"
 #include "Texture.h"
+#include "Entity.h"
 
 namespace sst = sunspot;
 namespace mst = mathspot;
@@ -128,6 +129,13 @@ int main(int argc, char **argv)
 		is >> obj;
 		obj.GetMaterials().back()->shininess = 1.0f;
 		obj.GetMeshes().back()->transform.rotateZ(0.4f);
+
+		// Test entity-script module
+		for (auto& mesh : obj.GetMeshes())
+		{
+			sst::Entity entity{ *mesh };
+		}
+
 		window.addObj(&obj);
 
 		window.loop(); // Game loop

@@ -54,7 +54,7 @@ sst::Mesh::~Mesh()
 }
 
 
-void sst::Mesh::draw(const sst::ShaderProgram& shader)
+void sst::Mesh::Draw(const sst::ShaderProgram& shader) const
 {
 	// Bind transform matrix
 	glUniformMatrix4fv(shader.getLocation("model"), 1, GL_FALSE, transform.matrix);

@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.6)
 include(CMakeToolsHelpers OPTIONAL)
 project(SunSpoT)
 
-set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wall")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti -Wall")
+#set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wall")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti -Wall")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES Android)
 	set(ANDROID TRUE)
@@ -23,16 +23,22 @@ set(SST_TITLE "SunSpoT")
 
 # Configure a header file to pass some of the CMake settings to the source code
 configure_file(
-	"${PROJECT_SOURCE_DIR}/source/Config.h.in"
-	"${PROJECT_SOURCE_DIR}/include/Config.h")
+	"${PROJECT_SOURCE_DIR}/source/SunSpotConfig.h.in"
+	"${PROJECT_SOURCE_DIR}/include/SunSpotConfig.h")
 
 # Specify the paths in which the linker should search for libraries
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${PROJECT_SOURCE_DIR}")
 
+# Python 3
+find_package(PythonInterp 3)
+find_package(PythonLibs 3)
+
 set(DEPENDENCY_INCLUDE_DIRECTORIES
 	${PROJECT_SOURCE_DIR}/include
+	${PROJECT_SOURCE_DIR}/include/entity
 	${PROJECT_SOURCE_DIR}/source/android
-	${PROJECT_SOURCE_DIR}/source)
+	${PROJECT_SOURCE_DIR}/source
+	${PYTHON_INCLUDE_DIR})
 
 if(${ANDROID})
 	set(DEPENDENCY_LIBRARIES GLESv3 android EGL log m)
@@ -49,6 +55,7 @@ else()
 		${GLEW_INCLUDE_DIR}
 		${GLFW_INCLUDE_DIR})
 endif()
+
 
 set(SHADERS
 	shader/base.vert
@@ -80,6 +87,8 @@ set(SOURCES
 	source/Material.cpp
 	source/Mesh.h
 	source/Mesh.cpp
+	source/entity/Script.cpp
+	source/entity/Entity.cpp
 	source/WavefrontObject.h
 	source/WavefrontObject.cpp
 	source/Color.h
@@ -125,17 +134,33 @@ add_subdirectory(${SOIL})
 set(SOIL_INCLUDE_DIR ${SOIL}/src)
 set(SOIL_LIBRARIES SOIL)
 
+# PySpot
+set(PYSPOT pyspot)
+add_subdirectory(${PYSPOT})
+set(PYSPOT_INCLUDE_DIR ${PYSPOT}/include)
+set(PYSPOT_LIBRARIES ${PYSPOT})
+
 # Add the given directories to those the compiler uses to search for include files
 
 target_include_directories(sunspot PUBLIC
 	${MATHSPOT_INCLUDE_DIR}
 	${SOIL_INCLUDE_DIR}
+	${PYSPOT_INCLUDE_DIR}
 	${DEPENDENCY_INCLUDE_DIRECTORIES})
+
+set(DEPENDENCY_LIBRARIES
+	${DEPENDENCY_LIBRARIES}
+	${MATHSPOT_LIBRARIES}
+	${SOIL_LIBRARIES}
+	${PYTHON_LIBRARIES}
+	${PYSPOT_LIBRARIES})
 
 if(WIN32)
 	set_target_properties(sunspot PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt")
 endif(WIN32)
 
-target_link_libraries(sunspot ${DEPENDENCY_LIBRARIES} ${MATHSPOT_LIBRARIES} ${SOIL_LIBRARIES})
+set_target_properties(sunspot PROPERTIES LINKER_LANGUAGE CXX)
+
+target_link_libraries(sunspot ${DEPENDENCY_LIBRARIES})
 
 file(COPY ${PROJECT_SOURCE_DIR}/shader DESTINATION ${PROJECT_BINARY_DIR})

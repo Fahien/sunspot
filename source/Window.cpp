@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Config.h"
+#include "SunSpotConfig.h"
 #ifdef SST_PROFILING
 #include <chrono>
 #endif

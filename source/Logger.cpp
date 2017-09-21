@@ -1,5 +1,5 @@
 #include "Logger.h"
-#include "Config.h"
+#include "SunSpotConfig.h"
 
 #ifdef SST_LOGGING
 	#ifdef ANDROID
