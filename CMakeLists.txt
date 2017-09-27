@@ -87,6 +87,7 @@ set(SOURCES
 	source/Material.cpp
 	source/Mesh.h
 	source/Mesh.cpp
+	source/entity/PyType.cpp
 	source/entity/Script.cpp
 	source/entity/Entity.cpp
 	source/WavefrontObject.h
