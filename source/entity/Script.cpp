@@ -65,12 +65,13 @@ PyMODINIT_FUNC InitSunSpot()
 	PyModule_AddObject(module, "error", sunspotError);
 
 	// Finalize the type
-	if (PyType_Ready(&sst::gPyTypeObject) < 0)
+	PyTypeObject& type{ sst::PyType::GetPyTypeObject() };
+	if (PyType_Ready(&type) < 0)
 	{
 		return nullptr;
 	}
-	Py_INCREF(&sst::gPyTypeObject);
-	PyModule_AddObject(module, "Spot", static_cast<PyObject*>(static_cast<void*>(&sst::gPyTypeObject)));
+	Py_INCREF(&type);
+	PyModule_AddObject(module, "Spot", static_cast<PyObject*>(static_cast<void*>(&type)));
 
 	return module;
 }
@@ -83,20 +84,20 @@ sst::Script::Script(std::string& name)
 :	mName{ name }
 ,	mModule{ pyspot.ImportModule(name.c_str()) }
 {
-	PyTypeObject* type = &gPyTypeObject;
+	PyTypeObject& type{ sst::PyType::GetPyTypeObject() };
 	
-	if (PyType_Ready(type) < 0)
+	if (PyType_Ready(&type) < 0)
 	{
 		assert(false);
 	}
 	
 	pst::PySpotTuple args{ 1 };
-	pst::PySpotObject spot{ PyType_new(type, nullptr, nullptr) };
+	pst::PySpotObject spot{ PyType::New(&type, nullptr, nullptr) };
 	args.SetItem(0, spot);
 	
 	sst::Logger::log.info("Calling update\n");
 	mModule.CallFunction("update", args);
 	
-	pst::PySpotObject result{ PyType_GetName(static_cast<PyType*>((void*)spot.GetObject()), nullptr) };
+	pst::PySpotObject result{ PyType::GetName(static_cast<PyType*>((void*)spot.GetObject()), nullptr) };
 	sst::Logger::log.info("Result: %ls\n", result.ToString().c_str());
 }

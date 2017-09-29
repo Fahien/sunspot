@@ -36,6 +36,7 @@ find_package(PythonLibs 3)
 set(DEPENDENCY_INCLUDE_DIRECTORIES
 	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/include/entity
+	${PROJECT_SOURCE_DIR}/include/component
 	${PROJECT_SOURCE_DIR}/source/android
 	${PROJECT_SOURCE_DIR}/source
 	${PYTHON_INCLUDE_DIR})
@@ -90,6 +91,7 @@ set(SOURCES
 	source/entity/PyType.cpp
 	source/entity/Script.cpp
 	source/entity/Entity.cpp
+	source/component/Transform.cpp
 	source/WavefrontObject.h
 	source/WavefrontObject.cpp
 	source/Color.h
