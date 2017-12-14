@@ -1,0 +1,17 @@
+{
+	"name": "TransformComponent",
+	"members": [
+		{
+			"name": "x",
+			"type": "float"
+		},
+		{
+			"name": "y",
+			"type": "float"
+		},
+		{
+			"name": "z",
+			"type": "float"
+		}
+	]
+}

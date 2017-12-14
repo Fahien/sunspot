@@ -4,10 +4,10 @@
 #include <string>
 #include <stdexcept>
 #include <vector>
-#include <MathSpot.h>
+#include "MathSpot.h"
 
-#include <Graphics.h>
-#include <Cursor.h>
+#include "Graphics.h"
+#include "Cursor.h"
 
 namespace mst = mathspot;
 
@@ -20,6 +20,7 @@ class Light;
 class WavefrontObject;
 class Framebuffer;
 class Camera;
+class Entity;
 
 
 class GlewException : public GraphicException
@@ -40,6 +41,7 @@ public:
 	inline void setBaseProgram(const ShaderProgram* baseProgram) { mBaseProgram = baseProgram; }
 	inline void setLight(Light* light) { mLight = light; }
 	inline void addObj(WavefrontObject* obj) { mObjs.push_back(obj); }
+	inline void addEntity(Entity* entity) { mEntity = entity; }
 
 	inline void setQuad(Quad* quad) { mQuad = quad; }
 	inline void setQuadProgram(const ShaderProgram* quadProgram) { mQuadProgram = quadProgram; }
@@ -84,6 +86,7 @@ private:
 	const ShaderProgram* mBaseProgram;
 	Light* mLight;
 	std::vector<WavefrontObject*> mObjs;
+	Entity* mEntity;
 	const ShaderProgram* mQuadProgram;
 	const ShaderProgram* mDepthProgram;
 	const Framebuffer* mFramebuffer;

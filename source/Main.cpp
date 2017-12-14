@@ -20,7 +20,7 @@
 namespace sst = sunspot;
 namespace mst = mathspot;
 
-static int scale{ 2 };
+static int scale{ 1 };
 static mst::Size windowSize{ 960, 540 };
 
 static float fov{ 45.0f };
@@ -28,7 +28,7 @@ static float near{ 0.125f };
 static float far{ 32.0f };
 
 static const std::string tag{ "Main" };
-static const std::string crateName{ "data/frigate/frigate-blender.obj" };
+static const std::string crateName{ "data/earth/earth.obj" };
 
 
 void printLogo()
@@ -130,13 +130,10 @@ int main(int argc, char **argv)
 		obj.GetMaterials().back()->shininess = 1.0f;
 		obj.GetMeshes().back()->transform.rotateZ(0.4f);
 
-		// Test entity-script module
-		for (auto& mesh : obj.GetMeshes())
-		{
-			sst::Entity entity{ *mesh };
-		}
-
 		window.addObj(&obj);
+
+		sst::Entity entity{ *obj.GetMeshes()[0] };
+		window.addEntity(&entity);
 
 		window.loop(); // Game loop
 

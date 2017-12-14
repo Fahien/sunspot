@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.6)
 include(CMakeToolsHelpers OPTIONAL)
 project(SunSpoT)
 
+set(CMAKE_C_STANDARD   11)
+set(CMAKE_CXX_STANDARD 11)
 #set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wall")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti -Wall")
 
@@ -15,6 +17,25 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/cmake")
 message("Searching modules in ${CMAKE_MODULE_PATH}")
 
 option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
+
+
+# MathSpoT
+set(MATHSPOT mathspot)
+add_subdirectory(${MATHSPOT})
+set(MATHSPOT_INCLUDE_DIR ${MATHSPOT}/include)
+set(MATHSPOT_LIBRARIES mathspot)
+
+# SOIL
+set(SOIL soil)
+add_subdirectory(${SOIL})
+set(SOIL_INCLUDE_DIR ${SOIL}/src)
+set(SOIL_LIBRARIES SOIL)
+
+# PySpot
+set(PYSPOT pyspot)
+add_subdirectory(${PYSPOT})
+set(PYSPOT_INCLUDE_DIR ${PYSPOT}/include)
+set(PYSPOT_LIBRARIES ${PYSPOT})
 
 # Version number
 set(SST_VERSION_MAJOR 0)
@@ -39,6 +60,8 @@ set(DEPENDENCY_INCLUDE_DIRECTORIES
 	${PROJECT_SOURCE_DIR}/include/component
 	${PROJECT_SOURCE_DIR}/source/android
 	${PROJECT_SOURCE_DIR}/source
+	${PROJECT_BINARY_DIR}/component
+	${PROJECT_BINARY_DIR}/extension
 	${PYTHON_INCLUDE_DIR})
 
 if(${ANDROID})
@@ -66,7 +89,36 @@ set(SHADERS
 	shader/quad.frag)
 source_group("Shaders" FILES ${SHADERS})
 
+
+# Get all the json in test/component and generate headers
+file(GLOB COMPONENTS source/component/*json)
+foreach(COMPONENT ${COMPONENTS})
+	get_filename_component(NAME ${COMPONENT} NAME_WE)
+	list(APPEND COMPONENT_NAMES ${NAME})
+	set(SST_COMPONENT_HEADER ${PROJECT_BINARY_DIR}/component/${NAME}.h)
+	list(APPEND COMPONENT_HEADERS ${SST_COMPONENT_HEADER})
+	add_custom_command(
+		OUTPUT ${SST_COMPONENT_HEADER}
+		COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-component.py ${COMPONENT} > ${SST_COMPONENT_HEADER}
+		COMMENT "Generating ${SST_COMPONENT_HEADER}"
+		VERBATIM)
+endforeach()
+
+# Generate the PySpotExtension header
+set(SST_EXTENSION_HEADER ${PROJECT_BINARY_DIR}/extension/PySpotExtension.h)
+set(SST_EXTENSION_SOURCE ${PROJECT_BINARY_DIR}/extension/PySpotExtension.cpp)
+add_custom_command(
+	OUTPUT ${SST_EXTENSION_HEADER} ${SST_EXTENSION_SOURCE}
+	COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-extension.py -h > ${SST_EXTENSION_HEADER}
+	COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-extension.py ${COMPONENT_NAMES} > ${SST_EXTENSION_SOURCE}
+	COMMENT "Generating ${SST_EXTENSION_HEADER}"
+	VERBATIM)
+
+
 set(SOURCES
+	${COMPONENT_HEADERS}
+	${SST_EXTENSION_HEADER}
+	${SST_EXTENSION_SOURCE}
 	source/Logger.h
 	source/Logger.cpp
 	source/Graphics.h
@@ -88,10 +140,8 @@ set(SOURCES
 	source/Material.cpp
 	source/Mesh.h
 	source/Mesh.cpp
-	source/entity/PyType.cpp
 	source/entity/Script.cpp
 	source/entity/Entity.cpp
-	source/component/Transform.cpp
 	source/WavefrontObject.h
 	source/WavefrontObject.cpp
 	source/Color.h
@@ -117,31 +167,12 @@ endif()
 
 source_group("Sources" FILES ${SOURCES})
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 11)
 if(${ANDROID})
 	add_library(sunspot ${SOURCES} ${SHADERS})
 else()
 	add_executable(sunspot ${SOURCES} ${SHADERS})
 endif()
 
-# MathSpoT
-set(MATHSPOT mathspot)
-add_subdirectory(${MATHSPOT})
-set(MATHSPOT_INCLUDE_DIR ${MATHSPOT}/include)
-set(MATHSPOT_LIBRARIES mathspot)
-
-# SOIL
-set(SOIL soil)
-add_subdirectory(${SOIL})
-set(SOIL_INCLUDE_DIR ${SOIL}/src)
-set(SOIL_LIBRARIES SOIL)
-
-# PySpot
-set(PYSPOT pyspot)
-add_subdirectory(${PYSPOT})
-set(PYSPOT_INCLUDE_DIR ${PYSPOT}/include)
-set(PYSPOT_LIBRARIES ${PYSPOT})
 
 # Add the given directories to those the compiler uses to search for include files
 

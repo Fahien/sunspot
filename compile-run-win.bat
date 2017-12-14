@@ -1,3 +1,3 @@
-cmake -H\. -Bbin -DSST_PROFILING=0 -DSST_LOGGING=1
-cmake --build bin --config Release
-bin\Release\sunspot.exe
+cmake -H\. -Bbuild -DSST_PROFILING=0 -DSST_LOGGING=1
+cmake --build build --config Release
+build\Release\sunspot.exe

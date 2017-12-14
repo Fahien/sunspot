@@ -13,6 +13,7 @@
 #include "WavefrontObject.h"
 #include "Quad.h"
 #include "Framebuffer.h"
+#include "Entity.h"
 
 using namespace sunspot;
 
@@ -63,6 +64,7 @@ void Window::render(const float& deltaTime) // TODO comment
 {
 	// std::cout << static_cast<int>(1.0f / deltaTime) << " "; // FPS
 	updateFrameSize();
+	mEntity->Update(deltaTime);
 	if (mStereoscopic)
 	{
 		renderStereoscopic(deltaTime);
