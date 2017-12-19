@@ -29,12 +29,6 @@ void DirectionalLight::Update(const ShaderProgram& program) const
 	glUniform3fv(location, 1, &mSpecular.r);
 }
 
-/*
-PointLight::PointLight(const float r, const float g, const float b)
-	: mPosition{}
-	, mColor{ r, g, b }
-{}
-*/
 
 void PointLight::Update(const ShaderProgram& program) const
 {
