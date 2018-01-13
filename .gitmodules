@@ -7,3 +7,6 @@
 [submodule "pyspot"]
 	path = pyspot
 	url = https://github.com/Fahien/pyspot.git
+[submodule "dataspot"]
+	path = dataspot
+	url = https://github.com/Fahien/dataspot.git

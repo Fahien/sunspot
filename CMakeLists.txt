@@ -31,11 +31,17 @@ add_subdirectory(${SOIL})
 set(SOIL_INCLUDE_DIR ${SOIL}/src)
 set(SOIL_LIBRARIES SOIL)
 
-# PySpot
+# PySpoT
 set(PYSPOT pyspot)
 add_subdirectory(${PYSPOT})
 set(PYSPOT_INCLUDE_DIR ${PYSPOT}/include)
 set(PYSPOT_LIBRARIES ${PYSPOT})
+
+# DataSpoT
+set(DATASPOT dataspot)
+add_subdirectory(${DATASPOT})
+set(DATASPOT_INCLUDE_DIR ${DATASPOT}/include)
+set(DATASPOT_LIBRARIES ${DATASPOT})
 
 # Version number
 set(SST_VERSION_MAJOR 0)
@@ -56,10 +62,10 @@ find_package(PythonLibs 3)
 
 set(DEPENDENCY_INCLUDE_DIRECTORIES
 	${PROJECT_SOURCE_DIR}/include
-	${PROJECT_SOURCE_DIR}/include/entity
-	${PROJECT_SOURCE_DIR}/include/component
-	${PROJECT_SOURCE_DIR}/source/android
 	${PROJECT_SOURCE_DIR}/source
+	${PROJECT_SOURCE_DIR}/source/android
+	${PROJECT_SOURCE_DIR}/source/entity
+	${PROJECT_SOURCE_DIR}/source/data
 	${PROJECT_BINARY_DIR}/component
 	${PROJECT_BINARY_DIR}/extension
 	${PYTHON_INCLUDE_DIR})
@@ -140,8 +146,12 @@ set(SOURCES
 	source/Material.cpp
 	source/Mesh.h
 	source/Mesh.cpp
+	source/entity/Script.h
 	source/entity/Script.cpp
+	source/entity/Entity.h
 	source/entity/Entity.cpp
+	source/data/EntityData.h
+	source/data/EntityData.cpp
 	source/WavefrontObject.h
 	source/WavefrontObject.cpp
 	source/Color.h
@@ -180,6 +190,7 @@ target_include_directories(sunspot PUBLIC
 	${MATHSPOT_INCLUDE_DIR}
 	${SOIL_INCLUDE_DIR}
 	${PYSPOT_INCLUDE_DIR}
+	${DATASPOT_INCLUDE_DIR}
 	${DEPENDENCY_INCLUDE_DIRECTORIES})
 
 set(DEPENDENCY_LIBRARIES
@@ -187,7 +198,8 @@ set(DEPENDENCY_LIBRARIES
 	${MATHSPOT_LIBRARIES}
 	${SOIL_LIBRARIES}
 	${PYTHON_LIBRARIES}
-	${PYSPOT_LIBRARIES})
+	${PYSPOT_LIBRARIES}
+	${DATASPOT_LIBRARIES})
 
 if(WIN32)
 	set_target_properties(sunspot PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt")

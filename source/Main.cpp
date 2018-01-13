@@ -1,8 +1,3 @@
-#include <fstream>
-#include <cstdlib>
-#include <vector>
-#include <algorithm>
-
 #include "SunSpotConfig.h"
 #include "Logger.h"
 #include "GlfwWindow.h"
@@ -16,9 +11,19 @@
 #include "Mesh.h"
 #include "Texture.h"
 #include "Entity.h"
+#include "EntityData.h"
+
+#include "DataSpot.h"
+
+#include <fstream>
+#include <cstdlib>
+#include <vector>
+#include <array>
+#include <algorithm>
 
 namespace sst = sunspot;
 namespace mst = mathspot;
+namespace dst = dataspot;
 
 static int scale{ 1 };
 static mst::Size windowSize{ 960, 540 };
@@ -28,7 +33,8 @@ static float near{ 0.125f };
 static float far{ 32.0f };
 
 static const std::string tag{ "Main" };
-static const std::string crateName{ "data/earth/earth.obj" };
+static const std::string dataDir{ "data/" };
+static const std::string objExt{ ".obj" };
 
 
 void printLogo()
@@ -83,6 +89,13 @@ int main(int argc, char **argv)
 		bool decorated   { contains(arguments, "-decorated")    }; // Window decorations
 		bool stereoscopic{ contains(arguments, "-stereoscopic") }; // Stereoscopic rendering
 
+		// Load database
+		dst::DataSpot dataspot;
+		dataspot.Open("sunspot.data");
+		windowSize.width  = std::stoi(dataspot.GetConfigValue("window.width"));
+		windowSize.height = std::stoi(dataspot.GetConfigValue("window.height"));
+		decorated = true;
+
 		sst::GlfwWindow window{ SST_TITLE, windowSize, decorated, stereoscopic };
 
 		sst::Camera camera{ fov, static_cast<float>(windowSize.width) / windowSize.height, near, far };
@@ -118,24 +131,38 @@ int main(int argc, char **argv)
 			window.setFramebuffer(&framebuffer);
 		}
 
-		// Load Wavefront Object
-		sst::Ifstream is{ crateName };
-		if (!is.is_open())
+		sst::EntityData entityData{ dataspot };
+
+		// Read a set of objects from dataspot
+		constexpr size_t objectsCount = 2;
+		// Create an array of Objects
+		std::array<sst::WavefrontObject, objectsCount> objects{};
+		// For every object get the name
+		for (size_t i{ 0 }; i < objectsCount; ++i)
 		{
-			sst::Logger::log.error("Could not find %s\n", crateName.c_str());
-			return EXIT_FAILURE;
+			std::string entityName{ dataDir + entityData.LoadEntity(i + 1) + objExt };
+			sst::Ifstream is{ entityName }; // TODO get the name from dataspot
+			if (!is.is_open())
+			{
+				sst::Logger::log.error("Could not find %s\n", entityName.c_str());
+				return EXIT_FAILURE;
+			}
+			auto& obj = objects[i];
+			// Load Wavefront Object
+			is >> obj;
+			obj.GetMaterials().back()->shininess = 1.0f;
+			obj.GetMeshes().back()->transform.rotateZ(0.4f);
+
+			window.addObj(&obj);
+
+			sst::Mesh* mesh{ obj.GetMeshes()[0] };
+
+			sst::Entity* entity{ new sst::Entity{ mesh } };
+			window.addEntity(entity);
 		}
-		sst::WavefrontObject obj{};
-		is >> obj;
-		obj.GetMaterials().back()->shininess = 1.0f;
-		obj.GetMeshes().back()->transform.rotateZ(0.4f);
-
-		window.addObj(&obj);
-
-		sst::Entity entity{ *obj.GetMeshes()[0] };
-		window.addEntity(&entity);
 
 		window.loop(); // Game loop
+
 
 		sst::Logger::log.info("%s version %d.%d successful\n", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
 		return EXIT_SUCCESS;

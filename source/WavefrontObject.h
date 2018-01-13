@@ -46,7 +46,7 @@ public:
 	inline std::vector<Texture>&   getTextures()  { return mTextures;  }
 	inline std::vector<Material*>& GetMaterials() { return mMaterials; }
 
-	inline std::vector<std::unique_ptr<Mesh>>& GetMeshes() { return mMeshes; }
+	inline std::vector<Mesh*>& GetMeshes() { return mMeshes; }
 
 	void draw(const ShaderProgram& shader) const;
 
@@ -89,7 +89,7 @@ private:
 	std::vector<GLuint>    mIndices;
 	std::vector<Texture>   mTextures;
 
-	std::vector<std::unique_ptr<Mesh>> mMeshes;
+	std::vector<Mesh*> mMeshes;
 	
 	Material* mCurrentMaterial;
 	std::vector<Material*> mMaterials;

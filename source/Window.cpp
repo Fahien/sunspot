@@ -44,6 +44,15 @@ Window::Window(const char* title, const mst::Size windowSize, const bool decorat
 {}
 
 
+Window::~Window()
+{
+	for (auto entity : mEntities)
+	{
+		delete entity;
+	}
+}
+
+
 void Window::initGlew()
 {
 	glewExperimental = GL_TRUE; // Initialize GLEW and handle error
@@ -64,7 +73,12 @@ void Window::render(const float& deltaTime) // TODO comment
 {
 	// std::cout << static_cast<int>(1.0f / deltaTime) << " "; // FPS
 	updateFrameSize();
-	mEntity->Update(deltaTime);
+
+	for (auto entity : mEntities)
+	{
+		entity->Update(deltaTime);
+	}
+
 	if (mStereoscopic)
 	{
 		renderStereoscopic(deltaTime);

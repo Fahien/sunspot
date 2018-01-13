@@ -5,11 +5,16 @@
 namespace sst = sunspot;
 
 
-sst::Entity::Entity(sst::Mesh& mesh)
+sst::Entity::Entity()
+:	mScript{ *this }
+{}
+
+
+sst::Entity::Entity(sst::Mesh* mesh)
 :	mMesh  { mesh }
 ,	mScript{ *this }
 {
-	sst::Logger::log.info("Entity: %s\n", mesh.GetName().c_str());
+	sst::Logger::log.info("Entity: %s\n", mesh->GetName().c_str());
 }
 
 

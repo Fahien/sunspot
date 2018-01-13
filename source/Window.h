@@ -36,12 +36,13 @@ public:
 	static const std::string tag;
 
 	Window(const char* title, const mst::Size windowSize, const bool decorated, const bool stereoscopic);
+	~Window();
 
 	inline mst::Size& getFrameSize() { return mFrameSize; }
 	inline void setBaseProgram(const ShaderProgram* baseProgram) { mBaseProgram = baseProgram; }
 	inline void setLight(Light* light) { mLight = light; }
 	inline void addObj(WavefrontObject* obj) { mObjs.push_back(obj); }
-	inline void addEntity(Entity* entity) { mEntity = entity; }
+	inline void addEntity(Entity* entity) { mEntities.push_back(entity); }
 
 	inline void setQuad(Quad* quad) { mQuad = quad; }
 	inline void setQuadProgram(const ShaderProgram* quadProgram) { mQuadProgram = quadProgram; }
@@ -86,7 +87,7 @@ private:
 	const ShaderProgram* mBaseProgram;
 	Light* mLight;
 	std::vector<WavefrontObject*> mObjs;
-	Entity* mEntity;
+	std::vector<Entity*> mEntities;
 	const ShaderProgram* mQuadProgram;
 	const ShaderProgram* mDepthProgram;
 	const Framebuffer* mFramebuffer;

@@ -16,8 +16,19 @@ pst::PySpot sst::Script::pyspot{ "sunspot", PyInit_PySpot };
 
 sst::Script::Script(sst::Entity& entity)
 :	mEntity{ entity }
-,	mModule{ pyspot.ImportModule(entity.GetMesh().GetName().c_str()) }
-{}
+,	mModule{ pyspot.ImportModule(entity.GetMesh()->GetName().c_str()) }
+{
+	pst::PySpotTuple args{ 1 };
+	args.SetItem(0, mEntity.mTransform);
+
+	sst::Logger::log.info("Calling python init\n");
+	mModule.CallFunction("init", args);
+
+	mEntity.mMesh->transform = mst::Mat4::identity;
+	mEntity.mMesh->transform.translateX(mEntity.mTransform.GetX());
+	mEntity.mMesh->transform.translateY(mEntity.mTransform.GetY());
+	mEntity.mMesh->transform.translateZ(mEntity.mTransform.GetZ());
+}
 
 
 void sst::Script::Update(const float delta)
@@ -29,8 +40,8 @@ void sst::Script::Update(const float delta)
 	sst::Logger::log.info("Calling python update\n");
 	mModule.CallFunction("update", args);
 	
-	mEntity.mMesh.transform = mst::Mat4::identity;
-	mEntity.mMesh.transform.rotateX(mEntity.mTransform.GetX()); //mEntity.mTransform.GetX() * delta);
-	mEntity.mMesh.transform.rotateY(mEntity.mTransform.GetY()); //mEntity.mTransform.GetX() * delta);
-	mEntity.mMesh.transform.rotateZ(mEntity.mTransform.GetZ()); //mEntity.mTransform.GetX() * delta);
+	//mEntity.mMesh->transform = mst::Mat4::identity;
+	//mEntity.mMesh->transform.rotateX(mEntity.mTransform.GetX());
+	//mEntity.mMesh->transform.rotateY(mEntity.mTransform.GetY());
+	//mEntity.mMesh->transform.rotateZ(mEntity.mTransform.GetZ());
 }

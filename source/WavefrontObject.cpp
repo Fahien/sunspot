@@ -39,7 +39,7 @@ WavefrontObject::~WavefrontObject()
 {
 	for (auto& mesh : mMeshes)
 	{
-		//delete mesh;
+		delete mesh;
 	}
 	Logger::log.info("WavefrontObject: destroyed %s\n", mName.c_str()); // TODO remove debug log
 }
@@ -268,7 +268,11 @@ void WavefrontObject::loadCachedMesh()
 {
 	if (!mVertices.empty() && !mIndices.empty())
 	{
-		mMeshes.push_back( std::unique_ptr<Mesh>{ new Mesh{ mCurrentGroupName, mVertices, mIndices, mCurrentMaterial } });
+		if (mCurrentMaterial == nullptr)
+		{
+			mCurrentMaterial = mMaterials.back();
+		}
+		mMeshes.push_back( new Mesh{ mCurrentGroupName, mVertices, mIndices, mCurrentMaterial });
 		mVertices.clear();
 		mVertexCount = 0;
 		mIndices.clear();
