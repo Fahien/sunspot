@@ -1,17 +1,18 @@
 {
+	"includes": ["Vec3"],
 	"name": "TransformComponent",
 	"members": [
 		{
-			"name": "x",
-			"type": "float"
+			"name": "position",
+			"type": "Vec3"
 		},
 		{
-			"name": "y",
-			"type": "float"
+			"name": "scale",
+			"type": "Vec3"
 		},
 		{
-			"name": "z",
-			"type": "float"
+			"name": "rotation",
+			"type": "Vec3"
 		}
 	]
 }

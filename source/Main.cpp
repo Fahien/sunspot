@@ -151,7 +151,7 @@ int main(int argc, char **argv)
 			// Load Wavefront Object
 			is >> obj;
 			obj.GetMaterials().back()->shininess = 1.0f;
-			obj.GetMeshes().back()->transform.rotateZ(0.4f);
+			obj.GetMeshes().back()->transform.RotateZ(0.4f);
 
 			window.addObj(&obj);
 

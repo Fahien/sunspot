@@ -15,6 +15,9 @@ sst::Entity::Entity(sst::Mesh* mesh)
 ,	mScript{ *this }
 {
 	sst::Logger::log.info("Entity: %s\n", mesh->GetName().c_str());
+	mTransform.GetScale().GetComponent()->x = 1.0f;
+	mTransform.GetScale().GetComponent()->y = 1.0f;
+	mTransform.GetScale().GetComponent()->z = 1.0f;
 }
 
 
