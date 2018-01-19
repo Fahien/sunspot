@@ -18,11 +18,6 @@ sst::Script::Script(sst::Entity& entity)
 :	mEntity{ entity }
 ,	mModule{ pyspot.ImportModule(entity.GetMesh()->GetName().c_str()) }
 {
-	sst::Logger::log.info("Setting scale to 1.0\n");
-	mEntity.mTransform.GetScale().GetComponent()->x = 1.0f;
-	mEntity.mTransform.GetScale().GetComponent()->y = 1.0f;
-	mEntity.mTransform.GetScale().GetComponent()->z = 1.0f;
-
 	pst::PySpotTuple args{ 1 };
 	args.SetItem(0, mEntity.mTransform);
 
@@ -35,6 +30,9 @@ sst::Script::Script(sst::Entity& entity)
 	mEntity.mMesh->transform.TranslateX(mEntity.mTransform.GetPosition().GetX());
 	mEntity.mMesh->transform.TranslateY(mEntity.mTransform.GetPosition().GetY());
 	mEntity.mMesh->transform.TranslateZ(mEntity.mTransform.GetPosition().GetZ());
+	mEntity.mMesh->transform.RotateX(mEntity.mTransform.GetRotation().GetX());
+	mEntity.mMesh->transform.RotateY(mEntity.mTransform.GetRotation().GetY());
+	mEntity.mMesh->transform.RotateZ(mEntity.mTransform.GetRotation().GetZ());
 }
 
 
