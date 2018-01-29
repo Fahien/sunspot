@@ -20,6 +20,7 @@
 #include <vector>
 #include <array>
 #include <algorithm>
+#include <memory>
 
 namespace sst = sunspot;
 namespace mst = mathspot;
@@ -157,8 +158,9 @@ int main(int argc, char **argv)
 
 			sst::Mesh* mesh{ obj.GetMeshes()[0] };
 
-			sst::Entity* entity{ new sst::Entity{ mesh } };
-			window.addEntity(entity);
+			sst::Entity* entity{ new sst::Entity{ mesh }};
+			std::shared_ptr<sst::Entity> pEntity{ entity };
+			window.addEntity(pEntity);
 		}
 
 		window.loop(); // Game loop

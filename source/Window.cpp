@@ -45,12 +45,7 @@ Window::Window(const char* title, const mst::Size windowSize, const bool decorat
 
 
 Window::~Window()
-{
-	for (auto entity : mEntities)
-	{
-		delete entity;
-	}
-}
+{}
 
 
 void Window::initGlew()

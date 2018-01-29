@@ -4,6 +4,8 @@
 #include <string>
 #include <stdexcept>
 #include <vector>
+#include <memory>
+
 #include "MathSpot.h"
 
 #include "Graphics.h"
@@ -42,7 +44,7 @@ public:
 	inline void setBaseProgram(const ShaderProgram* baseProgram) { mBaseProgram = baseProgram; }
 	inline void setLight(Light* light) { mLight = light; }
 	inline void addObj(WavefrontObject* obj) { mObjs.push_back(obj); }
-	inline void addEntity(Entity* entity) { mEntities.push_back(entity); }
+	inline void addEntity(std::shared_ptr<Entity> entity) { mEntities.push_back(entity); }
 
 	inline void setQuad(Quad* quad) { mQuad = quad; }
 	inline void setQuadProgram(const ShaderProgram* quadProgram) { mQuadProgram = quadProgram; }
@@ -87,7 +89,7 @@ private:
 	const ShaderProgram* mBaseProgram;
 	Light* mLight;
 	std::vector<WavefrontObject*> mObjs;
-	std::vector<Entity*> mEntities;
+	std::vector<std::shared_ptr<Entity>> mEntities;
 	const ShaderProgram* mQuadProgram;
 	const ShaderProgram* mDepthProgram;
 	const Framebuffer* mFramebuffer;

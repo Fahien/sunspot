@@ -1,9 +1,11 @@
 #ifndef SST_SCRIPT_H
 #define SST_SCRIPT_H
 
-#include <string>
 #include <PySpot.h>
 #include <PySpotModule.h>
+#include <PySpotTuple.h>
+
+#include <string>
 
 PyMODINIT_FUNC InitPySpot();
 
@@ -28,6 +30,7 @@ public:
 private:
 	Entity& mEntity;
 	pst::PySpotModule mModule;
+	pst::PySpotTuple mArgs;
 };
 
 
