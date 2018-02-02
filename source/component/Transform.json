@@ -1,7 +1,11 @@
 {
 	"includes": ["Vec3"],
-	"name": "TransformComponent",
+	"name": "Transform",
 	"members": [
+		{
+			"name": "id",
+			"type": "int"
+		},
 		{
 			"name": "position",
 			"type": "Vec3"

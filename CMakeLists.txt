@@ -148,6 +148,8 @@ set(SOURCES
 	source/Mesh.cpp
 	source/entity/Script.h
 	source/entity/Script.cpp
+	source/entity/Object.h
+	source/entity/Object.cpp
 	source/entity/Entity.h
 	source/entity/Entity.cpp
 	source/data/EntityData.h
