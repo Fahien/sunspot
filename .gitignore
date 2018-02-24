@@ -3,9 +3,10 @@ build
 include
 lib
 data
+doc
+script
+.vscode
 output.dat
 .ycm_extra_conf.pyc
-.vscode
 .pyc
-script
 *.data
