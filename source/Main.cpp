@@ -1,5 +1,14 @@
+#include <fstream>
+#include <cstdlib>
+#include <vector>
+#include <array>
+#include <algorithm>
+#include <memory>
+
+#include <Logger.h>
+#include <DataSpot.h>
+
 #include "SunSpotConfig.h"
-#include "Logger.h"
 #include "GlfwWindow.h"
 #include "Light.h"
 #include "ShaderProgram.h"
@@ -13,17 +22,10 @@
 #include "Entity.h"
 #include "EntityData.h"
 
-#include "DataSpot.h"
-
-#include <fstream>
-#include <cstdlib>
-#include <vector>
-#include <array>
-#include <algorithm>
-#include <memory>
 
 namespace sst = sunspot;
 namespace mst = mathspot;
+namespace lst = logspot;
 namespace dst = dataspot;
 
 static int scale{ 1 };
@@ -37,10 +39,11 @@ static const std::string tag{ "Main" };
 static const std::string dataDir{ "data/" };
 static const std::string objExt{ ".obj" };
 
+static const std::string projectDir{ "project" };
 
 void printLogo()
 {
-	sst::Logger::log.info("%s\n",
+	lst::Logger::log.info("%s\n",
 R"( ________  ___  ___  ________   ________  ________  ________  _________   
 |\   ____\|\  \|\  \|\   ___  \|\   ____\|\   __  \|\   __  \|\___   ___\ 
 \ \  \___|\ \  \\\  \ \  \\ \  \ \  \___|\ \  \|\  \ \  \|\  \|___ \  \_| 
@@ -77,7 +80,7 @@ int main(int argc, char **argv)
 			if (++it != arguments.end())
 			{
 				scale = std::stoi(*it);
-				sst::Logger::log.info("Scale [%d]\n", scale);
+				lst::Logger::log.info("Scale [%d]\n", scale);
 			}
 			else
 			{
@@ -86,13 +89,23 @@ int main(int argc, char **argv)
 		}
 		windowSize *= scale;
 
-		
 		bool decorated   { contains(arguments, "-decorated")    }; // Window decorations
 		bool stereoscopic{ contains(arguments, "-stereoscopic") }; // Stereoscopic rendering
 
+		// Project name
+		std::string project{ "default" };
+		if ((it = std::find(arguments.begin(), arguments.end(), "-project")) != arguments.end())
+		{
+			if (++it != arguments.end())
+			{
+				project = *it;
+			}
+			lst::Logger::log.info("Project [%s]\n", project.c_str());
+		}
+
 		// Load database
 		dst::DataSpot dataspot;
-		dataspot.Open("sunspot.data");
+		dataspot.Open(projectDir + "/" + project + "/" + project + ".data");
 		windowSize.width  = std::stoi(dataspot.GetConfigValue("window.width"));
 		windowSize.height = std::stoi(dataspot.GetConfigValue("window.height"));
 		decorated = true;
@@ -145,7 +158,7 @@ int main(int argc, char **argv)
 			sst::Ifstream is{ entityName }; // TODO get the name from dataspot
 			if (!is.is_open())
 			{
-				sst::Logger::log.error("Could not find %s\n", entityName.c_str());
+				lst::Logger::log.error("Could not find %s\n", entityName.c_str());
 				return EXIT_FAILURE;
 			}
 			auto& obj = objects[i];
@@ -166,17 +179,17 @@ int main(int argc, char **argv)
 		window.loop(); // Game loop
 
 
-		sst::Logger::log.info("%s version %d.%d successful\n", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
+		lst::Logger::log.info("%s version %d.%d successful\n", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
 		return EXIT_SUCCESS;
 	}
 	catch (const sst::GraphicException &e)
 	{
-		sst::Logger::log.error("%s: %s\n", tag.c_str(), e.what());
+		lst::Logger::log.error("%s: %s\n", tag.c_str(), e.what());
 		return EXIT_FAILURE;
 	}
 	catch (const std::runtime_error &e)
 	{
-		sst::Logger::log.error("%s: %s\n", tag.c_str(), e.what());
+		lst::Logger::log.error("%s: %s\n", tag.c_str(), e.what());
 		return EXIT_FAILURE;
 	}
 }

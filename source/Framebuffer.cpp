@@ -1,11 +1,13 @@
 #include <iostream>
 
+#include <Logger.h>
+
 #include "Framebuffer.h"
 #include "Texture.h"
 #include "ShaderProgram.h"
-#include "Logger.h"
 
 using namespace sunspot;
+namespace lst = logspot;
 
 
 const std::string Framebuffer::tag{ "Framebuffer" };
@@ -47,7 +49,7 @@ Framebuffer::Framebuffer(const mst::Size& size)
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
 	{
-		Logger::log.info("Stereoscopic Framebuffer [%dx%d]\n", mSize.width, mSize.height);
+		lst::Logger::log.info("Stereoscopic Framebuffer [%dx%d]\n", mSize.width, mSize.height);
 	}
 	else
 	{
@@ -67,7 +69,7 @@ Framebuffer::~Framebuffer()
 	glDeleteTextures(1, &mDepthTexture);
 	glDeleteTextures(1, &mColorTexture);
 	glDeleteFramebuffers(1, &mFbo);
-	Logger::log.info("Framebuffer: destroyed\n"); // TODO remove debug log
+	lst::Logger::log.info("Framebuffer: destroyed\n"); // TODO remove debug log
 }
 
 

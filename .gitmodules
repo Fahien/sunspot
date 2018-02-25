@@ -10,3 +10,6 @@
 [submodule "dataspot"]
 	path = dataspot
 	url = https://github.com/Fahien/dataspot.git
+[submodule "logspot"]
+	path = logspot
+	url = https://github.com/Fahien/logspot

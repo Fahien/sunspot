@@ -1,12 +1,14 @@
 #include <iostream>
 #include <sstream>
 
+#include <Logger.h>
+
 #include "Material.h"
-#include "Logger.h"
 #include "Graphics.h"
 #include "ShaderProgram.h"
 
 namespace sst = sunspot;
+namespace lst = logspot;
 
 
 sst::Material::Material()
@@ -28,7 +30,7 @@ sst::Material::Material(const char* n)
 ,	hasDiffuseMap { false }
 ,	hasSpecularMap{ false }
 {
-	sst::Logger::log.info("Material: created %s\n", n); // TODO remove debug log
+	lst::Logger::log.info("Material: created %s\n", n); // TODO remove debug log
 }
 
 
@@ -39,7 +41,7 @@ sst::Material::~Material()
 	if (hasSpecularMap)
 		glDeleteTextures(1, &specularMap);
 
-	sst::Logger::log.info("Material: destroyed %s\n", name.c_str()); // TODO remove debug log
+	lst::Logger::log.info("Material: destroyed %s\n", name.c_str()); // TODO remove debug log
 }
 
 

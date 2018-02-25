@@ -1,8 +1,9 @@
-#ifndef SST_QUAD_H
-#define SST_QUAD_H
+#ifndef SST_QUAD_H_
+#define SST_QUAD_H_
+
+#include <Logger.h>
 
 #include "Graphics.h"
-#include "Logger.h"
 
 
 namespace sunspot
@@ -12,7 +13,6 @@ namespace sunspot
 class Quad
 {
   public:
-	const static Logger log;
 	Quad();
 	~Quad();
 
@@ -29,4 +29,4 @@ class Quad
 
 }
 
-#endif // SST_QUAD_H
+#endif // SST_QUAD_H_

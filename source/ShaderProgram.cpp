@@ -2,7 +2,8 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "Logger.h"
+#include <Logger.h>
+
 #include "ShaderProgram.h"
 #include "android/AssetManager.h"
 

@@ -1,20 +1,21 @@
 #include <PySpotTuple.h>
 #include <PySpotString.h>
+#include <Logger.h>
+#include <PySpotExtension.h>
 
 #include "Script.h"
-#include "PySpotExtension.h"
-#include "Logger.h"
 #include "Entity.h"
 #include "Mesh.h"
 
-namespace sst = sunspot;
+using namespace sunspot;
 namespace mst = mathspot;
+namespace lst = logspot;
 
 
-pst::PySpot sst::Script::pyspot{ "sunspot", PyInit_PySpot };
+pst::PySpot Script::pyspot{ "sunspot", PyInit_PySpot };
 
 
-sst::Script::Script(sst::Entity& entity)
+Script::Script(Entity& entity)
 :	mEntity{ entity }
 ,	mModule{ pyspot.ImportModule(entity.GetMesh()->GetName().c_str()) }
 ,	mArgs  { 2 }
@@ -22,7 +23,7 @@ sst::Script::Script(sst::Entity& entity)
 	pst::PySpotTuple args{ 1 };
 	args.SetItem(0, *mEntity.mTransform);
 
-	sst::Logger::log.info("Calling python init\n");
+	lst::Logger::log.info("Calling python init\n");
 	mModule.CallFunction("init", args);
 
 	mEntity.mMesh->transform.ScaleX(mEntity.mTransform->GetScale().GetX());
@@ -37,12 +38,12 @@ sst::Script::Script(sst::Entity& entity)
 }
 
 
-void sst::Script::Update(const float delta)
+void Script::Update(const float delta)
 {
 	mArgs.SetItem(0, delta);
 	mArgs.SetItem(1, *mEntity.mTransform);
 	
-	sst::Logger::log.info("Calling python update\n");
+	lst::Logger::log.info("Calling python update\n");
 	mModule.CallFunction("update", mArgs);
 	
 	mEntity.mMesh->transform = mst::Mat4::identity;

@@ -1,12 +1,14 @@
 #include <iostream>
 #include <string>
 
+#include <Logger.h>
+
 #include "Mesh.h"
 #include "ShaderProgram.h"
-#include "Logger.h"
 
-namespace mst = mathspot;
 namespace sst = sunspot;
+namespace mst = mathspot;
+namespace lst = logspot;
 
 
 /// TODO Comment
@@ -39,7 +41,7 @@ sst::Mesh::Mesh(const std::string& name, std::vector<sst::Vertex>& v, std::vecto
 
 	glBindVertexArray(0); // Unbind vao
 
-	sst::Logger::log.info("Mesh: created %s\n", mName.c_str()); // TODO remove debug log
+	lst::Logger::log.info("Mesh: created %s\n", mName.c_str()); // TODO remove debug log
 }
 
 
@@ -50,7 +52,7 @@ sst::Mesh::~Mesh()
 	glDeleteVertexArrays(1, &mVao);
 	glDeleteBuffers(1, &mEbo);
 	glDeleteBuffers(1, &mVbo);
-	sst::Logger::log.info("Mesh: destroyed %s\n", mName.c_str()); // TODO remove debug log
+	lst::Logger::log.info("Mesh: destroyed %s\n", mName.c_str()); // TODO remove debug log
 }
 
 

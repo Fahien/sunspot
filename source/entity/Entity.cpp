@@ -1,30 +1,32 @@
-#include "Entity.h"
+#include <Logger.h>
+
 #include "Mesh.h"
-#include "Logger.h"
+#include "Entity.h"
 
-namespace sst = sunspot;
+using namespace sunspot;
+namespace lst = logspot;
 
 
-sst::Entity::Entity()
-:	mScript{ new sst::Script{ *this } }
+Entity::Entity()
+:	mScript{ new Script{ *this } }
 {}
 
 
-sst::Entity::Entity(sst::Mesh* mesh)
+Entity::Entity(Mesh* mesh)
 :	mMesh     { mesh }
 ,	mTransform{ new PySpotTransform{} }
-,	mScript   { new sst::Script{ *this } }
+,	mScript   { new Script{ *this } }
 {
-	sst::Logger::log.info("Entity: %s\n", mesh->GetName().c_str());
+	lst::Logger::log.info("Entity: %s\n", mesh->GetName().c_str());
 }
 
 
-sst::Entity::Entity(int id, std::string& name)
-:	sst::Object{ id, name }
+Entity::Entity(int id, std::string& name)
+:	Object{ id, name }
 {}
 
 
-sst::Entity::~Entity()
+Entity::~Entity()
 {
 	if (mTransform)
 	{
@@ -38,7 +40,7 @@ sst::Entity::~Entity()
 }
 
 
-void sst::Entity::Update(const float delta)
+void Entity::Update(const float delta)
 {
 	mScript->Update(delta);
 }

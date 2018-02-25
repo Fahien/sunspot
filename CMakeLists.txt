@@ -18,6 +18,11 @@ message("Searching modules in ${CMAKE_MODULE_PATH}")
 
 option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
+# LogSpoT
+set(LOGSPOT logspot)
+add_subdirectory(${LOGSPOT})
+set(LOGSPOT_INCLUDE_DIR ${LOGSPOT}/include)
+set(LOGSPOT_LIBRARIES ${LOGSPOT})
 
 # MathSpoT
 set(MATHSPOT mathspot)
@@ -125,8 +130,6 @@ set(SOURCES
 	${COMPONENT_HEADERS}
 	${SST_EXTENSION_HEADER}
 	${SST_EXTENSION_SOURCE}
-	source/Logger.h
-	source/Logger.cpp
 	source/Graphics.h
 	source/android/AssetManager.h
 	source/android/AssetManager.cpp
@@ -189,6 +192,7 @@ endif()
 # Add the given directories to those the compiler uses to search for include files
 
 target_include_directories(sunspot PUBLIC
+	${LOGSPOT_INCLUDE_DIR}
 	${MATHSPOT_INCLUDE_DIR}
 	${SOIL_INCLUDE_DIR}
 	${PYSPOT_INCLUDE_DIR}
@@ -197,6 +201,7 @@ target_include_directories(sunspot PUBLIC
 
 set(DEPENDENCY_LIBRARIES
 	${DEPENDENCY_LIBRARIES}
+	${LOGSPOT_LIBRARIES}
 	${MATHSPOT_LIBRARIES}
 	${SOIL_LIBRARIES}
 	${PYTHON_LIBRARIES}
