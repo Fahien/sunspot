@@ -70,7 +70,7 @@ set(DEPENDENCY_INCLUDE_DIRECTORIES
 	${PROJECT_SOURCE_DIR}/source
 	${PROJECT_SOURCE_DIR}/source/android
 	${PROJECT_SOURCE_DIR}/source/entity
-	${PROJECT_SOURCE_DIR}/source/data
+	${PROJECT_SOURCE_DIR}/source/repository
 	${PROJECT_BINARY_DIR}/component
 	${PROJECT_BINARY_DIR}/extension
 	${PYTHON_INCLUDE_DIR})
@@ -155,8 +155,10 @@ set(SOURCES
 	source/entity/Object.cpp
 	source/entity/Entity.h
 	source/entity/Entity.cpp
-	source/data/EntityData.h
-	source/data/EntityData.cpp
+	source/repository/ModelRepository.h
+	source/repository/ModelRepository.cpp
+	source/repository/EntityRepository.h
+	source/repository/EntityRepository.cpp
 	source/WavefrontObject.h
 	source/WavefrontObject.cpp
 	source/Color.h

@@ -95,6 +95,13 @@ void Window::render3D(const float& deltaTime) // TODO comment
 	mCamera->update(deltaTime, *mBaseProgram);
 	mLight->Update(*mBaseProgram);
 	for (WavefrontObject *obj : mObjs) { obj->draw(*mBaseProgram); }
+	for (Entity* entity : mEntities)
+	{
+		if (entity->GetMesh())
+		{
+			entity->GetMesh()->Draw(*mBaseProgram);
+		}
+	}
 }
 
 

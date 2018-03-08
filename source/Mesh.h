@@ -1,7 +1,9 @@
-#ifndef SST_MESH_H
-#define SST_MESH_H
+#ifndef SST_MESH_H_
+#define SST_MESH_H_
 
 #include <vector>
+#include <memory>
+
 #include <MathSpot.h>
 
 #include "Graphics.h"
@@ -9,6 +11,8 @@
 #include "Material.h"
 
 namespace mst = mathspot;
+
+class PySpotTransform;
 
 namespace sunspot {
 
@@ -27,11 +31,17 @@ struct Vertex
 class Mesh
 {
 public:
-	Mesh(const std::string& name, std::vector<Vertex>& vertices, std::vector<GLuint>& indices, Material* m);
+	Mesh(const std::string&         name,
+	     std::vector<Vertex>&       vertices,
+	     std::vector<GLuint>&       indices,
+	     std::shared_ptr<Material>& material);
 	~Mesh();
 
 	/// Returns the name of the mesh
 	std::string& GetName() { return mName; }
+
+	/// Applies the value of the transform component to the member transform matrix
+	void ApplyTransform(PySpotTransform& pTransform);
 
 	void Draw(const ShaderProgram& shader) const;
 
@@ -46,11 +56,11 @@ private:
 	GLuint mVao;
 	GLuint mVbo;
 	GLuint mEbo;
-	Material* mMaterial;
+	std::shared_ptr<Material> mMaterial;
 };
 
 
 }
 
 
-#endif // SST_MESH_H
+#endif // SST_MESH_H_

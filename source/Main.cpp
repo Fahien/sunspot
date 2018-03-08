@@ -20,7 +20,8 @@
 #include "Mesh.h"
 #include "Texture.h"
 #include "Entity.h"
-#include "EntityData.h"
+#include "ModelRepository.h"
+#include "EntityRepository.h"
 
 
 namespace sst = sunspot;
@@ -93,19 +94,19 @@ int main(int argc, char **argv)
 		bool stereoscopic{ contains(arguments, "-stereoscopic") }; // Stereoscopic rendering
 
 		// Project name
-		std::string project{ "default" };
+		std::string projectName{ "default" };
 		if ((it = std::find(arguments.begin(), arguments.end(), "-project")) != arguments.end())
 		{
 			if (++it != arguments.end())
 			{
-				project = *it;
+				projectName = *it;
 			}
-			lst::Logger::log.info("Project [%s]\n", project.c_str());
+			lst::Logger::log.info("Project [%s]\n", projectName.c_str());
 		}
 
 		// Load database
 		dst::DataSpot dataspot;
-		dataspot.Open(projectDir + "/" + project + "/" + project + ".data");
+		dataspot.Open(projectDir + "/" + projectName + "/" + projectName + ".data");
 		windowSize.width  = std::stoi(dataspot.GetConfigValue("window.width"));
 		windowSize.height = std::stoi(dataspot.GetConfigValue("window.height"));
 		decorated = true;
@@ -145,35 +146,25 @@ int main(int argc, char **argv)
 			window.setFramebuffer(&framebuffer);
 		}
 
-		sst::EntityData entityData{ dataspot };
+		// Initialize PySpot
+		std::wstring wProjectDir{ projectDir.begin(), projectDir.end() };
+		std::wstring wProjectName{ projectName.begin(), projectName.end() };
+		sst::Script::Initialize(L"/" + wProjectDir + L"/" + wProjectName + L"/script");
+
+		std::string projectPath{ projectDir + "/" + projectName + "/" };
+		sst::ModelRepository modelRepository{ dataspot, projectPath };
+		sst::EntityRepository entityRepository{ dataspot, modelRepository };
 
 		// Read a set of objects from dataspot
-		constexpr size_t objectsCount = 2;
+		constexpr size_t objectsCount = 3;
 		// Create an array of Objects
 		std::array<sst::WavefrontObject, objectsCount> objects{};
 		// For every object get the name
 		for (size_t i{ 0 }; i < objectsCount; ++i)
 		{
-			std::string entityName{ dataDir + entityData.LoadEntity(i + 1) + objExt };
-			sst::Ifstream is{ entityName }; // TODO get the name from dataspot
-			if (!is.is_open())
-			{
-				lst::Logger::log.error("Could not find %s\n", entityName.c_str());
-				return EXIT_FAILURE;
-			}
-			auto& obj = objects[i];
-			// Load Wavefront Object
-			is >> obj;
-			obj.GetMaterials().back()->shininess = 1.0f;
-			obj.GetMeshes().back()->transform.RotateZ(0.4f);
-
-			window.addObj(&obj);
-
-			sst::Mesh* mesh{ obj.GetMeshes()[0] };
-
-			sst::Entity* entity{ new sst::Entity{ mesh }};
-			std::shared_ptr<sst::Entity> pEntity{ entity };
-			window.addEntity(pEntity);
+			sst::Entity* entity{ entityRepository.LoadEntity(i+1) };
+			//std::shared_ptr<sst::Entity> pEntity{ entity };
+			window.AddEntity(entity);
 		}
 
 		window.loop(); // Game loop

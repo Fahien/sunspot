@@ -37,9 +37,14 @@ sst::Material::Material(const char* n)
 sst::Material::~Material()
 {
 	if (hasDiffuseMap)
+	{
 		glDeleteTextures(1, &diffuseMap);
+	}
+
 	if (hasSpecularMap)
+	{
 		glDeleteTextures(1, &specularMap);
+	}
 
 	lst::Logger::log.info("Material: destroyed %s\n", name.c_str()); // TODO remove debug log
 }

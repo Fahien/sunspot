@@ -8,17 +8,9 @@ namespace lst = logspot;
 
 
 Entity::Entity()
-:	mScript{ new Script{ *this } }
+:	mMesh{ nullptr }
+,	mScript{ new Script{ *this } }
 {}
-
-
-Entity::Entity(Mesh* mesh)
-:	mMesh     { mesh }
-,	mTransform{ new PySpotTransform{} }
-,	mScript   { new Script{ *this } }
-{
-	lst::Logger::log.info("Entity: %s\n", mesh->GetName().c_str());
-}
 
 
 Entity::Entity(int id, std::string& name)
@@ -42,5 +34,8 @@ Entity::~Entity()
 
 void Entity::Update(const float delta)
 {
-	mScript->Update(delta);
+	if (mScript)
+	{
+		mScript->Update(delta);
+	}
 }

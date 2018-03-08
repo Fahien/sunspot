@@ -1,11 +1,11 @@
-bin
+.vscode
 build
-include
-lib
 data
 doc
+include
+lib
+project
 script
-.vscode
 output.dat
 .ycm_extra_conf.pyc
 .pyc

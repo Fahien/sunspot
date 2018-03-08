@@ -44,9 +44,10 @@ public:
 	inline std::vector<Vertex>&    getVertices()  { return mVertices;  }
 	inline std::vector<GLuint>&    getIndices()   { return mIndices;   }
 	inline std::vector<Texture>&   getTextures()  { return mTextures;  }
-	inline std::vector<Material*>& GetMaterials() { return mMaterials; }
+	inline std::vector<std::shared_ptr<Material>>& GetMaterials() { return mMaterials; }
 
-	inline std::vector<Mesh*>& GetMeshes() { return mMeshes; }
+	std::shared_ptr<Mesh> GetMesh(const std::string& name);
+	inline std::vector<std::shared_ptr<Mesh>>& GetMeshes() { return mMeshes; }
 
 	void draw(const ShaderProgram& shader) const;
 
@@ -89,10 +90,10 @@ private:
 	std::vector<GLuint>    mIndices;
 	std::vector<Texture>   mTextures;
 
-	std::vector<Mesh*> mMeshes;
+	std::vector<std::shared_ptr<Mesh>> mMeshes;
 	
-	Material* mCurrentMaterial;
-	std::vector<Material*> mMaterials;
+	std::shared_ptr<Material> mCurrentMaterial;
+	std::vector<std::shared_ptr<Material>> mMaterials;
 };
 
 

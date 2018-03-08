@@ -12,12 +12,53 @@ namespace mst = mathspot;
 namespace lst = logspot;
 
 
-pst::PySpot Script::pyspot{ "sunspot", PyInit_PySpot };
+std::unique_ptr<pst::PySpot> Script::pyspot{ nullptr };
+
+
+void Script::Initialize(const std::wstring& scriptPath)
+{
+	if (!pyspot)
+	{
+		pyspot = std::make_unique<pst::PySpot>("sunspot", PyInit_PySpot, scriptPath.c_str());
+	}
+}
+
+
+Script::Script(const int id, std::string& name, Entity& entity)
+: Object{ id, name }
+, mEntity{ entity }
+, mModule{ pyspot->ImportModule(name) }
+, mArgs{ 2 }
+{}
+
+
+void Script::Initialize()
+{
+	if (mEntity.GetTransform())
+	{
+		pst::PySpotTuple args{ 1 };
+		args.SetItem(0, *mEntity.mTransform);
+
+		lst::Logger::log.info("Calling python init\n");
+		mModule.CallFunction("init", args);
+
+		// TODO refactor this
+		mEntity.mMesh->transform.ScaleX(mEntity.mTransform->GetScale().GetX());
+		mEntity.mMesh->transform.ScaleY(mEntity.mTransform->GetScale().GetY());
+		mEntity.mMesh->transform.ScaleZ(mEntity.mTransform->GetScale().GetZ());
+		mEntity.mMesh->transform.TranslateX(mEntity.mTransform->GetPosition().GetX());
+		mEntity.mMesh->transform.TranslateY(mEntity.mTransform->GetPosition().GetY());
+		mEntity.mMesh->transform.TranslateZ(mEntity.mTransform->GetPosition().GetZ());
+		mEntity.mMesh->transform.RotateX(mEntity.mTransform->GetRotation().GetX());
+		mEntity.mMesh->transform.RotateY(mEntity.mTransform->GetRotation().GetY());
+		mEntity.mMesh->transform.RotateZ(mEntity.mTransform->GetRotation().GetZ());
+	}
+}
 
 
 Script::Script(Entity& entity)
 :	mEntity{ entity }
-,	mModule{ pyspot.ImportModule(entity.GetMesh()->GetName().c_str()) }
+,	mModule{ pyspot->ImportModule(entity.GetMesh()->GetName().c_str()) }
 ,	mArgs  { 2 }
 {
 	pst::PySpotTuple args{ 1 };

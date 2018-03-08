@@ -9,6 +9,7 @@
 #include "WavefrontObject.h"
 
 
+using namespace std;
 using namespace sunspot;
 namespace mst = mathspot;
 namespace lst = logspot;
@@ -39,11 +40,22 @@ WavefrontObject::WavefrontObject()
 /// Release resources
 WavefrontObject::~WavefrontObject()
 {
-	for (auto& mesh : mMeshes)
-	{
-		delete mesh;
-	}
 	lst::Logger::log.info("WavefrontObject: destroyed %s\n", mName.c_str()); // TODO remove debug log
+}
+
+
+/// Returns the mesh with this name
+std::shared_ptr<Mesh> WavefrontObject::GetMesh(const std::string& name)
+{
+	for (auto& pMesh : mMeshes)
+	{
+		if(pMesh->GetName() == name)
+		{
+			return pMesh;
+		}
+	}
+
+	throw runtime_error{ "Mesh not found: " + name };
 }
 
 
@@ -270,11 +282,12 @@ void WavefrontObject::loadCachedMesh()
 {
 	if (!mVertices.empty() && !mIndices.empty())
 	{
-		if (mCurrentMaterial == nullptr)
+		if (!mCurrentMaterial)
 		{
 			mCurrentMaterial = mMaterials.back();
 		}
-		mMeshes.push_back( new Mesh{ mCurrentGroupName, mVertices, mIndices, mCurrentMaterial });
+		std::shared_ptr<Mesh> pMesh{ new Mesh{ mCurrentGroupName, mVertices, mIndices, mCurrentMaterial } };
+		mMeshes.push_back(pMesh);
 		mVertices.clear();
 		mVertexCount = 0;
 		mIndices.clear();
@@ -438,11 +451,11 @@ void WavefrontObject::createMaterial(std::stringstream& ss)
 		throw LoadingException{ "Error reading material name" };
 	}
 	// Create new current material
-	if (mCurrentMaterial != nullptr)
+	if (mCurrentMaterial)
 	{
 		throw LoadingException{ "Current material is not null" };
 	}
-	mCurrentMaterial = new Material{ name };
+	mCurrentMaterial = std::shared_ptr<Material>{ new Material{ name } };
 }
 
 
@@ -654,11 +667,11 @@ void WavefrontObject::useMaterial(std::stringstream& ss)
 		throw LoadingException{ "Error reading material name" };
 	}
 
-	for (Material* m : mMaterials)
+	for (auto material : mMaterials)
 	{
-		if (m->name == materialName)
+		if (material->name == materialName)
 		{
-			mCurrentMaterial = m;
+			mCurrentMaterial = material;
 		}
 	}
 }

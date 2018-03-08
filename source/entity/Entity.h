@@ -5,6 +5,7 @@
 #include "Script.h"
 #include "Object.h"
 
+#include <memory>
 
 namespace sunspot
 {
@@ -17,35 +18,57 @@ class Entity : public Object
 {
 public:
 	Entity();
-	Entity(Mesh* mesh);
 	Entity(int id, std::string& name);
 
 	~Entity();
 
-	inline Mesh* GetMesh() { return mMesh; }
-	inline void SetMesh(Mesh* mesh) { mMesh = mesh; }
+	inline std::shared_ptr<Mesh>& GetMesh() { return mMesh; }
+	inline void SetMesh(std::shared_ptr<Mesh>& mesh) { mMesh = mesh; }
 
-	inline PySpotTransform& GetTransform() { return *mTransform; }
+	inline PySpotTransform* GetTransform() { return mTransform; }
 	inline void SetTransform(PySpotTransform* transform);
+
+	inline Script* GetScript() { return mScript; }
+	inline void SetScript(Script* script);
 
 	void Update(const float delta);
 
 private:
-	Mesh*            mMesh      = nullptr;
-	PySpotTransform* mTransform = nullptr;
-	Script*          mScript    = nullptr;
+	std::shared_ptr<Mesh> mMesh;
+	PySpotTransform*      mTransform = nullptr;
+	Script*               mScript    = nullptr;
 
 	friend class Script;
 };
 
 void Entity::SetTransform(PySpotTransform* transform)
 {
-	if (!mTransform)
+	if (mTransform == transform)
+	{
+		return;
+	}
+
+	if (mTransform)
 	{
 		delete mTransform;
 	}
 
 	mTransform = transform;
+}
+
+void Entity::SetScript(Script* script)
+{
+	if (mScript == script)
+	{
+		return;
+	}
+
+	if (mScript)
+	{
+		delete mScript;
+	}
+
+	mScript = script;
 }
 
 }
