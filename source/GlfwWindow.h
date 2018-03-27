@@ -1,9 +1,10 @@
-#ifndef SST_GLFWWINDOW_H
-#define SST_GLFWWINDOW_H
+#ifndef SST_GLFWWINDOW_H_
+#define SST_GLFWWINDOW_H_
 
-#include <Window.h>
-#include <Cursor.h>
 #include <Logger.h>
+
+#include "Cursor.h"
+#include "Window.h"
 
 
 struct GLFWmonitor;
@@ -24,8 +25,6 @@ public:
 class GlfwWindow : public Window
 {
 public:
-	static const std::string tag;
-
 	GlfwWindow(const char* title, const mst::Size windowSize, const bool decorated, const bool stereoscopic);
 	~GlfwWindow();
 
@@ -54,4 +53,4 @@ private:
 
 }
 
-#endif // SST_GLFWWINDOW_H
+#endif // SST_GLFWWINDOW_H_

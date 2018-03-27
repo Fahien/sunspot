@@ -9,9 +9,6 @@ using namespace sunspot;
 namespace lst = logspot;
 
 
-const std::string GlfwWindow::tag{ "GlfwWindow" };
-
-
 GlfwWindow::GlfwWindow(const char* title,
                        const mst::Size windowSize,
                        const bool decorated,

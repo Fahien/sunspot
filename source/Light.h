@@ -1,5 +1,5 @@
-#ifndef SST_LIGHT_H
-#define SST_LIGHT_H
+#ifndef SST_LIGHT_H_
+#define SST_LIGHT_H_
 
 #include <MathSpot.h>
 
@@ -18,11 +18,11 @@ class Light
 {
 public:
 	Light(const float r, const float g, const float b);
-	Light(Color color) : mAmbient{ color }, mDiffuse{ color }, mSpecular{} {}
+	Light(const Color& color) : mAmbient{ color }, mDiffuse{ color }, mSpecular{} {}
 
-	inline Color &GetAmbient()  { return mAmbient;  }
-	inline Color &GetDiffuse()  { return mDiffuse;  }
-	inline Color &GetSpecular() { return mSpecular; }
+	inline Color& GetAmbient()  { return mAmbient;  }
+	inline Color& GetDiffuse()  { return mDiffuse;  }
+	inline Color& GetSpecular() { return mSpecular; }
 
 	virtual void Update(const ShaderProgram& program) const = 0;
 
@@ -36,7 +36,7 @@ protected:
 class DirectionalLight : public Light
 {
 public:
-	DirectionalLight(Color color) : Light{ color } {}
+	DirectionalLight(const Color& color) : Light{ color } {}
 
 	inline mst::Vec3& GetDirection() { return mDirection; }
 	inline void SetDirection(const float x, const float y, const float z) { mDirection.x = x; mDirection.y = y; mDirection.z = z; }
@@ -51,7 +51,7 @@ private:
 class PointLight : public Light
 {
 public:
-	PointLight(Color color) : Light{ color } {}
+	PointLight(const Color& color) : Light{ color } {}
 
 	inline mst::Vec3& GetPosition() { return mPosition; }
 	inline void SetPosition(const float x, const float y, const float z) { mPosition.x = x; mPosition.y = y; mPosition.z = z; }
@@ -66,4 +66,4 @@ private:
 }
 
 
-#endif // SST_LIGHT_H
+#endif // SST_LIGHT_H_
