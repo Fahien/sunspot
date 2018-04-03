@@ -7,21 +7,21 @@
 #include "Graphics.h"
 #include "ShaderProgram.h"
 
-namespace sst = sunspot;
-namespace lst = logspot;
+using namespace std;
+using namespace sunspot;
+using namespace logspot;
 
 
-sst::Material::Material()
-:	sst::Material("default")
+Material::Material()
+:	Material("default")
 {}
 
 
-sst::Material::Material(std::string& n)
-:	sst::Material{ n.c_str() }
+Material::Material(string& n)
+:	Material{ n.c_str() }
 {}
 
-
-sst::Material::Material(const char* n)
+Material::Material(const char* n)
 :	name{ n }
 ,	ambient {}
 ,	diffuse {}
@@ -30,11 +30,11 @@ sst::Material::Material(const char* n)
 ,	hasDiffuseMap { false }
 ,	hasSpecularMap{ false }
 {
-	lst::Logger::log.info("Material: created %s\n", n); // TODO remove debug log
+	Logger::log.info("Material: created %s\n", n); // TODO remove debug log
 }
 
 
-sst::Material::~Material()
+Material::~Material()
 {
 	if (hasDiffuseMap)
 	{
@@ -46,12 +46,20 @@ sst::Material::~Material()
 		glDeleteTextures(1, &specularMap);
 	}
 
-	lst::Logger::log.info("Material: destroyed %s\n", name.c_str()); // TODO remove debug log
+	Logger::log.info("Material: destroyed %s\n", name.c_str()); // TODO remove debug log
 }
 
 
-void sst::Material::bind(const sst::ShaderProgram& shader) const
+void Material::bind(const ShaderProgram& shader) const
 {
+	// Bind PBR base colour
+	glUniform3f(shader.getLocation("material.color"), color.r, color.g, color.b);
+	// Bind PVR metallic factor
+	glUniform1f(shader.getLocation("material.metallic"), metallic);
+	// Bind PVR roughness factor
+	glUniform1f(shader.getLocation("material.roughness"), roughness);
+	// Bind PVR ambient occlusion
+	glUniform1f(shader.getLocation("material.ambientOcclusion"), ambientOcclusion);
 	// Bind ambient color
 	glUniform3f(shader.getLocation("material.ambient"),  ambient.r,  ambient.g,  ambient.b);
 	// Bind diffuse color
@@ -82,7 +90,7 @@ void sst::Material::bind(const sst::ShaderProgram& shader) const
 }
 
 
-std::ostream& sst::operator<<(std::ostream& os, const Material& m)
+ostream& operator<<(ostream& os, const Material& m)
 {
 	return os << "Material["      << m.name        << "]\n"
 	          << "\tambient["     << m.ambient     << "]\n"

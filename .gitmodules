@@ -13,3 +13,6 @@
 [submodule "logspot"]
 	path = logspot
 	url = https://github.com/Fahien/logspot
+[submodule "gltfspot"]
+	path = gltfspot
+	url = https://github.com/Fahien/gltfspot.git

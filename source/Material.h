@@ -27,6 +27,11 @@ public:
 
 	std::string name;
 
+	Color color;
+	float metallic;
+	float roughness;
+	float ambientOcclusion;
+
 	Color ambient;
 	Color diffuse;
 	Color specular;

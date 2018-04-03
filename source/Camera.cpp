@@ -76,21 +76,27 @@ void Camera::updateView()
 
 void Camera::update(const float deltaTime, const ShaderProgram& program)
 {
-	if (mVelocity.x != 0.0f) {
+	if (mVelocity.x != 0.0f)
+	{
 		mPosition.x += mRight.x * mVelocity.x * mVelocityFactor * deltaTime;
 		mPosition.y += mRight.y * mVelocity.x * mVelocityFactor * deltaTime;
 		mPosition.z += mRight.z * mVelocity.x * mVelocityFactor * deltaTime;
 	}
-	if (mVelocity.y != 0.0f) {
+
+	if (mVelocity.y != 0.0f)
+	{
 		mPosition.x += mUp.x * mVelocity.y * mVelocityFactor * deltaTime;
 		mPosition.y += mUp.y * mVelocity.y * mVelocityFactor * deltaTime;
 		mPosition.z += mUp.z * mVelocity.y * mVelocityFactor * deltaTime;
 	}
-	if (mVelocity.z != 0.0f) {
+
+	if (mVelocity.z != 0.0f)
+	{
 		mPosition.x += mDirection.x * mVelocity.z * mVelocityFactor * deltaTime;
 		mPosition.y += mDirection.y * mVelocity.z * mVelocityFactor * deltaTime;
 		mPosition.z += mDirection.z * mVelocity.z * mVelocityFactor * deltaTime;
 	}
+
 	updateView();
 
 	GLuint location{ program.getLocation("view") };

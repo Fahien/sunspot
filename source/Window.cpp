@@ -5,6 +5,7 @@
 #include <chrono>
 #endif
 
+#include "view/GltfRenderer.h"
 #include "Graphics.h"
 #include "Window.h"
 #include "ShaderProgram.h"
@@ -80,8 +81,23 @@ void Window::render(const float& deltaTime) // TODO comment
 	}
 	else
 	{
-		render3D(deltaTime);
+		renderGltf(deltaTime);
 	}
+}
+
+
+void Window::renderGltf(const float& deltaTime)
+{
+	glEnable(GL_DEPTH_TEST);
+	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	glViewport(0, 0, mFrameSize.width, mFrameSize.height);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
+	mBaseProgram->use();
+	mCamera->update(deltaTime, *mBaseProgram);
+	mLight->Update(*mBaseProgram);
+
+	mGltfRenderer->Draw(*mBaseProgram);
 }
 
 

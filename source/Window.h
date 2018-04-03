@@ -24,6 +24,8 @@ class Framebuffer;
 class Camera;
 class Entity;
 
+class GltfRenderer;
+
 
 class GlewException : public GraphicException
 {
@@ -44,7 +46,7 @@ public:
 	inline void setBaseProgram(const ShaderProgram* baseProgram) { mBaseProgram = baseProgram; }
 	inline void setLight(Light* light) { mLight = light; }
 	inline void addObj(WavefrontObject* obj) { mObjs.push_back(obj); }
-	//inline void addEntity(std::shared_ptr<Entity> entity) { mEntities.push_back(entity); }
+	inline void AddGltf(GltfRenderer* renderer) { mGltfRenderer = renderer; }
 	inline void AddEntity(Entity* entity) { mEntities.push_back(entity); }
 
 	inline void setQuad(Quad* quad) { mQuad = quad; }
@@ -84,6 +86,7 @@ protected:
 private:
 	void render(const float &deltaTime);
 	void render3D(const float& deltaTime);
+	void renderGltf(const float& deltaTime);
 	void renderQuad(const float& deltaTime);
 	void renderStereoscopic(const float& deltaTime);
 
@@ -92,6 +95,7 @@ private:
 	std::vector<WavefrontObject*> mObjs;
 	//std::vector<std::shared_ptr<Entity>> mEntities;
 	std::vector<Entity*> mEntities;
+	GltfRenderer* mGltfRenderer;
 	const ShaderProgram* mQuadProgram;
 	const ShaderProgram* mDepthProgram;
 	const Framebuffer* mFramebuffer;

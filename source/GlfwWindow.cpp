@@ -13,10 +13,10 @@ GlfwWindow::GlfwWindow(const char* title,
                        const mst::Size windowSize,
                        const bool decorated,
                        const bool stereoscopic)
-	: Window::Window{ title, windowSize, decorated, stereoscopic }
-	, mMonitor      { nullptr }
-	, mVideoMode    { nullptr }
-	, mWindow       { nullptr }
+:	Window::Window{ title, windowSize, decorated, stereoscopic }
+,	mMonitor      { nullptr }
+,	mVideoMode    { nullptr }
+,	mWindow       { nullptr }
 {
 	// Initialize GLFW and handle error
 	if (glfwInit() != GLFW_TRUE)

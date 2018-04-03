@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.6)
 include(CMakeToolsHelpers OPTIONAL)
 project(SunSpoT)
 
-set(CMAKE_C_STANDARD   11)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_STANDARD   14)
+set(CMAKE_CXX_STANDARD 14)
 #set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wall")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti -Wall")
 
@@ -48,10 +48,17 @@ add_subdirectory(${DATASPOT})
 set(DATASPOT_INCLUDE_DIR ${DATASPOT}/include)
 set(DATASPOT_LIBRARIES ${DATASPOT})
 
+# GltfSpoT
+set(GLTFSPOT gltfspot)
+add_subdirectory(${GLTFSPOT})
+set(GLTFSPOT_INCLUDE_DIR ${GLTFSPOT}/include)
+set(GLTFSPOT_LIBRARIES ${GLTFSPOT})
+
 # Version number
 set(SST_VERSION_MAJOR 0)
 set(SST_VERSION_MINOR 14)
 set(SST_TITLE "SunSpoT")
+set(SST_NAME sunspot)
 
 # Configure a header file to pass some of the CMake settings to the source code
 configure_file(
@@ -159,6 +166,8 @@ set(SOURCES
 	source/repository/ModelRepository.cpp
 	source/repository/EntityRepository.h
 	source/repository/EntityRepository.cpp
+	source/view/GltfRenderer.h
+	source/view/GltfRenderer.cpp
 	source/WavefrontObject.h
 	source/WavefrontObject.cpp
 	source/Color.h
@@ -184,21 +193,21 @@ endif()
 
 source_group("Sources" FILES ${SOURCES})
 
-if(${ANDROID})
-	add_library(sunspot ${SOURCES} ${SHADERS})
-else()
-	add_executable(sunspot ${SOURCES} ${SHADERS})
-endif()
+add_library(${SST_NAME}-lib ${SOURCES} ${SHADERS})
+
+add_executable(${SST_NAME} ${SOURCES} ${SHADERS})
+
 
 
 # Add the given directories to those the compiler uses to search for include files
 
-target_include_directories(sunspot PUBLIC
+target_include_directories(${SST_NAME}-lib PUBLIC
 	${LOGSPOT_INCLUDE_DIR}
 	${MATHSPOT_INCLUDE_DIR}
 	${SOIL_INCLUDE_DIR}
 	${PYSPOT_INCLUDE_DIR}
 	${DATASPOT_INCLUDE_DIR}
+	${GLTFSPOT_INCLUDE_DIR}
 	${DEPENDENCY_INCLUDE_DIRECTORIES})
 
 set(DEPENDENCY_LIBRARIES
@@ -208,14 +217,21 @@ set(DEPENDENCY_LIBRARIES
 	${SOIL_LIBRARIES}
 	${PYTHON_LIBRARIES}
 	${PYSPOT_LIBRARIES}
-	${DATASPOT_LIBRARIES})
+	${DATASPOT_LIBRARIES}
+	${GLTFSPOT_LIBRARIES})
 
 if(WIN32)
-	set_target_properties(sunspot PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt")
+	set_target_properties(${SST_NAME}-lib PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt")
 endif(WIN32)
 
-set_target_properties(sunspot PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(${SST_NAME}-lib PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(${SST_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
-target_link_libraries(sunspot ${DEPENDENCY_LIBRARIES})
+target_link_libraries(${SST_NAME}-lib ${DEPENDENCY_LIBRARIES})
+target_link_libraries(${SST_NAME} ${SST_NAME}-lib)
 
 file(COPY ${PROJECT_SOURCE_DIR}/shader DESTINATION ${PROJECT_BINARY_DIR})
+
+# Test
+set(SST_TEST_DIR ${PROJECT_SOURCE_DIR}/test)
+include(${SST_TEST_DIR}/Tests.cmake)
