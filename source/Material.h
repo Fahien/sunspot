@@ -11,6 +11,7 @@ namespace sunspot
 {
 
 class ShaderProgram;
+class Texture;
 
 struct Material
 {
@@ -31,6 +32,8 @@ public:
 	float metallic;
 	float roughness;
 	float ambientOcclusion;
+
+	Texture* colorTexture = nullptr;
 
 	Color ambient;
 	Color diffuse;

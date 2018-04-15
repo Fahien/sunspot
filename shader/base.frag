@@ -4,9 +4,16 @@ const float zero = 0.0f;
 const float one  = 1.0f;
 const float pi   = 3.14159265359f;
 
+struct Vertex
+{
+	bool hasColor;
+};
+
 struct Material
 {
 	vec3 color;
+	bool hasColorTexture;
+	sampler2D colorTexture;
 	float metallic;
 	float roughness;
 	float ambientOcclusion;
@@ -41,6 +48,7 @@ struct Fragment
 	vec3 position;
 	vec3 normal;
 	vec2 coords;
+	bool hasVertexColor;
 	vec3 color;
 };
 
@@ -57,10 +65,12 @@ uniform DirectionalLight dLight;
 
 uniform Camera camera;
 uniform Material material;
+uniform Vertex vertex;
 
 in vec3 position;
 in vec3 normal;
 in vec2 texCoords;
+in vec4 vertColor;
 
 out vec4 color;
 
@@ -163,8 +173,7 @@ void applyPBRPointLight(in PointLight light, in Camera camera, inout Fragment fr
 	vec3 lightOutput = vec3(zero);
 
 	vec3 f0 = vec3(0.04f);
-	// TODO use albedo
-	f0 = mix(f0, material.color, material.metallic);
+	f0 = mix(f0, fragment.color, material.metallic);
 
 	float cosTheta = max(dot(cameraDirection, lightDirection), zero);
 	vec3 fresnelSchlick = calculateFresnelSchlick(cosTheta, f0);
@@ -181,11 +190,9 @@ void applyPBRPointLight(in PointLight light, in Camera camera, inout Fragment fr
 	vec3 kD = vec3(one) - kS;
 	kD *= one - material.metallic;
 
-	// TODO use albedo
-	lightOutput += (kD * material.color / pi + specular) * radiance * diffuseFactor;
+	lightOutput += (kD * fragment.color / pi + specular) * radiance * diffuseFactor;
 
-	// TODO use albedo
-	vec3 ambient = vec3(0.03f) * material.color * material.ambientOcclusion;
+	vec3 ambient = vec3(0.03f) * fragment.color * material.ambientOcclusion;
 	vec3 color = ambient + lightOutput;
 	color = color / (color + vec3(one));
 	color = pow(color, vec3(one / 2.2f));
@@ -200,9 +207,13 @@ void main()
 	fragment.position = position;
 	fragment.normal   = normalize(normal);
 	fragment.coords   = vec2(one - texCoords.x, texCoords.y);
-	fragment.color    = material.hasDiffuseMap ? vec3(texture(material.diffuseMap, fragment.coords)) : vec3(one);
+	fragment.color    = material.hasColorTexture ? texture(material.colorTexture, fragment.coords).rgb : material.color;
+	if (vertex.hasColor)
+	{
+		fragment.color *= vertColor.rgb;
+	}
 
 	applyPBRPointLight(pLight, camera, fragment);
 
-	color = vec4(fragment.color, one);
+	color = vec4(fragment.color, vertColor.a);
 }

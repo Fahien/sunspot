@@ -3,11 +3,13 @@
 
 #include "Graphics.h"
 #include "Material.h"
+#include "Texture.h"
+#include "view/GltfMesh.h"
 
 #include <Gltf.h>
 
 
-namespace gsp = gltfspot;
+namespace gst = gltfspot;
 
 
 namespace sunspot
@@ -18,18 +20,26 @@ class ShaderProgram;
 class GltfRenderer
 {
 public:
-	GltfRenderer(gsp::Gltf& model);
+	GltfRenderer(gst::Gltf& model);
 	~GltfRenderer();
 
-	void Draw(const ShaderProgram& shader) const;
+	void Draw(const ShaderProgram& shader);
 
 private:
+	void draw(const ShaderProgram& shader, const gst::Gltf::Node* const pNode);
+
+	gst::Gltf mModel;
+	std::map<gst::Gltf::Mesh*, GltfMesh> mMeshes;
+
 	GLuint mVao;
-	GLuint mVbo;
+	std::map<size_t, GLuint> mVbos;
 	GLuint mEbo;
 	size_t mIndicesCount;
+	bool mHasVertexColors;
 
 	Material mMaterial;
+
+	std::map<gst::Gltf::Texture*, Texture> mTextures;
 };
 
 }

@@ -6,6 +6,7 @@
 #include "Material.h"
 #include "Graphics.h"
 #include "ShaderProgram.h"
+#include "Texture.h"
 
 using namespace std;
 using namespace sunspot;
@@ -54,12 +55,26 @@ void Material::bind(const ShaderProgram& shader) const
 {
 	// Bind PBR base colour
 	glUniform3f(shader.getLocation("material.color"), color.r, color.g, color.b);
-	// Bind PVR metallic factor
+
+	// Bind PBR base color texture
+	glUniform1i(shader.getLocation("material.hasColorTexture"), colorTexture != nullptr);
+	if (colorTexture)
+	{
+		glUniform1i(shader.getLocation("material.colorTexture"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, colorTexture->getId());
+	}
+
+	// Bind PBR metallic factor
 	glUniform1f(shader.getLocation("material.metallic"), metallic);
-	// Bind PVR roughness factor
+
+	// Bind PBR roughness factor
 	glUniform1f(shader.getLocation("material.roughness"), roughness);
-	// Bind PVR ambient occlusion
+
+	// Bind PBR ambient occlusion
 	glUniform1f(shader.getLocation("material.ambientOcclusion"), ambientOcclusion);
+
+	// TODO deprecate
 	// Bind ambient color
 	glUniform3f(shader.getLocation("material.ambient"),  ambient.r,  ambient.g,  ambient.b);
 	// Bind diffuse color

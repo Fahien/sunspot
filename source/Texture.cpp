@@ -35,6 +35,7 @@ Texture::Texture(const std::string& path, const TextureType& type)
 
 Texture::~Texture()
 {
+	// TODO Release MIPMAP
 	lst::Logger::log.info("Texture: destroyed %s\n", mName.c_str()); // TODO remove debug log
 }
 
