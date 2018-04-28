@@ -1,9 +1,11 @@
 #include "view/GltfRenderer.h"
 #include "Graphics.h"
 #include "ShaderProgram.h"
+#include "MathSpot.h"
 
 using namespace std;
 using namespace sunspot;
+using namespace mathspot;
 using namespace gltfspot;
 
 
@@ -26,19 +28,21 @@ GltfRenderer::~GltfRenderer()
 {}
 
 
-void GltfRenderer::draw(const ShaderProgram& shader, const Gltf::Node* const pNode)
+void GltfRenderer::draw(const ShaderProgram& shader,
+                        const Gltf::Node* pNode,
+                        const Mat4& matrix)
 {
 	// Render its children
 	for (auto pChild : pNode->children)
 	{
-		draw(shader, pChild);
+		draw(shader, pChild, pNode->matrix);
 	}
 
 	// Render the node
 	if (pNode->pMesh)
 	{
 		auto& mesh = mMeshes[pNode->pMesh];
-		mesh.SetMatrix(pNode->matrix);
+		mesh.SetMatrix(pNode->matrix * matrix);
 		mMeshes[pNode->pMesh].Draw(shader);
 	}
 }

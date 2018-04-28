@@ -206,7 +206,7 @@ void main()
 	Fragment fragment;
 	fragment.position = position;
 	fragment.normal   = normalize(normal);
-	fragment.coords   = vec2(one - texCoords.x, texCoords.y);
+	fragment.coords   = texCoords;
 	fragment.color    = material.hasColorTexture ? texture(material.colorTexture, fragment.coords).rgb : material.color;
 	if (vertex.hasColor)
 	{

@@ -26,7 +26,9 @@ public:
 	void Draw(const ShaderProgram& shader);
 
 private:
-	void draw(const ShaderProgram& shader, const gst::Gltf::Node* const pNode);
+	void draw(const ShaderProgram& shader,
+	          const gst::Gltf::Node* pNode,
+	          const mst::Mat4& matrix = mst::Mat4::identity);
 
 	gst::Gltf mModel;
 	std::map<gst::Gltf::Mesh*, GltfMesh> mMeshes;
