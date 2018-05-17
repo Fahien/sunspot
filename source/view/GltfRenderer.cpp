@@ -1,12 +1,16 @@
 #include "view/GltfRenderer.h"
+#include "view/GltfPrimitive.h"
+
+#include "Logger.h"
 #include "Graphics.h"
 #include "ShaderProgram.h"
 #include "MathSpot.h"
 
 using namespace std;
-using namespace sunspot;
+using namespace logspot;
 using namespace mathspot;
 using namespace gltfspot;
+using namespace sunspot;
 
 
 GltfRenderer::GltfRenderer(Gltf& model)
@@ -30,20 +34,28 @@ GltfRenderer::~GltfRenderer()
 
 void GltfRenderer::draw(const ShaderProgram& shader,
                         const Gltf::Node* pNode,
-                        const Mat4& matrix)
+                        const Mat4& transform)
 {
+	// Current transform
+	Mat4 tTransform{ pNode->matrix };
+	tTransform.Rotate(pNode->rotation);
+	tTransform = transform * tTransform;
+
 	// Render its children
 	for (auto pChild : pNode->children)
 	{
-		draw(shader, pChild, pNode->matrix);
+		draw(shader, pChild, tTransform);
 	}
 
 	// Render the node
 	if (pNode->pMesh)
 	{
 		auto& mesh = mMeshes[pNode->pMesh];
-		mesh.SetMatrix(pNode->matrix * matrix);
-		mMeshes[pNode->pMesh].Draw(shader);
+		for (auto& primitive : mesh.GetPrimitives())
+		{
+			primitive.SetMatrix(tTransform);
+			primitive.Draw(shader);
+		}
 	}
 }
 

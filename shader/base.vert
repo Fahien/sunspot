@@ -20,6 +20,6 @@ void main()
 	position = vec3(model * position4);
 	gl_Position = projection * view * model * position4;
 	normal = mat3(transpose(inverse(model))) * in_Normal;
-	texCoords = vec2(in_TexCoords.x, 1.0 - in_TexCoords.y);
+	texCoords = in_TexCoords;
 	vertColor = in_Color;
 }

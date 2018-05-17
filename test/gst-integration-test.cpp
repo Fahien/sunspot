@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 
 		float fov{ 45.0f };
 		float near{ 0.125f };
-		float far{ 128.0f };
+		float far{ 256.0f };
 		Camera camera{ fov, static_cast<float>(windowSize.width) / windowSize.height, near, far };
 		camera.setPosition(-2.0f, 0.0f, -6.0f);
 		window.setCamera(&camera);

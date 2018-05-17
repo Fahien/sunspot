@@ -1,5 +1,5 @@
-#ifndef SST_GRAPHICS_H
-#define SST_GRAPHICS_H
+#ifndef SST_GRAPHICS_H_
+#define SST_GRAPHICS_H_
 
 #ifdef ANDROID
 	#include <GLES3/gl3.h>
@@ -22,4 +22,4 @@ public:
 }
 
 
-#endif // SST_GRAPHICS_H
+#endif // SST_GRAPHICS_H_

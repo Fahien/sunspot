@@ -166,6 +166,8 @@ set(SOURCES
 	source/repository/ModelRepository.cpp
 	source/repository/EntityRepository.h
 	source/repository/EntityRepository.cpp
+	source/view/GltfPrimitive.h
+	source/view/GltfPrimitive.cpp
 	source/view/GltfMesh.h
 	source/view/GltfMesh.cpp
 	source/view/GltfRenderer.h
