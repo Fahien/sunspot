@@ -13,13 +13,14 @@
 
 #include "EntityRepository.h"
 
+using namespace std;
 using namespace sunspot;
 using namespace pyspot;
+using namespace pyspot::component;
+using namespace dataspot;
 
 
-EntityRepository::EntityRepository(
-	dst::DataSpot& data,
-	ModelRepository& modelRepo)
+EntityRepository::EntityRepository(DataSpot& data, ModelRepository& modelRepo)
 :	mData{ data }
 ,	mModelRepository{ modelRepo }
 ,	mEntities{}
@@ -50,7 +51,7 @@ Entity* EntityRepository::LoadEntity(const int id)
 	mEntities.emplace(id, pEntity);
 	return pEntity;
 
-	//dst::Statement& stmt{ mData.Prepare("SELECT name FROM main.entity WHERE id = ?;") };
+	//Statement& stmt{ mData.Prepare("SELECT name FROM main.entity WHERE id = ?;") };
 	//stmt.Bind(id);
 	//stmt.Step();
 	//return stmt.GetText(0);
@@ -61,17 +62,17 @@ Entity* EntityRepository::LoadEntity(const int id)
 Entity* EntityRepository::loadEntity(const int id)
 {
 	// Get the entity
-	dst::Statement& stmtEntity{ mData.Prepare("SELECT name FROM main.entity WHERE id = ?;") };
+	Statement& stmtEntity{ mData.Prepare("SELECT name FROM main.entity WHERE id = ?;") };
 	stmtEntity.Bind(id);
 	stmtEntity.Step();
 
-	std::string name{ stmtEntity.GetText(0) };
+	string name{ stmtEntity.GetText(0) };
 
 	Entity* pEntity{ new Entity{ id, name } };
 
 	// Get the components
-	std::string query{ "SELECT component_id, component_type FROM main.entity_component WHERE entity_id = ?;" };
-	dst::Statement& stmtComponents{ mData.Prepare(query) };
+	string query{ "SELECT component_id, component_type FROM main.entity_component WHERE entity_id = ?;" };
+	Statement& stmtComponents{ mData.Prepare(query) };
 	stmtComponents.Bind(id);
 
 	while (true)
@@ -82,12 +83,12 @@ Entity* EntityRepository::loadEntity(const int id)
 			stmtComponents.Step();
 
 			// Get the component id and type
-			int         id  { stmtComponents.GetInteger(0) };
-			std::string type{ stmtComponents.GetText(1)    };
+			int    id  { stmtComponents.GetInteger(0) };
+			string type{ stmtComponents.GetText(1)    };
 
 			// Get the component
-			std::string query{ "SELECT * FROM main." + type + " WHERE id = ?;" };
-			dst::Statement& stmtComponent{ mData.Prepare(query) };
+			string query{ "SELECT * FROM main." + type + " WHERE id = ?;" };
+			Statement& stmtComponent{ mData.Prepare(query) };
 			stmtComponent.Bind(id);
 			stmtComponent.Step();
 
@@ -100,22 +101,22 @@ Entity* EntityRepository::loadEntity(const int id)
 				float x{ static_cast<float>(stmtComponent.GetDouble(1)) };
 				float y{ static_cast<float>(stmtComponent.GetDouble(2)) };
 				float z{ static_cast<float>(stmtComponent.GetDouble(3)) };
-				component::Vec3 position{ x, y, z };
+				Vec3 position{ x, y, z };
 
 				// Get rotation.xyz
 				x = static_cast<float>(stmtComponent.GetDouble(4));
 				y = static_cast<float>(stmtComponent.GetDouble(5));
 				z = static_cast<float>(stmtComponent.GetDouble(6));
-				component::Vec3 rotation{ x, y, z };
+				Vec3 rotation{ x, y, z };
 
 				// Get scale.xyz
 				x = static_cast<float>(stmtComponent.GetDouble(7));
 				y = static_cast<float>(stmtComponent.GetDouble(8));
 				z = static_cast<float>(stmtComponent.GetDouble(9));
-				component::Vec3 scale{ x, y, z };
+				Vec3 scale{ x, y, z };
 
 				// Construct the component
-				component::Transform* transform = new component::Transform{ id, position, rotation, scale };
+				Transform* transform = new Transform{ id, position, rotation, scale };
 				// Add the component to the entity
 				pEntity->SetTransform(transform);
 			}
@@ -125,7 +126,7 @@ Entity* EntityRepository::loadEntity(const int id)
 				int id { stmtComponent.GetInteger(0) };
 
 				// Get script name
-				std::string name{ stmtComponent.GetText(1) };
+				string name{ stmtComponent.GetText(1) };
 
 				// Construct the component
 				Script* script{ new Script{ id, name, *pEntity } };
@@ -137,10 +138,10 @@ Entity* EntityRepository::loadEntity(const int id)
 				int id { stmtComponent.GetInteger(0) };
 
 				// Get model path
-				std::string path{ stmtComponent.GetText(1) };
+				string path{ stmtComponent.GetText(1) };
 				
 				// Get mesh name
-				std::string name{ stmtComponent.GetText(2) };
+				string name{ stmtComponent.GetText(2) };
 
 				// Get the mesh
 				auto mesh = mModelRepository.GetMesh(id, path, name);
@@ -149,7 +150,7 @@ Entity* EntityRepository::loadEntity(const int id)
 				pEntity->SetMesh(mesh);
 			}
 		}
-		catch (const dst::DataSpotException&)
+		catch (const DataSpotException&)
 		{
 			// No more components
 			break;

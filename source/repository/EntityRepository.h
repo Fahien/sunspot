@@ -20,13 +20,13 @@ class ModelRepository;
 
 class EntityRepository
 {
-public:
+  public:
 	EntityRepository(dst::DataSpot& data, ModelRepository& modelRepo);
 	~EntityRepository();
 
 	Entity* LoadEntity(const int id);
 
-private:
+  private:
 	Entity* loadEntity(const int id);
 
 	dst::DataSpot& mData;

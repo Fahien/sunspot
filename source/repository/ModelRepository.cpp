@@ -6,13 +6,14 @@
 
 using namespace std;
 using namespace sunspot;
+using namespace dataspot;
 
 
-const std::string ModelRepository::kExt{ ".obj" };
-const std::string ModelRepository::kModelDir{ "model/" };
+const string ModelRepository::kExt{ ".obj" };
+const string ModelRepository::kModelDir{ "model/" };
 
 
-ModelRepository::ModelRepository(const dst::DataSpot& data, const std::string& projectDir)
+ModelRepository::ModelRepository(const DataSpot& data, const string& projectDir)
 :	mData{ data }
 ,	mProjectDir{ projectDir + kModelDir }
 ,	mMeshes{}
@@ -24,7 +25,7 @@ ModelRepository::~ModelRepository()
 {}
 
 
-std::shared_ptr<Mesh> ModelRepository::GetMesh(const int id, const string& path, const string& name)
+shared_ptr<Mesh> ModelRepository::GetMesh(const int id, const string& path, const string& name)
 {
 	// Check whether the mesh is already cached
 	auto meshIt = mMeshes.find(id);
