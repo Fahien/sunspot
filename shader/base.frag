@@ -1,8 +1,8 @@
 #version 330 core
 
-const float zero = 0.0f;
-const float one  = 1.0f;
-const float pi   = 3.14159265359f;
+const float zero = 0.0;
+const float one  = 1.0;
+const float pi   = 3.14159265359;
 
 struct Vertex
 {
@@ -129,7 +129,7 @@ float calculateDistributionGGX(vec3 N, vec3 H, float roughness)
 float calculateGeometrySchlickGGX(float NdotV, float roughness)
 {
 	float r = (roughness + one);
-	float k = (r * r) / 8.0f;
+	float k = (r * r) / 8.0;
 
 	float numerator   = NdotV;
 	float denominator = NdotV * (one - k) + k;
@@ -142,8 +142,8 @@ float calculateGeometrySmith(vec3 fragmentNormal, vec3 cameraDirection, vec3 lig
 {
 	float NdotV = max(dot(fragmentNormal, cameraDirection), zero);
 	float NdotL = max(dot(fragmentNormal, lightDirection), zero);
-	float ggx2  = calculateGeometrySchlickGGX(NdotV, roughness);
-	float ggx1  = calculateGeometrySchlickGGX(NdotL, roughness);
+	float ggx1  = calculateGeometrySchlickGGX(NdotV, roughness);
+	float ggx2  = calculateGeometrySchlickGGX(NdotL, roughness);
 	
 	return ggx1 * ggx2;
 }
@@ -151,7 +151,7 @@ float calculateGeometrySmith(vec3 fragmentNormal, vec3 cameraDirection, vec3 lig
 
 vec3 calculateFresnelSchlick(float cosTheta, vec3 f0)
 {
-	return f0 + (one - f0) * pow(one - cosTheta, 5.0f);
+	return f0 + (one - f0) * pow(one - cosTheta, 5.0);
 }
 
 
@@ -159,7 +159,7 @@ void applyPBRPointLight(in PointLight light, in Camera camera, inout Fragment fr
 {
 	vec3  lightVector      = light.position - fragment.position;
 	float lightDistance    = length(lightVector);
-	float lightAttenuation = one / (lightDistance * lightDistance / 64.0f);
+	float lightAttenuation = one / (lightDistance * lightDistance);
 	vec3  lightDirection   = normalize(lightVector);
 
 	float diffuseFactor = max(dot(fragment.normal, lightDirection), zero);
@@ -172,10 +172,10 @@ void applyPBRPointLight(in PointLight light, in Camera camera, inout Fragment fr
 	vec3 halfVector  = normalize(cameraVector + lightVector);
 	vec3 lightOutput = vec3(zero);
 
-	vec3 f0 = vec3(0.04f);
+	vec3 f0 = vec3(0.04);
 	f0 = mix(f0, fragment.color, material.metallic);
 
-	float cosTheta = max(dot(cameraDirection, lightDirection), zero);
+	float cosTheta = max(dot(fragment.normal, lightDirection), zero);
 	vec3 fresnelSchlick = calculateFresnelSchlick(cosTheta, f0);
 
 	float normalDistributionFactor = calculateDistributionGGX(fragment.normal, halfVector, material.roughness);
@@ -184,7 +184,7 @@ void applyPBRPointLight(in PointLight light, in Camera camera, inout Fragment fr
 	vec3 numerator = normalDistributionFactor * geometrySmith * fresnelSchlick;
 	float denominator = 4.0 * max(dot(fragment.normal, cameraDirection), zero) * diffuseFactor;
 
-	vec3 specular = numerator / max(denominator, one / 1024.0f);
+	vec3 specular = numerator / max(denominator, one / 1024.0);
 
 	vec3 kS = fresnelSchlick;
 	vec3 kD = vec3(one) - kS;
@@ -192,10 +192,10 @@ void applyPBRPointLight(in PointLight light, in Camera camera, inout Fragment fr
 
 	lightOutput += (kD * fragment.color / pi + specular) * radiance * diffuseFactor;
 
-	vec3 ambient = vec3(0.03f) * fragment.color * material.ambientOcclusion;
+	vec3 ambient = vec3(0.03) * fragment.color * material.ambientOcclusion;
 	vec3 color = ambient + lightOutput;
 	color = color / (color + vec3(one));
-	color = pow(color, vec3(one / 2.2f));
+	color = pow(color, vec3(one / 2.2));
 
 	fragment.color = color;
 }
@@ -208,6 +208,7 @@ void main()
 	fragment.normal   = normalize(normal);
 	fragment.coords   = texCoords;
 	fragment.color    = material.hasColorTexture ? texture(material.colorTexture, fragment.coords).rgb : material.color;
+	fragment.color    = pow(fragment.color, vec3(2.2));
 	if (vertex.hasColor)
 	{
 		fragment.color *= vertColor.rgb;

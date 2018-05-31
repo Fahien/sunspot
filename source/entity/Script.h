@@ -4,11 +4,11 @@
 #include <string>
 #include <memory>
 
-#include <PySpot.h>
-#include <PySpotModule.h>
-#include <PySpotTuple.h>
+#include <pyspot/Interpreter.h>
+#include <pyspot/Module.h>
+#include <pyspot/Tuple.h>
 
-#include "Object.h"
+#include "entity/Object.h"
 
 
 PyMODINIT_FUNC InitPySpot();
@@ -34,11 +34,11 @@ class Script : public Object
 	static void Initialize(const std::wstring& scriptPath);
 
   private:
-	static std::unique_ptr<pst::PySpot> pyspot;
+	static std::unique_ptr<pst::Interpreter> interpreter;
 
 	Entity& mEntity;
-	pst::PySpotModule mModule;
-	pst::PySpotTuple mArgs;
+	pst::Module mModule;
+	pst::Tuple mArgs;
 };
 
 

@@ -1,11 +1,13 @@
 #ifndef SST_ENTITY_H_
 #define SST_ENTITY_H_
 
-#include "Transform.h"
-#include "Script.h"
-#include "Object.h"
+#include "pyspot/component/Transform.h"
+#include "entity/Script.h"
+#include "entity/Object.h"
 
 #include <memory>
+
+namespace pst = pyspot;
 
 namespace sunspot
 {
@@ -25,8 +27,8 @@ public:
 	inline std::shared_ptr<Mesh>& GetMesh() { return mMesh; }
 	inline void SetMesh(std::shared_ptr<Mesh>& mesh) { mMesh = mesh; }
 
-	inline PySpotTransform* GetTransform() { return mTransform; }
-	inline void SetTransform(PySpotTransform* transform);
+	inline pst::component::Transform* GetTransform() { return mTransform; }
+	inline void SetTransform(pst::component::Transform* transform);
 
 	inline Script* GetScript() { return mScript; }
 	inline void SetScript(Script* script);
@@ -34,14 +36,14 @@ public:
 	void Update(const float delta);
 
 private:
-	std::shared_ptr<Mesh> mMesh;
-	PySpotTransform*      mTransform = nullptr;
-	Script*               mScript    = nullptr;
+	std::shared_ptr<Mesh>      mMesh;
+	pst::component::Transform* mTransform = nullptr;
+	Script*                    mScript    = nullptr;
 
 	friend class Script;
 };
 
-void Entity::SetTransform(PySpotTransform* transform)
+void Entity::SetTransform(pst::component::Transform* transform)
 {
 	if (mTransform == transform)
 	{

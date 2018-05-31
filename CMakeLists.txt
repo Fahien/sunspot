@@ -78,8 +78,7 @@ set(DEPENDENCY_INCLUDE_DIRECTORIES
 	${PROJECT_SOURCE_DIR}/source/android
 	${PROJECT_SOURCE_DIR}/source/entity
 	${PROJECT_SOURCE_DIR}/source/repository
-	${PROJECT_BINARY_DIR}/component
-	${PROJECT_BINARY_DIR}/extension
+	${PROJECT_BINARY_DIR}/include
 	${PYTHON_INCLUDE_DIR})
 
 if(${ANDROID})
@@ -113,7 +112,7 @@ file(GLOB COMPONENTS source/component/*json)
 foreach(COMPONENT ${COMPONENTS})
 	get_filename_component(NAME ${COMPONENT} NAME_WE)
 	list(APPEND COMPONENT_NAMES ${NAME})
-	set(SST_COMPONENT_HEADER ${PROJECT_BINARY_DIR}/component/${NAME}.h)
+	set(SST_COMPONENT_HEADER ${PROJECT_BINARY_DIR}/include/pyspot/component/${NAME}.h)
 	list(APPEND COMPONENT_HEADERS ${SST_COMPONENT_HEADER})
 	add_custom_command(
 		OUTPUT ${SST_COMPONENT_HEADER}
@@ -123,8 +122,8 @@ foreach(COMPONENT ${COMPONENTS})
 endforeach()
 
 # Generate the PySpotExtension header
-set(SST_EXTENSION_HEADER ${PROJECT_BINARY_DIR}/extension/PySpotExtension.h)
-set(SST_EXTENSION_SOURCE ${PROJECT_BINARY_DIR}/extension/PySpotExtension.cpp)
+set(SST_EXTENSION_HEADER ${PROJECT_BINARY_DIR}/include/pyspot/extension/Extension.h)
+set(SST_EXTENSION_SOURCE ${PROJECT_BINARY_DIR}/src/pyspot/extension/Extension.cpp)
 add_custom_command(
 	OUTPUT ${SST_EXTENSION_HEADER} ${SST_EXTENSION_SOURCE}
 	COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-extension.py -h > ${SST_EXTENSION_HEADER}

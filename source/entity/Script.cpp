@@ -1,34 +1,35 @@
-#include <PySpotTuple.h>
-#include <PySpotString.h>
 #include <Logger.h>
-#include <PySpotExtension.h>
+#include <pyspot/Tuple.h>
+#include <pyspot/String.h>
+#include <pyspot/extension/Extension.h>
 
 #include "Script.h"
 #include "Entity.h"
 #include "Mesh.h"
 
 using namespace sunspot;
+using namespace pyspot;
 namespace mst = mathspot;
 namespace lst = logspot;
 
 
-std::unique_ptr<pst::PySpot> Script::pyspot{ nullptr };
+std::unique_ptr<Interpreter> Script::interpreter{ nullptr };
 
 
 void Script::Initialize(const std::wstring& scriptPath)
 {
-	if (!pyspot)
+	if (!interpreter)
 	{
-		pyspot = std::make_unique<pst::PySpot>("sunspot", PyInit_PySpot, scriptPath.c_str());
+		interpreter = std::make_unique<Interpreter>("sunspot", PyInit_PySpot, scriptPath.c_str());
 	}
 }
 
 
 Script::Script(const int id, std::string& name, Entity& entity)
-: Object{ id, name }
-, mEntity{ entity }
-, mModule{ pyspot->ImportModule(name) }
-, mArgs{ 2 }
+:	Object { id, name }
+,	mEntity{ entity }
+,	mModule{ interpreter->ImportModule(name) }
+,	mArgs  { 2 }
 {}
 
 
@@ -36,7 +37,7 @@ void Script::Initialize()
 {
 	if (mEntity.GetTransform())
 	{
-		pst::PySpotTuple args{ 1 };
+		Tuple args{ 1 };
 		args.SetItem(0, *mEntity.mTransform);
 
 		lst::Logger::log.info("Calling python init\n");
@@ -58,10 +59,10 @@ void Script::Initialize()
 
 Script::Script(Entity& entity)
 :	mEntity{ entity }
-,	mModule{ pyspot->ImportModule(entity.GetMesh()->GetName().c_str()) }
+,	mModule{ interpreter->ImportModule(entity.GetMesh()->GetName().c_str()) }
 ,	mArgs  { 2 }
 {
-	pst::PySpotTuple args{ 1 };
+	Tuple args{ 1 };
 	args.SetItem(0, *mEntity.mTransform);
 
 	lst::Logger::log.info("Calling python init\n");

@@ -7,13 +7,14 @@
 #include "WavefrontObject.h"
 #include "ModelRepository.h"
 
-#include "Entity.h"
-#include "Transform.h"
+#include "entity/Entity.h"
+#include "pyspot/component/Transform.h"
 #include "Mesh.h"
 
 #include "EntityRepository.h"
 
 using namespace sunspot;
+using namespace pyspot;
 
 
 EntityRepository::EntityRepository(
@@ -99,22 +100,22 @@ Entity* EntityRepository::loadEntity(const int id)
 				float x{ static_cast<float>(stmtComponent.GetDouble(1)) };
 				float y{ static_cast<float>(stmtComponent.GetDouble(2)) };
 				float z{ static_cast<float>(stmtComponent.GetDouble(3)) };
-				PySpotVec3 position{ x, y, z };
+				component::Vec3 position{ x, y, z };
 
 				// Get rotation.xyz
 				x = static_cast<float>(stmtComponent.GetDouble(4));
 				y = static_cast<float>(stmtComponent.GetDouble(5));
 				z = static_cast<float>(stmtComponent.GetDouble(6));
-				PySpotVec3 rotation{ x, y, z };
+				component::Vec3 rotation{ x, y, z };
 
 				// Get scale.xyz
 				x = static_cast<float>(stmtComponent.GetDouble(7));
 				y = static_cast<float>(stmtComponent.GetDouble(8));
 				z = static_cast<float>(stmtComponent.GetDouble(9));
-				PySpotVec3 scale{ x, y, z };
+				component::Vec3 scale{ x, y, z };
 
 				// Construct the component
-				PySpotTransform* transform = new PySpotTransform{ id, position, rotation, scale };
+				component::Transform* transform = new component::Transform{ id, position, rotation, scale };
 				// Add the component to the entity
 				pEntity->SetTransform(transform);
 			}

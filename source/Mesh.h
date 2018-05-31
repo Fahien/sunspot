@@ -12,7 +12,19 @@
 
 namespace mst = mathspot;
 
-class PySpotTransform;
+namespace pyspot
+{
+
+namespace component
+{
+
+class Transform;
+
+}
+
+}
+
+namespace pst = pyspot;
 
 namespace sunspot {
 
@@ -41,7 +53,7 @@ public:
 	std::string& GetName() { return mName; }
 
 	/// Applies the value of the transform component to the member transform matrix
-	void ApplyTransform(PySpotTransform& pTransform);
+	void ApplyTransform(pst::component::Transform& pTransform);
 
 	void Draw(const ShaderProgram& shader) const;
 

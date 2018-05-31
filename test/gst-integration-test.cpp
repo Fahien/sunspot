@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 		//light.GetSpecular().g /= divFactor / 2;
 		//light.GetSpecular().b /= divFactor / 2;
 		PointLight light{ Color{ 1.0f, 1.0f, 1.0f } };
-		light.SetPosition(2.0f, 2.0f, -4.0f);
+		light.SetPosition(1.0f, 1.0f, -1.0f);
 		window.setLight(&light);
 
 		// TODO render to texture

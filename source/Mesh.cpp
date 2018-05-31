@@ -5,10 +5,11 @@
 
 #include "Mesh.h"
 #include "ShaderProgram.h"
-#include "Transform.h"
+#include "pyspot/component/Transform.h"
 
 using namespace std;
 using namespace sunspot;
+using namespace pyspot::component;
 namespace mst = mathspot;
 namespace lst = logspot;
 
@@ -59,7 +60,7 @@ Mesh::~Mesh()
 }
 
 
-void Mesh::ApplyTransform(PySpotTransform& pTransform)
+void Mesh::ApplyTransform(Transform& pTransform)
 {
 	transform.ScaleX(pTransform.GetScale().GetX());
 	transform.ScaleY(pTransform.GetScale().GetY());
