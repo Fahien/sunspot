@@ -33,6 +33,7 @@ public:
 protected:
 	void toggleFullscreen();
 	const float& computeDeltaTime();
+	const input::Key& pollInput();
 	void updateFrameSize();
 	void render(const float& deltaTime);
 

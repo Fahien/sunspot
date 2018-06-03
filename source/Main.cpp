@@ -120,17 +120,17 @@ int main(int argc, char **argv)
 		sst::ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
 		window.setBaseProgram(&baseProgram);
 
-		sst::DirectionalLight light{ sst::Color{ 1.0f, 1.0f, 1.0f } };
-		light.SetDirection(0.0f, 0.0f, 4.0f);
-		float divFactor = 32.0f;
-		light.GetAmbient().r /= divFactor;
-		light.GetAmbient().g /= divFactor;
-		light.GetAmbient().b /= divFactor;
-		light.GetSpecular().r /= divFactor / 2;
-		light.GetSpecular().g /= divFactor / 2;
-		light.GetSpecular().b /= divFactor / 2;
-		//sst::PointLight light{ sst::Color{ 0.5f, 0.5f, 0.5f } };
-		//light.SetPosition(2.0f, 2.0f, -4.0f);
+		//sst::DirectionalLight light{ sst::Color{ 1.0f, 1.0f, 1.0f } };
+		//light.SetDirection(0.0f, 0.0f, 4.0f);
+		//float divFactor = 1.0f;
+		//light.GetAmbient().r /= divFactor;
+		//light.GetAmbient().g /= divFactor;
+		//light.GetAmbient().b /= divFactor;
+		//light.GetSpecular().r /= divFactor / 2;
+		//light.GetSpecular().g /= divFactor / 2;
+		//light.GetSpecular().b /= divFactor / 2;
+		sst::PointLight light{ sst::Color{ 1.0f, 1.0f, 1.0f } };
+		light.SetPosition(0.0f, 4.0f, 0.0f);
 		window.setLight(&light);
 
 		// Inject dependencies into window
@@ -167,7 +167,7 @@ int main(int argc, char **argv)
 			window.AddEntity(entity);
 		}
 
-		window.loop(); // Game loop
+		window.loop(); // GameLoop.it
 
 
 		lst::Logger::log.info("%s version %d.%d successful\n", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);

@@ -144,10 +144,10 @@ Entity* EntityRepository::loadEntity(const int id)
 				string name{ stmtComponent.GetText(2) };
 
 				// Get the mesh
-				auto mesh = mModelRepository.GetMesh(id, path, name);
+				auto& model = mModelRepository.GetModel(id, path, name);
 
 				// Construct the component
-				pEntity->SetMesh(mesh);
+				pEntity->SetModel(&model);
 			}
 		}
 		catch (const DataSpotException&)
@@ -158,10 +158,20 @@ Entity* EntityRepository::loadEntity(const int id)
 	}
 
 	// If the entity has a Mesh and a Transform
-	if (pEntity->GetMesh() && pEntity->GetTransform())
+	if (pEntity->GetModel() && pEntity->GetTransform())
 	{
 		// Apply the transform to the mesh
-		pEntity->GetMesh()->ApplyTransform(*(pEntity->GetTransform()));
+		auto& node      = pEntity->GetModel()->GetNode();
+		auto pTransform = pEntity->GetTransform();
+		node.matrix.ScaleX(pTransform->GetScale().GetX());
+		node.matrix.ScaleY(pTransform->GetScale().GetY());
+		node.matrix.ScaleZ(pTransform->GetScale().GetZ());
+		node.matrix.TranslateX(pTransform->GetPosition().GetX());
+		node.matrix.TranslateY(pTransform->GetPosition().GetY());
+		node.matrix.TranslateZ(pTransform->GetPosition().GetZ());
+		node.matrix.RotateX(pTransform->GetRotation().GetX());
+		node.matrix.RotateY(pTransform->GetRotation().GetY());
+		node.matrix.RotateZ(pTransform->GetRotation().GetZ());
 	}
 
 	if (pEntity->GetScript())

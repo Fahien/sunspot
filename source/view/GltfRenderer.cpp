@@ -13,26 +13,28 @@ using namespace gltfspot;
 using namespace sunspot;
 
 
-GltfRenderer::GltfRenderer(Gltf& model)
-:	mModel{ model }
-,	mHasVertexColors{ false }
-,	mMaterial{}
-,	mMeshes{}
-,	mTextures{}
+GltfRenderer::GltfRenderer(Gltf&& gltf)
+:	mGltf{ move(gltf) }
 {
-	for (Gltf::Mesh& m : model.GetMeshes())
+	for (Gltf::Mesh& m : mGltf.GetMeshes())
 	{
-		GltfMesh mesh{ model, m };
+		GltfMesh mesh{ mGltf, m };
 		mMeshes.emplace(&m, move(mesh));
 	}
 }
+
+
+GltfRenderer::GltfRenderer(GltfRenderer&& other)
+: mGltf           { move(other.mGltf)      }
+, mMeshes         { move(other.mMeshes)    }
+{}
 
 
 GltfRenderer::~GltfRenderer()
 {}
 
 
-void GltfRenderer::draw(const ShaderProgram& shader,
+void GltfRenderer::Draw(const ShaderProgram& shader,
                         const Gltf::Node* pNode,
                         const Mat4& transform)
 {
@@ -44,7 +46,7 @@ void GltfRenderer::draw(const ShaderProgram& shader,
 	// Render its children
 	for (auto pChild : pNode->children)
 	{
-		draw(shader, pChild, tTransform);
+		Draw(shader, pChild, tTransform);
 	}
 
 	// Render the node
@@ -62,9 +64,9 @@ void GltfRenderer::draw(const ShaderProgram& shader,
 
 void GltfRenderer::Draw(const ShaderProgram& shader)
 {
-	auto pScene = mModel.GetScene();
+	auto pScene = mGltf.GetScene();
 	for(auto pNode : pScene->nodes)
 	{
-		draw(shader, pNode);
+		Draw(shader, pNode);
 	}
 }

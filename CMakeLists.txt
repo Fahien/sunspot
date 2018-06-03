@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.6)
 include(CMakeToolsHelpers OPTIONAL)
 project(SunSpoT)
 
-set(CMAKE_C_STANDARD   14)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_C_STANDARD   17)
+set(CMAKE_CXX_STANDARD 17)
 #set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wall")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti -Wall")
 
@@ -17,6 +17,12 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/cmake")
 message("Searching modules in ${CMAKE_MODULE_PATH}")
 
 option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
+
+# Python 3
+find_package(PythonInterp 3 PATHS "C:/Users/7oni/AppData/Local/Programs/Python/Python36-32")
+message(STATUS ${PYTHON_EXECUTABLE})
+find_package(PythonLibs   3 PATHS "C:/Users/7oni/AppData/Local/Programs/Python/Python36-32/include")
+message(STATUS ${PYTHON_INCLUDE_DIR})
 
 # LogSpoT
 set(LOGSPOT logspot)
@@ -68,9 +74,6 @@ configure_file(
 # Specify the paths in which the linker should search for libraries
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${PROJECT_SOURCE_DIR}")
 
-# Python 3
-find_package(PythonInterp 3)
-find_package(PythonLibs 3)
 
 set(DEPENDENCY_INCLUDE_DIRECTORIES
 	${PROJECT_SOURCE_DIR}/include
@@ -155,6 +158,7 @@ set(SOURCES
 	source/Material.cpp
 	source/Mesh.h
 	source/Mesh.cpp
+	source/component/Model.h
 	source/entity/Script.h
 	source/entity/Script.cpp
 	source/entity/Object.h

@@ -1,13 +1,18 @@
 #ifndef SST_ENTITY_H_
 #define SST_ENTITY_H_
 
+#include <memory>
+#include <Gltf.h>
+
 #include "pyspot/component/Transform.h"
+#include "component/Model.h"
 #include "entity/Script.h"
 #include "entity/Object.h"
+#include "input/Input.h"
 
-#include <memory>
 
 namespace pst = pyspot;
+namespace gst = gltfspot;
 
 namespace sunspot
 {
@@ -24,8 +29,8 @@ public:
 
 	~Entity();
 
-	inline std::shared_ptr<Mesh>& GetMesh() { return mMesh; }
-	inline void SetMesh(std::shared_ptr<Mesh>& mesh) { mMesh = mesh; }
+	inline Model* GetModel() { return mModel; }
+	inline void SetModel(Model* model);
 
 	inline pst::component::Transform* GetTransform() { return mTransform; }
 	inline void SetTransform(pst::component::Transform* transform);
@@ -33,15 +38,34 @@ public:
 	inline Script* GetScript() { return mScript; }
 	inline void SetScript(Script* script);
 
-	void Update(const float delta);
+	void Update(const float delta, const input::Key key);
 
 private:
-	std::shared_ptr<Mesh>      mMesh;
-	pst::component::Transform* mTransform = nullptr;
-	Script*                    mScript    = nullptr;
+	Model*                     mModel     { nullptr };
+	pst::component::Transform* mTransform { nullptr };
+	Script*                    mScript    { nullptr };
 
 	friend class Script;
 };
+
+
+
+void Entity::SetModel(Model* model)
+{
+	if (mModel == model)
+	{
+		return;
+	}
+
+	if (mModel)
+	{
+		delete mModel;
+	}
+
+	mModel = model;
+}
+
+
 
 void Entity::SetTransform(pst::component::Transform* transform)
 {

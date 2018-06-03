@@ -8,8 +8,7 @@ namespace lst = logspot;
 
 
 Entity::Entity()
-:	mMesh{ nullptr }
-,	mScript{ new Script{ *this } }
+:	mScript{ new Script{ *this } }
 {}
 
 
@@ -32,10 +31,10 @@ Entity::~Entity()
 }
 
 
-void Entity::Update(const float delta)
+void Entity::Update(const float delta, input::Key key)
 {
 	if (mScript)
 	{
-		mScript->Update(delta);
+		mScript->Update(delta, key);
 	}
 }

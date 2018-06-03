@@ -37,12 +37,10 @@ int main(int argc, char** argv)
 		camera.setPosition(-2.0f, 0.0f, -6.0f);
 		window.setCamera(&camera);
 
-		/// Load a Gltf model
+		// Load a Gltf model and upload the model into GPU buffers
 		string modelPath{ argv[1] };
-		Gltf model{ Gltf::Load(modelPath) };
-
-		/// Upload the model into GPU buffers
-		GltfRenderer renderer{ model };
+		Gltf gltf{ Gltf::Load(modelPath) };
+		GltfRenderer renderer{ move(gltf) };
 		window.AddGltf(&renderer);
 		/// Render to texture
 		/// Compare it with a reference
@@ -60,7 +58,7 @@ int main(int argc, char** argv)
 		//light.GetSpecular().g /= divFactor / 2;
 		//light.GetSpecular().b /= divFactor / 2;
 		PointLight light{ Color{ 1.0f, 1.0f, 1.0f } };
-		light.SetPosition(1.0f, 1.0f, -1.0f);
+		light.SetPosition(4.0f, 1.0f, -2.0f);
 		window.setLight(&light);
 
 		// TODO render to texture

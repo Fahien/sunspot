@@ -134,13 +134,28 @@ void GlfwWindow::handleMouse(const double x, const double y) // TODO comment
 }
 
 
+const input::Key& GlfwWindow::pollInput()
+{
+	glfwPollEvents();
+	return mKeyPressed;
+}
+
+
 void GlfwWindow::handleInput(const int key, const int action) // TODO comment
 {
 	switch (key)
 	{
 	  case GLFW_KEY_W:
-		if (action == GLFW_PRESS)       { mCamera->setVelocityZ(-1.0f); }
-		else if (action == GLFW_RELEASE) { mCamera->setVelocityZ(0.0f); }
+		if (action == GLFW_PRESS)
+		{
+			//mCamera->setVelocityZ(-1.0f);
+			mKeyPressed = input::Key::UP;
+		}
+		else if (action == GLFW_RELEASE)
+		{
+			//mCamera->setVelocityZ(0.0f);
+			mKeyPressed = static_cast<input::Key>(-1);
+		}
 		break;
 	  case GLFW_KEY_S:
 		if (action == GLFW_PRESS)        { mCamera->setVelocityZ(1.0f); }

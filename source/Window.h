@@ -7,9 +7,9 @@
 #include <memory>
 
 #include "MathSpot.h"
-
 #include "Graphics.h"
 #include "Cursor.h"
+#include "input/Input.h"
 
 namespace mst = mathspot;
 
@@ -65,6 +65,7 @@ protected:
 
 	virtual void toggleFullscreen() = 0;
 	virtual const float& computeDeltaTime() = 0;
+	virtual const input::Key& pollInput() = 0;
 	virtual void updateFrameSize() = 0;
 
 	const char* mTitle;
@@ -79,12 +80,13 @@ protected:
 	float mCurrentTime;
 	float mLastTime;
 	float mDeltaTime;
+	input::Key mKeyPressed;
 
 	Cursor  mCursor;
 	Camera* mCamera;
 
 private:
-	void render(const float &deltaTime);
+	void render(const float &deltaTime, const input::Key key);
 	void render3D(const float& deltaTime);
 	void renderGltf(const float& deltaTime);
 	void renderQuad(const float& deltaTime);
@@ -95,7 +97,7 @@ private:
 	std::vector<WavefrontObject*> mObjs;
 	//std::vector<std::shared_ptr<Entity>> mEntities;
 	std::vector<Entity*> mEntities;
-	GltfRenderer* mGltfRenderer;
+	GltfRenderer* mGltfRenderer { nullptr };
 	const ShaderProgram* mQuadProgram;
 	const ShaderProgram* mDepthProgram;
 	const Framebuffer* mFramebuffer;

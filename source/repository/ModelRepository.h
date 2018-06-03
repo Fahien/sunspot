@@ -4,9 +4,12 @@
 #include <memory>
 #include <map>
 #include <string>
+#include <Gltf.h>
 
 #include "Mesh.h"
 #include "WavefrontObject.h"
+#include "view/GltfRenderer.h"
+#include "component/Model.h"
 
 
 namespace dataspot
@@ -15,6 +18,7 @@ namespace dataspot
 }
 
 namespace dst = dataspot;
+namespace gst = gltfspot;
 
 
 namespace sunspot
@@ -29,13 +33,13 @@ class ModelRepository
 	ModelRepository(const dst::DataSpot& data, const std::string& projectDir);
 	~ModelRepository();
 
-	std::shared_ptr<Mesh> GetMesh(const int id, const std::string& path, const std::string& name);
+	Model& GetModel(const int id, const std::string& path, const std::string& name);
 
   private:
 	const dst::DataSpot& mData;
-	const std::string mProjectDir;
-	std::map<const int, std::shared_ptr<Mesh>> mMeshes;
-	std::map<std::string, std::shared_ptr<WavefrontObject>> mModels;
+	const std::string    mProjectDir;
+	std::map<const int, Model> mModels {};
+	std::map<std::string, GltfRenderer> mRenderers {};
 };
 
 }

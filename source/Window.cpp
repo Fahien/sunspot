@@ -61,18 +61,18 @@ void Window::initGlew()
 
 void Window::render()
 {
-	render(computeDeltaTime());
+	render(computeDeltaTime(), pollInput());
 }
 
 
-void Window::render(const float& deltaTime) // TODO comment
+void Window::render(const float& deltaTime, const input::Key key) // TODO comment
 {
 	// std::cout << static_cast<int>(1.0f / deltaTime) << " "; // FPS
 	updateFrameSize();
 
 	for (auto entity : mEntities)
 	{
-		entity->Update(deltaTime);
+		entity->Update(deltaTime, key);
 	}
 
 	if (mStereoscopic)
@@ -81,7 +81,7 @@ void Window::render(const float& deltaTime) // TODO comment
 	}
 	else
 	{
-		renderGltf(deltaTime);
+		render3D(deltaTime);
 	}
 }
 
@@ -113,10 +113,15 @@ void Window::render3D(const float& deltaTime) // TODO comment
 	for (WavefrontObject *obj : mObjs) { obj->draw(*mBaseProgram); }
 	for (Entity* entity : mEntities)
 	{
-		if (entity->GetMesh())
+		if (entity->GetModel())
 		{
-			entity->GetMesh()->Draw(*mBaseProgram);
+			auto pModel = entity->GetModel();
+			pModel->GetRenderer().Draw(*mBaseProgram, &pModel->GetNode());
 		}
+	}
+	if (mGltfRenderer)
+	{
+		mGltfRenderer->Draw(*mBaseProgram);
 	}
 }
 

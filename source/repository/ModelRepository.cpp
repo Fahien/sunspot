@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <DataSpot.h>
+#include <Gltf.h>
 
 #include "Ifstream.h"
 #include "ModelRepository.h"
@@ -7,17 +8,16 @@
 using namespace std;
 using namespace sunspot;
 using namespace dataspot;
+using namespace gltfspot;
 
 
-const string ModelRepository::kExt{ ".obj" };
+const string ModelRepository::kExt{ ".gltf" };
 const string ModelRepository::kModelDir{ "model/" };
 
 
 ModelRepository::ModelRepository(const DataSpot& data, const string& projectDir)
 :	mData{ data }
 ,	mProjectDir{ projectDir + kModelDir }
-,	mMeshes{}
-,	mModels{}
 {}
 
 
@@ -25,40 +25,51 @@ ModelRepository::~ModelRepository()
 {}
 
 
-shared_ptr<Mesh> ModelRepository::GetMesh(const int id, const string& path, const string& name)
+Model& ModelRepository::GetModel(const int id, const string& path, const string& name)
 {
-	// Check whether the mesh is already cached
-	auto meshIt = mMeshes.find(id);
-	if (meshIt != mMeshes.end())
+	// Check whether the model has already been loaded
+	auto itModel = mModels.find(id);
+	if (itModel != mModels.end())
 	{
-		return meshIt->second;
+		return itModel->second;
 	}
 
-	// Otherwise check whether the model has already been loaded
-	auto it = mModels.find(path);
-	shared_ptr<WavefrontObject> obj;
-	if (it != mModels.end())
+	// Otherwise check whether the Gltf has already been loaded
+	GltfRenderer* pRenderer { nullptr };
+	auto itRenderer = mRenderers.find(path);
+	if (itRenderer != mRenderers.end())
 	{
-		obj = it->second;
+		pRenderer = &itRenderer->second;
 	}
 	else
 	{
 		// Construct the complete path
-		string modelPath{ mProjectDir + path + "/" + path + kExt };
-		Ifstream is{ modelPath };
-		if (!is.is_open())
-		{
-			throw runtime_error{ "Could not load " + modelPath };
-		}
-		obj = shared_ptr<WavefrontObject>(new WavefrontObject{});
-		// Load the object from the input stream
-		is >> *obj;
+		string modelPath { mProjectDir + path + "/" + path + kExt };
+		GltfRenderer renderer { Gltf::Load(modelPath) };
 		// Store it into the model map
-		mModels.emplace(path, obj);
+		auto itRenderer = mRenderers.emplace(path, move(renderer));
+		if (itRenderer.second)
+		{
+			pRenderer = &itRenderer.first->second;
+		}
 	}
 
-	// TODO do I want a copy?
-	auto mesh = obj->GetMesh(name);
-	mMeshes.emplace(id, mesh);
-	return mesh;
+	// Find the nodes
+	for (auto& node : pRenderer->GetGltf().GetNodes())
+	{
+		if (node.name == name)
+		{
+			// Create a Model component
+			Model model { node, *pRenderer };
+			auto it = mModels.emplace(id, model);
+			if (it.second)
+			{
+				return it.first->second;
+			}
+		}
+	}
+	
+	std::string msg { "Node not found: "};
+	msg += name;
+	throw exception{ msg.c_str() };
 }
