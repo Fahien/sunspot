@@ -1,11 +1,13 @@
 #include <Logger.h>
 #include <pyspot/Tuple.h>
 #include <pyspot/String.h>
-#include <pyspot/extension/Extension.h>
+#include <sunspot/extension/Sunspot.h>
+#include <sunspot/component/Transform.h>
 
-#include "Script.h"
 #include "Entity.h"
 #include "Mesh.h"
+
+#include "Script.h"
 
 using namespace sunspot;
 using namespace pyspot;
@@ -20,7 +22,7 @@ void Script::Initialize(const std::wstring& scriptPath)
 {
 	if (!interpreter)
 	{
-		interpreter = std::make_unique<Interpreter>("sunspot", PyInit_PySpot, scriptPath.c_str());
+		interpreter = std::make_unique<Interpreter>("sunspot", PyInit_Sunspot, scriptPath.c_str());
 	}
 }
 

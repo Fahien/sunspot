@@ -8,15 +8,15 @@
 #include "ModelRepository.h"
 
 #include "entity/Entity.h"
-#include "pyspot/component/Transform.h"
+#include "sunspot/component/Transform.h"
 #include "Mesh.h"
 
 #include "EntityRepository.h"
 
 using namespace std;
 using namespace sunspot;
+using namespace sunspot::component;
 using namespace pyspot;
-using namespace pyspot::component;
 using namespace dataspot;
 
 

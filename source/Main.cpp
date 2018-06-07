@@ -23,6 +23,7 @@
 #include "ModelRepository.h"
 #include "EntityRepository.h"
 
+using namespace std;
 
 namespace sst = sunspot;
 namespace mst = mathspot;
@@ -36,11 +37,11 @@ static float fov{ 45.0f };
 static float near{ 0.125f };
 static float far{ 32.0f };
 
-static const std::string tag{ "Main" };
-static const std::string dataDir{ "data/" };
-static const std::string objExt{ ".obj" };
+static const string tag{ "Main" };
+static const string dataDir{ "data/" };
+static const string objExt{ ".obj" };
 
-static const std::string projectDir{ "project" };
+static const string projectDir{ "project" };
 
 void printLogo()
 {
@@ -56,9 +57,9 @@ R"( ________  ___  ___  ________   ________  ________  ________  _________
 }
 
 
-bool contains(const std::vector<std::string> &arguments, const char *s)
+bool contains(const vector<string> &arguments, const char *s)
 {
-	return std::find(arguments.begin(), arguments.end(), s) != arguments.end();
+	return find(arguments.begin(), arguments.end(), s) != arguments.end();
 }
 
 
@@ -68,24 +69,24 @@ int main(int argc, char **argv)
 
 	try {
 		// Get command line arguments
-		std::vector<std::string> arguments{};
+		vector<string> arguments{};
 		for (int i{ 1 }; i < argc; ++i)
 		{
-			arguments.push_back(std::string{argv[i]});
+			arguments.push_back(string{argv[i]});
 		}
 
 		// Window scale
-		std::vector<std::string>::iterator it;
-		if ((it = std::find(arguments.begin(), arguments.end(), "-scale")) != arguments.end())
+		vector<string>::iterator it;
+		if ((it = find(arguments.begin(), arguments.end(), "-scale")) != arguments.end())
 		{
 			if (++it != arguments.end())
 			{
-				scale = std::stoi(*it);
+				scale = stoi(*it);
 				lst::Logger::log.info("Scale [%d]\n", scale);
 			}
 			else
 			{
-				std::cerr << "Scale [" << scale << "] (Default)\n";
+				cerr << "Scale [" << scale << "] (Default)\n";
 			}
 		}
 		windowSize *= scale;
@@ -94,8 +95,8 @@ int main(int argc, char **argv)
 		bool stereoscopic{ contains(arguments, "-stereoscopic") }; // Stereoscopic rendering
 
 		// Project name
-		std::string projectName{ "default" };
-		if ((it = std::find(arguments.begin(), arguments.end(), "-project")) != arguments.end())
+		string projectName{ "default" };
+		if ((it = find(arguments.begin(), arguments.end(), "-project")) != arguments.end())
 		{
 			if (++it != arguments.end())
 			{
@@ -107,8 +108,8 @@ int main(int argc, char **argv)
 		// Load database
 		dst::DataSpot dataspot;
 		dataspot.Open(projectDir + "/" + projectName + "/" + projectName + ".data");
-		windowSize.width  = std::stoi(dataspot.GetConfigValue("window.width"));
-		windowSize.height = std::stoi(dataspot.GetConfigValue("window.height"));
+		windowSize.width  = stoi(dataspot.GetConfigValue("window.width"));
+		windowSize.height = stoi(dataspot.GetConfigValue("window.height"));
 		decorated = true;
 
 		sst::GlfwWindow window{ SST_TITLE, windowSize, decorated, stereoscopic };
@@ -147,23 +148,21 @@ int main(int argc, char **argv)
 		}
 
 		// Initialize PySpot
-		std::wstring wProjectDir{ projectDir.begin(), projectDir.end() };
-		std::wstring wProjectName{ projectName.begin(), projectName.end() };
+		wstring wProjectDir{ projectDir.begin(), projectDir.end() };
+		wstring wProjectName{ projectName.begin(), projectName.end() };
 		sst::Script::Initialize(L"/" + wProjectDir + L"/" + wProjectName + L"/script");
 
-		std::string projectPath{ projectDir + "/" + projectName + "/" };
+		string projectPath{ projectDir + "/" + projectName + "/" };
 		sst::ModelRepository modelRepository{ dataspot, projectPath };
 		sst::EntityRepository entityRepository{ dataspot, modelRepository };
 
 		// Read a set of objects from dataspot
-		constexpr size_t objectsCount = 3;
-		// Create an array of Objects
-		std::array<sst::WavefrontObject, objectsCount> objects{};
+		constexpr size_t entitiesCount = 3;
 		// For every object get the name
-		for (size_t i{ 0 }; i < objectsCount; ++i)
+		for (size_t i{ 0 }; i < entitiesCount; ++i)
 		{
 			sst::Entity* entity{ entityRepository.LoadEntity(i+1) };
-			//std::shared_ptr<sst::Entity> pEntity{ entity };
+			//shared_ptr<sst::Entity> pEntity{ entity };
 			window.AddEntity(entity);
 		}
 
@@ -178,7 +177,7 @@ int main(int argc, char **argv)
 		lst::Logger::log.error("%s: %s\n", tag.c_str(), e.what());
 		return EXIT_FAILURE;
 	}
-	catch (const std::runtime_error &e)
+	catch (const runtime_error &e)
 	{
 		lst::Logger::log.error("%s: %s\n", tag.c_str(), e.what());
 		return EXIT_FAILURE;

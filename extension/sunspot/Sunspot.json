@@ -1,0 +1,17 @@
+{
+	"includes": [],
+	"name": "Sunspot",
+	"methods": [
+		{
+			"name": "test",
+			"description": "Test function"
+		}
+	],
+	"components": [
+		"Transform",
+		"Vec3"
+	],
+	"enums": [
+		"Key"
+	]
+}

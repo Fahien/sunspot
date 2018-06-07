@@ -3,13 +3,13 @@
 
 #include <Logger.h>
 
-#include "Mesh.h"
 #include "ShaderProgram.h"
-#include "pyspot/component/Transform.h"
+#include "sunspot/component/Transform.h"
+#include "Mesh.h"
 
 using namespace std;
 using namespace sunspot;
-using namespace pyspot::component;
+using namespace sunspot::component;
 namespace mst = mathspot;
 namespace lst = logspot;
 

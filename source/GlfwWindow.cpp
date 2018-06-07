@@ -158,16 +158,38 @@ void GlfwWindow::handleInput(const int key, const int action) // TODO comment
 		}
 		break;
 	  case GLFW_KEY_S:
-		if (action == GLFW_PRESS)        { mCamera->setVelocityZ(1.0f); }
-		else if (action == GLFW_RELEASE) { mCamera->setVelocityZ(0.0f); }
+		if (action == GLFW_PRESS)
+		{
+			mCamera->setVelocityZ(1.0f);
+		}
+		else if (action == GLFW_RELEASE)
+		{
+			mCamera->setVelocityZ(0.0f);
+		}
 		break;
 	  case GLFW_KEY_A:
-		if (action == GLFW_PRESS)       { mCamera->setVelocityX(-1.0f); }
-		else if(action == GLFW_RELEASE) { mCamera->setVelocityX(0.0f); }
+		if (action == GLFW_PRESS)
+		{
+			mKeyPressed = input::Key::LEFT;
+			//mCamera->setVelocityX(-1.0f);
+		}
+		else if(action == GLFW_RELEASE)
+		{
+			mKeyPressed = static_cast<input::Key>(-1);
+			//mCamera->setVelocityX(0.0f);
+		}
 		break;
 	  case GLFW_KEY_D:
-		if (action == GLFW_PRESS)        { mCamera->setVelocityX(1.0f); }
-		else if (action == GLFW_RELEASE) { mCamera->setVelocityX(0.0f); }
+		if (action == GLFW_PRESS)
+		{
+			mKeyPressed = input::Key::RIGHT;
+			//mCamera->setVelocityX(1.0f);
+		}
+		else if (action == GLFW_RELEASE)
+		{
+			mKeyPressed = static_cast<input::Key>(-1);
+			//mCamera->setVelocityX(0.0f);
+		}
 		break;
 	  case GLFW_KEY_F: if (action == GLFW_PRESS) { toggleFullscreen(); } break;
 	  case GLFW_KEY_ESCAPE:

@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.6)
 include(CMakeToolsHelpers OPTIONAL)
 project(SunSpoT)
 
-set(CMAKE_C_STANDARD   17)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD   14)
+set(CMAKE_CXX_STANDARD 14)
 #set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wall")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti -Wall")
 
@@ -19,10 +19,8 @@ message("Searching modules in ${CMAKE_MODULE_PATH}")
 option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 # Python 3
-find_package(PythonInterp 3 PATHS "C:/Users/7oni/AppData/Local/Programs/Python/Python36-32")
-message(STATUS ${PYTHON_EXECUTABLE})
-find_package(PythonLibs   3 PATHS "C:/Users/7oni/AppData/Local/Programs/Python/Python36-32/include")
-message(STATUS ${PYTHON_INCLUDE_DIR})
+find_package(PythonInterp 3)
+find_package(PythonLibs   3)
 
 # LogSpoT
 set(LOGSPOT logspot)
@@ -110,33 +108,53 @@ set(SHADERS
 source_group("Shaders" FILES ${SHADERS})
 
 
-# Get all the json in test/component and generate headers
-file(GLOB COMPONENTS source/component/*json)
+# Generate the Sunspot Extension header
+set(SST_EXTENSION_NAME "Sunspot")
+set(SST_EXTENSION_JSON ${PROJECT_SOURCE_DIR}/extension/sunspot/${SST_EXTENSION_NAME}.json)
+set(SST_EXTENSION_HEADER ${PROJECT_BINARY_DIR}/include/sunspot/extension/${SST_EXTENSION_NAME}.h)
+set(SST_EXTENSION_SOURCE ${PROJECT_BINARY_DIR}/src/sunspot/extension/${SST_EXTENSION_NAME}.cpp)
+add_custom_command(
+	OUTPUT ${SST_EXTENSION_HEADER} ${SST_EXTENSION_SOURCE}
+	COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-extension.py ${SST_EXTENSION_JSON} -h > ${SST_EXTENSION_HEADER}
+	COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-extension.py ${SST_EXTENSION_JSON} > ${SST_EXTENSION_SOURCE}
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/pyspot/script
+	COMMENT "Generating ${SST_EXTENSION_HEADER}"
+	VERBATIM)
+
+# Get all the json in extension/component and generate headers
+file(GLOB COMPONENTS ${PROJECT_SOURCE_DIR}/extension/sunspot/component/*json)
 foreach(COMPONENT ${COMPONENTS})
 	get_filename_component(NAME ${COMPONENT} NAME_WE)
 	list(APPEND COMPONENT_NAMES ${NAME})
-	set(SST_COMPONENT_HEADER ${PROJECT_BINARY_DIR}/include/pyspot/component/${NAME}.h)
-	list(APPEND COMPONENT_HEADERS ${SST_COMPONENT_HEADER})
+	set(SST_COMPONENT_HEADER ${PROJECT_BINARY_DIR}/include/sunspot/component/${NAME}.h)
+	list(APPEND SST_COMPONENT_HEADERS ${SST_COMPONENT_HEADER})
 	add_custom_command(
 		OUTPUT ${SST_COMPONENT_HEADER}
-		COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-component.py ${COMPONENT} > ${SST_COMPONENT_HEADER}
+		COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-component.py ${SST_EXTENSION_NAME} ${COMPONENT} > ${SST_COMPONENT_HEADER}
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/pyspot/script
 		COMMENT "Generating ${SST_COMPONENT_HEADER}"
 		VERBATIM)
 endforeach()
 
-# Generate the PySpotExtension header
-set(SST_EXTENSION_HEADER ${PROJECT_BINARY_DIR}/include/pyspot/extension/Extension.h)
-set(SST_EXTENSION_SOURCE ${PROJECT_BINARY_DIR}/src/pyspot/extension/Extension.cpp)
-add_custom_command(
-	OUTPUT ${SST_EXTENSION_HEADER} ${SST_EXTENSION_SOURCE}
-	COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-extension.py -h > ${SST_EXTENSION_HEADER}
-	COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-extension.py ${COMPONENT_NAMES} > ${SST_EXTENSION_SOURCE}
-	COMMENT "Generating ${SST_EXTENSION_HEADER}"
-	VERBATIM)
+# Get all the json in extension/enums and generate headers
+file(GLOB ENUMS ${PROJECT_SOURCE_DIR}/extension/sunspot/enum/*json)
+foreach(ENUM ${ENUMS})
+	get_filename_component(NAME ${ENUM} NAME_WE)
+	list(APPEND ENUM_NAMES ${NAME})
+	set(SST_ENUM_HEADER ${PROJECT_BINARY_DIR}/include/sunspot/input/${NAME}.h)
+	list(APPEND SST_ENUM_HEADERS ${SST_ENUM_HEADER})
+	add_custom_command(
+		OUTPUT ${SST_ENUM_HEADER}
+		COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-enum.py ${SST_EXTENSION_NAME} ${ENUM} > ${SST_ENUM_HEADER}
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/pyspot/script
+		COMMENT "Generating ${SST_ENUM_HEADER}"
+		VERBATIM)
+endforeach()
 
 
 set(SOURCES
-	${COMPONENT_HEADERS}
+	${SST_COMPONENT_HEADERS}
+	${SST_ENUM_HEADERS}
 	${SST_EXTENSION_HEADER}
 	${SST_EXTENSION_SOURCE}
 	source/Graphics.h

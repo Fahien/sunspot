@@ -1,7 +1,9 @@
 #include <Logger.h>
 
-#include "Mesh.h"
 #include "Entity.h"
+
+#include "Mesh.h"
+#include "sunspot/component/Transform.h"
 
 using namespace sunspot;
 namespace lst = logspot;
@@ -28,6 +30,22 @@ Entity::~Entity()
 	{
 		delete mScript;
 	}
+}
+
+
+void Entity::SetTransform(component::Transform* transform)
+{
+	if (mTransform == transform)
+	{
+		return;
+	}
+
+	if (mTransform)
+	{
+		delete mTransform;
+	}
+
+	mTransform = transform;
 }
 
 
