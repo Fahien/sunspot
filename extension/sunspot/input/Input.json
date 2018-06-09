@@ -1,0 +1,14 @@
+{
+	"namespace": "input",
+	"name": "Input",
+	"members": [
+		{
+			"name": "key",
+			"type": "input::Key"
+		},
+		{
+			"name": "action",
+			"type": "input::Action"
+		}
+	]
+}

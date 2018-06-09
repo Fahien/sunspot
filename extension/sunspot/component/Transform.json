@@ -1,5 +1,5 @@
 {
-	"includes": ["Vec3"],
+	"namespace": "component",
 	"name": "Transform",
 	"members": [
 		{
@@ -8,15 +8,15 @@
 		},
 		{
 			"name": "position",
-			"type": "Vec3"
+			"type": "component::Vec3"
 		},
 		{
 			"name": "rotation",
-			"type": "Vec3"
+			"type": "component::Vec3"
 		},
 		{
 			"name": "scale",
-			"type": "Vec3",
+			"type": "component::Vec3",
 			"default": "1.0f, 1.0f, 1.0f"
 		}
 	]

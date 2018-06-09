@@ -128,74 +128,67 @@ GlfwWindow::~GlfwWindow()
 void GlfwWindow::handleMouse(const double x, const double y) // TODO comment
 {
 	mCursor.setPosition(static_cast<float>(x), static_cast<float>(y));
-	mCamera->setYaw  (mCamera->getYaw()   - mCursor.getOffset().x * mCursor.getSensitivity() * mDeltaTime);
-	mCamera->setPitch(mCamera->getPitch() + mCursor.getOffset().y * mCursor.getSensitivity() * mDeltaTime);
-	mCamera->updateVectors();
+	//mCamera->setYaw  (mCamera->getYaw()   - mCursor.getOffset().x * mCursor.getSensitivity() * mDeltaTime);
+	//mCamera->setPitch(mCamera->getPitch() + mCursor.getOffset().y * mCursor.getSensitivity() * mDeltaTime);
+	//mCamera->updateVectors();
 }
 
 
-const input::Key& GlfwWindow::pollInput()
+const input::Input GlfwWindow::pollInput()
 {
 	glfwPollEvents();
-	return mKeyPressed;
+	return input::Input{ mKey, mAction };
 }
 
 
 void GlfwWindow::handleInput(const int key, const int action) // TODO comment
 {
+	if (action == GLFW_PRESS)
+	{
+		mAction = input::Action::PRESS;
+	}
+	else if (action == GLFW_RELEASE)
+	{
+		mAction = input::Action::RELEASE;
+	}
+	else if (action == GLFW_REPEAT)
+	{
+		mAction = input::Action::REPEAT;
+	}
+
 	switch (key)
 	{
 	  case GLFW_KEY_W:
-		if (action == GLFW_PRESS)
-		{
-			//mCamera->setVelocityZ(-1.0f);
-			mKeyPressed = input::Key::UP;
-		}
-		else if (action == GLFW_RELEASE)
-		{
-			//mCamera->setVelocityZ(0.0f);
-			mKeyPressed = static_cast<input::Key>(-1);
-		}
-		break;
+		mKey = input::Key::W; break;
 	  case GLFW_KEY_S:
-		if (action == GLFW_PRESS)
-		{
-			mCamera->setVelocityZ(1.0f);
-		}
-		else if (action == GLFW_RELEASE)
-		{
-			mCamera->setVelocityZ(0.0f);
-		}
-		break;
+		mKey = input::Key::S; break;
 	  case GLFW_KEY_A:
-		if (action == GLFW_PRESS)
-		{
-			mKeyPressed = input::Key::LEFT;
-			//mCamera->setVelocityX(-1.0f);
-		}
-		else if(action == GLFW_RELEASE)
-		{
-			mKeyPressed = static_cast<input::Key>(-1);
-			//mCamera->setVelocityX(0.0f);
-		}
-		break;
+		mKey = input::Key::A; break;
 	  case GLFW_KEY_D:
+		mKey = input::Key::D; break;
+	  case GLFW_KEY_UP:
+		mKey = input::Key::UP; break;
+	  case GLFW_KEY_LEFT:
+		mKey = input::Key::LEFT; break;
+	  case GLFW_KEY_DOWN:
+		mKey = input::Key::DOWN; break;
+	  case GLFW_KEY_RIGHT:
+		mKey = input::Key::RIGHT; break;
+	  case GLFW_KEY_F:
+		mKey = static_cast<input::Key>(-1);
 		if (action == GLFW_PRESS)
 		{
-			mKeyPressed = input::Key::RIGHT;
-			//mCamera->setVelocityX(1.0f);
-		}
-		else if (action == GLFW_RELEASE)
-		{
-			mKeyPressed = static_cast<input::Key>(-1);
-			//mCamera->setVelocityX(0.0f);
+			toggleFullscreen();
 		}
 		break;
-	  case GLFW_KEY_F: if (action == GLFW_PRESS) { toggleFullscreen(); } break;
 	  case GLFW_KEY_ESCAPE:
 	  case GLFW_KEY_Q: glfwSetWindowShouldClose(mWindow, GLFW_TRUE); break;
-	  default: break;
+	  default:
+		mKey = static_cast<input::Key>(-1);
+		break;
 	}
+
+	Window::handleInput(input::Input{ mKey, mAction });
 }
 
 

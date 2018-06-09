@@ -59,20 +59,30 @@ void Window::initGlew()
 }
 
 
-void Window::render()
+void Window::handleInput(const input::Input i)
 {
-	render(computeDeltaTime(), pollInput());
+	for (auto& entity : mEntities)
+	{
+		entity->Handle(i);
+	}
 }
 
 
-void Window::render(const float& deltaTime, const input::Key key) // TODO comment
+void Window::render()
+{
+	input::Input i{ pollInput() };
+	render(computeDeltaTime(), i);
+}
+
+
+void Window::render(const float& deltaTime, const input::Input& input) // TODO comment
 {
 	// std::cout << static_cast<int>(1.0f / deltaTime) << " "; // FPS
 	updateFrameSize();
 
 	for (auto entity : mEntities)
 	{
-		entity->Update(deltaTime, key);
+		entity->Update(deltaTime, input);
 	}
 
 	if (mStereoscopic)

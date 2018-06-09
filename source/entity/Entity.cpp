@@ -4,6 +4,7 @@
 
 #include "Mesh.h"
 #include "sunspot/component/Transform.h"
+#include "sunspot/component/Rigidbody.h"
 
 using namespace sunspot;
 namespace lst = logspot;
@@ -49,10 +50,35 @@ void Entity::SetTransform(component::Transform* transform)
 }
 
 
-void Entity::Update(const float delta, input::Key key)
+void Entity::SetRigidbody(component::Rigidbody* rigidbody)
+{
+	if (mRigidbody == rigidbody)
+	{
+		return;
+	}
+
+	if (mRigidbody)
+	{
+		delete mRigidbody;
+	}
+
+	mRigidbody = rigidbody;
+}
+
+
+void Entity::Handle(const input::Input& input)
 {
 	if (mScript)
 	{
-		mScript->Update(delta, key);
+		mScript->Handle(input);
+	}
+}
+
+
+void Entity::Update(const float delta, const input::Input& input)
+{
+	if (mScript)
+	{
+		mScript->Update(delta, input);
 	}
 }

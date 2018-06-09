@@ -1,8 +1,10 @@
 #include <Logger.h>
 #include <pyspot/Tuple.h>
 #include <pyspot/String.h>
+#include <pyspot/Dictionary.h>
 #include <sunspot/extension/Sunspot.h>
 #include <sunspot/component/Transform.h>
+#include <sunspot/component/Rigidbody.h>
 
 #include "Entity.h"
 #include "Mesh.h"
@@ -31,7 +33,7 @@ Script::Script(const int id, std::string& name, Entity& entity)
 :	Object { id, name }
 ,	mEntity{ entity }
 ,	mModule{ interpreter->ImportModule(name) }
-,	mArgs  { 3 }
+,	mArgs  { 2 }
 {}
 
 
@@ -39,8 +41,10 @@ void Script::Initialize()
 {
 	if (mEntity.GetTransform())
 	{
-		Tuple args{ 1 };
-		args.SetItem(0, *mEntity.mTransform);
+		Dictionary dict{};
+		dict.SetItem("transform", *mEntity.mTransform);
+		dict.SetItem("rigidbody", *mEntity.mRigidbody);
+		Tuple args{ dict };
 
 		lst::Logger::log.info("Calling python init\n");
 		mModule.CallFunction("init", args);
@@ -64,8 +68,10 @@ Script::Script(Entity& entity)
 ,	mModule{ interpreter->ImportModule(entity.GetModel()->GetNode().name.c_str()) }
 ,	mArgs  { 3 }
 {
-	Tuple args{ 1 };
-	args.SetItem(0, *mEntity.mTransform);
+	Dictionary dict{};
+	dict.SetItem("transform", *mEntity.mTransform);
+	dict.SetItem("rigidbody", *mEntity.mRigidbody);
+	Tuple args{ dict };
 
 	lst::Logger::log.info("Calling python init\n");
 	mModule.CallFunction("init", args);
@@ -82,11 +88,17 @@ Script::Script(Entity& entity)
 }
 
 
-void Script::Update(const float delta, const input::Key key)
+void Script::Handle(const input::Input& input)
+{
+	Tuple args{ input };
+	mModule.CallFunction("handle", args);
+}
+
+
+void Script::Update(const float delta, const input::Input& input)
 {
 	mArgs.SetItem(0, delta);
-	mArgs.SetItem(1, static_cast<int>(key));
-	mArgs.SetItem(2, *mEntity.mTransform);
+	mArgs.SetItem(1, input);
 	
 	mModule.CallFunction("update", mArgs);
 	

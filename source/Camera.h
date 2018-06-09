@@ -15,6 +15,16 @@ public:
 
 	void setPosition(const float x, const float y, const float z);
 
+	/// Sets the direction
+	/// @param[in] d Direction vector
+	void LookAt(const mst::Vec3& d);
+
+	/// Sets the direction
+	/// @param[in] x Direction x
+	/// @param[in] y Direction y
+	/// @param[in] z Direction z
+	void LookAt(const float x, const float y, const float z);
+
 	inline float& getPitch() { return mPitch; }
 	inline float& getYaw()   { return mYaw;   }
 

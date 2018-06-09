@@ -7,6 +7,7 @@
 using namespace sunspot;
 namespace mst = mathspot;
 
+
 Camera::Camera(const float fov, const float aspectRatio, const float near, const float far)
 	: mRotation{ mst::Mat4::identity }
 	, mTranslation{ mst::Mat4::identity }
@@ -31,6 +32,7 @@ Camera::Camera(const float fov, const float aspectRatio, const float near, const
 	updateVectors();
 }
 
+
 void Camera::setPosition(const float x, const float y, const float z)
 {
 	mPosition.x = x;
@@ -39,18 +41,43 @@ void Camera::setPosition(const float x, const float y, const float z)
 }
 
 
+void Camera::LookAt(const mst::Vec3& p)
+{
+	LookAt(p.x, p.y, p.z);
+}
+
+
+void Camera::LookAt(const float x, const float y, const float z)
+{
+	mDirection.x = x - mPosition.x;
+	mDirection.y = y - mPosition.y;
+	mDirection.z = z - mPosition.z;
+	mDirection.normalize();
+	updateVectors();
+}
+
+
 void Camera::updateVectors()
 {
-	float cospitch{ static_cast<float>(std::cos(mPitch)) };
-	float sinpitch{ static_cast<float>(std::sin(mPitch)) };
-	float cosyaw{ static_cast<float>(std::cos(mYaw)) };
-	float sinyaw{ static_cast<float>(std::sin(mYaw)) };
-	mDirection.x = cospitch * cosyaw;
-	mDirection.y = sinpitch;
-	mDirection.z = cospitch * sinyaw;
-	mDirection.normalize();
-	mRight = mst::Vec3::cross(mDirection, mWorldUp);
-	mRight.normalize();
+	//float cospitch{ static_cast<float>(std::cos(mPitch)) };
+	//float sinpitch{ static_cast<float>(std::sin(mPitch)) };
+	//float cosyaw{ static_cast<float>(std::cos(mYaw)) };
+	//float sinyaw{ static_cast<float>(std::sin(mYaw)) };
+	//mDirection.x = cospitch * cosyaw;
+	//mDirection.y = sinpitch;
+	//mDirection.z = cospitch * sinyaw;
+	//mDirection.normalize();
+	if (true)
+	{
+		mRight.x = 1.0f;
+		mRight.y = 0.0f;
+		mRight.z = 0.0f;
+	}
+	else
+	{
+		mRight = mst::Vec3::cross(mDirection, mWorldUp);
+		mRight.normalize();
+	}
 	mUp = mst::Vec3::cross(mRight, mDirection);
 	mUp.normalize();
 }
@@ -67,9 +94,9 @@ void Camera::updateView()
 	mRotation[8] = mRight.z;
 	mRotation[9] = mUp.z;
 	mRotation[10] = mDirection.z;
-	mTranslation[12] = -mPosition.x;
-	mTranslation[13] = -mPosition.y;
-	mTranslation[14] = -mPosition.z;
+	mTranslation[12] = mPosition.x;
+	mTranslation[13] = mPosition.y;
+	mTranslation[14] = mPosition.z;
 	mView = mRotation * mTranslation;
 }
 

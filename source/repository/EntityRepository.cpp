@@ -9,6 +9,7 @@
 
 #include "entity/Entity.h"
 #include "sunspot/component/Transform.h"
+#include "sunspot/component/Rigidbody.h"
 #include "Mesh.h"
 
 #include "EntityRepository.h"
@@ -119,6 +120,22 @@ Entity* EntityRepository::loadEntity(const int id)
 				Transform* transform = new Transform{ id, position, rotation, scale };
 				// Add the component to the entity
 				pEntity->SetTransform(transform);
+			}
+			else if (type == "rigidbody")
+			{
+				// Get id
+				int id { stmtComponent.GetInteger(0) };
+
+				// Get velocity.xyz
+				float x{ static_cast<float>(stmtComponent.GetDouble(1)) };
+				float y{ static_cast<float>(stmtComponent.GetDouble(2)) };
+				float z{ static_cast<float>(stmtComponent.GetDouble(3)) };
+				Vec3 velocity{ x, y, z };
+
+				// Construct che component
+				Rigidbody* rigidbody = new Rigidbody{ id, velocity };
+				// Add the component
+				pEntity->SetRigidbody(rigidbody);
 			}
 			else if (type == "script")
 			{

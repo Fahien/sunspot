@@ -121,40 +121,35 @@ add_custom_command(
 	COMMENT "Generating ${SST_EXTENSION_HEADER}"
 	VERBATIM)
 
-# Get all the json in extension/component and generate headers
-file(GLOB COMPONENTS ${PROJECT_SOURCE_DIR}/extension/sunspot/component/*json)
-foreach(COMPONENT ${COMPONENTS})
-	get_filename_component(NAME ${COMPONENT} NAME_WE)
-	list(APPEND COMPONENT_NAMES ${NAME})
-	set(SST_COMPONENT_HEADER ${PROJECT_BINARY_DIR}/include/sunspot/component/${NAME}.h)
-	list(APPEND SST_COMPONENT_HEADERS ${SST_COMPONENT_HEADER})
-	add_custom_command(
-		OUTPUT ${SST_COMPONENT_HEADER}
-		COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-component.py ${SST_EXTENSION_NAME} ${COMPONENT} > ${SST_COMPONENT_HEADER}
-		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/pyspot/script
-		COMMENT "Generating ${SST_COMPONENT_HEADER}"
-		VERBATIM)
-endforeach()
 
-# Get all the json in extension/enums and generate headers
-file(GLOB ENUMS ${PROJECT_SOURCE_DIR}/extension/sunspot/enum/*json)
-foreach(ENUM ${ENUMS})
-	get_filename_component(NAME ${ENUM} NAME_WE)
-	list(APPEND ENUM_NAMES ${NAME})
-	set(SST_ENUM_HEADER ${PROJECT_BINARY_DIR}/include/sunspot/input/${NAME}.h)
-	list(APPEND SST_ENUM_HEADERS ${SST_ENUM_HEADER})
-	add_custom_command(
-		OUTPUT ${SST_ENUM_HEADER}
-		COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-enum.py ${SST_EXTENSION_NAME} ${ENUM} > ${SST_ENUM_HEADER}
-		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/pyspot/script
-		COMMENT "Generating ${SST_ENUM_HEADER}"
-		VERBATIM)
+# Get all the folders under test/extension/pytest
+set(EXTENSION_NAME sunspot)
+set(EXTENSION_PATH ${PROJECT_SOURCE_DIR}/extension/${EXTENSION_NAME})
+file(GLOB NAMESPACES LIST_DIRECTORY true ${EXTENSION_PATH}/*)
+foreach(NAMESPACE ${NAMESPACES})
+	message(STATUS "CHECK ${NAMESPACE}")
+	if(IS_DIRECTORY ${NAMESPACE})
+		# Get all the jsons and generate headers
+		file(GLOB COMPONENTS ${NAMESPACE}/*json)
+		foreach(COMPONENT ${COMPONENTS})
+			get_filename_component(NAMESPACE_NAME ${NAMESPACE} NAME_WE)
+			get_filename_component(NAME ${COMPONENT} NAME_WE)
+			list(APPEND COMPONENT_NAMES ${NAME})
+			set(COMPONENT_HEADER ${PROJECT_BINARY_DIR}/include/${EXTENSION_NAME}/${NAMESPACE_NAME}/${NAME}.h)
+			list(APPEND COMPONENT_HEADERS ${COMPONENT_HEADER})
+			add_custom_command(
+				OUTPUT ${COMPONENT_HEADER}
+				COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-component.py ${EXTENSION_NAME} ${COMPONENT} > ${COMPONENT_HEADER}
+				WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/pyspot/script
+				COMMENT "Generating ${COMPONENT_HEADER}"
+				VERBATIM)
+		endforeach()
+	endif()
 endforeach()
 
 
 set(SOURCES
-	${SST_COMPONENT_HEADERS}
-	${SST_ENUM_HEADERS}
+	${COMPONENT_HEADERS}
 	${SST_EXTENSION_HEADER}
 	${SST_EXTENSION_SOURCE}
 	source/Graphics.h

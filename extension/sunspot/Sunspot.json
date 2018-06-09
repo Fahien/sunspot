@@ -1,5 +1,5 @@
 {
-	"includes": [],
+	"import": ["Map"],
 	"name": "Sunspot",
 	"methods": [
 		{
@@ -8,10 +8,11 @@
 		}
 	],
 	"components": [
-		"Transform",
-		"Vec3"
-	],
-	"enums": [
-		"Key"
+		"component::Rigidbody",
+		"component::Transform",
+		"component::Vec3",
+		"input::Input",
+		"input::Key",
+		"input::Action"
 	]
 }

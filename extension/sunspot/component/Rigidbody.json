@@ -1,0 +1,14 @@
+{
+	"namespace": "component",
+	"name": "Rigidbody",
+	"members": [
+		{
+			"name": "id",
+			"type": "int"
+		},
+		{
+			"name": "velocity",
+			"type": "component::Vec3"
+		}
+	]
+}

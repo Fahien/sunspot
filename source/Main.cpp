@@ -9,7 +9,6 @@
 #include <DataSpot.h>
 
 #include "SunSpotConfig.h"
-#include "GlfwWindow.h"
 #include "Light.h"
 #include "ShaderProgram.h"
 #include "Quad.h"
@@ -22,6 +21,7 @@
 #include "Entity.h"
 #include "ModelRepository.h"
 #include "EntityRepository.h"
+#include "GlfwWindow.h"
 
 using namespace std;
 
@@ -112,10 +112,16 @@ int main(int argc, char **argv)
 		windowSize.height = stoi(dataspot.GetConfigValue("window.height"));
 		decorated = true;
 
+		// Initialize PySpot
+		wstring wProjectDir{ projectDir.begin(), projectDir.end() };
+		wstring wProjectName{ projectName.begin(), projectName.end() };
+		sst::Script::Initialize(L"/" + wProjectDir + L"/" + wProjectName + L"/script");
+
 		sst::GlfwWindow window{ SST_TITLE, windowSize, decorated, stereoscopic };
 
 		sst::Camera camera{ fov, static_cast<float>(windowSize.width) / windowSize.height, near, far };
-		camera.setPosition(-2.0f, 0.0f, -6.0f);
+		camera.setPosition(0.0f, -32.0f, 0.0f);
+		camera.LookAt(0.0f, 0.0f, 0.0f);
 		window.setCamera(&camera);
 
 		sst::ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
@@ -130,8 +136,8 @@ int main(int argc, char **argv)
 		//light.GetSpecular().r /= divFactor / 2;
 		//light.GetSpecular().g /= divFactor / 2;
 		//light.GetSpecular().b /= divFactor / 2;
-		sst::PointLight light{ sst::Color{ 1.0f, 1.0f, 1.0f } };
-		light.SetPosition(0.0f, 4.0f, 0.0f);
+		sst::PointLight light{ sst::Color{ 18.0f, 18.0f, 18.0f } };
+		light.SetPosition(0.0f, 16.0f, 0.0f);
 		window.setLight(&light);
 
 		// Inject dependencies into window
@@ -146,11 +152,6 @@ int main(int argc, char **argv)
 			window.setQuad(&quad);
 			window.setFramebuffer(&framebuffer);
 		}
-
-		// Initialize PySpot
-		wstring wProjectDir{ projectDir.begin(), projectDir.end() };
-		wstring wProjectName{ projectName.begin(), projectName.end() };
-		sst::Script::Initialize(L"/" + wProjectDir + L"/" + wProjectName + L"/script");
 
 		string projectPath{ projectDir + "/" + projectName + "/" };
 		sst::ModelRepository modelRepository{ dataspot, projectPath };

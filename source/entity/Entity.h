@@ -7,7 +7,7 @@
 #include "component/Model.h"
 #include "entity/Script.h"
 #include "entity/Object.h"
-#include "input/Input.h"
+#include "sunspot/input/Input.h"
 
 
 namespace pst = pyspot;
@@ -22,6 +22,7 @@ namespace component
 {
 
 class Transform;
+class Rigidbody;
 
 }
 
@@ -40,14 +41,19 @@ public:
 	inline component::Transform* GetTransform() { return mTransform; }
 	void SetTransform(component::Transform* transform);
 
+	component::Rigidbody* GetRigidbody() { return mRigidbody; }
+	void SetRigidbody(component::Rigidbody* rigidbody);
+
 	inline Script* GetScript() { return mScript; }
 	inline void SetScript(Script* script);
 
-	void Update(const float delta, const input::Key key);
+	void Handle(const input::Input& input);
+	void Update(const float delta, const input::Input& input);
 
 private:
 	Model*                mModel     { nullptr };
 	component::Transform* mTransform { nullptr };
+	component::Rigidbody* mRigidbody { nullptr };
 	Script*               mScript    { nullptr };
 
 	friend class Script;

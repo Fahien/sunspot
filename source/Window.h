@@ -9,7 +9,7 @@
 #include "MathSpot.h"
 #include "Graphics.h"
 #include "Cursor.h"
-#include "input/Input.h"
+#include "sunspot/input/Input.h"
 
 namespace mst = mathspot;
 
@@ -62,10 +62,11 @@ public:
 protected:
 	static void initGlew();
 	void render();
+	void handleInput(const input::Input in);
 
 	virtual void toggleFullscreen() = 0;
 	virtual const float& computeDeltaTime() = 0;
-	virtual const input::Key& pollInput() = 0;
+	virtual const input::Input pollInput() = 0;
 	virtual void updateFrameSize() = 0;
 
 	const char* mTitle;
@@ -80,13 +81,14 @@ protected:
 	float mCurrentTime;
 	float mLastTime;
 	float mDeltaTime;
-	input::Key mKeyPressed;
+	input::Key    mKey   { input::Key::UP };
+	input::Action mAction{ input::Action::RELEASE };
 
 	Cursor  mCursor;
 	Camera* mCamera;
 
 private:
-	void render(const float &deltaTime, const input::Key key);
+	void render(const float &deltaTime, const input::Input& input);
 	void render3D(const float& deltaTime);
 	void renderGltf(const float& deltaTime);
 	void renderQuad(const float& deltaTime);

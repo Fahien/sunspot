@@ -8,7 +8,7 @@
 #include <pyspot/Module.h>
 #include <pyspot/Tuple.h>
 
-#include "input/Input.h"
+#include "sunspot/input/Input.h"
 #include "entity/Object.h"
 
 
@@ -30,7 +30,8 @@ class Script : public Object
 	~Script() {}
 
 	void Initialize();
-	void Update(const float delta, const input::Key key);
+	void Handle(const input::Input& input);
+	void Update(const float delta, const input::Input& input);
 
 	static void Initialize(const std::wstring& scriptPath);
 
