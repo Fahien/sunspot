@@ -71,5 +71,5 @@ Model& ModelRepository::GetModel(const int id, const string& path, const string&
 	
 	std::string msg { "Node not found: "};
 	msg += name;
-	throw exception{ msg.c_str() };
+	throw runtime_error{ msg.c_str() };
 }

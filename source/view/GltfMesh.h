@@ -31,7 +31,7 @@ public:
 	/// @return The list of primitives
 	std::vector<GltfPrimitive>& GetPrimitives() { return mPrimitives; }
 
-	void GltfMesh::Draw(const ShaderProgram& shader) const;
+	void Draw(const ShaderProgram& shader) const;
 
 private:
 	std::string mName;

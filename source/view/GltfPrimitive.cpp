@@ -127,10 +127,10 @@ GltfPrimitive::GltfPrimitive(Gltf& model, Gltf::Mesh::Primitive& primitive)
 
 		assert(bufferView.target == Gltf::BufferView::Target::ARRAY_BUFFER);
 
-		auto& it = mVbos.find(bufferViewIndex);
+		auto it = mVbos.find(bufferViewIndex);
 		if (it == mVbos.end())
 		{
-			auto& pair = mVbos.emplace(bufferViewIndex, 0);
+			auto pair = mVbos.emplace(bufferViewIndex, 0);
 			auto& vbo = pair.first->second;
 			glGenBuffers(1, &vbo);
 			// TODO check i've already bound this buffer
@@ -207,7 +207,7 @@ GltfPrimitive::GltfPrimitive(Gltf& model, Gltf::Mesh::Primitive& primitive)
 			t->sampler->wrapS;
 			t->sampler->wrapT;
 			Texture texture{ uri, TextureType::DIFFUSE };
-			auto& r = mTextures.emplace(t, move(texture));
+			auto r = mTextures.emplace(t, move(texture));
 			mMaterial.colorTexture = &(r.first->second);
 		}
 		else
