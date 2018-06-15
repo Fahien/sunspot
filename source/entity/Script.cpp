@@ -5,6 +5,7 @@
 #include <sunspot/extension/Sunspot.h>
 #include <sunspot/component/Transform.h>
 #include <sunspot/component/Rigidbody.h>
+#include "component/Model.h"
 
 #include "Entity.h"
 #include "Mesh.h"

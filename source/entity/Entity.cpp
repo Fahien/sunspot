@@ -3,6 +3,7 @@
 #include "Entity.h"
 
 #include "Mesh.h"
+#include "component/Collider.h"
 #include "sunspot/component/Transform.h"
 #include "sunspot/component/Rigidbody.h"
 
@@ -22,6 +23,13 @@ Entity::Entity(int id, std::string& name)
 
 Entity::~Entity()
 {
+	// It does not own the Model
+
+	if (mCollider)
+	{
+		delete mCollider;
+	}
+
 	if (mTransform)
 	{
 		delete mTransform;
@@ -31,6 +39,33 @@ Entity::~Entity()
 	{
 		delete mScript;
 	}
+}
+
+
+void Entity::SetModel(component::Model* model)
+{
+	if (mModel == model)
+	{
+		return;
+	}
+
+	mModel = model;
+}
+
+
+void Entity::SetCollider(component::Collider* collider)
+{
+	if (mCollider == collider)
+	{
+		return;
+	}
+
+	if (mCollider)
+	{
+		delete mCollider;
+	}
+
+	mCollider = collider;
 }
 
 

@@ -15,6 +15,7 @@
 #include "Quad.h"
 #include "Framebuffer.h"
 #include "Entity.h"
+#include "component/Model.h"
 
 using namespace sunspot;
 

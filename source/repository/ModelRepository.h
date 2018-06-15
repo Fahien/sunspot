@@ -33,12 +33,12 @@ class ModelRepository
 	ModelRepository(const dst::DataSpot& data, const std::string& projectDir);
 	~ModelRepository();
 
-	Model& GetModel(const int id, const std::string& path, const std::string& name);
+	component::Model& GetModel(const int id, const std::string& path, const std::string& name);
 
   private:
 	const dst::DataSpot& mData;
 	const std::string    mProjectDir;
-	std::map<const int, Model> mModels {};
+	std::map<const int, component::Model> mModels {};
 	std::map<std::string, GltfRenderer> mRenderers {};
 };
 

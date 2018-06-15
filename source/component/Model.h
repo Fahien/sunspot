@@ -9,7 +9,7 @@
 namespace gst = gltfspot;
 
 
-namespace sunspot
+namespace sunspot::component
 {
 
 

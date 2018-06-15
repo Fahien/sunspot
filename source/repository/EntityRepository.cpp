@@ -1,5 +1,6 @@
 #include <memory>
 #include <DataSpot.h>
+#include <hitspot/BoundingBox.h>
 
 #include "Statement.h"
 #include "DataSpotException.h"
@@ -8,6 +9,7 @@
 #include "ModelRepository.h"
 
 #include "entity/Entity.h"
+#include "component/Collider.h"
 #include "sunspot/component/Transform.h"
 #include "sunspot/component/Rigidbody.h"
 #include "Mesh.h"
@@ -156,7 +158,7 @@ Entity* EntityRepository::loadEntity(const int id)
 
 				// Get model path
 				string path{ stmtComponent.GetText(1) };
-				
+
 				// Get mesh name
 				string name{ stmtComponent.GetText(2) };
 
@@ -165,6 +167,25 @@ Entity* EntityRepository::loadEntity(const int id)
 
 				// Construct the component
 				pEntity->SetModel(&model);
+			}
+			else if (type == "collider")
+			{
+				// Get id
+				int id { stmtComponent.GetInteger(0) };
+
+				// Get name
+				string name{ stmtComponent.GetText(1) };
+
+				// TODO Bounding could be of different types
+				// Implement circles, etc..
+
+				// Get box width and height
+				hitspot::BoundingBox box{ pEntity };
+				box.width  = static_cast<float>(stmtComponent.GetDouble(2));
+				box.height = static_cast<float>(stmtComponent.GetDouble(3));
+
+				Collider* collider{ new Collider{ id, name, *pEntity, move(box) } };
+				pEntity->SetCollider(collider);
 			}
 		}
 		catch (const DataSpotException&)

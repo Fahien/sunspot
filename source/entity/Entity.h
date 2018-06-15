@@ -4,7 +4,6 @@
 #include <memory>
 #include <Gltf.h>
 
-#include "component/Model.h"
 #include "entity/Script.h"
 #include "entity/Object.h"
 #include "sunspot/input/Input.h"
@@ -21,8 +20,11 @@ class Mesh;
 namespace component
 {
 
+class Model;
+class Collider;
 class Transform;
 class Rigidbody;
+
 
 }
 
@@ -35,23 +37,27 @@ public:
 
 	~Entity();
 
-	inline Model* GetModel() { return mModel; }
-	inline void SetModel(Model* model);
+	component::Model* GetModel() { return mModel; }
+	void SetModel(component::Model* model);
 
-	inline component::Transform* GetTransform() { return mTransform; }
+	component::Collider* GetCollider() { return mCollider; }
+	void SetCollider(component::Collider* mCollider);
+
+	component::Transform* GetTransform() { return mTransform; }
 	void SetTransform(component::Transform* transform);
 
 	component::Rigidbody* GetRigidbody() { return mRigidbody; }
 	void SetRigidbody(component::Rigidbody* rigidbody);
 
-	inline Script* GetScript() { return mScript; }
+	Script* GetScript() { return mScript; }
 	inline void SetScript(Script* script);
 
 	void Handle(const input::Input& input);
 	void Update(const float delta, const input::Input& input);
 
 private:
-	Model*                mModel     { nullptr };
+	component::Model*     mModel     { nullptr };
+	component::Collider*  mCollider  { nullptr };
 	component::Transform* mTransform { nullptr };
 	component::Rigidbody* mRigidbody { nullptr };
 	Script*               mScript    { nullptr };
@@ -59,22 +65,6 @@ private:
 	friend class Script;
 };
 
-
-
-void Entity::SetModel(Model* model)
-{
-	if (mModel == model)
-	{
-		return;
-	}
-
-	if (mModel)
-	{
-		delete mModel;
-	}
-
-	mModel = model;
-}
 
 
 void Entity::SetScript(Script* script)

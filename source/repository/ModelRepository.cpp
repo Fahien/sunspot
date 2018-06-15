@@ -25,7 +25,7 @@ ModelRepository::~ModelRepository()
 {}
 
 
-Model& ModelRepository::GetModel(const int id, const string& path, const string& name)
+component::Model& ModelRepository::GetModel(const int id, const string& path, const string& name)
 {
 	// Check whether the model has already been loaded
 	auto itModel = mModels.find(id);
@@ -60,7 +60,7 @@ Model& ModelRepository::GetModel(const int id, const string& path, const string&
 		if (node.name == name)
 		{
 			// Create a Model component
-			Model model { node, *pRenderer };
+			component::Model model { node, *pRenderer };
 			auto it = mModels.emplace(id, model);
 			if (it.second)
 			{

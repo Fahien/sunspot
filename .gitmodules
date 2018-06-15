@@ -16,3 +16,6 @@
 [submodule "gltfspot"]
 	path = gltfspot
 	url = https://github.com/Fahien/gltfspot.git
+[submodule "hitspot"]
+	path = hitspot
+	url = https://github.com/Fahien/hitspot.git
