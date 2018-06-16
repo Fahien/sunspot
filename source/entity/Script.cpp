@@ -96,6 +96,16 @@ void Script::Handle(const input::Input& input)
 }
 
 
+void Script::Collide(Entity& other)
+{
+	Dictionary dict{};
+	dict.SetItem("rigidbody", *mEntity.mRigidbody);
+	Tuple args{ dict };
+
+	mModule.CallFunction("collide", args);
+}
+
+
 void Script::Update(const float delta, const input::Input& input)
 {
 	mArgs.SetItem(0, delta);

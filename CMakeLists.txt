@@ -84,6 +84,7 @@ set(DEPENDENCY_INCLUDE_DIRECTORIES
 	${PROJECT_SOURCE_DIR}/source/entity
 	${PROJECT_SOURCE_DIR}/source/repository
 	${PROJECT_BINARY_DIR}/include
+	${PROJECT_BINARY_DIR}/include/sunspot
 	${PYTHON_INCLUDE_DIR})
 
 if(${ANDROID})
@@ -161,10 +162,8 @@ set(SOURCES
 	source/android/AssetManager.cpp
 	source/android/ShaderProgram.h
 	source/android/ShaderProgram.cpp
-	source/collision/BoundingBox.h
-	source/collision/BoundingBox.cpp
-	source/collision/CollisionSystem.h
-	source/collision/CollisionSystem.cpp
+	source/system/Collision.h
+	source/system/Collision.cpp
 	source/Cursor.h
 	source/Cursor.cpp
 	source/Texture.h

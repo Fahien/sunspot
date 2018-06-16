@@ -31,6 +31,7 @@ class Script : public Object
 
 	void Initialize();
 	void Handle(const input::Input& input);
+	void Collide(Entity& other);
 	void Update(const float delta, const input::Input& input);
 
 	static void Initialize(const std::wstring& scriptPath);

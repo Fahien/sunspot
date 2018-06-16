@@ -10,6 +10,7 @@
 #include "Graphics.h"
 #include "Cursor.h"
 #include "sunspot/input/Input.h"
+#include "system/Collision.h"
 
 namespace mst = mathspot;
 
@@ -47,7 +48,7 @@ public:
 	inline void setLight(Light* light) { mLight = light; }
 	inline void addObj(WavefrontObject* obj) { mObjs.push_back(obj); }
 	inline void AddGltf(GltfRenderer* renderer) { mGltfRenderer = renderer; }
-	inline void AddEntity(Entity* entity) { mEntities.push_back(entity); }
+	inline void AddEntity(Entity* entity) { mEntities.push_back(entity); mCollision.Add(*entity); }
 
 	inline void setQuad(Quad* quad) { mQuad = quad; }
 	inline void setQuadProgram(const ShaderProgram* quadProgram) { mQuadProgram = quadProgram; }
@@ -104,6 +105,8 @@ private:
 	const ShaderProgram* mDepthProgram;
 	const Framebuffer* mFramebuffer;
 	const Quad* mQuad;
+
+	system::Collision mCollision;
 };
 
 

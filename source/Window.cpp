@@ -81,6 +81,8 @@ void Window::render(const float& deltaTime, const input::Input& input) // TODO c
 	// std::cout << static_cast<int>(1.0f / deltaTime) << " "; // FPS
 	updateFrameSize();
 
+	mCollision.Update();
+
 	for (auto entity : mEntities)
 	{
 		entity->Update(deltaTime, input);

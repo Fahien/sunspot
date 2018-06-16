@@ -53,6 +53,7 @@ public:
 	inline void SetScript(Script* script);
 
 	void Handle(const input::Input& input);
+	void Collide(Entity& other);
 	void Update(const float delta, const input::Input& input);
 
 private:
