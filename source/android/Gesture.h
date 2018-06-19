@@ -1,5 +1,5 @@
-#ifndef SST_GESTURE_H
-#define SST_GESTURE_H
+#ifndef SST_GESTURE_H_
+#define SST_GESTURE_H_
 
 
 namespace sunspot
@@ -37,4 +37,4 @@ private:
 
 }
 
-#endif // SST_GESTURE_H
+#endif // SST_GESTURE_H_

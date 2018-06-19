@@ -19,3 +19,6 @@
 [submodule "hitspot"]
 	path = hitspot
 	url = https://github.com/Fahien/hitspot.git
+[submodule "filespot"]
+	path = filespot
+	url = https://github.com/Fahien/filespot.git

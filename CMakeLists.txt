@@ -32,6 +32,10 @@ add_subdirectory(${MATHSPOT})
 set(MATHSPOT_INCLUDE_DIR ${MATHSPOT}/include)
 set(MATHSPOT_LIBRARIES mathspot)
 
+# FileSpoT
+set(FILESPOT filespot)
+add_subdirectory(${FILESPOT})
+
 # SOIL
 set(SOIL soil)
 add_subdirectory(${SOIL})
@@ -158,8 +162,6 @@ set(SOURCES
 	${SST_EXTENSION_HEADER}
 	${SST_EXTENSION_SOURCE}
 	source/Graphics.h
-	source/android/AssetManager.h
-	source/android/AssetManager.cpp
 	source/android/ShaderProgram.h
 	source/android/ShaderProgram.cpp
 	source/system/Collision.h
@@ -168,8 +170,6 @@ set(SOURCES
 	source/Cursor.cpp
 	source/Texture.h
 	source/Texture.cpp
-	source/Ifstream.h
-	source/Ifstream.cpp
 	source/Material.h
 	source/Material.cpp
 	source/Mesh.h
@@ -223,10 +223,10 @@ add_executable(${SST_NAME} ${SOURCES} ${SHADERS})
 
 
 # Add the given directories to those the compiler uses to search for include files
-
 target_include_directories(${SST_NAME}-lib PUBLIC
 	${LOGSPOT_INCLUDE_DIR}
 	${MATHSPOT_INCLUDE_DIR}
+	${FIlESPOT_INCLUDE_DIRS}
 	${SOIL_INCLUDE_DIR}
 	${PYSPOT_INCLUDE_DIR}
 	${DATASPOT_INCLUDE_DIR}
@@ -238,6 +238,7 @@ set(DEPENDENCY_LIBRARIES
 	${DEPENDENCY_LIBRARIES}
 	${LOGSPOT_LIBRARIES}
 	${MATHSPOT_LIBRARIES}
+	${FILESPOT}
 	${SOIL_LIBRARIES}
 	${PYTHON_LIBRARIES}
 	${PYSPOT_LIBRARIES}

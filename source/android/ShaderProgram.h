@@ -1,5 +1,5 @@
-#ifndef SST_SHADERPROGRAM_H
-#define SST_SHADERPROGRAM_H
+#ifndef SST_SHADERPROGRAM_H_
+#define SST_SHADERPROGRAM_H_
 
 #include <stdexcept>
 #include <string>
@@ -48,4 +48,4 @@ private:
 
 }
 
-#endif // SST_SHADERPROGRAM_H
+#endif // SST_SHADERPROGRAM_H_

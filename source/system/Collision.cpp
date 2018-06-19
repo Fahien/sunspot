@@ -3,10 +3,10 @@
 #include "component/Collider.h"
 #include "component/Transform.h"
 
-using namespace sunspot::system;
+using namespace sunspot;
 
 
-void Collision::Add(Entity& entity)
+void system::Collision::Add(Entity& entity)
 {
 	auto c = entity.GetCollider();
 	// Check whether the entity has a collider
@@ -33,7 +33,7 @@ void Collision::Add(Entity& entity)
 }
 
 
-void Collision::Update()
+void system::Collision::Update()
 {
 	// Update boxes
 	for (auto& pair : mBoxes)

@@ -5,10 +5,12 @@
 #include <vector>
 #include <memory>
 #include <MathSpot.h>
+#include <filespot/Ifstream.h>
 
 #include "Graphics.h"
 #include "Mesh.h"
-#include "Ifstream.h"
+
+namespace fst = filespot;
 
 
 namespace sunspot {
@@ -68,12 +70,12 @@ private:
 	void loadDiffuseMap(std::stringstream& ss, const std::string& path);
 	void loadSpecularMap(std::stringstream& ss, const std::string& path);
 
-	void loadMaterials(Ifstream& is);
+	void loadMaterials(fst::Ifstream& is);
 	void loadMaterialLibrary(std::stringstream& ss, const std::string& path);
 	void useMaterial(std::stringstream& ss);
 	void loadCachedMaterial();
 
-	friend Ifstream& operator>>(Ifstream& is, WavefrontObject& obj);
+	friend fst::Ifstream& operator>>(fst::Ifstream& is, WavefrontObject& obj);
 
 	std::string mName;
 

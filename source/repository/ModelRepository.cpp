@@ -2,7 +2,6 @@
 #include <DataSpot.h>
 #include <Gltf.h>
 
-#include "Ifstream.h"
 #include "ModelRepository.h"
 
 using namespace std;

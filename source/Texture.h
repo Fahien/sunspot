@@ -1,11 +1,14 @@
-#ifndef SST_TEXTURE_H
-#define SST_TEXTURE_H
+#ifndef SST_TEXTURE_H_
+#define SST_TEXTURE_H_
 
 #include <stdexcept>
 #include <string>
 #include <Graphics.h>
 #include <Logger.h>
-#include <AssetManager.h>
+
+#ifdef ANDROID
+# include <filespot/AssetManager.h>
+#endif
 
 
 namespace sunspot {
@@ -86,4 +89,4 @@ private:
 
 }
 
-#endif // SST_TEXTURE_H
+#endif // SST_TEXTURE_H_

@@ -11,6 +11,7 @@
 
 using namespace std;
 using namespace sunspot;
+using namespace filespot;
 namespace mst = mathspot;
 namespace lst = logspot;
 
@@ -544,7 +545,7 @@ void WavefrontObject::loadMaterials(Ifstream& is)
 			case 'a': { // Ambient map
 				try
 				{
-					loadAmbientMap(ss, is.getPath());
+					loadAmbientMap(ss, is.GetPath());
 				}
 				catch (const LoadingException &e)
 				{
@@ -555,7 +556,7 @@ void WavefrontObject::loadMaterials(Ifstream& is)
 			case 'd': { // Diffuse map
 				try
 				{
-					loadDiffuseMap(ss, is.getPath());
+					loadDiffuseMap(ss, is.GetPath());
 				}
 				catch (const LoadingException &e)
 				{
@@ -566,7 +567,7 @@ void WavefrontObject::loadMaterials(Ifstream& is)
 			case 's': { // Specular map
 				try
 				{
-					loadSpecularMap(ss, is.getPath());
+					loadSpecularMap(ss, is.GetPath());
 				}
 				catch (const LoadingException &e)
 				{
@@ -778,7 +779,7 @@ Ifstream &sunspot::operator>>(Ifstream& is, WavefrontObject& obj)
 		case 'm': { // Material Library Command
 			try
 			{
-				obj.loadMaterialLibrary(ss, is.getPath());
+				obj.loadMaterialLibrary(ss, is.GetPath());
 			}
 			catch (const LoadingException& e)
 			{

@@ -1,7 +1,6 @@
 #ifndef SST_MODEL_H_
 #define SST_MODEL_H_
 
-
 #include <Gltf.h>
 
 #include "view/GltfRenderer.h"
@@ -9,9 +8,11 @@
 namespace gst = gltfspot;
 
 
-namespace sunspot::component
+namespace sunspot
 {
 
+namespace component
+{
 
 class Model
 {
@@ -31,6 +32,7 @@ class Model
 	GltfRenderer&    mRenderer;
 };
 
+}
 
 }
 
