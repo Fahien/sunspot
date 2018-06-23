@@ -1,13 +1,14 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
-
-#include <Logger.h>
-#include <ShaderProgram.h>
+#include <logspot/Logger.h>
 
 #ifdef ANDROID
-	#include <AssetManager.h>
+# include <filespot/AssetManager.h>
+namespace fst = filespot;
 #endif
+
+#include "ShaderProgram.h"
 
 using namespace sunspot;
 namespace lst = logspot;
@@ -47,7 +48,7 @@ ShaderProgram::ShaderProgram(const char* depth)
 
 	// TODO Handle some errors like vertexShader == 0, mBaseProgram == 0, etc.
 
-	lst::Logger::log.info("ShaderProgram: created\n"); // TODO remove debug log
+	lst::Logger::log.Info("ShaderProgram: created\n"); // TODO remove debug log
 }
 
 
@@ -73,7 +74,7 @@ ShaderProgram::ShaderProgram(const char* vertex, const char* fragment)
 
 	// TODO Handle some errors like vertexShader == 0, mBaseProgram == 0, etc.
 
-	lst::Logger::log.info("ShaderProgram: created\n"); // TODO remove debug log
+	lst::Logger::log.Info("ShaderProgram: created\n"); // TODO remove debug log
 }
 
 
@@ -81,7 +82,7 @@ ShaderProgram::~ShaderProgram()
 {
 	glDeleteProgram(mDepthProgram);
 	glDeleteProgram(mBaseProgram);
-	lst::Logger::log.info("ShaderProgram: destroyed\n"); // TODO remove debug log
+	lst::Logger::log.Info("ShaderProgram: destroyed\n"); // TODO remove debug log
 }
 
 
@@ -153,7 +154,7 @@ ShaderSource::ShaderSource(const char* p)
     AAsset_close(assetFile);
 	*/
 	
-	Asset file{ AssetManager::assets.Open(p) };
+	fst::Asset file{ fst::AssetManager::assets.Open(p) };
 	char* content{ file.GetContent() };
 	size_t length{ file.GetLength() };
 	handle = static_cast<GLchar*>(malloc(length * sizeof(char)));

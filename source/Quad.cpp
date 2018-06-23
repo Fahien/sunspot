@@ -1,4 +1,4 @@
-#include <Logger.h>
+#include <logspot/Logger.h>
 
 #include "Quad.h"
 
@@ -37,7 +37,7 @@ Quad::Quad()
 	glEnableVertexAttribArray(1);
 	glBindVertexArray(0); // Unbind vao
 
-	lst::Logger::log.info("Quad: created\n"); // TODO remove debug log
+	lst::Logger::log.Info("Quad: created\n"); // TODO remove debug log
 }
 
 
@@ -47,5 +47,5 @@ Quad::~Quad()
 	glDeleteBuffers(1, &ebo_);
 	glDeleteBuffers(1, &vbo_);
 
-	lst::Logger::log.info("Quad: destroyed\n"); // TODO remove debuf log
+	lst::Logger::log.Info("Quad: destroyed\n"); // TODO remove debuf log
 }

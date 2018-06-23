@@ -1,0 +1,84 @@
+#include <jni.h>
+#include <stdlib.h>
+#include <time.h>
+#include <fstream>
+
+#include <android/SunSpot.h>
+#include <android/Renderer.h>
+#include <logspot/Logger.h>
+#include <filespot/AssetManager.h>
+#include <DataSpot.h>
+
+namespace sst = sunspot;
+namespace lst = logspot;
+namespace fst = filespot;
+namespace dst = dataspot;
+
+
+static void printGlString(const char* name, GLenum s)
+{
+	const char* v{ (const char*)glGetString(s) };
+	lst::Logger::log.Info("GL %s: %s\n", name, v);
+}
+
+
+static sst::Renderer* gRenderer = nullptr;
+
+extern "C"
+{
+JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobject obj, jobject assets);
+JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_resize(JNIEnv *env, jobject obj, jint width, jint height);
+JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_step(JNIEnv *env, jobject obj);
+};
+
+
+JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobject obj, jobject assets)
+{
+	if (gRenderer)
+	{
+		delete gRenderer;
+		gRenderer = nullptr;
+	}
+
+	fst::AssetManager::assets.Init(env, assets);
+
+	printGlString("Version", GL_VERSION);
+	printGlString("Vendor", GL_VENDOR);
+	printGlString("Renderer", GL_RENDERER);
+	printGlString("Extensions", GL_EXTENSIONS);
+
+	glEnable(GL_DEPTH_TEST);
+
+	const char *versionStr{ reinterpret_cast<const char *>(glGetString(GL_VERSION)) };
+	if (strstr(versionStr, "OpenGL ES 3."))
+	{
+		gRenderer = sst::Renderer::createRenderer();
+	}
+	else
+	{
+		lst::Logger::log.Error("Unsupported OpenGL ES version");
+	}
+	
+	// Load database
+	dst::DataSpot dataspot;
+	dataspot.Open("pong.data");
+	int width  = stoi(dataspot.GetConfigValue("window.width"));
+	int height = stoi(dataspot.GetConfigValue("window.height"));
+	lst::Logger::log.Info("DataSpot Size [%dx%d]", width, height);
+}
+
+JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_resize(JNIEnv *env, jobject obj, jint width, jint height)
+{
+	if (gRenderer)
+	{
+		gRenderer->resize(width, height);
+	}
+}
+
+JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_step(JNIEnv *env, jobject obj)
+{
+	if (gRenderer)
+	{
+		gRenderer->render();
+	}
+}

@@ -1,4 +1,4 @@
-#include <Logger.h>
+#include <logspot/Logger.h>
 #include <pyspot/Tuple.h>
 #include <pyspot/String.h>
 #include <pyspot/Dictionary.h>
@@ -47,7 +47,7 @@ void Script::Initialize()
 		dict.SetItem("rigidbody", *mEntity.mRigidbody);
 		Tuple args{ dict };
 
-		lst::Logger::log.info("Calling python init\n");
+		lst::Logger::log.Info("Calling python init\n");
 		mModule.CallFunction("init", args);
 
 		// TODO refactor this
@@ -74,7 +74,7 @@ Script::Script(Entity& entity)
 	dict.SetItem("rigidbody", *mEntity.mRigidbody);
 	Tuple args{ dict };
 
-	lst::Logger::log.info("Calling python init\n");
+	lst::Logger::log.Info("Calling python init\n");
 	mModule.CallFunction("init", args);
 
 	mEntity.mModel->GetNode().matrix.ScaleX(mEntity.mTransform->GetScale().GetX());
@@ -99,7 +99,7 @@ void Script::Handle(const input::Input& input)
 void Script::Collide(Entity& other)
 {
 	Dictionary dict{};
-	dict.SetItem("rigidbody", *mEntity.mRigidbody);
+	dict.SetItem("rigidbody", *other.mRigidbody);
 	Tuple args{ dict };
 
 	mModule.CallFunction("collide", args);

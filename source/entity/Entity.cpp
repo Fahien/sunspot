@@ -1,5 +1,3 @@
-#include <Logger.h>
-
 #include "Entity.h"
 
 #include "Mesh.h"
@@ -8,7 +6,6 @@
 #include "sunspot/component/Rigidbody.h"
 
 using namespace sunspot;
-namespace lst = logspot;
 
 
 Entity::Entity()

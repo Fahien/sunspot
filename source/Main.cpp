@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <memory>
 
-#include <Logger.h>
+#include <logspot/Logger.h>
 #include <DataSpot.h>
 
 #include "SunSpotConfig.h"
@@ -18,9 +18,9 @@
 #include "WavefrontObject.h"
 #include "Mesh.h"
 #include "Texture.h"
-#include "Entity.h"
-#include "ModelRepository.h"
-#include "EntityRepository.h"
+#include "entity/Entity.h"
+#include "repository/ModelRepository.h"
+#include "repository/EntityRepository.h"
 #include "GlfwWindow.h"
 
 using namespace std;
@@ -45,7 +45,7 @@ static const string projectDir{ "project" };
 
 void printLogo()
 {
-	lst::Logger::log.info("%s\n",
+	lst::Logger::log.Info("%s\n",
 R"( ________  ___  ___  ________   ________  ________  ________  _________   
 |\   ____\|\  \|\  \|\   ___  \|\   ____\|\   __  \|\   __  \|\___   ___\ 
 \ \  \___|\ \  \\\  \ \  \\ \  \ \  \___|\ \  \|\  \ \  \|\  \|___ \  \_| 
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 			if (++it != arguments.end())
 			{
 				scale = stoi(*it);
-				lst::Logger::log.info("Scale [%d]\n", scale);
+				lst::Logger::log.Info("Scale [%d]\n", scale);
 			}
 			else
 			{
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
 			{
 				projectName = *it;
 			}
-			lst::Logger::log.info("Project [%s]\n", projectName.c_str());
+			lst::Logger::log.Info("Project [%s]\n", projectName.c_str());
 		}
 
 		// Load database
@@ -170,17 +170,17 @@ int main(int argc, char **argv)
 		window.loop(); // GameLoop.it
 
 
-		lst::Logger::log.info("%s version %d.%d successful\n", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
+		lst::Logger::log.Info("%s version %d.%d successful\n", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
 		return EXIT_SUCCESS;
 	}
 	catch (const sst::GraphicException &e)
 	{
-		lst::Logger::log.error("%s: %s\n", tag.c_str(), e.what());
+		lst::Logger::log.Error("%s: %s\n", tag.c_str(), e.what());
 		return EXIT_FAILURE;
 	}
 	catch (const runtime_error &e)
 	{
-		lst::Logger::log.error("%s: %s\n", tag.c_str(), e.what());
+		lst::Logger::log.Error("%s: %s\n", tag.c_str(), e.what());
 		return EXIT_FAILURE;
 	}
 }

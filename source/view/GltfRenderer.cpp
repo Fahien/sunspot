@@ -1,13 +1,12 @@
+
 #include "view/GltfRenderer.h"
 #include "view/GltfPrimitive.h"
 
-#include "Logger.h"
 #include "Graphics.h"
 #include "ShaderProgram.h"
 #include "MathSpot.h"
 
 using namespace std;
-using namespace logspot;
 using namespace mathspot;
 using namespace gltfspot;
 using namespace sunspot;

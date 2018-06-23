@@ -3,7 +3,7 @@
 #include <Graphics.h>
 #include <GlfwWindow.h>
 #include <Camera.h>
-#include <Logger.h>
+#include <logspot/Logger.h>
 
 using namespace sunspot;
 namespace lst = logspot;
@@ -26,7 +26,7 @@ GlfwWindow::GlfwWindow(const char* title,
 	// Set the error callback
 	glfwSetErrorCallback([](int error, const char *description)
 	{
-		lst::Logger::log.error("%s: %s [%d]\n", tag.c_str(), description, error);
+		lst::Logger::log.Error("%s: %s [%d]\n", tag.c_str(), description, error);
 	});
 
 	// Get the primary monitor
@@ -105,7 +105,7 @@ GlfwWindow::GlfwWindow(const char* title,
 	updateFrameSize();
 	glfwSwapInterval(1); // Vsync
 
-	lst::Logger::log.info("%s created\n\tOpenGL %s\n\tGLFW %s\n\tFrame size %dx%d\n",
+	lst::Logger::log.Info("%s created\n\tOpenGL %s\n\tGLFW %s\n\tFrame size %dx%d\n",
 	         tag.c_str(),
 	         glGetString(GL_VERSION),
 	         glfwGetVersionString(),
@@ -121,7 +121,7 @@ GlfwWindow::~GlfwWindow()
 		glfwDestroyWindow(mWindow);
 	}
 	glfwTerminate();
-	lst::Logger::log.info("%s: destroyed\n", tag.c_str()); // TODO remove debug log
+	lst::Logger::log.Info("%s: destroyed\n", tag.c_str()); // TODO remove debug log
 }
 
 

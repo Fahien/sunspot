@@ -1,7 +1,7 @@
 #ifndef SST_QUAD_H_
 #define SST_QUAD_H_
 
-#include <Logger.h>
+#include <logspot/Logger.h>
 
 #include "Graphics.h"
 

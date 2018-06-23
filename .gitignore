@@ -10,3 +10,5 @@ output.dat
 .ycm_extra_conf.pyc
 .pyc
 *.data
+.gradle
+.externalNativeBuild

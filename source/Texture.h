@@ -4,10 +4,10 @@
 #include <stdexcept>
 #include <string>
 #include <Graphics.h>
-#include <Logger.h>
 
 #ifdef ANDROID
 # include <filespot/AssetManager.h>
+namespace fst = filespot;
 #endif
 
 
@@ -41,7 +41,7 @@ private:
 	int      mChannels;
 	GLubyte* mHandle;
 #ifdef ANDROID
-	Asset    mAsset;
+	fst::Asset    mAsset;
 #endif
 };
 

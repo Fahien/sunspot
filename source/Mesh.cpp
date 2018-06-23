@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include <Logger.h>
+#include <logspot/Logger.h>
 
 #include "ShaderProgram.h"
 #include "sunspot/component/Transform.h"
@@ -47,7 +47,7 @@ Mesh::Mesh(const string&         name,
 
 	glBindVertexArray(0); // Unbind vao
 
-	lst::Logger::log.info("Mesh: created %s\n", mName.c_str()); // TODO remove debug log
+	lst::Logger::log.Info("Mesh: created %s\n", mName.c_str()); // TODO remove debug log
 }
 
 
@@ -56,7 +56,7 @@ Mesh::~Mesh()
 	glDeleteVertexArrays(1, &mVao);
 	glDeleteBuffers(1, &mEbo);
 	glDeleteBuffers(1, &mVbo);
-	lst::Logger::log.info("Mesh: destroyed %s\n", mName.c_str()); // TODO remove debug log
+	lst::Logger::log.Info("Mesh: destroyed %s\n", mName.c_str()); // TODO remove debug log
 }
 
 

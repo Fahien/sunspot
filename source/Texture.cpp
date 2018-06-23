@@ -3,7 +3,7 @@
 #include <cstdlib>
 
 #include <SOIL.h>
-#include <Logger.h>
+#include <logspot/Logger.h>
 
 #include "Texture.h"
 
@@ -29,14 +29,14 @@ Texture::Texture(const std::string& path, const TextureType& type)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	lst::Logger::log.info("Texture: created %s\n", mName.c_str()); // TODO remove debug log
+	lst::Logger::log.Info("Texture: created %s\n", mName.c_str()); // TODO remove debug log
 }
 
 
 Texture::~Texture()
 {
 	// TODO Release MIPMAP
-	lst::Logger::log.info("Texture: destroyed %s\n", mName.c_str()); // TODO remove debug log
+	lst::Logger::log.Info("Texture: destroyed %s\n", mName.c_str()); // TODO remove debug log
 }
 
 
@@ -49,7 +49,7 @@ SoilData::SoilData(const std::string& path)
 ,	mChannels{ 0 }
 ,	mHandle  { nullptr }
 #ifdef ANDROID
-,	mAsset{ AssetManager::assets.Open(path) }
+,	mAsset{ fst::AssetManager::assets.Open(path) }
 #endif
 {
 #ifdef ANDROID
@@ -62,7 +62,7 @@ SoilData::SoilData(const std::string& path)
 		throw TextureException{ tag, "Could not load " + path + ": " + SOIL_last_result() };
 	}
 
-	lst::Logger::log.info("SoilData: %s %s\n", path.c_str(), SOIL_last_result()); // TODO remove debug log
+	lst::Logger::log.Info("SoilData: %s %s\n", path.c_str(), SOIL_last_result()); // TODO remove debug log
 }
 
 

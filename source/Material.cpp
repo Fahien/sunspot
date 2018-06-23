@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 
-#include <Logger.h>
+#include <logspot/Logger.h>
 
 #include "Material.h"
 #include "Graphics.h"
@@ -10,7 +10,7 @@
 
 using namespace std;
 using namespace sunspot;
-using namespace logspot;
+namespace lst = logspot;
 
 
 Material::Material()
@@ -31,7 +31,7 @@ Material::Material(const char* n)
 ,	hasDiffuseMap { false }
 ,	hasSpecularMap{ false }
 {
-	Logger::log.info("Material: created %s\n", n); // TODO remove debug log
+	lst::Logger::log.Info("Material: created %s\n", n); // TODO remove debug log
 }
 
 
@@ -47,7 +47,7 @@ Material::~Material()
 		glDeleteTextures(1, &specularMap);
 	}
 
-	Logger::log.info("Material: destroyed %s\n", name.c_str()); // TODO remove debug log
+	lst::Logger::log.Info("Material: destroyed %s\n", name.c_str()); // TODO remove debug log
 }
 
 

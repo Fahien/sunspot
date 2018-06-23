@@ -1,40 +1,33 @@
 cmake_minimum_required(VERSION 3.6)
-include(CMakeToolsHelpers OPTIONAL)
-project(SunSpoT)
+project(SunSpot)
 
 set(CMAKE_C_STANDARD   11)
 set(CMAKE_CXX_STANDARD 14)
 
-if(${CMAKE_SYSTEM_NAME} MATCHES Android)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
 	set(ANDROID TRUE)
+	add_definitions(-DANDROID)
 else()
 	set(ANDROID FALSE)
 endif()
 
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/cmake")
-message("Searching modules in ${CMAKE_MODULE_PATH}")
+# CMake modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
+message(STATUS "Searching modules in ${CMAKE_MODULE_PATH}")
 
 option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 # Python 3
 find_package(PythonInterp 3)
-find_package(PythonLibs   3)
+find_package(PythonLibraries)
 
-# LogSpoT
-set(LOGSPOT logspot)
-add_subdirectory(${LOGSPOT})
-set(LOGSPOT_INCLUDE_DIR ${LOGSPOT}/include)
-set(LOGSPOT_LIBRARIES ${LOGSPOT})
-
-# MathSpoT
-set(MATHSPOT mathspot)
-add_subdirectory(${MATHSPOT})
-set(MATHSPOT_INCLUDE_DIR ${MATHSPOT}/include)
-set(MATHSPOT_LIBRARIES mathspot)
-
-# FileSpoT
-set(FILESPOT filespot)
-add_subdirectory(${FILESPOT})
+include(AddLogSpot)
+include(AddMathSpot)
+include(AddFileSpot)
+include(AddPySpot)
+include(AddDataSpot)
+include(AddGltfSpot)
+include(AddHitSpot)
 
 # SOIL
 set(SOIL soil)
@@ -42,66 +35,35 @@ add_subdirectory(${SOIL})
 set(SOIL_INCLUDE_DIR ${SOIL}/src)
 set(SOIL_LIBRARIES SOIL)
 
-# PySpoT
-set(PYSPOT pyspot)
-add_subdirectory(${PYSPOT})
-set(PYSPOT_INCLUDE_DIR ${PYSPOT}/include)
-set(PYSPOT_LIBRARIES ${PYSPOT})
-
-# DataSpoT
-set(DATASPOT dataspot)
-add_subdirectory(${DATASPOT})
-set(DATASPOT_INCLUDE_DIR ${DATASPOT}/include)
-set(DATASPOT_LIBRARIES ${DATASPOT})
-
-# GltfSpoT
-set(GLTFSPOT gltfspot)
-add_subdirectory(${GLTFSPOT})
-set(GLTFSPOT_INCLUDE_DIR ${GLTFSPOT}/include)
-set(GLTFSPOT_LIBRARIES ${GLTFSPOT})
-
-# HitSpoT
-set(HITSPOT hitspot)
-add_subdirectory(${HITSPOT})
-set(HITSPOT_INCLUDE_DIR ${HITSPOT}/include)
-set(HITSPOT_LIBRARIES ${HITSPOT})
-
 # Version number
 set(SST_VERSION_MAJOR 0)
-set(SST_VERSION_MINOR 14)
-set(SST_TITLE "SunSpoT")
+set(SST_VERSION_MINOR 15)
+set(SST_TITLE SunSpot)
 set(SST_NAME sunspot)
 
 # Configure a header file to pass some of the CMake settings to the source code
-configure_file(
-	"${PROJECT_SOURCE_DIR}/source/SunSpotConfig.h.in"
-	"${PROJECT_SOURCE_DIR}/include/SunSpotConfig.h")
-
-# Specify the paths in which the linker should search for libraries
-set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${PROJECT_SOURCE_DIR}")
+configure_file(${PROJECT_SOURCE_DIR}/source/SunSpotConfig.h.in
+               ${PROJECT_SOURCE_DIR}/include/SunSpotConfig.h)
 
 
-set(DEPENDENCY_INCLUDE_DIRECTORIES
+set(DEPENDENCY_INCLUDE_DIRS
 	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/source
-	${PROJECT_SOURCE_DIR}/source/android
-	${PROJECT_SOURCE_DIR}/source/entity
-	${PROJECT_SOURCE_DIR}/source/repository
 	${PROJECT_BINARY_DIR}/include
 	${PROJECT_BINARY_DIR}/include/sunspot
-	${PYTHON_INCLUDE_DIR})
+	${SOIL_INCLUDE_DIR})
 
-if(${ANDROID})
+if(ANDROID)
 	set(DEPENDENCY_LIBRARIES GLESv3 android EGL log m)
 else()
 	find_package(OpenGL REQUIRED)
-	find_package(GLEW REQUIRED)
-	find_package(GLFW REQUIRED)
+	find_package(GLEW   REQUIRED)
+	find_package(GLFW   REQUIRED)
 	set(DEPENDENCY_LIBRARIES
 		${OPENGL_LIBRARIES}
 		${GLEW_LIBRARIES}
 		${GLFW_LIBRARIES})
-	set(DEPENCENDY_INCLUDE_DIRECTORIES
+	set(DEPENCENDY_INCLUDE_DIRS
 		${OPENGL_INCLUDE_DIR}
 		${GLEW_INCLUDE_DIR}
 		${GLFW_INCLUDE_DIR})
@@ -114,7 +76,7 @@ set(SHADERS
 	shader/depth.frag
 	shader/quad.vert
 	shader/quad.frag)
-source_group("Shaders" FILES ${SHADERS})
+source_group("shader" FILES ${SHADERS})
 
 
 # Generate the Sunspot Extension header
@@ -205,7 +167,11 @@ set(SOURCES
 	source/Camera.h
 	source/Camera.cpp)
 
-if(NOT ${ANDROID})
+if(ANDROID)
+	set(ANDROID_SOURCES
+		source/android/SunSpot.cpp
+		source/android/Renderer.cpp)
+else()
 	set(SOURCES ${SOURCES}
 		source/Window.h
 		source/Window.cpp
@@ -214,47 +180,38 @@ if(NOT ${ANDROID})
 		source/Main.cpp)
 endif()
 
-source_group("Sources" FILES ${SOURCES})
+source_group("src" FILES ${SOURCES})
 
-add_library(${SST_NAME}-lib ${SOURCES} ${SHADERS})
-
-add_executable(${SST_NAME} ${SOURCES} ${SHADERS})
-
-
-
-# Add the given directories to those the compiler uses to search for include files
-target_include_directories(${SST_NAME}-lib PUBLIC
-	${LOGSPOT_INCLUDE_DIR}
-	${MATHSPOT_INCLUDE_DIR}
-	${FIlESPOT_INCLUDE_DIRS}
-	${SOIL_INCLUDE_DIR}
-	${PYSPOT_INCLUDE_DIR}
-	${DATASPOT_INCLUDE_DIR}
-	${GLTFSPOT_INCLUDE_DIR}
-	${HITSPOT_INCLUDE_DIR}
-	${DEPENDENCY_INCLUDE_DIRECTORIES})
 
 set(DEPENDENCY_LIBRARIES
 	${DEPENDENCY_LIBRARIES}
 	${LOGSPOT_LIBRARIES}
 	${MATHSPOT_LIBRARIES}
-	${FILESPOT}
+	${FILESPOT_LIBRARIES}
 	${SOIL_LIBRARIES}
-	${PYTHON_LIBRARIES}
 	${PYSPOT_LIBRARIES}
 	${DATASPOT_LIBRARIES}
 	${GLTFSPOT_LIBRARIES}
 	${HITSPOT_LIBRARIES})
 
+# SunSpot library
+add_library(${SST_NAME}-lib ${SOURCES} ${SHADERS})
+target_include_directories(${SST_NAME}-lib PUBLIC ${DEPENDENCY_INCLUDE_DIRS})
+target_link_libraries(${SST_NAME}-lib ${DEPENDENCY_LIBRARIES})
+
 if(WIN32)
 	set_target_properties(${SST_NAME}-lib PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt")
 endif(WIN32)
 
-set_target_properties(${SST_NAME}-lib PROPERTIES LINKER_LANGUAGE CXX)
-set_target_properties(${SST_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+# SunSpot target
+if(ANDROID)
+	add_library(${SST_NAME} SHARED ${ANDROID_SOURCES})
+else()
+	add_executable(${SST_NAME} ${SOURCES} ${SHADERS})
+endif()
 
-target_link_libraries(${SST_NAME}-lib ${DEPENDENCY_LIBRARIES})
 target_link_libraries(${SST_NAME} ${SST_NAME}-lib)
+
 
 file(COPY ${PROJECT_SOURCE_DIR}/shader DESTINATION ${PROJECT_BINARY_DIR})
 

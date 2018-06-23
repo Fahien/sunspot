@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <Logger.h>
+#include <logspot/Logger.h>
 
 #include "Framebuffer.h"
 #include "Texture.h"
@@ -49,7 +49,7 @@ Framebuffer::Framebuffer(const mst::Size& size)
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
 	{
-		lst::Logger::log.info("Stereoscopic Framebuffer [%dx%d]\n", mSize.width, mSize.height);
+		lst::Logger::log.Info("Stereoscopic Framebuffer [%dx%d]\n", mSize.width, mSize.height);
 	}
 	else
 	{
@@ -69,7 +69,7 @@ Framebuffer::~Framebuffer()
 	glDeleteTextures(1, &mDepthTexture);
 	glDeleteTextures(1, &mColorTexture);
 	glDeleteFramebuffers(1, &mFbo);
-	lst::Logger::log.info("Framebuffer: destroyed\n"); // TODO remove debug log
+	lst::Logger::log.Info("Framebuffer: destroyed\n"); // TODO remove debug log
 }
 
 

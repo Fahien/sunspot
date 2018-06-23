@@ -1,7 +1,7 @@
 #ifndef SST_GLFWWINDOW_H_
 #define SST_GLFWWINDOW_H_
 
-#include <Logger.h>
+#include <logspot/Logger.h>
 
 #include "Cursor.h"
 #include "Window.h"

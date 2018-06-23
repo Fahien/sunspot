@@ -1,0 +1,44 @@
+apply plugin: 'com.android.application'
+
+def platformVersion = 21    //openGLES 3 min Version
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion '28.0.0'
+
+    defaultConfig {
+        applicationId 'me.fahien.sunspot'
+        minSdkVersion "${platformVersion}"
+        targetSdkVersion 26
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
+        externalNativeBuild {
+            cmake {
+                    // pass command line arguments to cmake: our CMakeLists.txt needs it
+                    // to load the right openGL lib (gles2 vs. gles3 )
+                    // other ndk flags could also be configured there [cppFlags, cFlags...]
+                arguments "-DANDROID_PLATFORM_LEVEL=${platformVersion}",
+                          '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=c++_static',
+                          '-DLST_LOGGING=1'
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled = false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                          'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['D:/Users/7oni/Laboratory/SunSpoT/sunspot/lib/android']
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path '../../CMakeLists.txt'
+        }
+    }
+}
