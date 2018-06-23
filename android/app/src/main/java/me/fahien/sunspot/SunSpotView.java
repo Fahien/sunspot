@@ -25,14 +25,22 @@ class SunSpotView extends GLSurfaceView {
 		// supporting OpenGL ES 2.0 or later backwards-compatible versions.
 		setEGLConfigChooser(8, 8, 8, 0, 16, 0);
 		setEGLContextClientVersion(3);
-		setRenderer(new Renderer(context.getAssets()));
+		setRenderer(
+			new Renderer(
+				context.getFilesDir().getAbsolutePath(),
+				context.getCacheDir().getAbsolutePath(),
+				context.getAssets()));
 	}
 
 	private static class Renderer implements GLSurfaceView.Renderer {
+		private String external;
+		private String cache;
 		private AssetManager assets;
 
-		Renderer(AssetManager assets) {
-			this.assets = assets;
+		Renderer(String external, String cache, AssetManager assets) {
+			this.external = external;
+			this.cache    = cache;
+			this.assets   = assets;
 		}
 
 		public void onDrawFrame(GL10 gl) {
@@ -44,7 +52,7 @@ class SunSpotView extends GLSurfaceView {
 		}
 
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-			SunSpotLib.init(assets);
+			SunSpotLib.init(external, cache, assets);
 		}
 	}
 }

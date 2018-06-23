@@ -12,3 +12,4 @@ output.dat
 *.data
 .gradle
 .externalNativeBuild
+.idea

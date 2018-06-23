@@ -9,7 +9,7 @@ public class SunSpotLib {
 		System.loadLibrary("sunspot");
 	}
 
-	public static native void init(AssetManager assets);
+	public static native void init(String external, String cache, AssetManager assets);
 
 	public static native void resize(int width, int height);
 
