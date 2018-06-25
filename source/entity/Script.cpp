@@ -1,16 +1,17 @@
 #include <logspot/Logger.h>
+
+#include "Mesh.h"
+#include "sunspot/entity/Entity.h"
+#include "sunspot/component/Model.h"
+// Do not reorder, there is a conflict between json.h and Python.h
 #include <pyspot/Tuple.h>
 #include <pyspot/String.h>
 #include <pyspot/Dictionary.h>
-#include <sunspot/extension/Sunspot.h>
-#include <sunspot/component/Transform.h>
-#include <sunspot/component/Rigidbody.h>
-#include "component/Model.h"
+#include "sunspot/extension/Sunspot.h"
+#include "sunspot/component/Transform.h"
+#include "sunspot/component/Rigidbody.h"
 
-#include "Entity.h"
-#include "Mesh.h"
-
-#include "Script.h"
+#include "sunspot/entity/Script.h"
 
 using namespace sunspot;
 using namespace pyspot;
@@ -21,7 +22,7 @@ namespace lst = logspot;
 std::unique_ptr<Interpreter> Script::interpreter{ nullptr };
 
 
-void Script::Initialize(const std::wstring& scriptPath)
+void Script::Initialize(const std::string& scriptPath)
 {
 	if (!interpreter)
 	{
@@ -33,7 +34,7 @@ void Script::Initialize(const std::wstring& scriptPath)
 Script::Script(const int id, std::string& name, Entity& entity)
 :	Object { id, name }
 ,	mEntity{ entity }
-,	mModule{ interpreter->ImportModule(name) }
+,	mModule{ name }
 ,	mArgs  { 2 }
 {}
 

@@ -9,7 +9,7 @@
 #include <pyspot/Tuple.h>
 
 #include "sunspot/input/Input.h"
-#include "entity/Object.h"
+#include "sunspot/entity/Object.h"
 
 
 PyMODINIT_FUNC InitPySpot();
@@ -34,7 +34,7 @@ class Script : public Object
 	void Collide(Entity& other);
 	void Update(const float delta, const input::Input& input);
 
-	static void Initialize(const std::wstring& scriptPath);
+	static void Initialize(const std::string& scriptPath);
 
   private:
 	static std::unique_ptr<pst::Interpreter> interpreter;

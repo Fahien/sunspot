@@ -18,7 +18,7 @@
 #include "WavefrontObject.h"
 #include "Mesh.h"
 #include "Texture.h"
-#include "entity/Entity.h"
+#include "sunspot/entity/Entity.h"
 #include "repository/ModelRepository.h"
 #include "repository/EntityRepository.h"
 #include "GlfwWindow.h"

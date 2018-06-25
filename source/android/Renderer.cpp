@@ -1,7 +1,8 @@
-#include <android/Renderer.h>
 #include <filespot/Ifstream.h>
 #include <logspot/Logger.h>
 #include <MathSpot.h>
+
+#include <sunspot/android/Renderer.h>
 
 
 namespace mst = mathspot;

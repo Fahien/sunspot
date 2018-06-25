@@ -9,7 +9,7 @@
 #include "Mesh.h"
 #include "WavefrontObject.h"
 #include "view/GltfRenderer.h"
-#include "component/Model.h"
+#include "sunspot/component/Model.h"
 
 
 namespace dataspot

@@ -39,19 +39,19 @@ GLenum to_gl_component_type(const Gltf::Accessor::ComponentType& type)
 
 
 GltfPrimitive::GltfPrimitive(GltfPrimitive&& other)
-:	mMatrix         { other.mMatrix          }
-,	mHasVertexColors{ other.mHasVertexColors }
-,	mMaterial       { move(other.mMaterial)  }
-,	mHasVao         { other.mHasVao          }
+:	mHasVao         { other.mHasVao          }
 ,	mVao            { other.mVao             }
+,	mVbos           { move(other.mVbos)      }
 ,	mHasEbo         { other.mHasEbo          }
 ,	mEbo            { other.mEbo             }
-,	mVbos           { move(other.mVbos)      }
+,	mMode           { other.mMode            }
 ,	mIndicesCount   { other.mIndicesCount    }
 ,	mIndicesType    { other.mIndicesType     }
 ,	mIndicesOffset  { other.mIndicesOffset   }
+,	mMatrix         { other.mMatrix          }
+,	mHasVertexColors{ other.mHasVertexColors }
+,	mMaterial       { move(other.mMaterial)  }
 ,	mTextures       { move(other.mTextures)  }
-,	mMode           { other.mMode            }
 {
 	other.mHasVao = false;
 	other.mHasEbo = false;
@@ -97,16 +97,8 @@ void GltfPrimitive::readIndices(Gltf& model, Gltf::Mesh::Primitive& primitive)
 
 
 GltfPrimitive::GltfPrimitive(Gltf& model, Gltf::Mesh::Primitive& primitive)
-:	mMatrix         { Mat4::identity.matrix }
-,	mHasVertexColors{ false }
-,	mMaterial       {}
-,	mHasVao         { false }
-,	mVao            {}
-,	mHasEbo         { false }
-,	mEbo            {}
-,	mVbos           {}
-,	mTextures       {}
-,	mMode           { to_gl_mode(primitive.mode) }
+:	mMode  { to_gl_mode(primitive.mode) }
+,	mMatrix{ Mat4::identity.matrix      }
 {
 	// Generate a vertex array
 	glGenVertexArrays(1, &mVao);

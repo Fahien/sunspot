@@ -2,7 +2,10 @@
 build
 data
 doc
-include
+include/sunspot/android/python2.7
+include/GL
+include/GLFW
+include/nlohmann
 lib
 project
 script
@@ -13,3 +16,6 @@ output.dat
 .gradle
 .externalNativeBuild
 .idea
+gradle
+stdlib.zip
+app.iml

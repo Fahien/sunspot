@@ -4,8 +4,8 @@
 #include <memory>
 #include <Gltf.h>
 
-#include "entity/Script.h"
-#include "entity/Object.h"
+#include "sunspot/entity/Script.h"
+#include "sunspot/entity/Object.h"
 #include "sunspot/input/Input.h"
 
 

@@ -1,7 +1,7 @@
-#include "entity/Entity.h"
+#include "sunspot/entity/Entity.h"
 #include "system/Collision.h"
-#include "component/Collider.h"
-#include "component/Transform.h"
+#include "sunspot/component/Collider.h"
+#include "sunspot/component/Transform.h"
 
 using namespace sunspot;
 

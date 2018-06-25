@@ -2,10 +2,6 @@ package me.fahien.sunspot;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.WindowManager;
-
-import java.io.File;
 
 public class SunSpotActivity extends Activity {
 

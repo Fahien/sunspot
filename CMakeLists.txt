@@ -56,6 +56,10 @@ set(DEPENDENCY_INCLUDE_DIRS
 if(ANDROID)
 	set(DEPENDENCY_LIBRARIES GLESv3 android EGL log m)
 else()
+	list(APPEND CMAKE_PREFIX_PATH
+		${CMAKE_CURRENT_SOURCE_DIR}/include
+		${CMAKE_CURRENT_SOURCE_DIR}/lib)
+
 	find_package(OpenGL REQUIRED)
 	find_package(GLEW   REQUIRED)
 	find_package(GLFW   REQUIRED)
@@ -124,9 +128,7 @@ set(SOURCES
 	${SST_EXTENSION_HEADER}
 	${SST_EXTENSION_SOURCE}
 	source/Graphics.h
-	source/android/ShaderProgram.h
 	source/android/ShaderProgram.cpp
-	source/system/Collision.h
 	source/system/Collision.cpp
 	source/Cursor.h
 	source/Cursor.cpp
@@ -136,12 +138,8 @@ set(SOURCES
 	source/Material.cpp
 	source/Mesh.h
 	source/Mesh.cpp
-	source/component/Model.h
-	source/entity/Script.h
 	source/entity/Script.cpp
-	source/entity/Object.h
 	source/entity/Object.cpp
-	source/entity/Entity.h
 	source/entity/Entity.cpp
 	source/repository/ModelRepository.h
 	source/repository/ModelRepository.cpp
@@ -189,6 +187,7 @@ set(DEPENDENCY_LIBRARIES
 	${MATHSPOT_LIBRARIES}
 	${FILESPOT_LIBRARIES}
 	${SOIL_LIBRARIES}
+	${PYTHON_LIBRARIES}
 	${PYSPOT_LIBRARIES}
 	${DATASPOT_LIBRARIES}
 	${GLTFSPOT_LIBRARIES}

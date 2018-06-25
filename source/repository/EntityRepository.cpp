@@ -8,8 +8,8 @@
 #include "WavefrontObject.h"
 #include "ModelRepository.h"
 
-#include "entity/Entity.h"
-#include "component/Collider.h"
+#include "sunspot/entity/Entity.h"
+#include "sunspot/component/Collider.h"
 #include "sunspot/component/Transform.h"
 #include "sunspot/component/Rigidbody.h"
 #include "Mesh.h"

@@ -44,7 +44,6 @@ private:
 	GLuint mColorTexture;
 	GLuint mDepthTexture;
 	GLuint mHeaderTexture;
-	GLuint mRbo;
 };
 
 

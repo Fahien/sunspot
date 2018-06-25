@@ -2,13 +2,19 @@
 #include <stdlib.h>
 #include <time.h>
 #include <fstream>
+#include <sys/stat.h>
+#include <dirent.h>
 
-#include <android/SunSpot.h>
-#include <android/Renderer.h>
+
 #include <logspot/Logger.h>
 #include <filespot/Ifstream.h>
 #include <filespot/AssetManager.h>
 #include <DataSpot.h>
+
+#include "sunspot/entity/Script.h"
+#include "sunspot/android/Renderer.h"
+#include "sunspot/android/SunSpot.h"
+#include "Python.h"
 
 namespace sst = sunspot;
 namespace lst = logspot;
@@ -59,20 +65,25 @@ JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobje
 	{
 		lst::Logger::log.Error("Unsupported OpenGL ES version");
 	}
-	
-	{
-		fst::Ifstream db{ "pong.data", std::ios::binary };
-		lst::Logger::log.Info("Database line: %s", db.GetAsset().GetContent());
-	}
-
-	// Open asset database
-	fst::Ifstream db{ "pong.data" };
-	lst::Logger::log.Info("Database %s", db.IsOpen() ? "open" : "not open");
 
 	const char* nativeString = env->GetStringUTFChars(external, 0);
 	std::string sexternal{ nativeString };
 	env->ReleaseStringUTFChars(external, nativeString);
 	lst::Logger::log.Info("External %s", sexternal.c_str());
+
+	// Copy python libs
+	{
+		fst::Ifstream lib{ "stdlib.zip" };
+		std::string libPath{ sexternal + "/stdlib.zip"};
+		lst::Logger::log.Info("copying lib %s", libPath.c_str());
+		std::ofstream ofs{ libPath };
+		if (!ofs.is_open())
+		{
+			return;
+		}
+		ofs.write(lib.GetAsset().GetContent(), lib.GetAsset().GetLength());
+		ofs.close();
+	}
 
 	nativeString = env->GetStringUTFChars(cache, 0);
 	std::string scache{ nativeString };
@@ -87,9 +98,11 @@ JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobje
 	{
 		return;
 	}
+	// Open asset database
+	fst::Ifstream db{ "pong.data" };
+	lst::Logger::log.Info("Database %s", db.IsOpen() ? "open" : "not open");
 	ofs.write(db.GetAsset().GetContent(), db.GetAsset().GetLength());
 	ofs.close();
-
 
 	// Load database
 	dst::DataSpot dataspot;
@@ -97,6 +110,12 @@ JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobje
 	int width  = stoi(dataspot.GetConfigValue("window.width"));
 	int height = stoi(dataspot.GetConfigValue("window.height"));
 	lst::Logger::log.Info("DataSpot Size [%dx%d]", width, height);
+
+	// Initialize PySpot
+	sst::Script::Initialize(sexternal + "/stdlib.zip");
+	pst::Module module{ "os" };
+	pst::Object cwd{ module.CallFunction("getcwd") };
+	lst::Logger::log.Info("PySpot initialized: %s", cwd.ToCString());
 }
 
 JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_resize(JNIEnv *env, jobject obj, jint width, jint height)

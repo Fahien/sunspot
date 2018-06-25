@@ -3,13 +3,13 @@ apply plugin: 'com.android.application'
 def platformVersion = 21    //openGLES 3 min Version
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 23
     buildToolsVersion '28.0.0'
 
     defaultConfig {
         applicationId 'me.fahien.sunspot'
         minSdkVersion "${platformVersion}"
-        targetSdkVersion 26
+        targetSdkVersion 23
         ndk {
             abiFilters 'armeabi-v7a'
         }
@@ -33,7 +33,7 @@ android {
     }
     sourceSets {
         main {
-            jniLibs.srcDirs = ['D:/Users/7oni/Laboratory/SunSpoT/sunspot/lib/android']
+            jniLibs.srcDirs = ['D:/Users/7oni/Laboratory/SunSpoT/sunspot/lib']
         }
     }
     externalNativeBuild {

@@ -3,7 +3,7 @@
 
 #include <string>
 #include <hitspot/BoundingBox.h>
-#include <entity/Object.h>
+#include <sunspot/entity/Object.h>
 
 namespace hst = hitspot;
 

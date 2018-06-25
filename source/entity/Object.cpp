@@ -1,22 +1,22 @@
-#include "Object.h"
+#include "sunspot/entity/Object.h"
 
-namespace sst = sunspot;
-
-
-sst::Object::Object() {}
+using namespace sunspot;
 
 
-sst::Object::Object(int id)
+Object::Object() {}
+
+
+Object::Object(int id)
 :	mId{ id }
 {}
 
 
-sst::Object::Object(std::string& name)
+Object::Object(std::string& name)
 :	mName{ name }
 {}
 
 
-sst::Object::Object(int id, std::string& name)
+Object::Object(int id, std::string& name)
 :	mId  { id   }
 ,	mName{ name }
 {}

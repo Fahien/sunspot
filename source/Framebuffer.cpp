@@ -19,7 +19,6 @@ Framebuffer::Framebuffer(const mst::Size& size)
 ,	mColorTexture { 0 }
 ,	mDepthTexture { 0 }
 ,	mHeaderTexture{ 0 }
-,	mRbo          { 0 }
 {
 	glGenFramebuffers(1, &mFbo); // Create a framebuffer object
 	glBindFramebuffer(GL_FRAMEBUFFER, mFbo);

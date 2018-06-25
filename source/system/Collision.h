@@ -1,5 +1,5 @@
-#ifndef SST_COLLISION_H
-#define SST_COLLISION_H
+#ifndef SST_COLLISION_H_
+#define SST_COLLISION_H_
 
 #include <unordered_map>
 #include <hitspot/CollisionSystem.h>
@@ -32,4 +32,4 @@ public:
 
 }
 
-#endif // SST_COLLISION_H
+#endif // SST_COLLISION_H_

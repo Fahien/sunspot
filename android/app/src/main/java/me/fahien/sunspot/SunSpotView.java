@@ -2,17 +2,9 @@ package me.fahien.sunspot;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 
-import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLContext;
-import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.opengles.GL10;
 
 class SunSpotView extends GLSurfaceView {
@@ -25,12 +17,15 @@ class SunSpotView extends GLSurfaceView {
 		// supporting OpenGL ES 2.0 or later backwards-compatible versions.
 		setEGLConfigChooser(8, 8, 8, 0, 16, 0);
 		setEGLContextClientVersion(3);
+
 		setRenderer(
 			new Renderer(
 				context.getFilesDir().getAbsolutePath(),
 				context.getCacheDir().getAbsolutePath(),
 				context.getAssets()));
 	}
+
+
 
 	private static class Renderer implements GLSurfaceView.Renderer {
 		private String external;
