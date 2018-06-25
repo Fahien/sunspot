@@ -5,16 +5,17 @@
 #include <sys/stat.h>
 #include <dirent.h>
 
-
 #include <logspot/Logger.h>
 #include <filespot/Ifstream.h>
 #include <filespot/AssetManager.h>
 #include <DataSpot.h>
 
-#include "sunspot/entity/Script.h"
-#include "sunspot/android/Renderer.h"
-#include "sunspot/android/SunSpot.h"
-#include "Python.h"
+#include "repository/ModelRepository.h"
+#include "repository/EntityRepository.h"
+#include "entity/Script.h"
+#include "core/Renderer.h"
+#include "core/SunSpot.h"
+#include "core/String.h"
 
 namespace sst = sunspot;
 namespace lst = logspot;
@@ -33,13 +34,13 @@ static sst::Renderer* gRenderer = nullptr;
 
 extern "C"
 {
-JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobject obj, jstring external, jstring cache, jobject assets);
+JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobject obj, jstring jexternal, jstring jcache, jobject assets);
 JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_resize(JNIEnv *env, jobject obj, jint width, jint height);
 JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_step(JNIEnv *env, jobject obj);
 };
 
 
-JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobject obj, jstring external, jstring cache, jobject assets)
+JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobject obj, jstring jexternal, jstring jcache, jobject assets)
 {
 	if (gRenderer)
 	{
@@ -48,6 +49,7 @@ JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobje
 	}
 
 	fst::AssetManager::assets.Init(env, assets);
+	sst::String::Init(env);
 
 	printGlString("Version", GL_VERSION);
 	printGlString("Vendor", GL_VENDOR);
@@ -66,15 +68,13 @@ JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobje
 		lst::Logger::log.Error("Unsupported OpenGL ES version");
 	}
 
-	const char* nativeString = env->GetStringUTFChars(external, 0);
-	std::string sexternal{ nativeString };
-	env->ReleaseStringUTFChars(external, nativeString);
-	lst::Logger::log.Info("External %s", sexternal.c_str());
+	sst::String external{ jexternal };
+	lst::Logger::log.Info("External %s", external.c_str());
 
 	// Copy python libs
 	{
 		fst::Ifstream lib{ "stdlib.zip" };
-		std::string libPath{ sexternal + "/stdlib.zip"};
+		std::string libPath{ external + "/stdlib.zip"};
 		lst::Logger::log.Info("copying lib %s", libPath.c_str());
 		std::ofstream ofs{ libPath };
 		if (!ofs.is_open())
@@ -85,13 +85,13 @@ JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobje
 		ofs.close();
 	}
 
-	nativeString = env->GetStringUTFChars(cache, 0);
-	std::string scache{ nativeString };
-	env->ReleaseStringUTFChars(cache, nativeString);
-	lst::Logger::log.Info("Cache %s", scache.c_str());
-	sqlite3_temp_directory = sqlite3_mprintf("%s", scache.c_str());
+	// Set SQLite3 temp directory
+	sst::String cache{ jcache };
+	lst::Logger::log.Info("Cache %s", cache.c_str());
+	sqlite3_temp_directory = sqlite3_mprintf("%s", cache.c_str());
 
-	std::string dbPath{ sexternal + "/pong.data"};
+	// Copy database to internal folder
+	std::string dbPath{ external + "/pong.data"};
 	lst::Logger::log.Info("copying DB %s", dbPath.c_str());
 	std::ofstream ofs{ dbPath };
 	if (!ofs.is_open())
@@ -112,10 +112,23 @@ JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobje
 	lst::Logger::log.Info("DataSpot Size [%dx%d]", width, height);
 
 	// Initialize PySpot
-	sst::Script::Initialize(sexternal + "/stdlib.zip");
+	sst::Script::Initialize(external + "/stdlib.zip");
 	pst::Module module{ "os" };
 	pst::Object cwd{ module.CallFunction("getcwd") };
 	lst::Logger::log.Info("PySpot initialized: %s", cwd.ToCString());
+
+
+	sst::ModelRepository modelRepository{ dataspot, "." };
+	sst::EntityRepository entityRepository{ dataspot, modelRepository };
+
+	// Read a set of objects from dataspot
+	constexpr size_t entitiesCount = 3;
+	// For every object get the name
+	for (size_t i{ 0 }; i < entitiesCount; ++i)
+	{
+		sst::Entity* entity{ entityRepository.LoadEntity(i+1) };
+		lst::Logger::log.Info("Entity: %s", entity->GetName().c_str());
+	}
 }
 
 JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_resize(JNIEnv *env, jobject obj, jint width, jint height)

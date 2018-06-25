@@ -113,9 +113,7 @@ int main(int argc, char **argv)
 		decorated = true;
 
 		// Initialize PySpot
-		wstring wProjectDir{ projectDir.begin(), projectDir.end() };
-		wstring wProjectName{ projectName.begin(), projectName.end() };
-		sst::Script::Initialize(L"/" + wProjectDir + L"/" + wProjectName + L"/script");
+		sst::Script::Initialize("/" + projectDir + "/" + projectName + "/script");
 
 		sst::GlfwWindow window{ SST_TITLE, windowSize, decorated, stereoscopic };
 

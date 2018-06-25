@@ -16,13 +16,13 @@ class String : public std::string
 {
   public:
 #ifdef ANDROID
-	void SetEnv(JNIEnv* env) { pEnv = env };
-#endif
+	static void Init(JNIEnv* env) { pEnv = env; }
 	String(jstring s);
+#endif
 
   private:
 #ifdef ANDROID
-	static JNIEnv* pEnv{ nullptr };
+	static JNIEnv* pEnv;
 #endif
 
 };

@@ -8,7 +8,7 @@
 namespace fst = filespot;
 #endif
 
-#include "ShaderProgram.h"
+#include "core/ShaderProgram.h"
 
 using namespace sunspot;
 namespace lst = logspot;

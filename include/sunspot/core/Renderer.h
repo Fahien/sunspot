@@ -2,7 +2,7 @@
 #define SST_RENDERER_H_
 
 #include <EGL/egl.h>
-#include "sunspot/android/ShaderProgram.h"
+#include "core/ShaderProgram.h"
 #include "Camera.h"
 #include "Light.h"
 #include "sunspot/entity/Entity.h"

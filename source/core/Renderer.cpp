@@ -2,7 +2,7 @@
 #include <logspot/Logger.h>
 #include <MathSpot.h>
 
-#include <sunspot/android/Renderer.h>
+#include "core/Renderer.h"
 
 
 namespace mst = mathspot;

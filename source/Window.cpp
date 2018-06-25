@@ -8,14 +8,14 @@
 #include "view/GltfRenderer.h"
 #include "Graphics.h"
 #include "Window.h"
-#include "sunspot/android/ShaderProgram.h"
+#include "core/ShaderProgram.h"
 #include "Camera.h"
 #include "Light.h"
 #include "WavefrontObject.h"
 #include "Quad.h"
 #include "Framebuffer.h"
-#include "sunspot/entity/Entity.h"
-#include "sunspot/component/Model.h"
+#include "entity/Entity.h"
+#include "component/Model.h"
 
 using namespace sunspot;
 

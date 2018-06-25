@@ -48,9 +48,10 @@ configure_file(${PROJECT_SOURCE_DIR}/source/SunSpotConfig.h.in
 
 set(DEPENDENCY_INCLUDE_DIRS
 	${PROJECT_SOURCE_DIR}/include
+	${PROJECT_SOURCE_DIR}/include/sunspot
 	${PROJECT_SOURCE_DIR}/source
 	${PROJECT_BINARY_DIR}/include
-	${PROJECT_BINARY_DIR}/include/sunspot
+	${PROJECT_BINARY_DIR}/src
 	${SOIL_INCLUDE_DIR})
 
 if(ANDROID)
@@ -128,7 +129,8 @@ set(SOURCES
 	${SST_EXTENSION_HEADER}
 	${SST_EXTENSION_SOURCE}
 	source/Graphics.h
-	source/android/ShaderProgram.cpp
+	source/core/ShaderProgram.cpp
+	source/core/String.cpp
 	source/system/Collision.cpp
 	source/Cursor.h
 	source/Cursor.cpp
@@ -167,8 +169,8 @@ set(SOURCES
 
 if(ANDROID)
 	set(ANDROID_SOURCES
-		source/android/SunSpot.cpp
-		source/android/Renderer.cpp)
+		source/core/SunSpot.cpp
+		source/core/Renderer.cpp)
 else()
 	set(SOURCES ${SOURCES}
 		source/Window.h
