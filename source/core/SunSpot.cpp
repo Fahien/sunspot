@@ -85,6 +85,21 @@ JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobje
 		ofs.close();
 	}
 
+	// Copy python scripts
+	std::string scriptName{ "script.zip" };
+	{
+		fst::Ifstream script{ scriptName };
+		std::string scriptPath{ external + "/" + scriptName};
+		lst::Logger::log.Info("copying lib %s", scriptPath.c_str());
+		std::ofstream ofs{ scriptPath };
+		if (!ofs.is_open())
+		{
+			return;
+		}
+		ofs.write(script.GetAsset().GetContent(), script.GetAsset().GetLength());
+		ofs.close();
+	}
+
 	// Set SQLite3 temp directory
 	sst::String cache{ jcache };
 	lst::Logger::log.Info("Cache %s", cache.c_str());
@@ -112,13 +127,17 @@ JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobje
 	lst::Logger::log.Info("DataSpot Size [%dx%d]", width, height);
 
 	// Initialize PySpot
-	sst::Script::Initialize(external + "/stdlib.zip");
-	pst::Module module{ "os" };
-	pst::Object cwd{ module.CallFunction("getcwd") };
-	lst::Logger::log.Info("PySpot initialized: %s", cwd.ToCString());
+
+	std::string stdlib{ external + "/stdlib.zip" };
+	std::string script{ external + "/" + scriptName };
+	std::string path{ stdlib + ":" + script };
+	sst::Script::Initialize(path);
+	//pst::Module module{ "os" };
+	//pst::Object cwd{ module.CallFunction("getcwd") };
+	//lst::Logger::log.Info("PySpot initialized: %s", cwd.ToCString());
 
 
-	sst::ModelRepository modelRepository{ dataspot, "." };
+	sst::ModelRepository modelRepository{ dataspot, "" };
 	sst::EntityRepository entityRepository{ dataspot, modelRepository };
 
 	// Read a set of objects from dataspot

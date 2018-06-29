@@ -17,5 +17,6 @@ output.dat
 .externalNativeBuild
 .idea
 gradle
+android/app/src/main/assets
 stdlib.zip
 app.iml

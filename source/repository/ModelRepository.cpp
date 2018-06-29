@@ -1,5 +1,5 @@
 #include <stdexcept>
-#include <DataSpot.h>
+#include <dataspot/DataSpot.h>
 #include <Gltf.h>
 
 #include "ModelRepository.h"
@@ -16,7 +16,7 @@ const string ModelRepository::kModelDir{ "model/" };
 
 ModelRepository::ModelRepository(const DataSpot& data, const string& projectDir)
 :	mData{ data }
-,	mProjectDir{ projectDir + "/" + kModelDir }
+,	mProjectDir{ projectDir + kModelDir }
 {}
 
 

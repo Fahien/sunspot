@@ -1,10 +1,10 @@
 #include <memory>
-#include <DataSpot.h>
+#include <dataspot/DataSpot.h>
 #include <hitspot/BoundingBox.h>
+#include <dataspot/Statement.h>
+#include <dataspot/Exception.h>
+#include <sqlite3.h>
 
-#include "Statement.h"
-#include "DataSpotException.h"
-#include "sqlite3.h"
 #include "WavefrontObject.h"
 #include "ModelRepository.h"
 
@@ -80,10 +80,11 @@ Entity* EntityRepository::loadEntity(const int id)
 
 	while (true)
 	{
-		try
-		{
 			// Step multiple time
-			stmtComponents.Step();
+			if (stmtComponents.Step() != SQLITE_ROW)
+			{
+				break;
+			}
 
 			// Get the component id and type
 			int    id  { stmtComponents.GetInteger(0) };
@@ -188,12 +189,6 @@ Entity* EntityRepository::loadEntity(const int id)
 				pEntity->SetCollider(collider);
 			}
 		}
-		catch (const DataSpotException&)
-		{
-			// No more components
-			break;
-		}
-	}
 
 	// If the entity has a Mesh and a Transform
 	if (pEntity->GetModel() && pEntity->GetTransform())

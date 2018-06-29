@@ -6,7 +6,7 @@
 #include <memory>
 
 #include <logspot/Logger.h>
-#include <DataSpot.h>
+#include <dataspot/DataSpot.h>
 
 #include "SunSpotConfig.h"
 #include "Light.h"

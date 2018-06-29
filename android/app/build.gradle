@@ -20,7 +20,7 @@ android {
                     // other ndk flags could also be configured there [cppFlags, cFlags...]
                 arguments "-DANDROID_PLATFORM_LEVEL=${platformVersion}",
                           '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=c++_static',
-                          '-DLST_LOGGING=1'
+                          '-DLST_LOGGING=1', "-DANDROID_CPP_FEATURES=exceptions"
             }
         }
     }
