@@ -19,7 +19,6 @@ option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 # Python 3
 find_package(PythonInterp 3)
-find_package(PythonLibraries)
 
 include(AddLogSpot)
 include(AddMathSpot)
@@ -103,7 +102,6 @@ set(EXTENSION_NAME sunspot)
 set(EXTENSION_PATH ${PROJECT_SOURCE_DIR}/extension/${EXTENSION_NAME})
 file(GLOB NAMESPACES LIST_DIRECTORY true ${EXTENSION_PATH}/*)
 foreach(NAMESPACE ${NAMESPACES})
-	message(STATUS "CHECK ${NAMESPACE}")
 	if(IS_DIRECTORY ${NAMESPACE})
 		# Get all the jsons and generate headers
 		file(GLOB COMPONENTS ${NAMESPACE}/*json)
@@ -172,11 +170,14 @@ if(ANDROID)
 		source/core/SunSpot.cpp
 		source/core/Renderer.cpp)
 else()
-	set(SOURCES ${SOURCES}
+	set(GLFW_SOURCES
 		source/Window.h
 		source/Window.cpp
 		source/GlfwWindow.h
 		source/GlfwWindow.cpp
+	)
+	set(EXE_SOURCES
+		${GLFW_SOURCES}
 		source/Main.cpp)
 endif()
 
@@ -207,8 +208,15 @@ endif(WIN32)
 # SunSpot target
 if(ANDROID)
 	add_library(${SST_NAME} SHARED ${ANDROID_SOURCES})
+	add_custom_command(
+		TARGET PRE_BUILD
+			${SST_NAME}
+		COMMAND
+			${CMAKE_COMMAND} -E copy
+			${CMAKE_CURRENT_SOURCE_DIR}/pyspot/lib/${CMAKE_ANDROID_ARCH_ABI}/libpython2.7.so
+			${CMAKE_BINARY_DIR}/libpython2.7.so)
 else()
-	add_executable(${SST_NAME} ${SOURCES} ${SHADERS})
+	add_executable(${SST_NAME} ${EXE_SOURCES} ${SHADERS})
 endif()
 
 target_link_libraries(${SST_NAME} ${SST_NAME}-lib)

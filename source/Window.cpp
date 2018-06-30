@@ -85,7 +85,7 @@ void Window::render(const float& deltaTime, const input::Input& input) // TODO c
 
 	for (auto entity : mEntities)
 	{
-		entity->Update(deltaTime, input);
+		entity->Update(deltaTime);
 	}
 
 	if (mStereoscopic)

@@ -35,7 +35,6 @@ Script::Script(const int id, std::string& name, Entity& entity)
 :	Object { id, name }
 ,	mEntity{ entity }
 ,	mModule{ name.c_str() }
-,	mArgs  { 2 }
 {}
 
 
@@ -68,7 +67,6 @@ void Script::Initialize()
 Script::Script(Entity& entity)
 :	mEntity{ entity }
 ,	mModule{ entity.GetModel()->GetNode().name.c_str() }
-,	mArgs  { 3 }
 {
 	Dictionary dict{};
 	dict.SetItem("transform", *mEntity.mTransform);
@@ -107,11 +105,9 @@ void Script::Collide(Entity& other)
 }
 
 
-void Script::Update(const float delta, const input::Input& input)
+void Script::Update(const float delta)
 {
 	mArgs.SetItem(0, delta);
-	mArgs.SetItem(1, input);
-	
 	mModule.CallFunction("update", mArgs);
 	
 	mEntity.mModel->GetNode().matrix = mst::Mat4::identity;

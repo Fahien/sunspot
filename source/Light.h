@@ -27,9 +27,9 @@ public:
 	virtual void Update(const ShaderProgram& program) const = 0;
 
 protected:
-	Color mAmbient;
-	Color mDiffuse;
-	Color mSpecular;
+	Color mAmbient{};
+	Color mDiffuse{};
+	Color mSpecular{};
 };
 
 
@@ -44,7 +44,7 @@ public:
 	void Update(const ShaderProgram& program) const override;
 
 private:
-	mst::Vec3 mDirection;
+	mst::Vec3 mDirection{};
 };
 
 
@@ -59,7 +59,7 @@ public:
 	void Update(const ShaderProgram& program) const override;
 
 private:
-	mst::Vec3 mPosition;
+	mst::Vec3 mPosition{};
 };
 
 

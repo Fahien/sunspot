@@ -130,30 +130,6 @@ ShaderSource::ShaderSource(const char* p)
 ,	handle{ nullptr }
 {
 #ifdef ANDROID
-	// TODO: Implement a proper way to load a shader in Android
-	// Fallback to assetManager
-	/*
-    AAssetManager* assetManager = activity_->assetManager;
-    AAsset* assetFile =
-        AAssetManager_open(assetManager, fileName, AASSET_MODE_BUFFER);
-    if (!assetFile) {
-      return false;
-    }
-    uint8_t* data = (uint8_t*)AAsset_getBuffer(assetFile);
-    int32_t size = AAsset_getLength(assetFile);
-    if (data == NULL) {
-      AAsset_close(assetFile);
-
-      LOGI("Failed to load:%s", fileName);
-      return false;
-    }
-
-    buffer_ref->reserve(size);
-    buffer_ref->assign(data, data + size);
-
-    AAsset_close(assetFile);
-	*/
-	
 	fst::Asset file{ fst::AssetManager::assets.Open(p) };
 	char* content{ file.GetContent() };
 	size_t length{ file.GetLength() };

@@ -99,7 +99,7 @@ private:
 	Light* mLight;
 	std::vector<WavefrontObject*> mObjs;
 	//std::vector<std::shared_ptr<Entity>> mEntities;
-	std::vector<Entity*> mEntities;
+	std::vector<Entity*> mEntities{};
 	GltfRenderer* mGltfRenderer { nullptr };
 	const ShaderProgram* mQuadProgram;
 	const ShaderProgram* mDepthProgram;

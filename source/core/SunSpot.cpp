@@ -7,8 +7,9 @@
 
 #include <logspot/Logger.h>
 #include <filespot/Ifstream.h>
+#include <filespot/File.h>
 #include <filespot/AssetManager.h>
-#include <DataSpot.h>
+#include <dataspot/DataSpot.h>
 
 #include "repository/ModelRepository.h"
 #include "repository/EntityRepository.h"
@@ -51,51 +52,37 @@ JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobje
 	fst::AssetManager::assets.Init(env, assets);
 	sst::String::Init(env);
 
-	printGlString("Version", GL_VERSION);
-	printGlString("Vendor", GL_VENDOR);
-	printGlString("Renderer", GL_RENDERER);
-	printGlString("Extensions", GL_EXTENSIONS);
-
-	glEnable(GL_DEPTH_TEST);
-
-	const char *versionStr{ reinterpret_cast<const char *>(glGetString(GL_VERSION)) };
-	if (strstr(versionStr, "OpenGL ES 3."))
-	{
-		gRenderer = sst::Renderer::createRenderer();
-	}
-	else
-	{
-		lst::Logger::log.Error("Unsupported OpenGL ES version");
-	}
-
 	sst::String external{ jexternal };
 	lst::Logger::log.Info("External %s", external.c_str());
 
 	// Copy python libs
+	std::string libName{ "stdlib.zip" };
+	std::string libPath{ external + "/" + libName };
+	if (!fst::File::Exists(libPath))
 	{
-		fst::Ifstream lib{ "stdlib.zip" };
-		std::string libPath{ external + "/stdlib.zip"};
 		lst::Logger::log.Info("copying lib %s", libPath.c_str());
 		std::ofstream ofs{ libPath };
 		if (!ofs.is_open())
 		{
 			return;
 		}
+		fst::Ifstream lib{ libName };
 		ofs.write(lib.GetAsset().GetContent(), lib.GetAsset().GetLength());
 		ofs.close();
 	}
 
 	// Copy python scripts
 	std::string scriptName{ "script.zip" };
+	std::string scriptPath{ external + "/" + scriptName };
+	//if (!fst::File::Exists(scriptPath))
 	{
-		fst::Ifstream script{ scriptName };
-		std::string scriptPath{ external + "/" + scriptName};
 		lst::Logger::log.Info("copying lib %s", scriptPath.c_str());
 		std::ofstream ofs{ scriptPath };
 		if (!ofs.is_open())
 		{
 			return;
 		}
+		fst::Ifstream script{ scriptName };
 		ofs.write(script.GetAsset().GetContent(), script.GetAsset().GetLength());
 		ofs.close();
 	}
@@ -106,47 +93,43 @@ JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobje
 	sqlite3_temp_directory = sqlite3_mprintf("%s", cache.c_str());
 
 	// Copy database to internal folder
+	std::string dbName{ "pong.data" };
 	std::string dbPath{ external + "/pong.data"};
-	lst::Logger::log.Info("copying DB %s", dbPath.c_str());
-	std::ofstream ofs{ dbPath };
-	if (!ofs.is_open())
+	if (!fst::File::Exists(dbPath))
 	{
-		return;
+		lst::Logger::log.Info("copying DB %s", dbPath.c_str());
+		std::ofstream ofs{ dbPath };
+		if (!ofs.is_open())
+		{
+			return;
+		}
+		// Open asset database
+		fst::Ifstream db{ "pong.data" };
+		lst::Logger::log.Info("Database %s", db.IsOpen() ? "open" : "not open");
+		ofs.write(db.GetAsset().GetContent(), db.GetAsset().GetLength());
+		ofs.close();
 	}
-	// Open asset database
-	fst::Ifstream db{ "pong.data" };
-	lst::Logger::log.Info("Database %s", db.IsOpen() ? "open" : "not open");
-	ofs.write(db.GetAsset().GetContent(), db.GetAsset().GetLength());
-	ofs.close();
-
-	// Load database
-	dst::DataSpot dataspot;
-	dataspot.Open(dbPath);
-	int width  = stoi(dataspot.GetConfigValue("window.width"));
-	int height = stoi(dataspot.GetConfigValue("window.height"));
-	lst::Logger::log.Info("DataSpot Size [%dx%d]", width, height);
 
 	// Initialize PySpot
-
-	std::string stdlib{ external + "/stdlib.zip" };
-	std::string script{ external + "/" + scriptName };
-	std::string path{ stdlib + ":" + script };
+	std::string path{ libPath + ":" + scriptPath };
 	sst::Script::Initialize(path);
-	//pst::Module module{ "os" };
-	//pst::Object cwd{ module.CallFunction("getcwd") };
-	//lst::Logger::log.Info("PySpot initialized: %s", cwd.ToCString());
 
+	// Renderer
+	printGlString("Version", GL_VERSION);
+	printGlString("Vendor", GL_VENDOR);
+	printGlString("Renderer", GL_RENDERER);
+	printGlString("Extensions", GL_EXTENSIONS);
 
-	sst::ModelRepository modelRepository{ dataspot, "" };
-	sst::EntityRepository entityRepository{ dataspot, modelRepository };
+	glEnable(GL_DEPTH_TEST);
 
-	// Read a set of objects from dataspot
-	constexpr size_t entitiesCount = 3;
-	// For every object get the name
-	for (size_t i{ 0 }; i < entitiesCount; ++i)
+	const char *versionStr{ reinterpret_cast<const char *>(glGetString(GL_VERSION)) };
+	if (strstr(versionStr, "OpenGL ES 3."))
 	{
-		sst::Entity* entity{ entityRepository.LoadEntity(i+1) };
-		lst::Logger::log.Info("Entity: %s", entity->GetName().c_str());
+		gRenderer = sst::Renderer::New(dbPath);
+	}
+	else
+	{
+		lst::Logger::log.Error("Unsupported OpenGL ES version");
 	}
 }
 

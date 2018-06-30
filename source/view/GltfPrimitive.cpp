@@ -71,7 +71,7 @@ void GltfPrimitive::readIndices(Gltf& model, Gltf::Mesh::Primitive& primitive)
 	auto& indicesAccessor = model.GetAccessors()[indicesIndex];
 
 	// Number of indices
-	mIndicesCount = indicesAccessor.count;
+	mIndicesCount = static_cast<GLsizei>(indicesAccessor.count);
 
 	// Type of indices
 	mIndicesType = to_gl_component_type(indicesAccessor.componentType);
@@ -80,12 +80,12 @@ void GltfPrimitive::readIndices(Gltf& model, Gltf::Mesh::Primitive& primitive)
 	mIndicesOffset = reinterpret_cast<const void*>(indicesAccessor.byteOffset);
 
 	// Get the bufferview
-	unsigned bufferViewIndex     = indicesAccessor.bufferView;
-	Gltf::BufferView& bufferView = model.GetBufferViews()[bufferViewIndex];
+	auto  bufferViewIndex = indicesAccessor.bufferView;
+	auto& bufferView      = model.GetBufferViews()[bufferViewIndex];
 	assert(bufferView.target == Gltf::BufferView::Target::ELEMENT_ARRAY_BUFFER);
 
 	// Get the buffer
-	unsigned bufferIndex = bufferView.buffer;
+	auto bufferIndex = bufferView.buffer;
 	vector<char>& buffer = model.GetBuffer(bufferIndex);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);
@@ -113,7 +113,7 @@ GltfPrimitive::GltfPrimitive(Gltf& model, Gltf::Mesh::Primitive& primitive)
 	{
 		unsigned accessorIndex = attribute.second;
 		auto& accessor = model.GetAccessors().at(accessorIndex);
-		unsigned bufferViewIndex = accessor.bufferView;
+		auto bufferViewIndex = accessor.bufferView;
 		Gltf::BufferView& bufferView = model.GetBufferViews().at(bufferViewIndex);
 		vector<char>& buffer = model.GetBuffer(bufferView.buffer);
 
@@ -143,26 +143,30 @@ GltfPrimitive::GltfPrimitive(Gltf& model, Gltf::Mesh::Primitive& primitive)
 		{
 			glEnableVertexAttribArray(1); // Vertex Normals
 			GLvoid* offset{ reinterpret_cast<GLvoid*>(accessor.byteOffset) };
-			glVertexAttribPointer(1, 3, componentType, GL_FALSE, bufferView.byteStride, offset);
+			auto stride = static_cast<GLsizei>(bufferView.byteStride);
+			glVertexAttribPointer(1, 3, componentType, GL_FALSE, stride, offset);
 		}
 		else if (attribute.first == Gltf::Mesh::Primitive::Semantic::POSITION)
 		{
 			glEnableVertexAttribArray(0); // Vertex Position
 			GLvoid* offset{ reinterpret_cast<GLvoid*>(accessor.byteOffset) };
-			glVertexAttribPointer(0, 3, componentType, GL_FALSE, bufferView.byteStride, offset);
+			auto stride = static_cast<GLsizei>(bufferView.byteStride);
+			glVertexAttribPointer(0, 3, componentType, GL_FALSE, stride, offset);
 		}
 		else if (attribute.first == Gltf::Mesh::Primitive::Semantic::TEXCOORD_0)
 		{
 			glEnableVertexAttribArray(2); // Tex coords
 			GLvoid* offset{ reinterpret_cast<GLvoid*>(accessor.byteOffset) };
-			glVertexAttribPointer(2, 2, componentType, GL_FALSE, bufferView.byteStride, offset);
+			auto stride = static_cast<GLsizei>(bufferView.byteStride);
+			glVertexAttribPointer(2, 2, componentType, GL_FALSE, stride, offset);
 		}
 		else if (attribute.first == Gltf::Mesh::Primitive::Semantic::COLOR_0)
 		{
 			mHasVertexColors = true;
 			glEnableVertexAttribArray(3); // Color
 			GLvoid* offset{ reinterpret_cast<GLvoid*>(accessor.byteOffset) };
-			glVertexAttribPointer(3, 4, componentType, GL_FALSE, bufferView.byteStride, offset);
+			auto stride = static_cast<GLsizei>(bufferView.byteStride);
+			glVertexAttribPointer(3, 4, componentType, GL_FALSE, stride, offset);
 		}
 	}
 

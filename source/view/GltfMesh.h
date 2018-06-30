@@ -34,8 +34,8 @@ public:
 	void Draw(const ShaderProgram& shader) const;
 
 private:
-	std::string mName;
-	std::vector<GltfPrimitive> mPrimitives;
+	std::string mName{};
+	std::vector<GltfPrimitive> mPrimitives{};
 };
 
 

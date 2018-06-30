@@ -7,6 +7,7 @@
 
 #include <logspot/Logger.h>
 #include <dataspot/DataSpot.h>
+#include <dataspot/Exception.h>
 
 #include "SunSpotConfig.h"
 #include "Light.h"
@@ -46,14 +47,14 @@ static const string projectDir{ "project" };
 void printLogo()
 {
 	lst::Logger::log.Info("%s\n",
-R"( ________  ___  ___  ________   ________  ________  ________  _________   
-|\   ____\|\  \|\  \|\   ___  \|\   ____\|\   __  \|\   __  \|\___   ___\ 
-\ \  \___|\ \  \\\  \ \  \\ \  \ \  \___|\ \  \|\  \ \  \|\  \|___ \  \_| 
- \ \_____  \ \  \\\  \ \  \\ \  \ \_____  \ \   ____\ \  \\\  \   \ \  \  
-  \|____|\  \ \  \\\  \ \  \\ \  \|____|\  \ \  \___|\ \  \\\  \   \ \  \ 
-    ____\_\  \ \_______\ \__\\ \__\____\_\  \ \__\    \ \_______\   \ \  \
-   |\_________\|_______|\|__| \|__|\_________\|__|     \|_______|    \ \__\
-    \|_________|                   \|_________|                       \|__| )");
+" ________  ___  ___  ________   ________  ________  ________  _________   \n\
+|\\   ____\\|\\  \\|\\  \\|\\   ___  \\|\\   ____\\|\\   __  \\|\\   __  \\|\\___   ___\\ \n\
+\\ \\  \\___|\\ \\  \\ \\  \\ \\  \\ \\  \\ \\  \\___|\\ \\  \\|\\  \\ \\  \\|\\  \\|___ \\  \\_| \n\
+ \\ \\_____  \\ \\  \\ \\  \\ \\  \\ \\  \\ \\_____  \\ \\   ____\\ \\  \\ \\  \\   \\ \\  \\  \n\
+  \\|____|\\  \\ \\  \\ \\  \\ \\  \\ \\  \\|____|\\  \\ \\  \\___|\\ \\  \\ \\  \\   \\ \\  \\ \n\
+    ____\\_\\  \\ \\_______\\ \\__\\ \\__\\____\\_\\  \\ \\__\\    \\ \\_______\\   \\ \\  \\\n\
+   |\\_________\\|_______|\\|__| \\|__|\\_________\\|__|     \\|_______|    \\ \\__\\\n\
+    \\|_________|                   \\|_________|                       \\|__| ");
 }
 
 
@@ -106,14 +107,13 @@ int main(int argc, char **argv)
 		}
 
 		// Load database
-		dst::DataSpot dataspot;
-		dataspot.Open(projectDir + "/" + projectName + "/" + projectName + ".data");
+		dst::DataSpot dataspot{ projectDir + "/" + projectName + "/" + projectName + ".data" };
 		windowSize.width  = stoi(dataspot.GetConfigValue("window.width"));
 		windowSize.height = stoi(dataspot.GetConfigValue("window.height"));
 		decorated = true;
 
 		// Initialize PySpot
-		sst::Script::Initialize("/" + projectDir + "/" + projectName + "/script");
+		sst::Script::Initialize(projectDir + "/" + projectName + "/script");
 
 		sst::GlfwWindow window{ SST_TITLE, windowSize, decorated, stereoscopic };
 
@@ -152,13 +152,13 @@ int main(int argc, char **argv)
 		}
 
 		string projectPath{ projectDir + "/" + projectName + "/" };
-		sst::ModelRepository modelRepository{ dataspot, projectPath };
+		sst::ModelRepository modelRepository{ projectPath };
 		sst::EntityRepository entityRepository{ dataspot, modelRepository };
 
 		// Read a set of objects from dataspot
-		constexpr size_t entitiesCount = 3;
+		constexpr int entitiesCount = 3;
 		// For every object get the name
-		for (size_t i{ 0 }; i < entitiesCount; ++i)
+		for (int i{ 0 }; i < entitiesCount; ++i)
 		{
 			sst::Entity* entity{ entityRepository.LoadEntity(i+1) };
 			//shared_ptr<sst::Entity> pEntity{ entity };
@@ -171,12 +171,17 @@ int main(int argc, char **argv)
 		lst::Logger::log.Info("%s version %d.%d successful\n", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
 		return EXIT_SUCCESS;
 	}
-	catch (const sst::GraphicException &e)
+	catch (const sst::GraphicException& e)
 	{
 		lst::Logger::log.Error("%s: %s\n", tag.c_str(), e.what());
 		return EXIT_FAILURE;
 	}
-	catch (const runtime_error &e)
+	catch (const dst::Exception& e)
+	{
+		lst::Logger::log.Error("%s: %s\n", tag.c_str(), e.ToString());
+		return EXIT_FAILURE;
+	}
+	catch (const runtime_error& e)
 	{
 		lst::Logger::log.Error("%s: %s\n", tag.c_str(), e.what());
 		return EXIT_FAILURE;

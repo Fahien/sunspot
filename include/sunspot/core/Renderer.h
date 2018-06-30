@@ -6,6 +6,10 @@
 #include "Camera.h"
 #include "Light.h"
 #include "sunspot/entity/Entity.h"
+#include <dataspot/DataSpot.h>
+#include "repository/ModelRepository.h"
+#include "repository/EntityRepository.h"
+#include "system/Collision.h"
 
 namespace sunspot
 {
@@ -16,10 +20,12 @@ class GltfRenderer;
 class Renderer
 {
   public:
-	Renderer();
+	Renderer(const std::string& db);
 	virtual ~Renderer();
 
-	static Renderer* createRenderer();
+	static Renderer* New(const std::string& db);
+
+	void Add(Entity* pEntity);
 
 	bool init();
 	void resize(int w, int h);
@@ -30,7 +36,8 @@ class Renderer
 	virtual void draw();
 	bool checkGlError(const char* funcName);
 
-	uint64_t mLastFrameNs;
+	uint64_t mLastFrameNs{ 0 };
+	float mDelta{ 0.0f };
 
 	const EGLContext mEglContext;
 
@@ -40,6 +47,12 @@ class Renderer
 
 	std::vector<Entity*> mEntities;
 	GltfRenderer* mGltfRenderer { nullptr };
+
+	dst::DataSpot mDataSpot;
+	ModelRepository mModelRepository;
+	EntityRepository mEntityRepository;
+
+	system::Collision mCollision;
 };
 
 

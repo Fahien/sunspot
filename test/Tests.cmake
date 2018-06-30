@@ -5,7 +5,9 @@ include(${GLTFSPOT}/test/GltfFiles.cmake)
 
 function(make_test TEST_NAME)
 	# Sources
-	set(TEST_SOURCES ${SST_TEST_DIR}/${TEST_NAME}.cpp)
+	set(TEST_SOURCES
+		${GLFW_SOURCES}
+		${SST_TEST_DIR}/${TEST_NAME}.cpp)
 	source_group(${TEST_NAME} FILES ${TEST_SOURCES})
 
 	# Executable

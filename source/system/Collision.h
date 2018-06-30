@@ -24,8 +24,8 @@ public:
 	void Update();
 
   private:
-	std::unordered_map<Entity*, hst::BoundingBox> mBoxes;
-	hst::CollisionSystem mSystem;
+	std::unordered_map<Entity*, hst::BoundingBox> mBoxes{};
+	hst::CollisionSystem mSystem{};
 };
 
 }

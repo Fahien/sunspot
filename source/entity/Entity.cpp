@@ -116,10 +116,10 @@ void Entity::Collide(Entity& other)
 }
 
 
-void Entity::Update(const float delta, const input::Input& input)
+void Entity::Update(const float delta)
 {
 	if (mScript)
 	{
-		mScript->Update(delta, input);
+		mScript->Update(delta);
 	}
 }

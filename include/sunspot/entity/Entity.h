@@ -54,7 +54,7 @@ public:
 
 	void Handle(const input::Input& input);
 	void Collide(Entity& other);
-	void Update(const float delta, const input::Input& input);
+	void Update(const float delta);
 
 private:
 	component::Model*     mModel     { nullptr };

@@ -14,9 +14,8 @@ const string ModelRepository::kExt{ ".gltf" };
 const string ModelRepository::kModelDir{ "model/" };
 
 
-ModelRepository::ModelRepository(const DataSpot& data, const string& projectDir)
-:	mData{ data }
-,	mProjectDir{ projectDir + kModelDir }
+ModelRepository::ModelRepository(const string& projectDir)
+:	mProjectDir{ projectDir + kModelDir }
 {}
 
 

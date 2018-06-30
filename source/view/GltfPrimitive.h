@@ -39,24 +39,24 @@ public:
 private:
 	void readIndices(gst::Gltf& model, gst::Gltf::Mesh::Primitive& primitive);
 
-	bool mHasVao;
-	GLuint mVao;
-	std::map<size_t, GLuint> mVbos;
-	bool mHasEbo;
-	GLuint mEbo;
+	bool mHasVao{};
+	GLuint mVao{};
+	std::map<size_t, GLuint> mVbos{};
+	bool mHasEbo{};
+	GLuint mEbo{};
 
-	GLenum mMode;
-	size_t mIndicesCount;
-	GLenum mIndicesType;
-	const void* mIndicesOffset;
+	GLenum  mMode{};
+	GLsizei mIndicesCount{};
+	GLenum  mIndicesType{};
+	const void* mIndicesOffset{};
 
-	mst::Mat4 mMatrix;
+	mst::Mat4 mMatrix{};
 
-	bool mHasVertexColors;
+	bool mHasVertexColors{};
 
-	Material mMaterial;
+	Material mMaterial{};
 
-	std::map<gst::Gltf::Texture*, Texture> mTextures;
+	std::map<gst::Gltf::Texture*, Texture> mTextures{};
 
 };
 

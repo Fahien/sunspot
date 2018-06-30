@@ -19,6 +19,8 @@ struct Color
 	friend std::ostream& operator<<(std::ostream& os, const Color& c);
 };
 
+std::ostream& operator<<(std::ostream& os, const Color& c);
+
 }
 
 #endif // SST_COLOR_H

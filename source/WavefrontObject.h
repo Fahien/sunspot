@@ -98,6 +98,7 @@ private:
 	std::vector<std::shared_ptr<Material>> mMaterials;
 };
 
+fst::Ifstream &operator>>(fst::Ifstream& is, WavefrontObject& obj);
 
 }
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include <string>
 
 #include <SOIL.h>
 #include <logspot/Logger.h>
