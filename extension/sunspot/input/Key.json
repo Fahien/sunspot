@@ -2,14 +2,15 @@
 	"namespace": "input",
 	"name": "Key",
 	"values": {
-		"UP"   : 0,
-		"LEFT" : 1,
-		"DOWN" : 2,
-		"RIGHT": 3,
-		"W"    : 4,
-		"A"    : 5,
-		"S"    : 6,
-		"D"    : 7
+		"NONE" : 0,
+		"UP"   : 1,
+		"LEFT" : 2,
+		"DOWN" : 3,
+		"RIGHT": 4,
+		"W"    : 5,
+		"A"    : 6,
+		"S"    : 7,
+		"D"    : 8
 	}
 }
 

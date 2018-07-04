@@ -7,6 +7,8 @@
 #include <pyspot/Tuple.h>
 #include <pyspot/String.h>
 #include <pyspot/Dictionary.h>
+#include <pyspot/Error.h>
+
 #include "sunspot/extension/Sunspot.h"
 #include "sunspot/component/Transform.h"
 #include "sunspot/component/Rigidbody.h"
@@ -47,7 +49,7 @@ void Script::Initialize()
 		dict.SetItem("rigidbody", *mEntity.mRigidbody);
 		Tuple args{ dict };
 
-		lst::Logger::log.Info("Calling python init\n");
+		lst::Logger::log.Info("%s.init", mModule.GetName().c_str());
 		mModule.CallFunction("init", args);
 
 		// TODO refactor this
@@ -73,7 +75,7 @@ Script::Script(Entity& entity)
 	dict.SetItem("rigidbody", *mEntity.mRigidbody);
 	Tuple args{ dict };
 
-	lst::Logger::log.Info("Calling python init\n");
+	lst::Logger::log.Info("%s.init", mModule.GetName().c_str());
 	mModule.CallFunction("init", args);
 
 	mEntity.mModel->GetNode().matrix.ScaleX(mEntity.mTransform->GetScale().GetX());

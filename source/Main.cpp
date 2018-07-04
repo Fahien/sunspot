@@ -47,12 +47,12 @@ static const string projectDir{ "project" };
 void printLogo()
 {
 	lst::Logger::log.Info("%s\n",
-" ________  ___  ___  ________   ________  ________  ________  _________   \n\
-|\\   ____\\|\\  \\|\\  \\|\\   ___  \\|\\   ____\\|\\   __  \\|\\   __  \\|\\___   ___\\ \n\
-\\ \\  \\___|\\ \\  \\ \\  \\ \\  \\ \\  \\ \\  \\___|\\ \\  \\|\\  \\ \\  \\|\\  \\|___ \\  \\_| \n\
- \\ \\_____  \\ \\  \\ \\  \\ \\  \\ \\  \\ \\_____  \\ \\   ____\\ \\  \\ \\  \\   \\ \\  \\  \n\
-  \\|____|\\  \\ \\  \\ \\  \\ \\  \\ \\  \\|____|\\  \\ \\  \\___|\\ \\  \\ \\  \\   \\ \\  \\ \n\
-    ____\\_\\  \\ \\_______\\ \\__\\ \\__\\____\\_\\  \\ \\__\\    \\ \\_______\\   \\ \\  \\\n\
+" ________  ___  ___  ________   ________  ________  ________  ___________ \n\
+|\\   ____\\|\\  \\|\\  \\|\\   ___  \\|\\   ____\\|\\   __  \\|\\   __  \\|\\____   ___\\ \n\
+\\ \\  \\___|\\ \\  \\ \\  \\ \\  \\  \\  \\ \\  \\___|\\ \\  \\|\\  \\ \\  \\|\\  \\|___ \\  \\__| \n\
+ \\ \\_____  \\ \\  \\ \\  \\ \\  \\  \\  \\ \\_____  \\ \\   ____\\ \\  \\ \\  \\   \\ \\  \\  \n\
+  \\|____|\\  \\ \\  \\ \\  \\ \\  \\  \\  \\|____|\\  \\ \\  \\___|\\ \\  \\ \\  \\   \\ \\  \\ \n\
+    ____\\_\\  \\ \\_______\\ \\__\\  \\__\\____\\_\\  \\ \\__\\    \\ \\_______\\   \\ \\  \\\n\
    |\\_________\\|_______|\\|__| \\|__|\\_________\\|__|     \\|_______|    \\ \\__\\\n\
     \\|_________|                   \\|_________|                       \\|__| ");
 }
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 			if (++it != arguments.end())
 			{
 				scale = stoi(*it);
-				lst::Logger::log.Info("Scale [%d]\n", scale);
+				lst::Logger::log.Info("Scale [%d]", scale);
 			}
 			else
 			{
@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 			{
 				projectName = *it;
 			}
-			lst::Logger::log.Info("Project [%s]\n", projectName.c_str());
+			lst::Logger::log.Info("Project [%s]", projectName.c_str());
 		}
 
 		// Load database
@@ -168,22 +168,20 @@ int main(int argc, char **argv)
 		window.loop(); // GameLoop.it
 
 
-		lst::Logger::log.Info("%s version %d.%d successful\n", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
+		lst::Logger::log.Info("%s version %d.%d successful", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
 		return EXIT_SUCCESS;
 	}
 	catch (const sst::GraphicException& e)
 	{
-		lst::Logger::log.Error("%s: %s\n", tag.c_str(), e.what());
-		return EXIT_FAILURE;
+		lst::Logger::log.Error("%s: %s", tag.c_str(), e.what());
 	}
 	catch (const dst::Exception& e)
 	{
-		lst::Logger::log.Error("%s: %s\n", tag.c_str(), e.ToString());
-		return EXIT_FAILURE;
+		lst::Logger::log.Error("%s: %s", tag.c_str(), e.ToString());
 	}
 	catch (const runtime_error& e)
 	{
-		lst::Logger::log.Error("%s: %s\n", tag.c_str(), e.what());
-		return EXIT_FAILURE;
+		lst::Logger::log.Error("%s: %s", tag.c_str(), e.what());
 	}
+	return EXIT_FAILURE;
 }

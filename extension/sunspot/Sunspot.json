@@ -11,7 +11,9 @@
 		"component::Rigidbody",
 		"component::Transform",
 		"component::Vec3",
+		"math::Vec2",
 		"input::Input",
+		"input::Type",
 		"input::Key",
 		"input::Action"
 	]

@@ -26,7 +26,7 @@ GlfwWindow::GlfwWindow(const char* title,
 	// Set the error callback
 	glfwSetErrorCallback([](int error, const char *description)
 	{
-		lst::Logger::log.Error("%s: %s [%d]\n", tag.c_str(), description, error);
+		lst::Logger::log.Error("%s: %s [%d]", tag.c_str(), description, error);
 	});
 
 	// Get the primary monitor
@@ -75,19 +75,24 @@ GlfwWindow::GlfwWindow(const char* title,
 	glfwMakeContextCurrent(mWindow);
 
 	// Hide the cursor and capture it, perfect for an FPS camera system
-	glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	// Listen to mouse-movement events
+	// Listen to mouse events
+	glfwSetMouseButtonCallback(mWindow, [](GLFWwindow* window, int button, int action, int mods)
+	{
+		auto win = reinterpret_cast<GlfwWindow *>(glfwGetWindowUserPointer(window));
+		win->handleMouse(action);
+	});
 	glfwSetCursorPosCallback(mWindow, [](GLFWwindow *window, double xpos, double ypos)
 	{
-		GlfwWindow* win{ static_cast<GlfwWindow *>(glfwGetWindowUserPointer(window)) };
+		auto win = reinterpret_cast<GlfwWindow *>(glfwGetWindowUserPointer(window));
 		win->handleMouse(xpos, ypos);
 	});
 
 	// Listen to keyboard events
 	glfwSetKeyCallback(mWindow, [](GLFWwindow *window, int key, int /* scancode */, int action, int /* mode */)
 	{
-		GlfwWindow *win{ static_cast<GlfwWindow *>(glfwGetWindowUserPointer(window)) };
+		auto*win = reinterpret_cast<GlfwWindow *>(glfwGetWindowUserPointer(window));
 		win->handleInput(key, action);
 	});
 
@@ -121,13 +126,31 @@ GlfwWindow::~GlfwWindow()
 		glfwDestroyWindow(mWindow);
 	}
 	glfwTerminate();
-	lst::Logger::log.Info("%s: destroyed\n", tag.c_str()); // TODO remove debug log
+	lst::Logger::log.Info("%s: destroyed", tag.c_str()); // TODO remove debug log
+}
+
+
+void GlfwWindow::handleMouse(const int action)
+{
+	if (action == GLFW_PRESS)
+	{
+		mAction = input::Action::PRESS;
+	}
+	else if (action == GLFW_RELEASE)
+	{
+		mAction = input::Action::RELEASE;
+	}
+	Window::handleInput(input::Input{ mType, mKey, mAction, mPosition });
 }
 
 
 void GlfwWindow::handleMouse(const double x, const double y) // TODO comment
 {
 	mCursor.setPosition(static_cast<float>(x), static_cast<float>(y));
+	mType = input::Type::MOTION;
+	mPosition.GetComponent()->x = static_cast<float>(x);
+	mPosition.GetComponent()->y = static_cast<float>(y);
+	Window::handleInput(input::Input{ mType, mKey, mAction, mPosition });
 	//mCamera->setYaw  (mCamera->getYaw()   - mCursor.getOffset().x * mCursor.getSensitivity() * mDeltaTime);
 	//mCamera->setPitch(mCamera->getPitch() + mCursor.getOffset().y * mCursor.getSensitivity() * mDeltaTime);
 	//mCamera->updateVectors();
@@ -137,7 +160,7 @@ void GlfwWindow::handleMouse(const double x, const double y) // TODO comment
 const input::Input GlfwWindow::pollInput()
 {
 	glfwPollEvents();
-	return input::Input{ mKey, mAction };
+	return input::Input{};
 }
 
 
@@ -175,7 +198,7 @@ void GlfwWindow::handleInput(const int key, const int action) // TODO comment
 	  case GLFW_KEY_RIGHT:
 		mKey = input::Key::RIGHT; break;
 	  case GLFW_KEY_F:
-		mKey = static_cast<input::Key>(-1);
+		mKey = input::Key::NONE;
 		if (action == GLFW_PRESS)
 		{
 			toggleFullscreen();
@@ -184,11 +207,12 @@ void GlfwWindow::handleInput(const int key, const int action) // TODO comment
 	  case GLFW_KEY_ESCAPE:
 	  case GLFW_KEY_Q: glfwSetWindowShouldClose(mWindow, GLFW_TRUE); break;
 	  default:
-		mKey = static_cast<input::Key>(-1);
+		mKey = input::Key::NONE;
 		break;
 	}
 
-	Window::handleInput(input::Input{ mKey, mAction });
+	mType = input::Type::KEY;
+	Window::handleInput(input::Input{ mType, mKey, mAction, mPosition });
 }
 
 

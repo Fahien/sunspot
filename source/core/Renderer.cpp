@@ -4,11 +4,12 @@
 #include <logspot/Logger.h>
 #include <MathSpot.h>
 
+#include "sunspot/input/Input.h"
 #include "core/Renderer.h"
 
 
+using namespace sunspot;
 namespace mst = mathspot;
-namespace sst = sunspot;
 namespace lst = logspot;
 
 
@@ -19,7 +20,7 @@ static float near{ 0.125f };
 static float far { 128.0f };
 
 
-sst::Renderer::Renderer(const std::string& db)
+Renderer::Renderer(const std::string& db)
 :	mLastFrameNs{ 0 }
 ,	mEglContext{ eglGetCurrentContext() }
 ,	mShaderProgram{ "shader/android.vert", "shader/android.frag" }
@@ -43,14 +44,14 @@ sst::Renderer::Renderer(const std::string& db)
 	// For every object get the name
 	for (size_t i{ 0 }; i < entitiesCount; ++i)
 	{
-		sst::Entity* pEntity{ mEntityRepository.LoadEntity(i+1) };
+		Entity* pEntity{ mEntityRepository.LoadEntity(i+1) };
 		lst::Logger::log.Info("Entity: %s", pEntity->GetName().c_str());
 		Add(pEntity);
 	}
 }
 
 
-sst::Renderer::~Renderer()
+Renderer::~Renderer()
 {
 	// The destructor may be called after the context has already been
 	// destroyed, in which case our objects have already been destroyed
@@ -64,9 +65,9 @@ sst::Renderer::~Renderer()
 }
 
 
-sst::Renderer* sst::Renderer::New(const std::string& db)
+Renderer* Renderer::New(const std::string& db)
 {
-	sst::Renderer* renderer{ new sst::Renderer{ db } };
+	Renderer* renderer{ new Renderer{ db } };
 	if (!renderer->init())
 	{
 		delete renderer;
@@ -76,28 +77,37 @@ sst::Renderer* sst::Renderer::New(const std::string& db)
 }
 
 
-void sst::Renderer::Add(Entity* pEntity)
+void Renderer::Add(Entity* pEntity)
 {
 	mEntities.push_back(pEntity);
 	mCollision.Add(*pEntity);
 }
 
 
-bool sst::Renderer::init()
+void Renderer::Handle(input::Input& input)
+{
+	for (auto& entity : mEntities)
+	{
+		entity->Handle(input);
+	}
+}
+
+
+bool Renderer::init()
 {
 	lst::Logger::log.Info("Using OpenGL ES 3.0 renderer");
 	return true;
 }
 
 
-void sst::Renderer::resize(int w, int h)
+void Renderer::resize(int w, int h)
 {
 	mLastFrameNs = 0;
 	glViewport(0, 0, w, h);
 }
 
 
-void sst::Renderer::render()
+void Renderer::render()
 {
 	// Calculate delta time in nanoseconds
 	step();
@@ -119,7 +129,7 @@ static const float deltaMin = 0.0025f;
 
 static const float deltaMax = 0.015625f;
 
-void sst::Renderer::step()
+void Renderer::step()
 {
 	timespec now;
 	clock_gettime(CLOCK_MONOTONIC, &now);
@@ -130,7 +140,7 @@ void sst::Renderer::step()
 }
 
 
-void sst::Renderer::draw()
+void Renderer::draw()
 {
 	mShaderProgram.use();
 	mCamera.update(0.125f, mShaderProgram);
@@ -147,12 +157,12 @@ void sst::Renderer::draw()
 }
 
 
-bool sst::Renderer::checkGlError(const char* funcName)
+bool Renderer::checkGlError(const char* funcName)
 {
 	GLint err = glGetError();
 	if (err != GL_NO_ERROR)
 	{
-		lst::Logger::log.Error("GL error after %s(): 0x%08x\n", funcName, err);
+		lst::Logger::log.Error("GL error after %s(): 0x%08x", funcName, err);
 		return true;
 	}
 	return false;

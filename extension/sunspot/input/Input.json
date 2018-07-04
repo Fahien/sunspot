@@ -3,12 +3,20 @@
 	"name": "Input",
 	"members": [
 		{
+			"name": "type",
+			"type": "input::Type"
+		},
+		{
 			"name": "key",
 			"type": "input::Key"
 		},
 		{
 			"name": "action",
 			"type": "input::Action"
+		},
+		{
+			"name": "position",
+			"type": "math::Vec2"
 		}
 	]
 }

@@ -16,6 +16,10 @@ namespace sunspot
 
 class GltfRenderer;
 
+namespace Input
+{
+class Input;
+}
 
 class Renderer
 {
@@ -26,6 +30,7 @@ class Renderer
 	static Renderer* New(const std::string& db);
 
 	void Add(Entity* pEntity);
+	void Handle(input::Input& input);
 
 	bool init();
 	void resize(int w, int h);

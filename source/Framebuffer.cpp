@@ -48,7 +48,7 @@ Framebuffer::Framebuffer(const mst::Size& size)
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
 	{
-		lst::Logger::log.Info("Stereoscopic Framebuffer [%dx%d]\n", mSize.width, mSize.height);
+		lst::Logger::log.Info("Stereoscopic Framebuffer [%dx%d]", mSize.width, mSize.height);
 	}
 	else
 	{

@@ -6,7 +6,7 @@
 #include <Graphics.h>
 
 #ifdef ANDROID
-# include <filespot/AssetManager.h>
+# include <filespot/Asset.h>
 namespace fst = filespot;
 #endif
 

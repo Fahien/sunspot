@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6)
-project(SunSpot)
+project(SunSpot LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD   11)
 set(CMAKE_CXX_STANDARD 14)
@@ -55,6 +55,7 @@ set(DEPENDENCY_INCLUDE_DIRS
 
 if(ANDROID)
 	set(DEPENDENCY_LIBRARIES GLESv3 android EGL log m)
+	list(APPEND DEPENDENCY_INCLUDE_DIRS ${ANDROID_NDK}/sources)
 else()
 	list(APPEND CMAKE_PREFIX_PATH
 		${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -67,7 +68,7 @@ else()
 		${OPENGL_LIBRARIES}
 		${GLEW_LIBRARIES}
 		${GLFW_LIBRARIES})
-	set(DEPENCENDY_INCLUDE_DIRS
+	list(APPEND DEPENDENCY_INCLUDE_DIRS
 		${OPENGL_INCLUDE_DIR}
 		${GLEW_INCLUDE_DIR}
 		${GLFW_INCLUDE_DIR})
@@ -168,7 +169,11 @@ set(SOURCES
 if(ANDROID)
 	set(ANDROID_SOURCES
 		source/core/SunSpot.cpp
-		source/core/Renderer.cpp)
+		source/core/Renderer.cpp
+		${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
+		source/core/android/Graphics.cpp
+		source/core/android/App.cpp
+		source/core/android/SunspotNativeActivity.cpp)
 else()
 	set(GLFW_SOURCES
 		source/Window.h
@@ -208,6 +213,11 @@ endif(WIN32)
 # SunSpot target
 if(ANDROID)
 	add_library(${SST_NAME} SHARED ${ANDROID_SOURCES})
+
+	# Export ANativeActivity_onCreate(),
+	# Refer to: https://github.com/android-ndk/ndk/issues/381.
+	set_target_properties(${SST_NAME} PROPERTIES LINK_FLAGS "-u ANativeActivity_onCreate")
+
 	add_custom_command(
 		TARGET PRE_BUILD
 			${SST_NAME}

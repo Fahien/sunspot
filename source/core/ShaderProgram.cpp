@@ -4,7 +4,7 @@
 #include <logspot/Logger.h>
 
 #ifdef ANDROID
-# include <filespot/AssetManager.h>
+# include <filespot/Asset.h>
 namespace fst = filespot;
 #endif
 
@@ -130,7 +130,7 @@ ShaderSource::ShaderSource(const char* p)
 ,	handle{ nullptr }
 {
 #ifdef ANDROID
-	fst::Asset file{ fst::AssetManager::assets.Open(p) };
+	fst::Asset file{ p };
 	char* content{ file.GetContent() };
 	size_t length{ file.GetLength() };
 	handle = static_cast<GLchar*>(malloc(length * sizeof(char)));

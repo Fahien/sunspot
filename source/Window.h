@@ -82,14 +82,17 @@ protected:
 	float mCurrentTime;
 	float mLastTime;
 	float mDeltaTime;
-	input::Key    mKey   { input::Key::UP };
+
+	input::Type   mType  { input::Type::INVALID   };
+	input::Key    mKey   { input::Key::NONE       };
 	input::Action mAction{ input::Action::RELEASE };
+	math::Vec2 mPosition{ 0.0f, 0.0f };
 
 	Cursor  mCursor;
 	Camera* mCamera;
 
 private:
-	void render(const float &deltaTime, const input::Input& input);
+	void render(const float &deltaTime);
 	void render3D(const float& deltaTime);
 	void renderGltf(const float& deltaTime);
 	void renderQuad(const float& deltaTime);

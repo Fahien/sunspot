@@ -31,7 +31,7 @@ Material::Material(const char* n)
 ,	hasDiffuseMap { false }
 ,	hasSpecularMap{ false }
 {
-	lst::Logger::log.Info("Material: created %s\n", n); // TODO remove debug log
+	lst::Logger::log.Info("Material: created %s", n); // TODO remove debug log
 }
 
 
@@ -47,7 +47,7 @@ Material::~Material()
 		glDeleteTextures(1, &specularMap);
 	}
 
-	lst::Logger::log.Info("Material: destroyed %s\n", name.c_str()); // TODO remove debug log
+	lst::Logger::log.Info("Material: destroyed %s", name.c_str()); // TODO remove debug log
 }
 
 

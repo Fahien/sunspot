@@ -8,7 +8,7 @@
 #include <logspot/Logger.h>
 #include <filespot/Ifstream.h>
 #include <filespot/File.h>
-#include <filespot/AssetManager.h>
+#include <filespot/Asset.h>
 #include <dataspot/DataSpot.h>
 
 #include "repository/ModelRepository.h"
@@ -27,7 +27,7 @@ namespace dst = dataspot;
 static void printGlString(const char* name, GLenum s)
 {
 	const char* v{ (const char*)glGetString(s) };
-	lst::Logger::log.Info("GL %s: %s\n", name, v);
+	lst::Logger::log.Info("GL %s: %s", name, v);
 }
 
 

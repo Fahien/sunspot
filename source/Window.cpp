@@ -71,12 +71,11 @@ void Window::handleInput(const input::Input i)
 
 void Window::render()
 {
-	input::Input i{ pollInput() };
-	render(computeDeltaTime(), i);
+	render(computeDeltaTime());
 }
 
 
-void Window::render(const float& deltaTime, const input::Input& input) // TODO comment
+void Window::render(const float& deltaTime) // TODO comment
 {
 	// std::cout << static_cast<int>(1.0f / deltaTime) << " "; // FPS
 	updateFrameSize();

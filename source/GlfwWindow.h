@@ -38,6 +38,7 @@ protected:
 	void render(const float& deltaTime);
 
 private:
+	void handleMouse(const int action);
 	void handleMouse(const double x, const double y);
 	void handleInput(const int key, const int action);
 

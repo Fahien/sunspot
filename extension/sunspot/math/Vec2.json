@@ -1,0 +1,14 @@
+{
+	"namespace": "math",
+	"name": "Vec2",
+	"members": [
+		{
+			"name": "x",
+			"type": "float"
+		},
+		{
+			"name": "y",
+			"type": "float"
+		}
+	]
+}
