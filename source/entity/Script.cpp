@@ -44,13 +44,13 @@ void Script::Initialize()
 {
 	if (mEntity.GetTransform())
 	{
-		Dictionary dict{};
+		Module utils{ "utils" };
+		Dictionary dict{ utils.Invoke("Map") };
 		dict.SetItem("transform", *mEntity.mTransform);
 		dict.SetItem("rigidbody", *mEntity.mRigidbody);
-		Tuple args{ dict };
 
 		lst::Logger::log.Info("%s.init", mModule.GetName().c_str());
-		mModule.CallFunction("init", args);
+		mModule.Invoke("init", Tuple{ dict });
 
 		// TODO refactor this
 		mEntity.mModel->GetNode().matrix.ScaleX(mEntity.mTransform->GetScale().GetX());
@@ -76,7 +76,7 @@ Script::Script(Entity& entity)
 	Tuple args{ dict };
 
 	lst::Logger::log.Info("%s.init", mModule.GetName().c_str());
-	mModule.CallFunction("init", args);
+	mModule.Invoke("init", args);
 
 	mEntity.mModel->GetNode().matrix.ScaleX(mEntity.mTransform->GetScale().GetX());
 	mEntity.mModel->GetNode().matrix.ScaleY(mEntity.mTransform->GetScale().GetY());
@@ -93,24 +93,25 @@ Script::Script(Entity& entity)
 void Script::Handle(const input::Input& input)
 {
 	Tuple args{ input };
-	mModule.CallFunction("handle", args);
+	mModule.Invoke("handle", args);
 }
 
 
 void Script::Collide(Entity& other)
 {
-	Dictionary dict{};
+	Module utils{ "utils" };
+	Dictionary dict{ utils.Invoke("Map") };
 	dict.SetItem("rigidbody", *other.mRigidbody);
 	Tuple args{ dict };
 
-	mModule.CallFunction("collide", args);
+	mModule.Invoke("collide", args);
 }
 
 
 void Script::Update(const float delta)
 {
 	mArgs.SetItem(0, delta);
-	mModule.CallFunction("update", mArgs);
+	mModule.Invoke("update", mArgs);
 	
 	mEntity.mModel->GetNode().matrix = mst::Mat4::identity;
 	mEntity.mModel->GetNode().matrix.ScaleX(mEntity.mTransform->GetScale().GetX());
