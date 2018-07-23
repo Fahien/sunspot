@@ -25,6 +25,7 @@
 #include "GlfwWindow.h"
 
 using namespace std;
+using namespace pyspot;
 
 namespace sst = sunspot;
 namespace mst = mathspot;
@@ -113,7 +114,13 @@ int main(int argc, char **argv)
 		decorated = true;
 
 		// Initialize PySpot
-		sst::Script::Initialize(projectDir + "/" + projectName + "/script");
+		wstring wProjectDir;
+		wProjectDir.assign(projectDir.begin(), projectDir.end());
+		
+		wstring wProjectName;
+		wProjectName.assign(projectName.begin(), projectName.end());
+
+		sst::Script::Initialize(wProjectDir + _T("/") + wProjectName + _T("/script"));
 
 		sst::GlfwWindow window{ SST_TITLE, windowSize, decorated, stereoscopic };
 

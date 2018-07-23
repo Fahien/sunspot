@@ -24,7 +24,7 @@ namespace lst = logspot;
 std::unique_ptr<Interpreter> Script::interpreter{ nullptr };
 
 
-void Script::Initialize(const std::string& scriptPath)
+void Script::Initialize(const tstring& scriptPath)
 {
 	if (!interpreter)
 	{

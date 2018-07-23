@@ -85,48 +85,13 @@ source_group("shader" FILES ${SHADERS})
 
 
 # Generate the Sunspot Extension header
-set(SST_EXTENSION_NAME "Sunspot")
-set(SST_EXTENSION_JSON ${PROJECT_SOURCE_DIR}/extension/sunspot/${SST_EXTENSION_NAME}.json)
-set(SST_EXTENSION_HEADER ${PROJECT_BINARY_DIR}/include/sunspot/extension/${SST_EXTENSION_NAME}.h)
-set(SST_EXTENSION_SOURCE ${PROJECT_BINARY_DIR}/src/sunspot/extension/${SST_EXTENSION_NAME}.cpp)
-add_custom_command(
-	OUTPUT ${SST_EXTENSION_HEADER} ${SST_EXTENSION_SOURCE}
-	COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-extension.py ${SST_EXTENSION_JSON} -h ${SST_EXTENSION_HEADER}
-	COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-extension.py ${SST_EXTENSION_JSON} ${SST_EXTENSION_SOURCE}
-	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/pyspot/script
-	COMMENT "Generating ${SST_EXTENSION_HEADER}"
-	VERBATIM)
-
-
-# Get all the folders under test/extension/pytest
-set(EXTENSION_NAME sunspot)
-set(EXTENSION_PATH ${PROJECT_SOURCE_DIR}/extension/${EXTENSION_NAME})
-file(GLOB NAMESPACES LIST_DIRECTORY true ${EXTENSION_PATH}/*)
-foreach(NAMESPACE ${NAMESPACES})
-	if(IS_DIRECTORY ${NAMESPACE})
-		# Get all the jsons and generate headers
-		file(GLOB COMPONENTS ${NAMESPACE}/*json)
-		foreach(COMPONENT ${COMPONENTS})
-			get_filename_component(NAMESPACE_NAME ${NAMESPACE} NAME_WE)
-			get_filename_component(NAME ${COMPONENT} NAME_WE)
-			list(APPEND COMPONENT_NAMES ${NAME})
-			set(COMPONENT_HEADER ${PROJECT_BINARY_DIR}/include/${EXTENSION_NAME}/${NAMESPACE_NAME}/${NAME}.h)
-			list(APPEND COMPONENT_HEADERS ${COMPONENT_HEADER})
-			add_custom_command(
-				OUTPUT ${COMPONENT_HEADER}
-				COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/pyspot/script/generate-component.py ${EXTENSION_NAME} ${COMPONENT} ${COMPONENT_HEADER}
-				WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/pyspot/script
-				COMMENT "Generating ${COMPONENT_HEADER}"
-				VERBATIM)
-		endforeach()
-	endif()
-endforeach()
-
+set(PST_SCRIPT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${PYSPOT}/script)
+include(${CMAKE_CURRENT_SOURCE_DIR}/${PYSPOT}/cmake/ExtensionGenerator.cmake)
+generate_extension(${CMAKE_CURRENT_SOURCE_DIR}/extension Sunspot)
+add_definitions(-DPYTHON_VERSION=${PYTHON_VERSION})
 
 set(SOURCES
-	${COMPONENT_HEADERS}
-	${SST_EXTENSION_HEADER}
-	${SST_EXTENSION_SOURCE}
+	${EXTENSION_SOURCES}
 	source/Graphics.h
 	source/core/ShaderProgram.cpp
 	source/core/String.cpp
