@@ -1,24 +1,24 @@
 [submodule "soil"]
-	path = soil
+	path = module/soil
 	url = https://github.com/kbranigan/Simple-OpenGL-Image-Library.git
 [submodule "mathspot"]
-	path = mathspot
+	path = module/mathspot
 	url = https://github.com/Fahien/mathspot.git
 [submodule "pyspot"]
-	path = pyspot
+	path = module/pyspot
 	url = https://github.com/Fahien/pyspot.git
 [submodule "dataspot"]
-	path = dataspot
+	path = module/dataspot
 	url = https://github.com/Fahien/dataspot.git
 [submodule "logspot"]
-	path = logspot
+	path = module/logspot
 	url = https://github.com/Fahien/logspot
 [submodule "gltfspot"]
-	path = gltfspot
+	path = module/gltfspot
 	url = https://github.com/Fahien/gltfspot.git
 [submodule "hitspot"]
-	path = hitspot
+	path = module/hitspot
 	url = https://github.com/Fahien/hitspot.git
 [submodule "filespot"]
-	path = filespot
+	path = module/filespot
 	url = https://github.com/Fahien/filespot.git

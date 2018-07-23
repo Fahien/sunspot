@@ -1,6 +1,6 @@
 # Add FileSpot
 set(FILESPOT filespot)
-set(FILESPOT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/${FILESPOT}/include)
+set(FILESPOT_INCLUDE_DIR ${MODULE_DIR}/${FILESPOT}/include)
 set(FILESPOT_LIBRARY ${FILESPOT})
 if(ANDROID)
 	set(FILESPOT_LIBRARY ${FILESPOT_LIBRARY} android)
@@ -11,5 +11,5 @@ set(FILESPOT_LIBRARIES ${FILESPOT_LIBRARY})
 
 # Check FileSpot
 if(NOT TARGET ${FILESPOT})
-	add_subdirectory(${CMAKE_SOURCE_DIR}/${FILESPOT})
+	add_subdirectory(${MODULE_DIR}/${FILESPOT})
 endif()

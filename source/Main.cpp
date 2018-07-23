@@ -36,8 +36,8 @@ static int scale{ 1 };
 static mst::Size windowSize{ 960, 540 };
 
 static float fov{ 45.0f };
-static float near{ 0.125f };
-static float far{ 32.0f };
+static float kNear{ 0.125f };
+static float kFar{ 32.0f };
 
 static const string tag{ "Main" };
 static const string dataDir{ "data/" };
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
 
 		sst::GlfwWindow window{ SST_TITLE, windowSize, decorated, stereoscopic };
 
-		sst::Camera camera{ fov, static_cast<float>(windowSize.width) / windowSize.height, near, far };
+		sst::Camera camera{ fov, static_cast<float>(windowSize.width) / windowSize.height, kNear, kFar };
 		camera.setPosition(0.0f, -32.0f, 0.0f);
 		camera.LookAt(0.0f, 0.0f, 0.0f);
 		window.setCamera(&camera);

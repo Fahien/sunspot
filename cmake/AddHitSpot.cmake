@@ -1,6 +1,6 @@
 # Add HitSpot
 set(HITSPOT hitspot)
-set(HITSPOT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/${HITSPOT}/include)
+set(HITSPOT_INCLUDE_DIR ${MODULE_DIR}/${HITSPOT}/include)
 set(HITSPOT_LIBRARY ${HITSPOT})
 
 set(HITSPOT_INCLUDE_DIRS ${HITSPOT_INCLUDE_DIR})
@@ -8,5 +8,5 @@ set(HITSPOT_LIBRARIES ${HITSPOT_LIBRARY})
 
 # Check HitSpot
 if(NOT TARGET ${HITSPOT})
-	add_subdirectory(${CMAKE_SOURCE_DIR}/${HITSPOT})
+	add_subdirectory(${MODULE_DIR}/${HITSPOT})
 endif()

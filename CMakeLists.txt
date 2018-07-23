@@ -20,6 +20,9 @@ option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 # Python 3
 find_package(PythonInterp 3)
 
+# Modules
+set(MODULE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/module)
+
 include(AddLogSpot)
 include(AddMathSpot)
 include(AddFileSpot)
@@ -30,8 +33,9 @@ include(AddHitSpot)
 
 # SOIL
 set(SOIL soil)
-add_subdirectory(${SOIL})
-set(SOIL_INCLUDE_DIR ${SOIL}/src)
+set(SOIL_DIR ${MODULE_DIR}/${SOIL})
+add_subdirectory(${SOIL_DIR})
+set(SOIL_INCLUDE_DIR ${SOIL_DIR}/src)
 set(SOIL_LIBRARIES SOIL)
 
 # Version number
@@ -85,8 +89,8 @@ source_group("shader" FILES ${SHADERS})
 
 
 # Generate the Sunspot Extension header
-set(PST_SCRIPT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${PYSPOT}/script)
-include(${CMAKE_CURRENT_SOURCE_DIR}/${PYSPOT}/cmake/ExtensionGenerator.cmake)
+set(PST_SCRIPT_DIR ${MODULE_DIR}/${PYSPOT}/script)
+include(${MODULE_DIR}/${PYSPOT}/cmake/ExtensionGenerator.cmake)
 generate_extension(${CMAKE_CURRENT_SOURCE_DIR}/extension Sunspot)
 add_definitions(-DPYTHON_VERSION=${PYTHON_VERSION})
 

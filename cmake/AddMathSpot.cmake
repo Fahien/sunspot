@@ -1,6 +1,6 @@
 # Add MathSpot
 set(MATHSPOT mathspot)
-set(MATHSPOT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/${MATHSPOT}/include)
+set(MATHSPOT_INCLUDE_DIR ${MODULE_DIR}/${MATHSPOT}/include)
 set(MATHSPOT_LIBRARY ${MATHSPOT})
 if(ANDROID)
 	set(MATHSPOT_LIBRARY ${MATHSPOT_LIBRARY} m)
@@ -11,5 +11,5 @@ set(MATHSPOT_LIBRARIES ${MATHSPOT_LIBRARY})
 
 # Check MathSpot
 if(NOT TARGET ${MATHSPOT})
-	add_subdirectory(${CMAKE_SOURCE_DIR}/${MATHSPOT})
+	add_subdirectory(${MODULE_DIR}/${MATHSPOT})
 endif()

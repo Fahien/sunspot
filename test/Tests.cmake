@@ -1,7 +1,7 @@
 include(CTest)
 
 set(GLTF_OUT ${CMAKE_CURRENT_SOURCE_DIR}/${GLTFSPOT}/test/model)
-include(${GLTFSPOT}/test/GltfFiles.cmake)
+include(${MODULE_DIR}/${GLTFSPOT}/test/GltfFiles.cmake)
 
 function(make_test TEST_NAME)
 	# Sources
