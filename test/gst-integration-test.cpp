@@ -2,6 +2,8 @@
 #include <string>
 
 #include "view/GltfRenderer.h"
+#include <pyspot/Interpreter.h>
+
 #include "GlfwWindow.h"
 #include "ShaderProgram.h"
 #include "Light.h"
@@ -9,6 +11,7 @@
 
 using namespace std;
 using namespace sunspot;
+using namespace pyspot;
 using namespace mathspot;
 using namespace gltfspot;
 
@@ -28,6 +31,7 @@ int main(int argc, char** argv)
 
 	try
 	{
+		Interpreter interpreter{ };
 		GlfwWindow window{ title.c_str(), windowSize, true, false };
 
 		float fov{ 45.0f };
