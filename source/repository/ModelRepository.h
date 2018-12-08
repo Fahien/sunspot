@@ -2,16 +2,14 @@
 #define SST_MODELREPOSITORY_H_
 
 #include <memory>
-#include <map>
+#include <unordered_map>
 #include <string>
-#include <Gltf.h>
 
 #include "Mesh.h"
 #include "WavefrontObject.h"
 #include "view/GltfRenderer.h"
 #include "sunspot/component/Model.h"
 
-namespace gst = gltfspot;
 
 
 namespace sunspot
@@ -30,8 +28,8 @@ class ModelRepository
 
   private:
 	const std::string mProjectDir;
-	std::map<const int, component::Model> mModels {};
-	std::map<std::string, GltfRenderer> mRenderers{};
+	std::unordered_map<int, component::Model> mModels;
+	std::unordered_map<std::string, GltfRenderer> mRenderers;
 };
 
 }

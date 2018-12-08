@@ -14,7 +14,7 @@ Camera::Camera(const float fov, const float aspectRatio, const float near, const
 	, mView{ mst::Mat4::identity }
 	, mProjection{}
 	, mPitch{ 0.0f }
-	, mYaw{ -mst::pi / 2.0f }
+	, mYaw{ -mst::kPi / 2.0f }
 	, mPosition{ 0.0f, 0.0f, -1.0f }
 	, mDirection{ 0.0f, 0.0f, 1.0f }
 	, mUp{ 0.0f, 1.0f, 0.0f }
@@ -23,7 +23,7 @@ Camera::Camera(const float fov, const float aspectRatio, const float near, const
 	, mVelocity{}
 	, mVelocityFactor{ 8.0f }
 {
-	float cotfov{ 1.0f / static_cast<float>(std::tan(fov * mst::pi / 360.0f)) };
+	float cotfov{ 1.0f / static_cast<float>(std::tan(fov)) };
 	mProjection[0] = cotfov / aspectRatio;
 	mProjection[5] = cotfov;
 	mProjection[10] = (near + far) / (near - far);
@@ -52,7 +52,7 @@ void Camera::LookAt(const float x, const float y, const float z)
 	mDirection.x = x - mPosition.x;
 	mDirection.y = y - mPosition.y;
 	mDirection.z = z - mPosition.z;
-	mDirection.normalize();
+	mDirection.Normalize();
 	updateVectors();
 }
 
@@ -75,11 +75,11 @@ void Camera::updateVectors()
 	}
 	else
 	{
-		mRight = mst::Vec3::cross(mDirection, mWorldUp);
-		mRight.normalize();
+		mRight = mst::Vec3::Cross(mDirection, mWorldUp);
+		mRight.Normalize();
 	}
-	mUp = mst::Vec3::cross(mRight, mDirection);
-	mUp.normalize();
+	mUp = mst::Vec3::Cross(mRight, mDirection);
+	mUp.Normalize();
 }
 
 

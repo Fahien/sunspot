@@ -3,8 +3,9 @@
 
 #include <vector>
 
-#include <Gltf.h>
-#include <view/GltfPrimitive.h>
+#include <gltfspot/Gltf.h>
+
+#include "view/GltfPrimitive.h"
 
 namespace gst = gltfspot;
 

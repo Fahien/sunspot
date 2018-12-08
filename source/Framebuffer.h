@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 #include <string>
-#include <MathSpot.h>
+#include <mathspot/Math.h>
 
 #include "Graphics.h"
 

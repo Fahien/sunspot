@@ -6,6 +6,7 @@
 #endif
 
 #include "view/GltfRenderer.h"
+#include "view/GltfCamera.h"
 #include "Graphics.h"
 #include "Window.h"
 #include "core/ShaderProgram.h"
@@ -18,6 +19,7 @@
 #include "component/Model.h"
 
 using namespace sunspot;
+using namespace mathspot;
 
 
 const std::string Window::tag{ "Window" };
@@ -35,7 +37,7 @@ Window::Window(const char* title, const mst::Size windowSize, const bool decorat
 ,	mLastTime{ 0.0f }
 ,	mDeltaTime{ 0.0f }
 ,	mCursor{}
-,	mCamera { nullptr }
+,	m_pCamera { nullptr }
 ,	mBaseProgram{ nullptr }
 ,	mLight{ nullptr }
 ,	mObjs{}
@@ -60,11 +62,41 @@ void Window::initGlew()
 }
 
 
-void Window::handleInput(const input::Input i)
+void Window::handleInput( input::Input i )
 {
-	for (auto& entity : mEntities)
+	if ( i.action == input::Action::PRESS )
 	{
-		entity->Handle(i);
+		if ( i.key == input::Key::A )
+		{
+			m_Camera->GetTransform()->position.x += -1.0;
+		}
+		if ( i.key == input::Key::S )
+		{
+			m_Camera->GetTransform()->position.z += -1.0;
+		}
+		if ( i.key == input::Key::W )
+		{
+			m_Camera->GetTransform()->position.z += 1.0;
+		}
+		if ( i.key == input::Key::D )
+		{
+			m_Camera->GetTransform()->position.x += 1.0;
+		}
+		if ( i.key == input::Key::Q )
+		{
+			m_Camera->GetTransform()->rotation.x += 0.25;
+			logspot::Logger::log.Info( "Camera Rotation X: %f", m_Camera->GetTransform()->rotation.x );
+		}
+		if ( i.key == input::Key::E )
+		{
+			m_Camera->GetTransform()->rotation.x += -0.25;
+			logspot::Logger::log.Info( "Camera Rotation X: %f", m_Camera->GetTransform()->rotation.x );
+		}
+	}
+
+	for ( auto& entity : mEntities )
+	{
+		entity->Handle( i );
 	}
 }
 
@@ -106,7 +138,7 @@ void Window::renderGltf(const float& deltaTime)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
 	mBaseProgram->use();
-	mCamera->update(deltaTime, *mBaseProgram);
+	//mCamera->update(deltaTime, *mBaseProgram);
 	mLight->Update(*mBaseProgram);
 
 	mGltfRenderer->Draw(*mBaseProgram);
@@ -120,17 +152,19 @@ void Window::render3D(const float& deltaTime) // TODO comment
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
 	mBaseProgram->use();
-	mCamera->update(deltaTime, *mBaseProgram);
 	mLight->Update(*mBaseProgram);
-	for (WavefrontObject *obj : mObjs) { obj->draw(*mBaseProgram); }
-	for (Entity* entity : mEntities)
+
+	m_Camera->Get<component::Camera>()->get().Update(*mBaseProgram);
+
+	for (auto pEntity : mEntities)
 	{
-		if (entity->GetModel())
+		if (pEntity->GetModel())
 		{
-			auto pModel = entity->GetModel();
+			auto pModel = pEntity->GetModel();
 			pModel->GetRenderer().Draw(*mBaseProgram, &pModel->GetNode());
 		}
 	}
+
 	if (mGltfRenderer)
 	{
 		mGltfRenderer->Draw(*mBaseProgram);
@@ -166,7 +200,7 @@ void Window::renderStereoscopic(const float& deltaTime)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
 	mBaseProgram->use();
-	mCamera->update(deltaTime, *mBaseProgram);
+	m_pCamera->Update(*mBaseProgram);
 	mLight->Update(*mBaseProgram);
 	for (WavefrontObject *obj : mObjs) { obj->draw(*mBaseProgram); }
 	mFramebuffer->unbind();

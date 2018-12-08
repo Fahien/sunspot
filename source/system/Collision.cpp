@@ -44,8 +44,8 @@ void system::Collision::Update()
 		// Apply transform to the box
 		// TODO rotation and scale
 		// Fix Y-Z incoherency
-		box.x = pTransform->GetPosition().GetX();
-		box.y = pTransform->GetPosition().GetZ();
+		box.x = pTransform->position.x;
+		box.y = pTransform->position.z;
 	}
 
 	mSystem.Update();

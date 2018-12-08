@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-#include <MathSpot.h>
+#include <mathspot/Math.h>
 
 #include "Graphics.h"
 #include "Texture.h"

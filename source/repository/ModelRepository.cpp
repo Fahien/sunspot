@@ -1,8 +1,8 @@
 #include <stdexcept>
 #include <dataspot/DataSpot.h>
-#include <Gltf.h>
+#include <gltfspot/Gltf.h>
 
-#include "ModelRepository.h"
+#include "repository/ModelRepository.h"
 
 using namespace std;
 using namespace sunspot;

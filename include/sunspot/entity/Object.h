@@ -8,6 +8,8 @@
 namespace sunspot
 {
 
+class Entity;
+
 class Object
 {
 public:
@@ -15,16 +17,21 @@ public:
 	Object(int id);
 	Object(std::string& name);
 	Object(int id, std::string& name);
+	virtual ~Object() {}
 
-	inline int GetId() { return mId; }
-	inline void SetId(int id) { mId = id; }
+	int GetId() { return m_Id; }
+	void SetId(int id) { m_Id = id; }
+	Entity* GetParent() const { return m_pParent; }
 
-	inline std::string& GetName() { return mName; }
-	inline void SetName(std::string& name) { mName = name; }
+	std::string& GetName() { return m_Name; }
+	void SetName(std::string& name) { m_Name = name; }
+	void SetParent( Entity* pParent ) { m_pParent = pParent; }
 
 private:
-	int mId;
-	std::string mName;
+	int m_Id;
+	std::string m_Name;
+
+	Entity* m_pParent { nullptr };
 };
 
 }

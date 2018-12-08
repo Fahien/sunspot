@@ -112,7 +112,10 @@ JNIEXPORT void JNICALL Java_me_fahien_sunspot_SunSpotLib_init(JNIEnv *env, jobje
 
 	// Initialize PySpot
 	std::string path{ libPath + ":" + scriptPath };
-	sst::Script::Initialize(path);
+	pst::tstring tPath(path.length(), ' ');
+	std::copy( path.begin(), path.end(), tPath.begin() );
+	lst::Logger::log.Info("Script path in %ls", tPath.c_str());
+	sst::Script::Initialize( tPath );
 
 	// Renderer
 	printGlString("Version", GL_VERSION);

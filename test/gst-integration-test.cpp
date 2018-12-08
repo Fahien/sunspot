@@ -1,28 +1,31 @@
-#include <Gltf.h>
 #include <string>
 
-#include "view/GltfRenderer.h"
+#include <gltfspot/Gltf.h>
 #include <pyspot/Interpreter.h>
+#include <logspot/Logger.h>
+
+#include "view/GltfRenderer.h"
 
 #include "GlfwWindow.h"
 #include "ShaderProgram.h"
 #include "Light.h"
-#include "Camera.h"
+#include "view/GltfCamera.h"
 
 using namespace std;
 using namespace sunspot;
 using namespace pyspot;
 using namespace mathspot;
 using namespace gltfspot;
+using namespace logspot;
 
 
 /// Test GltfSpoT module with SunSpoT
-int main(int argc, char** argv)
+int main( int argc, char** argv )
 {
 	/// Check arguments
-	if (argc < 2)
+	if ( argc < 2 )
 	{
-		cerr << "Usage: " << argv[0] << " modelPath" << endl;
+		Logger::log.Error( "Usage: %s <model/path>\n", argv[0] );
 		return EXIT_FAILURE;
 	}
 
@@ -31,26 +34,29 @@ int main(int argc, char** argv)
 
 	try
 	{
-		Interpreter interpreter{ };
+		Interpreter interpreter{};
 		GlfwWindow window{ title.c_str(), windowSize, true, false };
 
-		float fov{ 45.0f };
+		float aspectRatio{ static_cast<float>( windowSize.width ) / windowSize.height };
+		float fov{ radians( 45.0f ) };
 		float near{ 0.125f };
 		float far{ 256.0f };
-		Camera camera{ fov, static_cast<float>(windowSize.width) / windowSize.height, near, far };
-		camera.setPosition(-2.0f, 0.0f, -6.0f);
-		window.setCamera(&camera);
+
+		GltfPerspectiveCamera camera{ aspectRatio, fov, near, far };
+		camera.Translate( Vec3{ 0.0f, 0.0f, 6.0f } );
+		window.SetCamera( &camera );
 
 		// Load a Gltf model and upload the model into GPU buffers
 		string modelPath{ argv[1] };
-		Gltf gltf{ Gltf::Load(modelPath) };
-		GltfRenderer renderer{ move(gltf) };
-		window.AddGltf(&renderer);
+		Gltf gltf{ Gltf::Load( modelPath ) };
+		GltfRenderer renderer{ move( gltf ) };
+		window.AddGltf( &renderer );
+
 		/// Render to texture
 		/// Compare it with a reference
 
 		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
-		window.setBaseProgram(&baseProgram);
+		window.setBaseProgram( &baseProgram );
 
 		//DirectionalLight light{ Color{ 1.0f, 1.0f, 1.0f } };
 		//light.SetDirection(0.0f, 0.0f, 4.0f);
@@ -62,22 +68,22 @@ int main(int argc, char** argv)
 		//light.GetSpecular().g /= divFactor / 2;
 		//light.GetSpecular().b /= divFactor / 2;
 		PointLight light{ Color{ 1.0f, 1.0f, 1.0f } };
-		light.SetPosition(4.0f, 1.0f, -2.0f);
-		window.setLight(&light);
+		light.SetPosition( 4.0f, 1.0f, -2.0f );
+		window.setLight( &light );
 
 		// TODO render to texture
 		// TODO Compare rendered texture to gold image
 
 		window.loop();
 	}
-	catch (const GraphicException& e)
+	catch ( const GraphicException& e )
 	{
-		cerr << e.what() << endl;
+		Logger::log.Error( "Exception: %s\n", e.what() );
 		return EXIT_FAILURE;
 	}
-	catch (const exception& e)
+	catch ( const exception& e )
 	{
-		cerr << e.what() << endl;
+		Logger::log.Error( "Exception: %s\n", e.what() );
 		return EXIT_FAILURE;
 	}
 

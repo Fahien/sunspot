@@ -1,8 +1,10 @@
 #ifndef SST_GLTFRENDERER_H_
 #define SST_GLTFRENDERER_H_
 
-#include <MathSpot.h>
-#include <Gltf.h>
+#include <mathspot/Math.h>
+#include <gltfspot/Gltf.h>
+
+#include <unordered_map>
 
 #include "Graphics.h"
 #include "view/GltfMesh.h"
@@ -24,7 +26,7 @@ public:
 	GltfRenderer(GltfRenderer&& other);
 	~GltfRenderer();
 
-	gst::Gltf& GetGltf() { return mGltf; }
+	gst::Gltf& GetGltf() { return m_Gltf; }
 
 	void Draw(const ShaderProgram& shader);
 
@@ -33,8 +35,8 @@ public:
 	          const mst::Mat4& transform = mst::Mat4::identity);
 
 private:
-	gst::Gltf mGltf;
-	std::map<gst::Gltf::Mesh*, GltfMesh> mMeshes {};
+	gst::Gltf m_Gltf;
+	std::unordered_map<gst::Gltf::Mesh*, GltfMesh> m_Meshes {};
 };
 
 }

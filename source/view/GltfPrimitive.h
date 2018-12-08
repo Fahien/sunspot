@@ -5,7 +5,7 @@
 #include "Material.h"
 #include "Texture.h"
 
-#include <Gltf.h>
+#include <gltfspot/Gltf.h>
 
 namespace mst = mathspot;
 namespace gst = gltfspot;

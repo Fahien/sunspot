@@ -1,10 +1,11 @@
+#include <tuple>
 
 #include "view/GltfRenderer.h"
 #include "view/GltfPrimitive.h"
 
 #include "Graphics.h"
 #include "ShaderProgram.h"
-#include "MathSpot.h"
+#include <mathspot/Math.h>
 
 using namespace std;
 using namespace mathspot;
@@ -13,19 +14,19 @@ using namespace sunspot;
 
 
 GltfRenderer::GltfRenderer(Gltf&& gltf)
-:	mGltf{ move(gltf) }
+:	m_Gltf { move(gltf) }
 {
-	for (Gltf::Mesh& m : mGltf.GetMeshes())
+	for (auto& m : m_Gltf.GetMeshes())
 	{
-		GltfMesh mesh{ mGltf, m };
-		mMeshes.emplace(&m, move(mesh));
+		GltfMesh mesh { m_Gltf, m };
+		m_Meshes.emplace(&m, move(mesh));
 	}
 }
 
 
 GltfRenderer::GltfRenderer(GltfRenderer&& other)
-: mGltf           { move(other.mGltf)      }
-, mMeshes         { move(other.mMeshes)    }
+: m_Gltf   { move(other.m_Gltf)   }
+, m_Meshes { move(other.m_Meshes) }
 {}
 
 
@@ -38,7 +39,8 @@ void GltfRenderer::Draw(const ShaderProgram& shader,
                         const Mat4& transform)
 {
 	// Current transform
-	Mat4 tTransform{ pNode->matrix };
+	Mat4 tTransform { pNode->matrix };
+	tTransform.Translate(pNode->translation);
 	tTransform.Rotate(pNode->rotation);
 	tTransform = transform * tTransform;
 
@@ -51,7 +53,7 @@ void GltfRenderer::Draw(const ShaderProgram& shader,
 	// Render the node
 	if (pNode->pMesh)
 	{
-		auto& mesh = mMeshes[pNode->pMesh];
+		auto& mesh = m_Meshes[pNode->pMesh];
 		for (auto& primitive : mesh.GetPrimitives())
 		{
 			primitive.SetMatrix(tTransform);
@@ -63,7 +65,8 @@ void GltfRenderer::Draw(const ShaderProgram& shader,
 
 void GltfRenderer::Draw(const ShaderProgram& shader)
 {
-	auto pScene = mGltf.GetScene();
+	auto pScene = m_Gltf.GetScene();
+
 	for(auto pNode : pScene->nodes)
 	{
 		Draw(shader, pNode);

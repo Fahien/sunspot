@@ -2,7 +2,7 @@
 
 #include <filespot/Ifstream.h>
 #include <logspot/Logger.h>
-#include <MathSpot.h>
+#include <mathspot/Math.h>
 
 #include "sunspot/input/Input.h"
 #include "core/Renderer.h"

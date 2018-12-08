@@ -33,7 +33,7 @@ android {
     }
     sourceSets {
         main {
-            jniLibs.srcDirs = ['D:/Users/7oni/Laboratory/SunSpoT/sunspot/pyspot/lib']
+            jniLibs.srcDirs = ['../../module/pyspot/lib/android']
         }
     }
     externalNativeBuild {

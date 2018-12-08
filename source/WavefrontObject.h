@@ -4,7 +4,7 @@
 #include <exception>
 #include <vector>
 #include <memory>
-#include <MathSpot.h>
+#include <mathspot/Math.h>
 #include <filespot/Ifstream.h>
 
 #include "Graphics.h"

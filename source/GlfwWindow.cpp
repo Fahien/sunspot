@@ -148,8 +148,8 @@ void GlfwWindow::handleMouse(const double x, const double y) // TODO comment
 {
 	mCursor.setPosition(static_cast<float>(x), static_cast<float>(y));
 	mType = input::Type::MOTION;
-	mPosition.GetComponent()->x = static_cast<float>(x);
-	mPosition.GetComponent()->y = static_cast<float>(y);
+	mPosition.x = static_cast<float>(x);
+	mPosition.y = static_cast<float>(y);
 	Window::handleInput(input::Input{ mType, mKey, mAction, mPosition });
 	//mCamera->setYaw  (mCamera->getYaw()   - mCursor.getOffset().x * mCursor.getSensitivity() * mDeltaTime);
 	//mCamera->setPitch(mCamera->getPitch() + mCursor.getOffset().y * mCursor.getSensitivity() * mDeltaTime);
@@ -181,22 +181,16 @@ void GlfwWindow::handleInput(const int key, const int action) // TODO comment
 
 	switch (key)
 	{
-	  case GLFW_KEY_W:
-		mKey = input::Key::W; break;
-	  case GLFW_KEY_S:
-		mKey = input::Key::S; break;
-	  case GLFW_KEY_A:
-		mKey = input::Key::A; break;
-	  case GLFW_KEY_D:
-		mKey = input::Key::D; break;
-	  case GLFW_KEY_UP:
-		mKey = input::Key::UP; break;
-	  case GLFW_KEY_LEFT:
-		mKey = input::Key::LEFT; break;
-	  case GLFW_KEY_DOWN:
-		mKey = input::Key::DOWN; break;
-	  case GLFW_KEY_RIGHT:
-		mKey = input::Key::RIGHT; break;
+	  case GLFW_KEY_A: mKey = input::Key::A; break;
+	  case GLFW_KEY_Q: mKey = input::Key::Q; break;
+	  case GLFW_KEY_W: mKey = input::Key::W; break;
+	  case GLFW_KEY_E: mKey = input::Key::E; break;
+	  case GLFW_KEY_S: mKey = input::Key::S; break;
+	  case GLFW_KEY_D: mKey = input::Key::D; break;
+	  case GLFW_KEY_UP: mKey = input::Key::UP; break;
+	  case GLFW_KEY_LEFT: mKey = input::Key::LEFT; break;
+	  case GLFW_KEY_RIGHT: mKey = input::Key::RIGHT; break;
+	  case GLFW_KEY_DOWN: mKey = input::Key::DOWN; break;
 	  case GLFW_KEY_F:
 		mKey = input::Key::NONE;
 		if (action == GLFW_PRESS)
@@ -205,7 +199,7 @@ void GlfwWindow::handleInput(const int key, const int action) // TODO comment
 		}
 		break;
 	  case GLFW_KEY_ESCAPE:
-	  case GLFW_KEY_Q: glfwSetWindowShouldClose(mWindow, GLFW_TRUE); break;
+		glfwSetWindowShouldClose(mWindow, GLFW_TRUE); break;
 	  default:
 		mKey = input::Key::NONE;
 		break;

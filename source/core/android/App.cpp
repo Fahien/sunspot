@@ -118,8 +118,10 @@ App::App(android_app* app)
 	}
 
 	// Initialize PySpot
-	std::string path{ libPath + ":" + scriptPath };
-	Script::Initialize(path);
+	auto path = libPath + ":" + scriptPath;
+	pst::tstring tPath(path.length(), ' ');
+	std::copy( path.begin(), path.end(), tPath.begin() );
+	Script::Initialize( tPath );
 
 }
 
@@ -239,8 +241,8 @@ int32_t App::handleInput(android_app* app, AInputEvent* input)
 	input::Action action{ input::Action::PRESS };
 	if (type == input::Type::MOTION)
 	{
-		auto action = AMotionEvent_getAction(input);
-		unsigned int flags = action & AMOTION_EVENT_ACTION_MASK;
+		auto act = AMotionEvent_getAction(input);
+		unsigned int flags = act & AMOTION_EVENT_ACTION_MASK;
 		switch (flags) {
 			case AMOTION_EVENT_ACTION_DOWN:
 			{
@@ -259,7 +261,7 @@ int32_t App::handleInput(android_app* app, AInputEvent* input)
 	// Position
 	auto x = AMotionEvent_getX(input, 0);
 	auto y = AMotionEvent_getY(input, 0);
-	math::Vec2 position{ x, y };
+	mathspot::Vec2 position{ x, y };
 
 	input::Key key = input::Key::A;
 	input::Input i{ type, key, action, position };
@@ -275,7 +277,7 @@ int32_t App::handleInput(android_app* app, AInputEvent* input)
 
 bool App::Handle(input::Input& input)
 {
-	if (input.GetType() == input::Type::MOTION)
+	if (input.type == input::Type::MOTION)
 	{
 		mRenderer->Handle(input);
 		return true;

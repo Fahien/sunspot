@@ -1,7 +1,7 @@
 #ifndef SST_LIGHT_H_
 #define SST_LIGHT_H_
 
-#include <MathSpot.h>
+#include <mathspot/Math.h>
 
 #include "Graphics.h"
 #include "Color.h"

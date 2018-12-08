@@ -1,4 +1,4 @@
-#include <Gltf.h>
+#include <gltfspot/Gltf.h>
 
 #include "ShaderProgram.h"
 #include "view/GltfPrimitive.h"

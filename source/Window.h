@@ -5,12 +5,14 @@
 #include <stdexcept>
 #include <vector>
 #include <memory>
+#include <optional>
 
-#include "MathSpot.h"
+#include <mathspot/Math.h>
 #include "Graphics.h"
 #include "Cursor.h"
 #include "sunspot/input/Input.h"
 #include "system/Collision.h"
+#include "sunspot/component/Camera.h"
 
 namespace mst = mathspot;
 
@@ -26,6 +28,7 @@ class Camera;
 class Entity;
 
 class GltfRenderer;
+class GltfCamera;
 
 
 class GlewException : public GraphicException
@@ -55,15 +58,16 @@ public:
 	inline void setDepthProgram(const ShaderProgram* depthProgram) { mDepthProgram = depthProgram; }
 
 
-	inline void setCamera(Camera* camera) { mCamera = camera; }
-	inline void setFramebuffer(const Framebuffer* framebuffer) { mFramebuffer = framebuffer; }
+	void SetCamera( GltfCamera* camera ) { m_pCamera = camera; }
+	void SetCamera( Entity& camera ) { m_Camera = &camera; }
+	void setFramebuffer(const Framebuffer* framebuffer) { mFramebuffer = framebuffer; }
 
 	virtual void loop() = 0;
 
 protected:
 	static void initGlew();
 	void render();
-	void handleInput(const input::Input in);
+	void handleInput(input::Input in);
 
 	virtual void toggleFullscreen() = 0;
 	virtual const float& computeDeltaTime() = 0;
@@ -86,10 +90,12 @@ protected:
 	input::Type   mType  { input::Type::INVALID   };
 	input::Key    mKey   { input::Key::NONE       };
 	input::Action mAction{ input::Action::RELEASE };
-	math::Vec2 mPosition{ 0.0f, 0.0f };
+	mst::Vec2 mPosition{ 0.0f, 0.0f };
 
 	Cursor  mCursor;
-	Camera* mCamera;
+
+	GltfCamera* m_pCamera;
+	Entity* m_Camera;
 
 private:
 	void render(const float &deltaTime);

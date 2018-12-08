@@ -1,7 +1,7 @@
 #ifndef SST_CAMERA_H
 #define SST_CAMERA_H
 
-#include <MathSpot.h>
+#include <mathspot/Math.h>
 
 namespace mst = mathspot;
 

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 project(SunSpot LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD   11)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
 	set(ANDROID TRUE)
@@ -19,6 +19,7 @@ option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 # Python 3
 find_package(PythonInterp 3)
+add_definitions("-DPYTHON_VERSION=${PYTHON_VERSION}")
 
 # Modules
 set(MODULE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/module)
@@ -88,14 +89,42 @@ set(SHADERS
 source_group("shader" FILES ${SHADERS})
 
 
-# Generate the Sunspot Extension header
-set(PST_SCRIPT_DIR ${MODULE_DIR}/${PYSPOT}/script)
-include(${MODULE_DIR}/${PYSPOT}/cmake/ExtensionGenerator.cmake)
-generate_extension(${CMAKE_CURRENT_SOURCE_DIR}/extension Sunspot)
-add_definitions(-DPYTHON_VERSION=${PYTHON_VERSION})
+# Pyspot extension files
+set(GEN_SOURCES
+	${CMAKE_CURRENT_BINARY_DIR}/include/pyspot/Bindings.h
+	${CMAKE_CURRENT_BINARY_DIR}/include/pyspot/Extension.h
+	${CMAKE_CURRENT_BINARY_DIR}/src/pyspot/Bindings.cpp
+	${CMAKE_CURRENT_BINARY_DIR}/src/pyspot/Extension.cpp
+)
+# Join function
+FUNCTION(JOIN VALUES GLUE OUTPUT)
+	STRING(REGEX REPLACE "([^\\]|^);" "\\1${GLUE}" _TMP_STR "${VALUES}")
+	STRING(REGEX REPLACE "[\\](.)" "\\1" _TMP_STR "${_TMP_STR}") #fixes escaping
+	SET(${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
+ENDFUNCTION()
+
+# Sources to export
+set(EXPORT_SOURCES
+	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/component/Rigidbody.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/component/Transform.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Action.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Input.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Key.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Type.h
+	${MATHSPOT_INCLUDE_DIR}/mathspot/Math.h
+)
+# Generation command
+JOIN("${DEPENDENCY_INCLUDE_DIRS};${MATHSPOT_INCLUDE_DIRS}" "\" -I\"" GEN_INCLUDE_DIRS)
+set(GEN_INCLUDE_DIRS "\"${GEN_INCLUDE_DIRS}\"")
+add_custom_command(OUTPUT ${GEN_SOURCES}
+	COMMAND pywrap.exe
+	ARGS ${EXPORT_SOURCES} -- -I${GEN_INCLUDE_DIRS} -xc++ -std=c++14 -DPYTHON_VERSION=${PYTHON_VERSION}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	COMMENT "Generating Bindings and Extension"
+)
 
 set(SOURCES
-	${EXTENSION_SOURCES}
+	${GEN_SOURCES}
 	source/Graphics.h
 	source/core/ShaderProgram.cpp
 	source/core/String.cpp
@@ -108,6 +137,7 @@ set(SOURCES
 	source/Material.cpp
 	source/Mesh.h
 	source/Mesh.cpp
+	source/component/Camera.cpp
 	source/entity/Script.cpp
 	source/entity/Object.cpp
 	source/entity/Entity.cpp
@@ -115,6 +145,8 @@ set(SOURCES
 	source/repository/ModelRepository.cpp
 	source/repository/EntityRepository.h
 	source/repository/EntityRepository.cpp
+	source/view/GltfCamera.h
+	source/view/GltfCamera.cpp
 	source/view/GltfPrimitive.h
 	source/view/GltfPrimitive.cpp
 	source/view/GltfMesh.h

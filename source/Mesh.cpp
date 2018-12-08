@@ -62,15 +62,15 @@ Mesh::~Mesh()
 
 void Mesh::ApplyTransform(Transform& pTransform)
 {
-	transform.ScaleX(pTransform.GetScale().GetX());
-	transform.ScaleY(pTransform.GetScale().GetY());
-	transform.ScaleZ(pTransform.GetScale().GetZ());
-	transform.TranslateX(pTransform.GetPosition().GetX());
-	transform.TranslateY(pTransform.GetPosition().GetY());
-	transform.TranslateZ(pTransform.GetPosition().GetZ());
-	transform.RotateX(pTransform.GetRotation().GetX());
-	transform.RotateY(pTransform.GetRotation().GetY());
-	transform.RotateZ(pTransform.GetRotation().GetZ());
+	transform.ScaleX(pTransform.scale.x);
+	transform.ScaleY(pTransform.scale.y);
+	transform.ScaleZ(pTransform.scale.z);
+	transform.TranslateX(pTransform.position.x);
+	transform.TranslateY(pTransform.position.y);
+	transform.TranslateZ(pTransform.position.z);
+	transform.RotateX(pTransform.rotation.x);
+	transform.RotateY(pTransform.rotation.y);
+	transform.RotateZ(pTransform.rotation.z);
 }
 
 

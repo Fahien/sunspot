@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 
+#include "view/GltfCamera.h"
 
 namespace dataspot
 {
@@ -29,10 +30,10 @@ class EntityRepository
   private:
 	Entity* loadEntity(const int id);
 
-	dst::DataSpot& mData;
-	ModelRepository& mModelRepository;
+	dst::DataSpot& m_Data;
+	ModelRepository& m_ModelRepository;
 
-	std::map<const int, Entity*> mEntities;
+	std::map<const int, Entity*> m_Entities;
 };
 
 

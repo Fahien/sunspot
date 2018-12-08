@@ -1,7 +1,7 @@
 #ifndef SST_INPUT_H
 #define SST_INPUT_H
 
-#include <MathSpot.h>
+#include <mathspot/Math.h>
 
 namespace mst = mathspot;
 

@@ -13,7 +13,6 @@
 #include "Light.h"
 #include "ShaderProgram.h"
 #include "Quad.h"
-#include "Camera.h"
 #include "Framebuffer.h"
 
 #include "WavefrontObject.h"
@@ -22,18 +21,20 @@
 #include "sunspot/entity/Entity.h"
 #include "repository/ModelRepository.h"
 #include "repository/EntityRepository.h"
+
+#include "sunspot/component/Camera.h"
 #include "GlfwWindow.h"
+#include "view/GltfCamera.h"
 
 using namespace std;
 using namespace pyspot;
-
-namespace sst = sunspot;
-namespace mst = mathspot;
-namespace lst = logspot;
-namespace dst = dataspot;
+using namespace sunspot;
+using namespace mathspot;
+using namespace logspot;
+using namespace dataspot;
 
 static int scale{ 1 };
-static mst::Size windowSize{ 960, 540 };
+static Size windowSize{ 960, 540 };
 
 static float fov{ 45.0f };
 static float kNear{ 0.125f };
@@ -47,7 +48,7 @@ static const string projectDir{ "project" };
 
 void printLogo()
 {
-	lst::Logger::log.Info("%s\n",
+	Logger::log.Info("%s\n",
 " ________  ___  ___  ________   ________  ________  ________  ___________ \n\
 |\\   ____\\|\\  \\|\\  \\|\\   ___  \\|\\   ____\\|\\   __  \\|\\   __  \\|\\____   ___\\ \n\
 \\ \\  \\___|\\ \\  \\ \\  \\ \\  \\  \\  \\ \\  \\___|\\ \\  \\|\\  \\ \\  \\|\\  \\|___ \\  \\__| \n\
@@ -84,7 +85,7 @@ int main(int argc, char **argv)
 			if (++it != arguments.end())
 			{
 				scale = stoi(*it);
-				lst::Logger::log.Info("Scale [%d]", scale);
+				Logger::log.Info("Scale [%d]", scale);
 			}
 			else
 			{
@@ -104,11 +105,11 @@ int main(int argc, char **argv)
 			{
 				projectName = *it;
 			}
-			lst::Logger::log.Info("Project [%s]", projectName.c_str());
+			Logger::log.Info("Project [%s]", projectName.c_str());
 		}
 
 		// Load database
-		dst::DataSpot dataspot{ projectDir + "/" + projectName + "/" + projectName + ".data" };
+		dst::DataSpot dataspot { projectDir + "/" + projectName + "/" + projectName + ".data" };
 		windowSize.width  = stoi(dataspot.GetConfigValue("window.width"));
 		windowSize.height = stoi(dataspot.GetConfigValue("window.height"));
 		decorated = true;
@@ -120,19 +121,22 @@ int main(int argc, char **argv)
 		wstring wProjectName;
 		wProjectName.assign(projectName.begin(), projectName.end());
 
-		sst::Script::Initialize(wProjectDir + _T("/") + wProjectName + _T("/script"));
+		Script::Initialize(wProjectDir + _T("/") + wProjectName + _T("/script"));
 
-		sst::GlfwWindow window{ SST_TITLE, windowSize, decorated, stereoscopic };
+		GlfwWindow window{ SST_TITLE, windowSize, decorated, stereoscopic };
+		float aspectRatio{ static_cast<float>(windowSize.width) / windowSize.height };
 
-		sst::Camera camera{ fov, static_cast<float>(windowSize.width) / windowSize.height, kNear, kFar };
-		camera.setPosition(0.0f, -32.0f, 0.0f);
-		camera.LookAt(0.0f, 0.0f, 0.0f);
-		window.setCamera(&camera);
+		{
+			GltfPerspectiveCamera camera{ aspectRatio, fov, kNear, kFar };
+			camera.Translate(Vec3{ 0.0f, 0.0f, 32.0f });
+			//camera.LookAt(0.0f, 0.0f, 0.0f);
+			window.SetCamera( &camera );
+		}
 
-		sst::ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
+		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
 		window.setBaseProgram(&baseProgram);
 
-		//sst::DirectionalLight light{ sst::Color{ 1.0f, 1.0f, 1.0f } };
+		//DirectionalLight light{ Color{ 1.0f, 1.0f, 1.0f } };
 		//light.SetDirection(0.0f, 0.0f, 4.0f);
 		//float divFactor = 1.0f;
 		//light.GetAmbient().r /= divFactor;
@@ -141,15 +145,15 @@ int main(int argc, char **argv)
 		//light.GetSpecular().r /= divFactor / 2;
 		//light.GetSpecular().g /= divFactor / 2;
 		//light.GetSpecular().b /= divFactor / 2;
-		sst::PointLight light{ sst::Color{ 18.0f, 18.0f, 18.0f } };
+		PointLight light{ Color{ 18.0f, 18.0f, 18.0f } };
 		light.SetPosition(0.0f, 16.0f, 0.0f);
 		window.setLight(&light);
 
 		// Inject dependencies into window
-		sst::Framebuffer framebuffer{ window.getFrameSize() / 2 };
-		sst::ShaderProgram quadProgram { "shader/quad.vert", "shader/quad.frag" };
-		sst::ShaderProgram depthProgram{ "shader/quad.vert", "shader/depth.frag" };
-		sst::Quad quad{};
+		Framebuffer framebuffer{ window.getFrameSize() / 2 };
+		ShaderProgram quadProgram { "shader/quad.vert", "shader/quad.frag" };
+		ShaderProgram depthProgram{ "shader/quad.vert", "shader/depth.frag" };
+		Quad quad{};
 		if (stereoscopic)
 		{
 			window.setQuadProgram(&quadProgram);
@@ -159,36 +163,45 @@ int main(int argc, char **argv)
 		}
 
 		string projectPath{ projectDir + "/" + projectName + "/" };
-		sst::ModelRepository modelRepository{ projectPath };
-		sst::EntityRepository entityRepository{ dataspot, modelRepository };
+		ModelRepository modelRepository{ projectPath };
+		EntityRepository entityRepository { dataspot, modelRepository };
 
 		// Read a set of objects from dataspot
-		constexpr int entitiesCount = 3;
+		constexpr int entitiesCount = 4;
 		// For every object get the name
 		for (int i{ 0 }; i < entitiesCount; ++i)
 		{
-			sst::Entity* entity{ entityRepository.LoadEntity(i+1) };
-			//shared_ptr<sst::Entity> pEntity{ entity };
+			Entity* entity { entityRepository.LoadEntity( i + 1 ) };
+
+			if ( auto camera = entity->Get<component::Camera>() )
+			{
+				if ( auto pPerspectiveCam = dynamic_cast<component::PerspectiveCamera*>( &camera->get() ) )
+				{
+					pPerspectiveCam->SetAspectRatio( aspectRatio );
+				}
+				window.SetCamera( *entity );
+			}
+
 			window.AddEntity(entity);
 		}
 
 		window.loop(); // GameLoop.it
 
 
-		lst::Logger::log.Info("%s version %d.%d successful", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
+		Logger::log.Info("%s version %d.%d successful", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
 		return EXIT_SUCCESS;
 	}
-	catch (const sst::GraphicException& e)
+	catch (const GraphicException& e)
 	{
-		lst::Logger::log.Error("%s: %s", tag.c_str(), e.what());
+		Logger::log.Error("%s: %s", tag.c_str(), e.what());
 	}
 	catch (const dst::Exception& e)
 	{
-		lst::Logger::log.Error("%s: %s", tag.c_str(), e.ToString());
+		Logger::log.Error("%s: %s", tag.c_str(), e.ToString());
 	}
 	catch (const runtime_error& e)
 	{
-		lst::Logger::log.Error("%s: %s", tag.c_str(), e.what());
+		Logger::log.Error("%s: %s", tag.c_str(), e.what());
 	}
 	return EXIT_FAILURE;
 }

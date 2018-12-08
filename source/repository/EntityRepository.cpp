@@ -12,6 +12,7 @@
 #include "sunspot/component/Collider.h"
 #include "sunspot/component/Transform.h"
 #include "sunspot/component/Rigidbody.h"
+#include "sunspot/component/Camera.h"
 #include "Mesh.h"
 
 #include "EntityRepository.h"
@@ -23,18 +24,18 @@ using namespace pyspot;
 using namespace dataspot;
 
 
-EntityRepository::EntityRepository(DataSpot& data, ModelRepository& modelRepo)
-:	mData{ data }
-,	mModelRepository{ modelRepo }
-,	mEntities{}
+EntityRepository::EntityRepository( DataSpot& data, ModelRepository& modelRepo )
+:	m_Data { data }
+,	m_ModelRepository { modelRepo }
+,	m_Entities {}
 {}
 
 
 EntityRepository::~EntityRepository()
 {
-	for (auto& pair : mEntities)
+	for ( auto& pair : m_Entities )
 	{
-		if (pair.second)
+		if ( pair.second )
 		{
 			delete pair.second;
 		}
@@ -42,22 +43,18 @@ EntityRepository::~EntityRepository()
 }
 
 
-Entity* EntityRepository::LoadEntity(const int id)
+Entity* EntityRepository::LoadEntity( const int id )
 {
-	auto it = mEntities.find(id);
-	if (it != mEntities.end())
+	// Check if already loaded
+	auto it = m_Entities.find( id );
+	if (it != m_Entities.end())
 	{
 		return it->second;
 	}
 
-	Entity* pEntity{ loadEntity(id) };
-	mEntities.emplace(id, pEntity);
+	Entity* pEntity{ loadEntity( id ) };
+	m_Entities.emplace( id, pEntity );
 	return pEntity;
-
-	//Statement& stmt{ mData.Prepare("SELECT name FROM main.entity WHERE id = ?;") };
-	//stmt.Bind(id);
-	//stmt.Step();
-	//return stmt.GetText(0);
 }
 
 
@@ -65,7 +62,7 @@ Entity* EntityRepository::LoadEntity(const int id)
 Entity* EntityRepository::loadEntity(const int id)
 {
 	// Get the entity
-	Statement& stmtEntity{ mData.Prepare("SELECT name FROM main.entity WHERE id = ?;") };
+	Statement& stmtEntity{ m_Data.Prepare("SELECT name FROM main.entity WHERE id = ?;") };
 	stmtEntity.Bind(id);
 	stmtEntity.Step();
 
@@ -75,7 +72,7 @@ Entity* EntityRepository::loadEntity(const int id)
 
 	// Get the components
 	string query{ "SELECT component_id, component_type FROM main.entity_component WHERE entity_id = ?;" };
-	Statement& stmtComponents{ mData.Prepare(query) };
+	Statement& stmtComponents{ m_Data.Prepare(query) };
 	stmtComponents.Bind(id);
 
 	while (true)
@@ -92,7 +89,7 @@ Entity* EntityRepository::loadEntity(const int id)
 
 			// Get the component
 			string query{ "SELECT * FROM main." + type + " WHERE id = ?;" };
-			Statement& stmtComponent{ mData.Prepare(query) };
+			Statement& stmtComponent{ m_Data.Prepare(query) };
 			stmtComponent.Bind(id);
 			stmtComponent.Step();
 
@@ -105,19 +102,19 @@ Entity* EntityRepository::loadEntity(const int id)
 				float x{ static_cast<float>(stmtComponent.GetDouble(1)) };
 				float y{ static_cast<float>(stmtComponent.GetDouble(2)) };
 				float z{ static_cast<float>(stmtComponent.GetDouble(3)) };
-				Vec3 position{ x, y, z };
+				mathspot::Vec3 position{ x, y, z };
 
 				// Get rotation.xyz
 				x = static_cast<float>(stmtComponent.GetDouble(4));
 				y = static_cast<float>(stmtComponent.GetDouble(5));
 				z = static_cast<float>(stmtComponent.GetDouble(6));
-				Vec3 rotation{ x, y, z };
+				mathspot::Vec3 rotation{ x, y, z };
 
 				// Get scale.xyz
 				x = static_cast<float>(stmtComponent.GetDouble(7));
 				y = static_cast<float>(stmtComponent.GetDouble(8));
 				z = static_cast<float>(stmtComponent.GetDouble(9));
-				Vec3 scale{ x, y, z };
+				mathspot::Vec3 scale{ x, y, z };
 
 				// Construct the component
 				Transform* transform = new Transform{ id, position, rotation, scale };
@@ -133,7 +130,7 @@ Entity* EntityRepository::loadEntity(const int id)
 				float x{ static_cast<float>(stmtComponent.GetDouble(1)) };
 				float y{ static_cast<float>(stmtComponent.GetDouble(2)) };
 				float z{ static_cast<float>(stmtComponent.GetDouble(3)) };
-				Vec3 velocity{ x, y, z };
+				mathspot::Vec3 velocity{ x, y, z };
 
 				// Construct che component
 				Rigidbody* rigidbody = new Rigidbody{ id, velocity };
@@ -164,7 +161,7 @@ Entity* EntityRepository::loadEntity(const int id)
 				string name{ stmtComponent.GetText(2) };
 
 				// Get the mesh
-				auto& model = mModelRepository.GetModel(id, path, name);
+				auto& model = m_ModelRepository.GetModel(id, path, name);
 
 				// Construct the component
 				pEntity->SetModel(&model);
@@ -188,6 +185,18 @@ Entity* EntityRepository::loadEntity(const int id)
 				Collider* collider{ new Collider{ id, name, *pEntity, move(box) } };
 				pEntity->SetCollider(collider);
 			}
+			else if ( type == "camera" )
+			{
+				int id { stmtComponent.GetInteger( 0 ) };
+				string name { stmtComponent.GetText( 1 ) };
+
+				auto pCamera = &component::PerspectiveCamera::Default();
+				pCamera->SetId( id );
+				pCamera->SetName( name );
+				pCamera->SetParent( pEntity );
+
+				pEntity->Add<component::Camera>( *pCamera );
+			}
 		}
 
 	// If the entity has a Mesh and a Transform
@@ -196,15 +205,15 @@ Entity* EntityRepository::loadEntity(const int id)
 		// Apply the transform to the mesh
 		auto& node      = pEntity->GetModel()->GetNode();
 		auto pTransform = pEntity->GetTransform();
-		node.matrix.ScaleX(pTransform->GetScale().GetX());
-		node.matrix.ScaleY(pTransform->GetScale().GetY());
-		node.matrix.ScaleZ(pTransform->GetScale().GetZ());
-		node.matrix.TranslateX(pTransform->GetPosition().GetX());
-		node.matrix.TranslateY(pTransform->GetPosition().GetY());
-		node.matrix.TranslateZ(pTransform->GetPosition().GetZ());
-		node.matrix.RotateX(pTransform->GetRotation().GetX());
-		node.matrix.RotateY(pTransform->GetRotation().GetY());
-		node.matrix.RotateZ(pTransform->GetRotation().GetZ());
+		node.matrix.ScaleX(pTransform->scale.x);
+		node.matrix.ScaleY(pTransform->scale.y);
+		node.matrix.ScaleZ(pTransform->scale.z);
+		node.matrix.TranslateX(pTransform->position.x);
+		node.matrix.TranslateY(pTransform->position.y);
+		node.matrix.TranslateZ(pTransform->position.z);
+		node.matrix.RotateX(pTransform->rotation.x);
+		node.matrix.RotateY(pTransform->rotation.y);
+		node.matrix.RotateZ(pTransform->rotation.z);
 	}
 
 	if (pEntity->GetScript())

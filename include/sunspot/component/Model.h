@@ -1,7 +1,7 @@
 #ifndef SST_MODEL_H_
 #define SST_MODEL_H_
 
-#include <Gltf.h>
+#include <gltfspot/Gltf.h>
 
 #include "view/GltfRenderer.h"
 
