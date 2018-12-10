@@ -1,41 +1,43 @@
-#ifndef SST_TEXTURE_H_
-#define SST_TEXTURE_H_
+#pragma once
 
 #include <stdexcept>
 #include <string>
-#include <Graphics.h>
 
 #ifdef ANDROID
 # include <filespot/Asset.h>
 namespace fst = filespot;
 #endif
 
+#include "sunspot/system/graphic/Gl.h"
+#include "sunspot/system/graphic/Exception.h"
 
-namespace sunspot {
 
-
-class TextureException : public GraphicException
+namespace sunspot::graphic
 {
-public:
+
+
+class TextureException : public graphic::Exception
+{
+  public:
 	TextureException(const std::string& tag, const std::string& message)
-		: GraphicException{tag + ": " + message } {}
+		: graphic::Exception{tag + ": " + message } {}
 };
 
 
 class SoilData
 {
-public:
+  public:
 	static const std::string tag;
 
 	SoilData(const std::string& path);
 	~SoilData();
 
-	inline GLsizei  getWidth ()   { return mWidth;    }
-	inline GLsizei  getHeight()   { return mHeight;   }
-	inline int      getChannels() { return mChannels; }
-	inline GLubyte* getHandle()   { return mHandle;   }
+	GLsizei  getWidth ()   { return mWidth;    }
+	GLsizei  getHeight()   { return mHeight;   }
+	int      getChannels() { return mChannels; }
+	GLubyte* getHandle()   { return mHandle;   }
 
-private:
+  private:
 	GLsizei  mWidth;
 	GLsizei  mHeight;
 	int      mChannels;
@@ -48,7 +50,7 @@ private:
 
 class TextureData
 {
-public:
+  public:
 	static const std::string tag;
 
 	TextureData(const std::string& path);
@@ -70,8 +72,9 @@ static const char* textureTypeNames[] = { "diffuse", "specular" };
 const char* getTextureTypeName(const TextureType& type);
 
 
-class Texture {
-public:
+class Texture
+{
+  public:
 	Texture(const std::string& path, const TextureType& type);
 	~Texture();
 
@@ -80,13 +83,11 @@ public:
 	inline GLuint&      getId()   { return mId;   }
 	inline TextureType& getType() { return mType; }
 
-private:
+  private:
 	GLuint      mId;
 	std::string mName;
 	TextureType mType;
 };
 
 
-}
-
-#endif // SST_TEXTURE_H_
+} // namespace sunspot::graphic

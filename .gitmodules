@@ -22,3 +22,6 @@
 [submodule "module/gltfspot"]
 	path = module/gltfspot
 	url = https://github.com/Fahien/gltfspot.git
+[submodule "module/imgui"]
+	path = module/imgui
+	url = https://github.com/ocornut/imgui.git

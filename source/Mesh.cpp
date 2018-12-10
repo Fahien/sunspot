@@ -3,7 +3,6 @@
 
 #include <logspot/Logger.h>
 
-#include "ShaderProgram.h"
 #include "sunspot/component/Transform.h"
 #include "Mesh.h"
 
@@ -18,7 +17,7 @@ namespace lst = logspot;
 Mesh::Mesh(const string&         name,
            vector<Vertex>&       v,
            vector<GLuint>&       i,
-           shared_ptr<Material>& material)
+           shared_ptr<graphic::Material>& material)
 :	vertices { v }
 ,	indices  { i }
 ,	transform{ mst::Mat4::identity }
@@ -74,10 +73,10 @@ void Mesh::ApplyTransform(Transform& pTransform)
 }
 
 
-void Mesh::Draw(const ShaderProgram& shader) const
+void Mesh::Draw(const graphic::shader::Program& shader) const
 {
 	// Bind transform matrix
-	glUniformMatrix4fv(shader.getLocation("model"), 1, GL_FALSE, transform.matrix);
+	glUniformMatrix4fv(shader.GetLocation("model"), 1, GL_FALSE, transform.matrix);
 	if (mMaterial)
 	{
 		mMaterial->bind(shader);

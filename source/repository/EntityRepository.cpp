@@ -164,7 +164,7 @@ Entity* EntityRepository::loadEntity(const int id)
 				auto& model = m_ModelRepository.GetModel(id, path, name);
 
 				// Construct the component
-				pEntity->SetModel(&model);
+				pEntity->Add<component::Model>( model );
 			}
 			else if (type == "collider")
 			{
@@ -190,7 +190,13 @@ Entity* EntityRepository::loadEntity(const int id)
 				int id { stmtComponent.GetInteger( 0 ) };
 				string name { stmtComponent.GetText( 1 ) };
 
-				auto pCamera = &component::PerspectiveCamera::Default();
+				auto width = 50.0f;
+				auto r = width / 2.0f;
+				auto l = -r;
+				auto t = r * 540.0f / 960.0f;
+				auto b = -t;
+
+				auto pCamera = new component::OrthographicCamera(r, l, t, b);
 				pCamera->SetId( id );
 				pCamera->SetName( name );
 				pCamera->SetParent( pEntity );
@@ -200,20 +206,20 @@ Entity* EntityRepository::loadEntity(const int id)
 		}
 
 	// If the entity has a Mesh and a Transform
-	if (pEntity->GetModel() && pEntity->GetTransform())
+	if ( pEntity->Has<component::Model>() && pEntity->GetTransform() )
 	{
 		// Apply the transform to the mesh
-		auto& node      = pEntity->GetModel()->GetNode();
+		auto& node      = pEntity->Get<component::Model>()->get().GetNode();
 		auto pTransform = pEntity->GetTransform();
-		node.matrix.ScaleX(pTransform->scale.x);
-		node.matrix.ScaleY(pTransform->scale.y);
-		node.matrix.ScaleZ(pTransform->scale.z);
-		node.matrix.TranslateX(pTransform->position.x);
-		node.matrix.TranslateY(pTransform->position.y);
-		node.matrix.TranslateZ(pTransform->position.z);
-		node.matrix.RotateX(pTransform->rotation.x);
-		node.matrix.RotateY(pTransform->rotation.y);
-		node.matrix.RotateZ(pTransform->rotation.z);
+		node.matrix.ScaleX( pTransform->scale.x );
+		node.matrix.ScaleY( pTransform->scale.y );
+		node.matrix.ScaleZ( pTransform->scale.z );
+		node.matrix.TranslateX( pTransform->position.x );
+		node.matrix.TranslateY( pTransform->position.y );
+		node.matrix.TranslateZ( pTransform->position.z );
+		node.matrix.RotateX( pTransform->rotation.x );
+		node.matrix.RotateY( pTransform->rotation.y );
+		node.matrix.RotateZ( pTransform->rotation.z );
 	}
 
 	if (pEntity->GetScript())

@@ -1,23 +1,21 @@
-#ifndef SST_MODEL_H_
-#define SST_MODEL_H_
+#pragma once
 
 #include <gltfspot/Gltf.h>
 
+#include "sunspot/entity/Object.h"
 #include "view/GltfRenderer.h"
 
 namespace gst = gltfspot;
 
 
-namespace sunspot
+namespace sunspot::component
 {
 
-namespace component
-{
 
-class Model
+class Model : public Object
 {
   public:
-	Model(gst::Gltf::Node& node, GltfRenderer& renderer)
+	Model( gst::Gltf::Node& node, GltfRenderer& renderer )
 	: mNode     { node     }
 	, mRenderer { renderer }
 	{}
@@ -32,8 +30,5 @@ class Model
 	GltfRenderer&    mRenderer;
 };
 
-}
 
-}
-
-#endif // SST_MODEL_H_
+} // namespace sunspot::component

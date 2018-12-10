@@ -1,20 +1,19 @@
 #ifndef SST_GLTPRIMITIVE_H_
 #define SST_GLTPRIMITIVE_H_
 
-#include "Graphics.h"
-#include "Material.h"
-#include "Texture.h"
-
 #include <gltfspot/Gltf.h>
+
+#include "sunspot/system/graphic/Gl.h"
+#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphic/Material.h"
+#include "sunspot/system/graphic/Texture.h"
+
 
 namespace mst = mathspot;
 namespace gst = gltfspot;
 
 namespace sunspot
 {
-
-
-class ShaderProgram;
 
 
 class GltfPrimitive
@@ -34,7 +33,7 @@ public:
 
 	void SetMatrix(const mst::Mat4& matrix);
 
-	void Draw(const ShaderProgram& shader) const;
+	void Draw(const graphic::shader::Program& shader) const;
 
 private:
 	void readIndices(gst::Gltf& model, gst::Gltf::Mesh::Primitive& primitive);
@@ -54,9 +53,9 @@ private:
 
 	bool mHasVertexColors{};
 
-	Material mMaterial{};
+	graphic::Material mMaterial{};
 
-	std::map<gst::Gltf::Texture*, Texture> mTextures{};
+	std::map<gst::Gltf::Texture*, graphic::Texture> mTextures{};
 
 };
 

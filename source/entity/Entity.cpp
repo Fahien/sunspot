@@ -39,15 +39,15 @@ Entity::~Entity()
 }
 
 
-void Entity::SetModel(component::Model* model)
-{
-	if (mModel == model)
-	{
-		return;
-	}
-
-	mModel = model;
-}
+//void Entity::SetModel(component::Model* model)
+//{
+//	if (mModel == model)
+//	{
+//		return;
+//	}
+//
+//	mModel = model;
+//}
 
 
 void Entity::SetCollider(component::Collider* collider)

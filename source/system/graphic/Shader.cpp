@@ -1,3 +1,5 @@
+#include "sunspot/system/graphic/Shader.h"
+
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
@@ -8,7 +10,6 @@
 namespace fst = filespot;
 #endif
 
-#include "core/ShaderProgram.h"
 
 using namespace sunspot;
 namespace lst = logspot;
@@ -22,71 +23,75 @@ namespace lst = logspot;
 #define SCALEROT_ATTRIB 2
 #define OFFSET_ATTRIB 3
 
+
+namespace sunspot::graphic::shader
+{
+
 static const char VERTEX_SHADER[]   = "shaders/base.vert";
 static const char FRAGMENT_SHADER[] = "shaders/base.frag";
 
-ShaderProgram::ShaderProgram(const char* depth)
-:	mBaseProgram { glCreateProgram() }
-,	mDepthProgram{ glCreateProgram() }
+Program::Program(const char* depth)
+:	m_BaseProgram { glCreateProgram() }
+,	m_DepthProgram{ glCreateProgram() }
 {
-	ShaderSource vertexSource  { VERTEX_SHADER   };
-	ShaderSource fragmentSource{ FRAGMENT_SHADER };
+	Source vertexSource  { VERTEX_SHADER   };
+	Source fragmentSource{ FRAGMENT_SHADER };
 
-	GLuint vertexShader  { compileShader(GL_VERTEX_SHADER,   vertexSource) };
-	GLuint fragmentShader{ compileShader(GL_FRAGMENT_SHADER, fragmentSource) };
+	GLuint vertexShader  { Compile(GL_VERTEX_SHADER,   vertexSource) };
+	GLuint fragmentShader{ Compile(GL_FRAGMENT_SHADER, fragmentSource) };
 
-	linkProgram(mBaseProgram, vertexShader, fragmentShader);
+	Link(m_BaseProgram, vertexShader, fragmentShader);
 
-	ShaderSource depthSource{ depth };
-	GLuint depthShader{ compileShader(GL_FRAGMENT_SHADER, depthSource) };
+	Source depthSource{ depth };
+	GLuint depthShader{ Compile(GL_FRAGMENT_SHADER, depthSource) };
 
-	linkProgram(mDepthProgram, vertexShader, depthShader);
+	Link(m_DepthProgram, vertexShader, depthShader);
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 	glDeleteShader(depthShader);
 
-	// TODO Handle some errors like vertexShader == 0, mBaseProgram == 0, etc.
+	// TODO Handle some errors like vertexShader == 0, m_BaseProgram == 0, etc.
 
-	lst::Logger::log.Info("ShaderProgram: created\n"); // TODO remove debug log
+	lst::Logger::log.Info("Program: created\n"); // TODO remove debug log
 }
 
 
-ShaderProgram::ShaderProgram()
-:	ShaderProgram{ VERTEX_SHADER, FRAGMENT_SHADER }
+Program::Program()
+:	Program{ VERTEX_SHADER, FRAGMENT_SHADER }
 {}
 
 
-ShaderProgram::ShaderProgram(const char* vertex, const char* fragment)
-:	mBaseProgram { glCreateProgram() }
-,	mDepthProgram{ glCreateProgram() }
+Program::Program(const char* vertex, const char* fragment)
+:	m_BaseProgram { glCreateProgram() }
+,	m_DepthProgram{ glCreateProgram() }
 {
-	ShaderSource vertexSource  { vertex   };
-	ShaderSource fragmentSource{ fragment };
+	Source vertexSource  { vertex   };
+	Source fragmentSource{ fragment };
 
-	GLuint vertexShader  { compileShader(GL_VERTEX_SHADER,   vertexSource)   };
-	GLuint fragmentShader{ compileShader(GL_FRAGMENT_SHADER, fragmentSource) };
+	GLuint vertexShader  { Compile(GL_VERTEX_SHADER,   vertexSource)   };
+	GLuint fragmentShader{ Compile(GL_FRAGMENT_SHADER, fragmentSource) };
 
-	linkProgram(mBaseProgram, vertexShader, fragmentShader);
+	Link(m_BaseProgram, vertexShader, fragmentShader);
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-	// TODO Handle some errors like vertexShader == 0, mBaseProgram == 0, etc.
+	// TODO Handle some errors like vertexShader == 0, m_BaseProgram == 0, etc.
 
-	lst::Logger::log.Info("ShaderProgram: created\n"); // TODO remove debug log
+	lst::Logger::log.Info("Program: created\n"); // TODO remove debug log
 }
 
 
-ShaderProgram::~ShaderProgram()
+Program::~Program()
 {
-	glDeleteProgram(mDepthProgram);
-	glDeleteProgram(mBaseProgram);
-	lst::Logger::log.Info("ShaderProgram: destroyed\n"); // TODO remove debug log
+	glDeleteProgram(m_DepthProgram);
+	glDeleteProgram(m_BaseProgram);
+	lst::Logger::log.Info("Program: destroyed\n"); // TODO remove debug log
 }
 
 
-void ShaderProgram::linkProgram(const GLuint program, const GLuint vertex, const GLuint fragment)
+void Program::Link(const GLuint program, const GLuint vertex, const GLuint fragment)
 {
 	glAttachShader(program, vertex);
 	glAttachShader(program, fragment);
@@ -99,14 +104,14 @@ void ShaderProgram::linkProgram(const GLuint program, const GLuint vertex, const
 		GLchar infoLog[512];
 		glGetProgramInfoLog(program, 512, nullptr, infoLog);
 		std::string message{ "Error linking shader program: " };
-		throw ShaderException{ message + infoLog };
+		throw shader::Exception{ message + infoLog };
 	}
 	glDetachShader(program, vertex);
 	glDetachShader(program, fragment);
 }
 
 
-GLuint ShaderProgram::compileShader(const GLenum type, const ShaderSource& source)
+GLuint Program::Compile(const GLenum type, const Source& source)
 {
 	GLuint shader{ glCreateShader(type) }; // Create a shader object
 	glShaderSource(shader, 1, &source.handle, nullptr);
@@ -119,13 +124,13 @@ GLuint ShaderProgram::compileShader(const GLenum type, const ShaderSource& sourc
 		GLchar infoLog[512];
 		glGetShaderInfoLog(shader, 512, nullptr, infoLog);
 		std::string message{ "Error compiling "};
-		throw ShaderException{ message + source.path + ": " + infoLog };
+		throw shader::Exception{ message + source.path + ": " + infoLog };
 	}
 	return shader;
 }
 
 
-ShaderSource::ShaderSource(const char* p)
+Source::Source(const char* p)
 :	path{ p }
 ,	handle{ nullptr }
 {
@@ -144,7 +149,7 @@ ShaderSource::ShaderSource(const char* p)
 	#endif
 	if (file == nullptr) {
 		std::string message{ "Could not open shader file: " };
-		throw ShaderException{ message + path };
+		throw shader::Exception{ message + path };
 	}
 	fseek(file, 0, SEEK_END); // Calculate length
 	long length {ftell(file) + 1};
@@ -154,14 +159,17 @@ ShaderSource::ShaderSource(const char* p)
 	if (ferror(file))
 	{
 		std::string message{ "Could not read shader file: " };
-		throw ShaderException{ message + path };
+		throw shader::Exception{ message + path };
 	}
 	handle[length - 1] = 0;
 	fclose(file);
 #endif // ANDROID
 }
 
-ShaderSource::~ShaderSource()
+Source::~Source()
 {
 	free(handle);
 }
+
+
+} // namespace sunspot::graphic::shader

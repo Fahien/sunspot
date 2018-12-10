@@ -4,14 +4,13 @@
 #include <mathspot/Math.h>
 
 #include "sunspot/component/Transform.h"
+#include "sunspot/system/graphic/Shader.h"
 
 namespace mst = mathspot;
 
 
 namespace sunspot
 {
-
-class	ShaderProgram;
 
 class GltfCamera
 {
@@ -22,7 +21,7 @@ class GltfCamera
 	void Rotate( const mst::Quat& q );
 
 	void SetView( const mst::Mat4& v ) { m_View = v; }
-	void Update( const ShaderProgram& );
+	void Update( const graphic::shader::Program& );
 
   protected:
 	GltfCamera(const float f, const float n)

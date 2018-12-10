@@ -1,30 +1,28 @@
-#ifndef SST_MATERIAL_H
-#define SST_MATERIAL_H
+#pragma once
 
 #include <fstream>
 
-#include "Graphics.h"
+#include "sunspot/system/graphic/Shader.h"
 #include "Color.h"
 
 
-namespace sunspot
+namespace sunspot::graphic
 {
 
-class ShaderProgram;
 class Texture;
 
 struct Material
 {
-public:
+  public:
 	Material();
-	Material(const char* n);
-	Material(std::string& n);
+	Material( const char* n );
+	Material( std::string& n );
 	~Material();
 
 	/// Bind the material to the shader
-	void bind(const ShaderProgram& shader) const;
+	void bind( const shader::Program& shader ) const;
 
-	friend std::ostream& operator<<(std::ostream& os, const Material& mtl);
+	friend std::ostream& operator<<( std::ostream& os, const Material& mtl );
 
 	std::string name;
 
@@ -50,6 +48,5 @@ public:
 	GLuint specularMap;
 };
 
-}
 
-#endif // SST_MATERIAL_H
+} // namespace sunspot::graphic

@@ -80,6 +80,32 @@ else()
 endif()
 
 
+# ImGui
+set(IMGUI imgui)
+set(IMGUI_DIR ${MODULE_DIR}/${IMGUI})
+set(IMGUI_INCLUDE_DIR ${MODULE_DIR})
+set(IMGUI_SOURCES
+	${IMGUI_DIR}/imgui.cpp
+	${IMGUI_DIR}/imgui_draw.cpp
+	${IMGUI_DIR}/imgui_widgets.cpp
+	${IMGUI_DIR}/imgui_demo.cpp
+	${IMGUI_DIR}/examples/imgui_impl_opengl3.cpp
+	${IMGUI_DIR}/examples/imgui_impl_glfw.cpp)
+add_library(${IMGUI} ${IMGUI_SOURCES})
+target_link_libraries(${IMGUI}
+	${OPENGL_LIBRARIES}
+	${GLEW_LIBRARIES}
+	${GLFW_LIBRARIES})
+target_include_directories(${IMGUI}
+	PUBLIC
+		${IMGUI_INCLUDE_DIR}
+		${OPENGL_INCLUDE_DIR}
+		${GLEW_INCLUDE_DIR}
+		${GLFW_INCLUDE_DIR}
+	PRIVATE ${IMGUI_DIR})
+target_compile_definitions(${IMGUI} PUBLIC "-DIMGUI_IMPL_OPENGL_LOADER_GLEW" "-DGLEW_STATIC")
+
+
 set(SHADERS
 	shader/base.vert
 	shader/base.frag
@@ -125,18 +151,17 @@ add_custom_command(OUTPUT ${GEN_SOURCES}
 
 set(SOURCES
 	${GEN_SOURCES}
-	source/Graphics.h
-	source/core/ShaderProgram.cpp
+	source/system/Graphic.cpp
+	source/system/graphic/Shader.cpp
 	source/core/String.cpp
 	source/system/Collision.cpp
 	source/Cursor.h
 	source/Cursor.cpp
-	source/Texture.h
-	source/Texture.cpp
-	source/Material.h
-	source/Material.cpp
+	source/system/graphic/Texture.cpp
+	source/system/graphic/Material.cpp
 	source/Mesh.h
 	source/Mesh.cpp
+	source/core/Gui.cpp
 	source/component/Camera.cpp
 	source/entity/Script.cpp
 	source/entity/Object.cpp
@@ -153,17 +178,14 @@ set(SOURCES
 	source/view/GltfMesh.cpp
 	source/view/GltfRenderer.h
 	source/view/GltfRenderer.cpp
-	source/WavefrontObject.h
-	source/WavefrontObject.cpp
+	#source/WavefrontObject.h
+	#source/WavefrontObject.cpp
 	source/Color.h
 	source/Color.cpp
-	source/Material.h
-	source/Light.h
-	source/Light.cpp
+	source/system/graphic/Light.cpp
 	source/Quad.h
 	source/Quad.cpp
-	source/Framebuffer.h
-	source/Framebuffer.cpp
+	source/system/graphic/Framebuffer.cpp
 	source/Camera.h
 	source/Camera.cpp)
 
@@ -177,10 +199,10 @@ if(ANDROID)
 		source/core/android/SunspotNativeActivity.cpp)
 else()
 	set(GLFW_SOURCES
+		source/core/Game.cpp
 		source/Window.h
 		source/Window.cpp
-		source/GlfwWindow.h
-		source/GlfwWindow.cpp
+		source/core/GlfwWindow.cpp
 	)
 	set(EXE_SOURCES
 		${GLFW_SOURCES}
@@ -199,7 +221,8 @@ set(DEPENDENCY_LIBRARIES
 	${PYSPOT_LIBRARIES}
 	${DATASPOT_LIBRARIES}
 	${GLTFSPOT_LIBRARIES}
-	${HITSPOT_LIBRARIES})
+	${HITSPOT_LIBRARIES}
+	${IMGUI})
 
 # SunSpot library
 add_library(${SST_NAME}-lib ${SOURCES} ${SHADERS})

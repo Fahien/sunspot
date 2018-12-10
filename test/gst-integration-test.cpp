@@ -6,9 +6,9 @@
 
 #include "view/GltfRenderer.h"
 
-#include "GlfwWindow.h"
-#include "ShaderProgram.h"
-#include "Light.h"
+#include "sunspot/core/GlfwWindow.h"
+#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphic/Light.h"
 #include "view/GltfCamera.h"
 
 using namespace std;
@@ -55,7 +55,7 @@ int main( int argc, char** argv )
 		/// Render to texture
 		/// Compare it with a reference
 
-		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
+		graphic::shader::Program baseProgram { "shader/base.vert", "shader/base.frag" };
 		window.setBaseProgram( &baseProgram );
 
 		//DirectionalLight light{ Color{ 1.0f, 1.0f, 1.0f } };
@@ -67,7 +67,7 @@ int main( int argc, char** argv )
 		//light.GetSpecular().r /= divFactor / 2;
 		//light.GetSpecular().g /= divFactor / 2;
 		//light.GetSpecular().b /= divFactor / 2;
-		PointLight light{ Color{ 1.0f, 1.0f, 1.0f } };
+		graphic::PointLight light{ Color{ 1.0f, 1.0f, 1.0f } };
 		light.SetPosition( 4.0f, 1.0f, -2.0f );
 		window.setLight( &light );
 
@@ -76,7 +76,7 @@ int main( int argc, char** argv )
 
 		window.loop();
 	}
-	catch ( const GraphicException& e )
+	catch ( const graphic::Exception& e )
 	{
 		Logger::log.Error( "Exception: %s\n", e.what() );
 		return EXIT_FAILURE;

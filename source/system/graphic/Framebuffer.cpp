@@ -2,12 +2,14 @@
 
 #include <logspot/Logger.h>
 
-#include "Framebuffer.h"
-#include "Texture.h"
-#include "ShaderProgram.h"
+#include "sunspot/system/graphic/Framebuffer.h"
+#include "sunspot/system/graphic/Texture.h"
 
-using namespace sunspot;
 namespace lst = logspot;
+
+
+namespace sunspot::graphic
+{
 
 
 const std::string Framebuffer::tag{ "Framebuffer" };
@@ -72,24 +74,27 @@ Framebuffer::~Framebuffer()
 }
 
 
-void Framebuffer::bindColorTexture(const ShaderProgram& shader) const
+void Framebuffer::bindColorTexture(const shader::Program& shader) const
 {
-	glUniform1i(shader.getLocation("colorTexture"), 0);
+	glUniform1i(shader.GetLocation("colorTexture"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, mColorTexture);
-	glUniform1i(shader.getLocation("headerTexture"), 1);
+	glUniform1i(shader.GetLocation("headerTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, mHeaderTexture);
-	glUniform2f(shader.getLocation("frameSize"),
+	glUniform2f(shader.GetLocation("frameSize"),
 		static_cast<GLfloat>(mSize.width), static_cast<GLfloat>(mSize.height));
 }
 
 
-void Framebuffer::bindDepthTexture(const ShaderProgram& shader) const
+void Framebuffer::bindDepthTexture(const shader::Program& shader) const
 {
-	glUniform1i(shader.getLocation("depthTexture"), 0);
+	glUniform1i(shader.GetLocation("depthTexture"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, mDepthTexture);
-	glUniform2f(shader.getLocation("frameSize"),
+	glUniform2f(shader.GetLocation("frameSize"),
 		static_cast<GLfloat>(mSize.width), static_cast<GLfloat>(mSize.height));
 }
+
+
+} // namespace sunspot::graphic

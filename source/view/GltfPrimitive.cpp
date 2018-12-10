@@ -1,6 +1,5 @@
 #include "view/GltfPrimitive.h"
-#include "Graphics.h"
-#include "ShaderProgram.h"
+#include "sunspot/system/graphic/Shader.h"
 
 using namespace std;
 using namespace sunspot;
@@ -202,7 +201,7 @@ GltfPrimitive::GltfPrimitive(Gltf& model, Gltf::Mesh::Primitive& primitive)
 			t->sampler->minFilter;
 			t->sampler->wrapS;
 			t->sampler->wrapT;
-			Texture texture{ uri, TextureType::DIFFUSE };
+			graphic::Texture texture{ uri, graphic::TextureType::DIFFUSE };
 			auto r = mTextures.emplace(t, move(texture));
 			mMaterial.colorTexture = &(r.first->second);
 		}
@@ -239,12 +238,12 @@ void GltfPrimitive::SetMatrix(const Mat4& matrix)
 }
 
 
-void GltfPrimitive::Draw(const ShaderProgram& shader) const
+void GltfPrimitive::Draw(const graphic::shader::Program& shader) const
 {
 	// Bind transform matrix
-	glUniformMatrix4fv(shader.getLocation("model"), 1, GL_FALSE, mMatrix.matrix);
+	glUniformMatrix4fv(shader.GetLocation("model"), 1, GL_FALSE, mMatrix.matrix);
 	// Bind PBR base color texture
-	glUniform1i(shader.getLocation("vertex.hasColor"), mHasVertexColors);
+	glUniform1i(shader.GetLocation("vertex.hasColor"), mHasVertexColors);
 
 	mMaterial.bind(shader);
 

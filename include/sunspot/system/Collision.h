@@ -1,7 +1,7 @@
-#ifndef SST_COLLISION_H_
-#define SST_COLLISION_H_
+#pragma once
 
 #include <unordered_map>
+
 #include <hitspot/CollisionSystem.h>
 #include <hitspot/BoundingBox.h>
 
@@ -11,14 +11,16 @@ namespace hst = hitspot;
 namespace sunspot
 {
 
+
 class Entity;
+
 
 namespace system
 {
 
 class Collision
 {
-public:
+  public:
 	void Add(Entity& e);
 
 	void Update();
@@ -28,8 +30,7 @@ public:
 	hst::CollisionSystem mSystem{};
 };
 
-}
 
-}
+} // namespace system
 
-#endif // SST_COLLISION_H_
+} // namespace sunspot

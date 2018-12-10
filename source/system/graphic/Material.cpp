@@ -3,14 +3,16 @@
 
 #include <logspot/Logger.h>
 
-#include "Material.h"
-#include "Graphics.h"
-#include "ShaderProgram.h"
-#include "Texture.h"
+#include "sunspot/system/graphic/Material.h"
+#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphic/Texture.h"
 
 using namespace std;
-using namespace sunspot;
 namespace lst = logspot;
+
+
+namespace sunspot::graphic
+{
 
 
 Material::Material()
@@ -51,54 +53,54 @@ Material::~Material()
 }
 
 
-void Material::bind(const ShaderProgram& shader) const
+void Material::bind(const shader::Program& shader) const
 {
 	// Bind PBR base colour
-	glUniform3f(shader.getLocation("material.color"), color.r, color.g, color.b);
+	glUniform3f(shader.GetLocation("material.color"), color.r, color.g, color.b);
 
 	// Bind PBR base color texture
-	glUniform1i(shader.getLocation("material.hasColorTexture"), colorTexture != nullptr);
+	glUniform1i(shader.GetLocation("material.hasColorTexture"), colorTexture != nullptr);
 	if (colorTexture)
 	{
-		glUniform1i(shader.getLocation("material.colorTexture"), 0);
+		glUniform1i(shader.GetLocation("material.colorTexture"), 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, colorTexture->getId());
 	}
 
 	// Bind PBR metallic factor
-	glUniform1f(shader.getLocation("material.metallic"), metallic);
+	glUniform1f(shader.GetLocation("material.metallic"), metallic);
 
 	// Bind PBR roughness factor
-	glUniform1f(shader.getLocation("material.roughness"), roughness);
+	glUniform1f(shader.GetLocation("material.roughness"), roughness);
 
 	// Bind PBR ambient occlusion
-	glUniform1f(shader.getLocation("material.ambientOcclusion"), ambientOcclusion);
+	glUniform1f(shader.GetLocation("material.ambientOcclusion"), ambientOcclusion);
 
 	// TODO deprecate
 	// Bind ambient color
-	glUniform3f(shader.getLocation("material.ambient"),  ambient.r,  ambient.g,  ambient.b);
+	glUniform3f(shader.GetLocation("material.ambient"),  ambient.r,  ambient.g,  ambient.b);
 	// Bind diffuse color
-	glUniform3f(shader.getLocation("material.diffuse"),  diffuse.r,  diffuse.g,  diffuse.b);
+	glUniform3f(shader.GetLocation("material.diffuse"),  diffuse.r,  diffuse.g,  diffuse.b);
 	// Bind specular color
-	glUniform3f(shader.getLocation("material.specular"), specular.r, specular.g, specular.b);
+	glUniform3f(shader.GetLocation("material.specular"), specular.r, specular.g, specular.b);
 	// Bind shininess
-	glUniform1f(shader.getLocation("material.shininess"), shininess);
+	glUniform1f(shader.GetLocation("material.shininess"), shininess);
 	// TODO ambient flag and map
 	// Bind diffuse flag
-	glUniform1i(shader.getLocation("material.hasDiffuseMap"), hasDiffuseMap);
+	glUniform1i(shader.GetLocation("material.hasDiffuseMap"), hasDiffuseMap);
 	// Bind diffuse map
 	if (hasDiffuseMap)
 	{
-		glUniform1i(shader.getLocation("material.diffuseMap"), 0);
+		glUniform1i(shader.GetLocation("material.diffuseMap"), 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
 	}
 	// Bind specular flag
-	glUniform1i(shader.getLocation("material.hasSpecularMap"), hasSpecularMap);
+	glUniform1i(shader.GetLocation("material.hasSpecularMap"), hasSpecularMap);
 	// Bind specular map
 	if (hasSpecularMap)
 	{
-		glUniform1i(shader.getLocation("material.specularMap"), 1);
+		glUniform1i(shader.GetLocation("material.specularMap"), 1);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
 	}
@@ -114,3 +116,6 @@ ostream& operator<<(ostream& os, const Material& m)
 	          << "\tdiffuseMap["  << m.diffuseMap  << "]\n"
 	          << "\tspecularMap[" << m.specularMap << "]";
 }
+
+
+} // namespace sunspot::graphic

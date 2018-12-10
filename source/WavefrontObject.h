@@ -7,7 +7,7 @@
 #include <mathspot/Math.h>
 #include <filespot/Ifstream.h>
 
-#include "Graphics.h"
+#include "sunspot/system/graphic/Gl.h"
 #include "Mesh.h"
 
 namespace fst = filespot;
@@ -46,7 +46,7 @@ public:
 	inline std::vector<Vertex>&    getVertices()  { return mVertices;  }
 	inline std::vector<GLuint>&    getIndices()   { return mIndices;   }
 	inline std::vector<Texture>&   getTextures()  { return mTextures;  }
-	inline std::vector<std::shared_ptr<Material>>& GetMaterials() { return mMaterials; }
+	inline std::vector<std::shared_ptr<graphic::Material>>& GetMaterials() { return mMaterials; }
 
 	std::shared_ptr<Mesh> GetMesh(const std::string& name);
 	inline std::vector<std::shared_ptr<Mesh>>& GetMeshes() { return mMeshes; }
@@ -94,8 +94,8 @@ private:
 
 	std::vector<std::shared_ptr<Mesh>> mMeshes;
 	
-	std::shared_ptr<Material> mCurrentMaterial;
-	std::vector<std::shared_ptr<Material>> mMaterials;
+	std::shared_ptr<graphic::Material> mCurrentMaterial;
+	std::vector<std::shared_ptr<graphic::Material>> mMaterials;
 };
 
 fst::Ifstream &operator>>(fst::Ifstream& is, WavefrontObject& obj);

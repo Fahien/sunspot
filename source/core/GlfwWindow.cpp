@@ -1,9 +1,10 @@
+#include "sunspot/core/GlfwWindow.h"
+
 #include <iostream>
 
-#include <Graphics.h>
-#include <GlfwWindow.h>
-#include <Camera.h>
 #include <logspot/Logger.h>
+
+#include "Camera.h"
 
 using namespace sunspot;
 namespace lst = logspot;
@@ -13,10 +14,11 @@ GlfwWindow::GlfwWindow(const char* title,
                        const mst::Size windowSize,
                        const bool decorated,
                        const bool stereoscopic)
-:	Window::Window{ title, windowSize, decorated, stereoscopic }
-,	mMonitor      { nullptr }
-,	mVideoMode    { nullptr }
-,	mWindow       { nullptr }
+:	Window::Window { title, windowSize, decorated, stereoscopic }
+,	context { { 3, 3 }, GLFW_OPENGL_CORE_PROFILE }
+,	m_Monitor      { nullptr }
+,	m_VideoMode    { nullptr }
+,	m_Window       { nullptr }
 {
 	// Initialize GLFW and handle error
 	if (glfwInit() != GLFW_TRUE)
@@ -30,67 +32,67 @@ GlfwWindow::GlfwWindow(const char* title,
 	});
 
 	// Get the primary monitor
-	mMonitor = glfwGetPrimaryMonitor();
-	if (mMonitor == nullptr) // Handle error
+	m_Monitor = glfwGetPrimaryMonitor();
+	if (m_Monitor == nullptr) // Handle error
 	{
 		glfwTerminate();
 		throw GlfwException{ tag, "Could not get primary monitor" };
 	}
 
 	// Get the video mode for the monitor
-	mVideoMode = glfwGetVideoMode(mMonitor);
-	if (mVideoMode == nullptr) // Handle error
+	m_VideoMode = glfwGetVideoMode(m_Monitor);
+	if (m_VideoMode == nullptr) // Handle error
 	{
 		glfwTerminate();
 		throw GlfwException{ tag, "Could not get video mode" };
 	}
-	mMonitorSize.width  = mVideoMode->width;
-	mMonitorSize.height = mVideoMode->height;
+	m_MonitorSize.width  = m_VideoMode->width;
+	m_MonitorSize.height = m_VideoMode->height;
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // TODO refactor magic numbers
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // TODO refactor magic numbers
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, context.version.major);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, context.version.minor);
 
 	// Hard constraints
 	glfwWindowHint(GLFW_DOUBLEBUFFER,         GL_TRUE);
 	glfwWindowHint(GLFW_CLIENT_API,           GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
-	glfwWindowHint(GLFW_OPENGL_PROFILE,       GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE,       context.profile);
 
 	glfwWindowHint(GLFW_RESIZABLE,    GL_FALSE);
 	glfwWindowHint(GLFW_DECORATED,    decorated ? GL_TRUE : GL_FALSE);
 	glfwWindowHint(GLFW_FOCUSED,      GL_TRUE);
-	glfwWindowHint(GLFW_RED_BITS,     mVideoMode->redBits);
-	glfwWindowHint(GLFW_GREEN_BITS,   mVideoMode->greenBits);
-	glfwWindowHint(GLFW_BLUE_BITS,    mVideoMode->blueBits);
-	glfwWindowHint(GLFW_REFRESH_RATE, mVideoMode->refreshRate);
+	glfwWindowHint(GLFW_RED_BITS,     m_VideoMode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS,   m_VideoMode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS,    m_VideoMode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, m_VideoMode->refreshRate);
 
 	// Create a window object
-	mWindow = glfwCreateWindow(mWindowSize.width, mWindowSize.height, mTitle, nullptr, nullptr);
-	if (mWindow == nullptr) // Handle window creation error
+	m_Window = glfwCreateWindow(m_WindowSize.width, m_WindowSize.height, m_Title, nullptr, nullptr);
+	if (m_Window == nullptr) // Handle window creation error
 	{
 		glfwTerminate();
 		throw GlfwException{ tag, "Could not create GLFW window" };
 	}
-	glfwSetWindowUserPointer(mWindow, this);
-	glfwMakeContextCurrent(mWindow);
+	glfwSetWindowUserPointer(m_Window, this);
+	glfwMakeContextCurrent(m_Window);
 
 	// Hide the cursor and capture it, perfect for an FPS camera system
-	//glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Listen to mouse events
-	glfwSetMouseButtonCallback(mWindow, [](GLFWwindow* window, int button, int action, int mods)
+	glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
 	{
 		auto win = reinterpret_cast<GlfwWindow *>(glfwGetWindowUserPointer(window));
 		win->handleMouse(action);
 	});
-	glfwSetCursorPosCallback(mWindow, [](GLFWwindow *window, double xpos, double ypos)
+	glfwSetCursorPosCallback(m_Window, [](GLFWwindow *window, double xpos, double ypos)
 	{
 		auto win = reinterpret_cast<GlfwWindow *>(glfwGetWindowUserPointer(window));
 		win->handleMouse(xpos, ypos);
 	});
 
 	// Listen to keyboard events
-	glfwSetKeyCallback(mWindow, [](GLFWwindow *window, int key, int /* scancode */, int action, int /* mode */)
+	glfwSetKeyCallback(m_Window, [](GLFWwindow *window, int key, int /* scancode */, int action, int /* mode */)
 	{
 		auto*win = reinterpret_cast<GlfwWindow *>(glfwGetWindowUserPointer(window));
 		win->handleInput(key, action);
@@ -102,33 +104,49 @@ GlfwWindow::GlfwWindow(const char* title,
 	}
 	catch (const GlewException &) // Handle error
 	{
-		glfwDestroyWindow(mWindow);
+		glfwDestroyWindow(m_Window);
 		glfwTerminate();
 		throw;
 	}
 
-	updateFrameSize();
+	UpdateSize();
 	glfwSwapInterval(1); // Vsync
 
 	lst::Logger::log.Info("%s created\n\tOpenGL %s\n\tGLFW %s\n\tFrame size %dx%d\n",
 	         tag.c_str(),
 	         glGetString(GL_VERSION),
 	         glfwGetVersionString(),
-	         mFrameSize.width,
-	         mFrameSize.height);
+	         m_FrameSize.width,
+	         m_FrameSize.height);
 }
 
 
 GlfwWindow::~GlfwWindow()
 {
-	if (mWindow != nullptr)
+	if (m_Window != nullptr)
 	{
-		glfwDestroyWindow(mWindow);
+		glfwDestroyWindow(m_Window);
 	}
 	glfwTerminate();
 	lst::Logger::log.Info("%s: destroyed", tag.c_str()); // TODO remove debug log
 }
 
+
+std::string GlfwWindow::GetGlslVersion() const
+{
+	std::string ret = "#version ";
+
+	ret += context.version.major;
+	ret += context.version.minor;
+	ret += "0";
+
+	if ( context.profile == GLFW_OPENGL_CORE_PROFILE )
+	{
+		ret += " core";
+	}
+
+	return ret;
+}
 
 void GlfwWindow::handleMouse(const int action)
 {
@@ -199,7 +217,7 @@ void GlfwWindow::handleInput(const int key, const int action) // TODO comment
 		}
 		break;
 	  case GLFW_KEY_ESCAPE:
-		glfwSetWindowShouldClose(mWindow, GLFW_TRUE); break;
+		glfwSetWindowShouldClose(m_Window, GLFW_TRUE); break;
 	  default:
 		mKey = input::Key::NONE;
 		break;
@@ -212,27 +230,27 @@ void GlfwWindow::handleInput(const int key, const int action) // TODO comment
 
 void GlfwWindow::toggleFullscreen()
 {
-	mMonitor   = glfwGetPrimaryMonitor();
-	mVideoMode = glfwGetVideoMode(mMonitor);
+	m_Monitor   = glfwGetPrimaryMonitor();
+	m_VideoMode = glfwGetVideoMode(m_Monitor);
 	if (mFullscreen) // Use start-up values for windowed mode
 	{
-		glfwSetWindowMonitor(mWindow,
+		glfwSetWindowMonitor(m_Window,
 		                     nullptr,
-		                     mVideoMode->width  / 2 - mWindowSize.width  / 2, // X center
-		                     mVideoMode->height / 2 - mWindowSize.height / 2, // Y center
-		                     mWindowSize.width,
-		                     mWindowSize.height,
-		                     mVideoMode->refreshRate);
+		                     m_VideoMode->width  / 2 - m_WindowSize.width  / 2, // X center
+		                     m_VideoMode->height / 2 - m_WindowSize.height / 2, // Y center
+		                     m_WindowSize.width,
+		                     m_WindowSize.height,
+		                     m_VideoMode->refreshRate);
 	}
 	else // Set window size for fullscreen-windowed mode to the desktop resolution
 	{
-		glfwSetWindowMonitor(mWindow,
-		                     mMonitor,
+		glfwSetWindowMonitor(m_Window,
+		                     m_Monitor,
 		                     0, // left
 		                     0, // top
-		                     mVideoMode->width,
-		                     mVideoMode->height,
-		                     mVideoMode->refreshRate);
+		                     m_VideoMode->width,
+		                     m_VideoMode->height,
+		                     m_VideoMode->refreshRate);
 	}
 	glfwSwapInterval(1); // Vsync
 	mFullscreen = !mFullscreen;
@@ -246,26 +264,17 @@ void GlfwWindow::loop() // TODO comment
 #ifdef SST_PROFILING
 	std::cout << "#Frame\tPass1\tPass2.1\tPass2.2\tTotal\tOverhead\n";
 #endif
-	while (!glfwWindowShouldClose(mWindow))
+	while (!glfwWindowShouldClose(m_Window))
 	{
 		glfwPollEvents();
 		Window::render();
-		glfwSwapBuffers(mWindow);
+		glfwSwapBuffers(m_Window);
 	}
 }
 
 
-const float& GlfwWindow::computeDeltaTime() // TODO comment
-{
-	mCurrentTime = static_cast<float>(glfwGetTime());
-	mDeltaTime   = mCurrentTime - mLastTime;
-	mLastTime    = mCurrentTime;
-	return mDeltaTime;
-}
 
-
-void GlfwWindow::updateFrameSize()
+void GlfwWindow::UpdateSize()
 {
-	// Dimensions from GLFW such that it also works on high DPI screens
-	glfwGetFramebufferSize(mWindow, &mFrameSize.width, &mFrameSize.height);
+	glfwGetFramebufferSize( m_Window, &m_FrameSize.width, &m_FrameSize.height );
 }

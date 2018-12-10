@@ -1,9 +1,8 @@
-#ifndef SST_QUAD_H_
-#define SST_QUAD_H_
+#pragma once
 
 #include <logspot/Logger.h>
 
-#include "Graphics.h"
+#include "sunspot/system/graphic/Gl.h"
 
 
 namespace sunspot
@@ -27,6 +26,4 @@ class Quad
 };
 
 
-}
-
-#endif // SST_QUAD_H_
+} // namespace sunspot

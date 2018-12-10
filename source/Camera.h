@@ -1,16 +1,18 @@
-#ifndef SST_CAMERA_H
-#define SST_CAMERA_H
+#pragma once
 
 #include <mathspot/Math.h>
 
+#include "sunspot/system/graphic/Shader.h"
+
 namespace mst = mathspot;
 
-namespace sunspot {
+namespace sunspot
+{
 
-class ShaderProgram;
 
-class Camera {
-public:
+class Camera
+{
+  public:
 	Camera(const float fov, const float aspectRatio, const float near, const float far);
 
 	void setPosition(const float x, const float y, const float z);
@@ -34,7 +36,7 @@ public:
 	void updateVectors();
 	void updateView();
 
-	void update(const float deltaTime, const ShaderProgram& program);
+	void update( const float deltaTime, const graphic::shader::Program& program );
 
 	inline void setVelocityX(const float x) { mVelocity.x = x; }
 	inline void setVelocityY(const float y) { mVelocity.y = y; }
@@ -60,6 +62,5 @@ private:
 	float mVelocityFactor;
 };
 
-}
 
-#endif // SST_CAMERA_H
+} // namespace sunspot

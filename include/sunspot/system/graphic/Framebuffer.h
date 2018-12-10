@@ -5,15 +5,13 @@
 #include <string>
 #include <mathspot/Math.h>
 
-#include "Graphics.h"
+#include "sunspot/system/graphic/Shader.h"
 
 namespace mst = mathspot;
 
 
-namespace sunspot {
-
-
-class ShaderProgram;
+namespace sunspot::graphic
+{
 
 
 class FramebufferException : public std::runtime_error {
@@ -35,8 +33,8 @@ public:
 	inline void bind()   const { glBindFramebuffer(GL_FRAMEBUFFER, mFbo); }
 	inline void unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0);    }
 
-	void bindColorTexture(const ShaderProgram& program) const;
-	void bindDepthTexture(const ShaderProgram& program) const;
+	void bindColorTexture(const shader::Program& program) const;
+	void bindDepthTexture(const shader::Program& program) const;
 
 private:
 	const mst::Size mSize;

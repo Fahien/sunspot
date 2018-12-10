@@ -1,20 +1,20 @@
+#include "Window.h"
+
 #include <iostream>
 
-#include "SunSpotConfig.h"
 #ifdef SST_PROFILING
 #include <chrono>
 #endif
 
+#include "SunSpotConfig.h"
 #include "view/GltfRenderer.h"
 #include "view/GltfCamera.h"
-#include "Graphics.h"
-#include "Window.h"
-#include "core/ShaderProgram.h"
+#include "sunspot/system/graphic/Gl.h"
+#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphic/Light.h"
+#include "sunspot/system/graphic/Framebuffer.h"
 #include "Camera.h"
-#include "Light.h"
-#include "WavefrontObject.h"
 #include "Quad.h"
-#include "Framebuffer.h"
 #include "entity/Entity.h"
 #include "component/Model.h"
 
@@ -26,10 +26,10 @@ const std::string Window::tag{ "Window" };
 
 
 Window::Window(const char* title, const mst::Size windowSize, const bool decorated, const bool stereoscopic)
-:	mTitle{ title }
-,	mWindowSize{ windowSize }
-,	mMonitorSize{ windowSize }
-,	mFrameSize{ windowSize }
+:	m_Title       { title }
+,	m_WindowSize  { windowSize }
+,	m_MonitorSize { windowSize }
+,	m_FrameSize   { windowSize }
 ,	mDecorated{ decorated }
 ,	mStereoscopic{ stereoscopic }
 ,	mFullscreen{ false }
@@ -103,14 +103,14 @@ void Window::handleInput( input::Input i )
 
 void Window::render()
 {
-	render(computeDeltaTime());
+	render( 0.125f );
 }
 
 
 void Window::render(const float& deltaTime) // TODO comment
 {
 	// std::cout << static_cast<int>(1.0f / deltaTime) << " "; // FPS
-	updateFrameSize();
+	//updateFrameSize();
 
 	mCollision.Update();
 
@@ -134,50 +134,50 @@ void Window::renderGltf(const float& deltaTime)
 {
 	glEnable(GL_DEPTH_TEST);
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-	glViewport(0, 0, mFrameSize.width, mFrameSize.height);
+	glViewport(0, 0, m_FrameSize.width, m_FrameSize.height);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
-	mBaseProgram->use();
+//	mBaseProgram->use();
 	//mCamera->update(deltaTime, *mBaseProgram);
-	mLight->Update(*mBaseProgram);
+//	mLight->Update(*mBaseProgram);
 
-	mGltfRenderer->Draw(*mBaseProgram);
+//	mGltfRenderer->Draw(*mBaseProgram);
 }
 
 
-void Window::render3D(const float& deltaTime) // TODO comment
+void Window::render3D( const float& deltaTime ) // TODO comment
 {
-	glEnable(GL_DEPTH_TEST);
-	glViewport(0, 0, mFrameSize.width, mFrameSize.height);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
-	mBaseProgram->use();
-	mLight->Update(*mBaseProgram);
+	glEnable( GL_DEPTH_TEST );
+	glViewport( 0, 0, m_FrameSize.width, m_FrameSize.height );
+	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); // Clear color and depth buffer
+	mBaseProgram->Use();
+	mLight->Update( *mBaseProgram );
 
-	m_Camera->Get<component::Camera>()->get().Update(*mBaseProgram);
+	m_Camera->Get<component::Camera>()->get().Update( *mBaseProgram );
 
-	for (auto pEntity : mEntities)
+	for ( auto pEntity : mEntities )
 	{
-		if (pEntity->GetModel())
+		if ( pEntity->Has<component::Model>() )
 		{
-			auto pModel = pEntity->GetModel();
-			pModel->GetRenderer().Draw(*mBaseProgram, &pModel->GetNode());
+			auto& model = pEntity->Get<component::Model>()->get();
+			model.GetRenderer().Draw( *mBaseProgram, &model.GetNode() );
 		}
 	}
 
-	if (mGltfRenderer)
+	if ( mGltfRenderer )
 	{
-		mGltfRenderer->Draw(*mBaseProgram);
+		mGltfRenderer->Draw( *mBaseProgram );
 	}
 }
 
 
-void Window::renderQuad(const float& /* deltaTime */)
+void Window::renderQuad( const float& /* deltaTime */ )
 {
-	glViewport(0, 0, mFrameSize.width, mFrameSize.height);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color buffer
-	mQuadProgram->use();
+	glViewport( 0, 0, m_FrameSize.width, m_FrameSize.height );
+	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); // Clear color buffer
+	mQuadProgram->Use();
 	mQuad->bind();
 	mQuad->render();
 	mQuad->unbind();
@@ -199,10 +199,10 @@ void Window::renderStereoscopic(const float& deltaTime)
 	glViewport(0, 0, mFramebuffer->getWidth(), mFramebuffer->getHeight()); // Viewport for framebuffer
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
-	mBaseProgram->use();
+	mBaseProgram->Use();
 	m_pCamera->Update(*mBaseProgram);
 	mLight->Update(*mBaseProgram);
-	for (WavefrontObject *obj : mObjs) { obj->draw(*mBaseProgram); }
+//	for (WavefrontObject *obj : mObjs) { obj->draw(*mBaseProgram); }
 	mFramebuffer->unbind();
 	// End First pass
 
@@ -213,8 +213,8 @@ void Window::renderStereoscopic(const float& deltaTime)
 	// Second pass
 	glDisable(GL_DEPTH_TEST);
 	mQuad->bind();
-	glViewport(0, 0, mFrameSize.width / 2, mFrameSize.height);
-	mQuadProgram->use();
+	glViewport(0, 0, m_FrameSize.width / 2, m_FrameSize.height);
+	mQuadProgram->Use();
 	mFramebuffer->bindColorTexture(*mQuadProgram); // Render color on the left
 	mQuad->render();
 
@@ -222,8 +222,8 @@ void Window::renderStereoscopic(const float& deltaTime)
 	auto t3 = std::chrono::high_resolution_clock::now();
 #endif
 
-	glViewport(mFrameSize.width / 2, 0, mFrameSize.width / 2, mFrameSize.height);
-	mDepthProgram->use();
+	glViewport(m_FrameSize.width / 2, 0, m_FrameSize.width / 2, m_FrameSize.height);
+	mDepthProgram->Use();
 	mFramebuffer->bindDepthTexture(*mDepthProgram); // Render depth on the right
 	mQuad->render();
 	mQuad->unbind();

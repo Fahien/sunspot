@@ -52,26 +52,27 @@ void Script::Initialize()
 		dict.SetItem( "transform", wTransform );
 		dict.SetItem( "rigidbody", wRigidbody );
 
-		lst::Logger::log.Info("%s.init", mModule.GetName().c_str());
-		mModule.Invoke("init", Tuple{ dict });
+		lst::Logger::log.Info( "%s.init", mModule.GetName().c_str() );
+		mModule.Invoke( "init", Tuple{ dict } );
 
 		// TODO refactor this
-		mEntity.mModel->GetNode().matrix.ScaleX(mEntity.mTransform->scale.x);
-		mEntity.mModel->GetNode().matrix.ScaleY(mEntity.mTransform->scale.y);
-		mEntity.mModel->GetNode().matrix.ScaleZ(mEntity.mTransform->scale.z);
-		mEntity.mModel->GetNode().matrix.TranslateX(mEntity.mTransform->position.x);
-		mEntity.mModel->GetNode().matrix.TranslateY(mEntity.mTransform->position.y);
-		mEntity.mModel->GetNode().matrix.TranslateZ(mEntity.mTransform->position.z);
-		mEntity.mModel->GetNode().matrix.RotateX(mEntity.mTransform->rotation.x);
-		mEntity.mModel->GetNode().matrix.RotateY(mEntity.mTransform->rotation.y);
-		mEntity.mModel->GetNode().matrix.RotateZ(mEntity.mTransform->rotation.z);
+		auto& model = mEntity.Get<component::Model>()->get();
+		model.GetNode().matrix.ScaleX( mEntity.mTransform->scale.x );
+		model.GetNode().matrix.ScaleY( mEntity.mTransform->scale.y );
+		model.GetNode().matrix.ScaleZ( mEntity.mTransform->scale.z );
+		model.GetNode().matrix.TranslateX( mEntity.mTransform->position.x );
+		model.GetNode().matrix.TranslateY( mEntity.mTransform->position.y );
+		model.GetNode().matrix.TranslateZ( mEntity.mTransform->position.z );
+		model.GetNode().matrix.RotateX( mEntity.mTransform->rotation.x );
+		model.GetNode().matrix.RotateY( mEntity.mTransform->rotation.y );
+		model.GetNode().matrix.RotateZ( mEntity.mTransform->rotation.z );
 	}
 }
 
 
 Script::Script(Entity& entity)
 :	mEntity{ entity }
-,	mModule{ entity.GetModel()->GetNode().name.c_str() }
+,	mModule{ entity.Get<component::Model>()->get().GetNode().name.c_str() }
 {
 	Dictionary dict{};
 	auto wTransform = Wrapper<component::Transform>( mEntity.mTransform );
@@ -83,15 +84,16 @@ Script::Script(Entity& entity)
 	lst::Logger::log.Info("%s.init", mModule.GetName().c_str());
 	mModule.Invoke("init", args);
 
-	mEntity.mModel->GetNode().matrix.ScaleX(mEntity.mTransform->scale.x);
-	mEntity.mModel->GetNode().matrix.ScaleY(mEntity.mTransform->scale.y);
-	mEntity.mModel->GetNode().matrix.ScaleZ(mEntity.mTransform->scale.z);
-	mEntity.mModel->GetNode().matrix.TranslateX(mEntity.mTransform->position.x);
-	mEntity.mModel->GetNode().matrix.TranslateY(mEntity.mTransform->position.y);
-	mEntity.mModel->GetNode().matrix.TranslateZ(mEntity.mTransform->position.z);
-	mEntity.mModel->GetNode().matrix.RotateX(mEntity.mTransform->rotation.x);
-	mEntity.mModel->GetNode().matrix.RotateY(mEntity.mTransform->rotation.y);
-	mEntity.mModel->GetNode().matrix.RotateZ(mEntity.mTransform->rotation.z);
+	auto& model = mEntity.Get<component::Model>()->get();
+	model.GetNode().matrix.ScaleX( mEntity.mTransform->scale.x );
+	model.GetNode().matrix.ScaleY( mEntity.mTransform->scale.y );
+	model.GetNode().matrix.ScaleZ( mEntity.mTransform->scale.z );
+	model.GetNode().matrix.TranslateX( mEntity.mTransform->position.x );
+	model.GetNode().matrix.TranslateY( mEntity.mTransform->position.y );
+	model.GetNode().matrix.TranslateZ( mEntity.mTransform->position.z );
+	model.GetNode().matrix.RotateX( mEntity.mTransform->rotation.x );
+	model.GetNode().matrix.RotateY( mEntity.mTransform->rotation.y );
+	model.GetNode().matrix.RotateZ( mEntity.mTransform->rotation.z );
 }
 
 
@@ -104,29 +106,30 @@ void Script::Handle(const input::Input& input)
 
 void Script::Collide(Entity& other)
 {
-	Module utils{ "utils" };
-	Dictionary dict{ utils.Invoke("Map") };
+	Module utils { "utils" };
+	Dictionary dict { utils.Invoke("Map") };
 	auto wRigidbody = Wrapper<component::Rigidbody>( other.mRigidbody );
-	dict.SetItem("rigidbody", wRigidbody);
-	Tuple args{ dict };
+	dict.SetItem( "rigidbody", wRigidbody );
+	Tuple args { dict };
 
 	mModule.Invoke("collide", args);
 }
 
 
-void Script::Update(const float delta)
+void Script::Update( const float delta )
 {
-	mArgs.SetItem(0, delta);
-	mModule.Invoke("update", mArgs);
+	mArgs.SetItem( 0, delta );
+	mModule.Invoke( "update", mArgs );
 	
-	mEntity.mModel->GetNode().matrix = mst::Mat4::identity;
-	mEntity.mModel->GetNode().matrix.ScaleX(mEntity.mTransform->scale.x);
-	mEntity.mModel->GetNode().matrix.ScaleY(mEntity.mTransform->scale.y);
-	mEntity.mModel->GetNode().matrix.ScaleZ(mEntity.mTransform->scale.z);
-	mEntity.mModel->GetNode().matrix.TranslateX(mEntity.mTransform->position.x);
-	mEntity.mModel->GetNode().matrix.TranslateY(mEntity.mTransform->position.y);
-	mEntity.mModel->GetNode().matrix.TranslateZ(mEntity.mTransform->position.z);
-	mEntity.mModel->GetNode().matrix.RotateX(mEntity.mTransform->rotation.x);
-	mEntity.mModel->GetNode().matrix.RotateY(mEntity.mTransform->rotation.y);
-	mEntity.mModel->GetNode().matrix.RotateZ(mEntity.mTransform->rotation.z);
+	auto& model = mEntity.Get<component::Model>()->get();
+	model.GetNode().matrix = mst::Mat4::identity;
+	model.GetNode().matrix.ScaleX( mEntity.mTransform->scale.x );
+	model.GetNode().matrix.ScaleY( mEntity.mTransform->scale.y );
+	model.GetNode().matrix.ScaleZ( mEntity.mTransform->scale.z );
+	model.GetNode().matrix.TranslateX( mEntity.mTransform->position.x );
+	model.GetNode().matrix.TranslateY( mEntity.mTransform->position.y );
+	model.GetNode().matrix.TranslateZ( mEntity.mTransform->position.z );
+	model.GetNode().matrix.RotateX( mEntity.mTransform->rotation.x );
+	model.GetNode().matrix.RotateY( mEntity.mTransform->rotation.y );
+	model.GetNode().matrix.RotateZ( mEntity.mTransform->rotation.z );
 }

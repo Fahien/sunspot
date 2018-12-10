@@ -10,20 +10,24 @@
 #include <dataspot/Exception.h>
 
 #include "SunSpotConfig.h"
-#include "Light.h"
-#include "ShaderProgram.h"
+
+#include "sunspot/core/Game.h"
+
+#include "sunspot/system/graphic/Light.h"
+#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphic/Framebuffer.h"
 #include "Quad.h"
-#include "Framebuffer.h"
 
 #include "WavefrontObject.h"
 #include "Mesh.h"
-#include "Texture.h"
+#include "sunspot/system/graphic/Texture.h"
 #include "sunspot/entity/Entity.h"
 #include "repository/ModelRepository.h"
 #include "repository/EntityRepository.h"
 
 #include "sunspot/component/Camera.h"
-#include "GlfwWindow.h"
+#include "sunspot/core/GlfwWindow.h"
+#include "sunspot/core/Gui.h"
 #include "view/GltfCamera.h"
 
 using namespace std;
@@ -123,18 +127,21 @@ int main(int argc, char **argv)
 
 		Script::Initialize(wProjectDir + _T("/") + wProjectName + _T("/script"));
 
-		GlfwWindow window{ SST_TITLE, windowSize, decorated, stereoscopic };
+		Game game;
+		game.GetGraphics().SetViewport( graphic::System::Viewport{ { 0, 0 }, { windowSize.width, windowSize.height } } );
+		//GlfwWindow window { SST_TITLE, windowSize, decorated, stereoscopic };
+
 		float aspectRatio{ static_cast<float>(windowSize.width) / windowSize.height };
 
 		{
 			GltfPerspectiveCamera camera{ aspectRatio, fov, kNear, kFar };
 			camera.Translate(Vec3{ 0.0f, 0.0f, 32.0f });
 			//camera.LookAt(0.0f, 0.0f, 0.0f);
-			window.SetCamera( &camera );
+			//game.GetGraphics().SetCamera( &camera );
 		}
 
-		ShaderProgram baseProgram{ "shader/base.vert", "shader/base.frag" };
-		window.setBaseProgram(&baseProgram);
+		graphic::shader::Program baseProgram { "shader/base.vert", "shader/base.frag" };
+		game.GetGraphics().SetShaderProgram( &baseProgram );
 
 		//DirectionalLight light{ Color{ 1.0f, 1.0f, 1.0f } };
 		//light.SetDirection(0.0f, 0.0f, 4.0f);
@@ -145,31 +152,31 @@ int main(int argc, char **argv)
 		//light.GetSpecular().r /= divFactor / 2;
 		//light.GetSpecular().g /= divFactor / 2;
 		//light.GetSpecular().b /= divFactor / 2;
-		PointLight light{ Color{ 18.0f, 18.0f, 18.0f } };
-		light.SetPosition(0.0f, 16.0f, 0.0f);
-		window.setLight(&light);
+		graphic::PointLight light { Color { 18.0f, 18.0f, 18.0f } };
+		light.SetPosition(0.0f, 0.0f, 8.0f);
+		game.GetGraphics().SetLight( &light );
 
 		// Inject dependencies into window
-		Framebuffer framebuffer{ window.getFrameSize() / 2 };
-		ShaderProgram quadProgram { "shader/quad.vert", "shader/quad.frag" };
-		ShaderProgram depthProgram{ "shader/quad.vert", "shader/depth.frag" };
+		graphic::Framebuffer framebuffer { game.GetWindow().getFrameSize() / 2 };
+		graphic::shader::Program quadProgram  { "shader/quad.vert", "shader/quad.frag" };
+		graphic::shader::Program depthProgram { "shader/quad.vert", "shader/depth.frag" };
 		Quad quad{};
-		if (stereoscopic)
+		if ( stereoscopic )
 		{
-			window.setQuadProgram(&quadProgram);
-			window.setDepthProgram(&depthProgram);
-			window.setQuad(&quad);
-			window.setFramebuffer(&framebuffer);
+			//game.GetGraphics().setQuadProgram( &quadProgram );
+			//game.GetGraphics().setDepthProgram( &depthProgram );
+			//game.GetGraphics().setQuad( &quad );
+			//game.GetGraphics().setFramebuffer( &framebuffer );
 		}
 
-		string projectPath{ projectDir + "/" + projectName + "/" };
-		ModelRepository modelRepository{ projectPath };
+		string projectPath { projectDir + "/" + projectName + "/" };
+		ModelRepository modelRepository { projectPath };
 		EntityRepository entityRepository { dataspot, modelRepository };
 
 		// Read a set of objects from dataspot
 		constexpr int entitiesCount = 4;
 		// For every object get the name
-		for (int i{ 0 }; i < entitiesCount; ++i)
+		for ( int i{ 0 }; i < entitiesCount; ++i )
 		{
 			Entity* entity { entityRepository.LoadEntity( i + 1 ) };
 
@@ -179,19 +186,24 @@ int main(int argc, char **argv)
 				{
 					pPerspectiveCam->SetAspectRatio( aspectRatio );
 				}
-				window.SetCamera( *entity );
+				game.GetGraphics().SetCamera( *entity );
 			}
 
-			window.AddEntity(entity);
+			if ( auto model = entity->Get<component::Model>() )
+			{
+				game.GetGraphics().AddModel( &model->get() );
+			}
+
+			game.AddEntity( *entity );
 		}
 
-		window.loop(); // GameLoop.it
+		game.Loop(); // GameLoop.it
 
 
-		Logger::log.Info("%s version %d.%d successful", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR);
+		Logger::log.Info( "%s version %d.%d successful", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR );
 		return EXIT_SUCCESS;
 	}
-	catch (const GraphicException& e)
+	catch (const graphic::Exception& e)
 	{
 		Logger::log.Error("%s: %s", tag.c_str(), e.what());
 	}

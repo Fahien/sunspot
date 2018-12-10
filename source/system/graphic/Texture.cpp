@@ -1,3 +1,5 @@
+#include "sunspot/system/graphic/Texture.h"
+
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
@@ -6,13 +8,14 @@
 #include <SOIL.h>
 #include <logspot/Logger.h>
 
-#include "Texture.h"
+#include "sunspot/system/graphic/Gl.h"
 
-using namespace sunspot;
 namespace lst = logspot;
 
+namespace sunspot::graphic
+{
 
-const char* sunspot::getTextureTypeName(const TextureType& type)
+const char* getTextureTypeName(const TextureType& type)
 {
 	return textureTypeNames[type];
 }
@@ -185,3 +188,6 @@ TextureData::~TextureData()
 		free(mData);
 	}
 }
+
+
+} // namespace sunspot::graphic

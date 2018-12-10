@@ -50,8 +50,8 @@ public:
 	template<typename T>
 	void Add( T& );
 
-	component::Model* GetModel() { return mModel; }
-	void SetModel(component::Model* model);
+	//component::Model* GetModel() { return mModel; }
+	//void SetModel(component::Model* model);
 
 	component::Collider* GetCollider() { return mCollider; }
 	void SetCollider(component::Collider* mCollider);
@@ -70,7 +70,7 @@ public:
 	void Update(const float delta);
 
 private:
-	component::Model*     mModel     { nullptr };
+	//component::Model*     mModel     { nullptr };
 	component::Collider*  mCollider  { nullptr };
 	component::Transform* mTransform { nullptr };
 	component::Rigidbody* mRigidbody { nullptr };

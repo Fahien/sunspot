@@ -5,14 +5,13 @@
 
 #include "sunspot/entity/Object.h"
 #include "sunspot/component/Transform.h"
+#include "sunspot/system/graphic/Shader.h"
 
 namespace mst = mathspot;
 
 
 namespace sunspot
 {
-
-class ShaderProgram;
 
 namespace component
 {
@@ -41,7 +40,7 @@ class Camera : public Object
 	void Rotate( const mst::Quat& q );
 
 	void SetView( const mst::Mat4& v ) { m_View = v; }
-	void Update( const ShaderProgram& );
+	void Update( const graphic::shader::Program& );
 
   protected:
 
@@ -66,6 +65,7 @@ class PerspectiveCamera : public Camera
 
 	void SetAspectRatio( const float a );
 
+  private:
 	float m_AspectRatio;
 	float m_YFov;
 };
@@ -74,14 +74,20 @@ class PerspectiveCamera : public Camera
 class OrthographicCamera : public Camera
 {
   public:
-	OrthographicCamera( const float r, const float t, const float f, const float n )
-	:	Camera { f , n }
-	,	m_XMag { r }
-	,	m_YMag { t }
-	{}
+	static const float kRight;
+	static const float kLeft;
+	static const float kTop;
+	static const float kBottom;
+	static const float kNear;
+	static const float kFar;
 
-	float m_XMag;
-	float m_YMag;
+	OrthographicCamera( const float r = kRight, const float l = kLeft, const float t = kTop, const float b = kBottom, const float f = kFar, const float n = kNear );
+
+  private:
+	float m_Right;
+	float m_Left;
+	float m_Top;
+	float m_Bottom;
 
 };
 

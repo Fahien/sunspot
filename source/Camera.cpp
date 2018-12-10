@@ -1,8 +1,6 @@
+#include "Camera.h"
 #include <cmath>
 
-#include "Camera.h"
-#include "Graphics.h"
-#include "ShaderProgram.h"
 
 using namespace sunspot;
 namespace mst = mathspot;
@@ -101,7 +99,7 @@ void Camera::updateView()
 }
 
 
-void Camera::update(const float deltaTime, const ShaderProgram& program)
+void Camera::update(const float deltaTime, const graphic::shader::Program& program)
 {
 	if (mVelocity.x != 0.0f)
 	{
@@ -126,12 +124,12 @@ void Camera::update(const float deltaTime, const ShaderProgram& program)
 
 	updateView();
 
-	GLuint location{ program.getLocation("view") };
+	GLuint location{ program.GetLocation("view") };
 	glUniformMatrix4fv(location, 1, GL_FALSE, mView.matrix);
 
-	location = program.getLocation("projection");
+	location = program.GetLocation("projection");
 	glUniformMatrix4fv(location, 1, GL_FALSE, mProjection.matrix);
 
-	location = program.getLocation("camera.position");
+	location = program.GetLocation("camera.position");
 	glUniform3fv(location, 1, &mPosition.x);
 };

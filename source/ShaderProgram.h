@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "Graphics.h"
+#include "sunspot/system/graphic/Gl.h"
 
 namespace sunspot
 {
