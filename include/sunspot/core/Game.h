@@ -25,6 +25,8 @@ class Game
 
 	void AddEntity( Entity& entity ) { m_Entities.push_back( &entity ); m_Collisions.Add( entity ); }
 
+	void Handle( input::Input&& in );
+
 	void Loop();
 
   private:
@@ -32,8 +34,8 @@ class Game
 
 	Time m_Time = {};
 
-	GlfwWindow m_Window = {};
-	Gui        m_Gui    = { m_Window };
+	GlfwWindow m_Window = { *this };
+	ImGui      m_Gui    = { m_Window };
 
 	system::Collision m_Collisions = {};
 	graphic::System   m_Graphics   = {};

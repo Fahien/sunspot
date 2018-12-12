@@ -7,6 +7,7 @@
 #endif
 
 #include "SunSpotConfig.h"
+#include "sunspot/core/Game.h"
 #include "view/GltfRenderer.h"
 #include "view/GltfCamera.h"
 #include "sunspot/system/graphic/Gl.h"
@@ -18,15 +19,17 @@
 #include "entity/Entity.h"
 #include "component/Model.h"
 
-using namespace sunspot;
 using namespace mathspot;
 
+namespace sunspot
+{
 
 const std::string Window::tag{ "Window" };
 
 
-Window::Window(const char* title, const mst::Size windowSize, const bool decorated, const bool stereoscopic)
-:	m_Title       { title }
+Window::Window( Game& game, const char* title, const mst::Size windowSize, const bool decorated, const bool stereoscopic)
+:	m_Game { game }
+,	m_Title       { title }
 ,	m_WindowSize  { windowSize }
 ,	m_MonitorSize { windowSize }
 ,	m_FrameSize   { windowSize }
@@ -62,8 +65,10 @@ void Window::initGlew()
 }
 
 
-void Window::handleInput( input::Input i )
+void Window::handleInput( input::Input&& i )
 {
+	m_Game.Handle( std::move( i ) );
+/*
 	if ( i.action == input::Action::PRESS )
 	{
 		if ( i.key == input::Key::A )
@@ -98,6 +103,7 @@ void Window::handleInput( input::Input i )
 	{
 		entity->Handle( i );
 	}
+*/
 }
 
 
@@ -246,3 +252,5 @@ void Window::renderStereoscopic(const float& deltaTime)
 		<< std::endl;
 #endif
 }
+
+} // namespace sunspot

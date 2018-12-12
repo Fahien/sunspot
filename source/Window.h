@@ -21,6 +21,7 @@ namespace mst = mathspot;
 
 namespace sunspot {
 
+class Game;
 class Quad;
 class Light;
 class WavefrontObject;
@@ -43,24 +44,24 @@ class Window
 public:
 	static const std::string tag;
 
-	Window(const char* title, const mst::Size windowSize, const bool decorated, const bool stereoscopic);
+	Window( Game& game, const char* title, const mst::Size windowSize, const bool decorated, const bool stereoscopic );
 	~Window();
 
 	const mst::Size& getFrameSize() const { return m_FrameSize; }
-	inline void setBaseProgram(const graphic::shader::Program* baseProgram) { mBaseProgram = baseProgram; }
-	inline void setLight(graphic::Light* light) { mLight = light; }
-	inline void addObj(WavefrontObject* obj) { mObjs.push_back(obj); }
-	inline void AddGltf(GltfRenderer* renderer) { mGltfRenderer = renderer; }
-	inline void AddEntity(Entity* entity) { mEntities.push_back(entity); mCollision.Add(*entity); }
+	inline void setBaseProgram( const graphic::shader::Program* baseProgram ) { mBaseProgram = baseProgram; }
+	inline void setLight( graphic::Light* light ) { mLight = light; }
+	inline void addObj( WavefrontObject* obj ) { mObjs.push_back(obj); }
+	inline void AddGltf( GltfRenderer* renderer ) { mGltfRenderer = renderer; }
+	inline void AddEntity( Entity* entity ) { mEntities.push_back(entity); mCollision.Add(*entity); }
 
-	inline void setQuad(Quad* quad) { mQuad = quad; }
-	inline void setQuadProgram(const graphic::shader::Program* quadProgram) { mQuadProgram = quadProgram; }
-	inline void setDepthProgram(const graphic::shader::Program* depthProgram) { mDepthProgram = depthProgram; }
+	inline void setQuad( Quad* quad ) { mQuad = quad; }
+	inline void setQuadProgram( const graphic::shader::Program* quadProgram ) { mQuadProgram = quadProgram; }
+	inline void setDepthProgram( const graphic::shader::Program* depthProgram ) { mDepthProgram = depthProgram; }
 
 
 	void SetCamera( GltfCamera* camera ) { m_pCamera = camera; }
 	void SetCamera( Entity& camera ) { m_Camera = &camera; }
-	void setFramebuffer(const graphic::Framebuffer* framebuffer) { mFramebuffer = framebuffer; }
+	void setFramebuffer( const graphic::Framebuffer* framebuffer ) { mFramebuffer = framebuffer; }
 
 	virtual void loop() = 0;
 	virtual void UpdateSize() = 0;
@@ -68,7 +69,7 @@ public:
 protected:
 	static void initGlew();
 	void render();
-	void handleInput(input::Input in);
+	void handleInput( input::Input&& in );
 
 	virtual void toggleFullscreen() = 0;
 	virtual const input::Input pollInput() = 0;
@@ -86,10 +87,10 @@ protected:
 	float mLastTime;
 	float mDeltaTime;
 
-	input::Type   mType  { input::Type::INVALID   };
-	input::Key    mKey   { input::Key::NONE       };
-	input::Action mAction{ input::Action::RELEASE };
-	mst::Vec2 mPosition{ 0.0f, 0.0f };
+	input::Type   mType     { input::Type::INVALID   };
+	input::Key    mKey      { input::Key::NONE       };
+	input::Action mAction   { input::Action::RELEASE };
+	mst::Vec2     mPosition { 0.0f, 0.0f };
 
 	Cursor  mCursor;
 
@@ -102,6 +103,8 @@ private:
 	void renderGltf(const float& deltaTime);
 	void renderQuad(const float& deltaTime);
 	void renderStereoscopic(const float& deltaTime);
+
+	Game& m_Game;
 
 	const graphic::shader::Program* mBaseProgram;
 	graphic::Light* mLight;

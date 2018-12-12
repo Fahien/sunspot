@@ -1,21 +1,31 @@
 #pragma once
 
+#include <imgui/imgui.h>
+
 
 namespace sunspot
 {
 
-
 class GlfwWindow;
 
-class Gui
+
+class [[pyspot::export]] Gui
 {
   public:
-	Gui( const GlfwWindow& );
-	~Gui();
 
-	void NewFrame() const;
+	void Begin( const char* title ) const { ::ImGui::Begin( title ); }
+	void End() const { ::ImGui::End(); }
+};
 
-	void Render() const;
+
+class ImGui
+{
+  public:
+	ImGui( const GlfwWindow& );
+	~ImGui();
+	void Update( const float delta ) const;
+
+	void Draw() const;
 };
 
 

@@ -26,15 +26,17 @@ public:
 class GlfwWindow : public Window
 {
 public:
-	GlfwWindow(const char* title = "SunSpot", const mst::Size windowSize = { 960, 540 }, const bool decorated = true, const bool stereoscopic = false);
+	GlfwWindow( Game& game, const char* title = "SunSpot", const mst::Size windowSize = { 960, 540 }, const bool decorated = true, const bool stereoscopic = false);
 	~GlfwWindow();
 
 	GLFWwindow* GetHandle() const { return m_Window; }
-	std::string GetGlslVersion() const;
 
 	bool ShouldClose() const { return glfwWindowShouldClose( m_Window ); }
 	void PollEvents() const { glfwPollEvents(); }
-	void SwapBuffers() const { glfwSwapBuffers( m_Window ); }
+	void SwapBuffers() const {
+		glfwMakeContextCurrent( m_Window );
+		glfwSwapBuffers( m_Window );
+	}
 	const float GetTime() const { return static_cast<float>( glfwGetTime() ); }
 	void UpdateSize();
 

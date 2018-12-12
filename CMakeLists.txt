@@ -137,10 +137,11 @@ set(EXPORT_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Input.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Key.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Type.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/core/Gui.h
 	${MATHSPOT_INCLUDE_DIR}/mathspot/Math.h
 )
 # Generation command
-JOIN("${DEPENDENCY_INCLUDE_DIRS};${MATHSPOT_INCLUDE_DIRS}" "\" -I\"" GEN_INCLUDE_DIRS)
+JOIN("${DEPENDENCY_INCLUDE_DIRS};${MATHSPOT_INCLUDE_DIRS};${IMGUI_INCLUDE_DIR}" "\" -I\"" GEN_INCLUDE_DIRS)
 set(GEN_INCLUDE_DIRS "\"${GEN_INCLUDE_DIRS}\"")
 add_custom_command(OUTPUT ${GEN_SOURCES}
 	COMMAND pywrap.exe

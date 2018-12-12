@@ -32,7 +32,6 @@
 
 using namespace std;
 using namespace pyspot;
-using namespace sunspot;
 using namespace mathspot;
 using namespace logspot;
 using namespace dataspot;
@@ -72,6 +71,8 @@ bool contains(const vector<string> &arguments, const char *s)
 
 int main(int argc, char **argv)
 {
+	using namespace sunspot;
+
 	printLogo();
 
 	try {
@@ -120,18 +121,18 @@ int main(int argc, char **argv)
 
 		// Initialize PySpot
 		wstring wProjectDir;
-		wProjectDir.assign(projectDir.begin(), projectDir.end());
+		wProjectDir.assign( projectDir.begin(), projectDir.end() );
 		
 		wstring wProjectName;
-		wProjectName.assign(projectName.begin(), projectName.end());
+		wProjectName.assign( projectName.begin(), projectName.end() );
 
-		Script::Initialize(wProjectDir + _T("/") + wProjectName + _T("/script"));
+		Script::Initialize( wProjectDir + _T( "/" ) + wProjectName + _T( "/script" ) );
 
 		Game game;
 		game.GetGraphics().SetViewport( graphic::System::Viewport{ { 0, 0 }, { windowSize.width, windowSize.height } } );
 		//GlfwWindow window { SST_TITLE, windowSize, decorated, stereoscopic };
 
-		float aspectRatio{ static_cast<float>(windowSize.width) / windowSize.height };
+		float aspectRatio { static_cast<float>( windowSize.width ) / windowSize.height };
 
 		{
 			GltfPerspectiveCamera camera{ aspectRatio, fov, kNear, kFar };

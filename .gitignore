@@ -1,4 +1,5 @@
 .vscode
+*.ini
 build
 data
 doc

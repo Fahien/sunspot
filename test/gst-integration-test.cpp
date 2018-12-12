@@ -6,13 +6,12 @@
 
 #include "view/GltfRenderer.h"
 
-#include "sunspot/core/GlfwWindow.h"
+#include "sunspot/core/Game.h"
 #include "sunspot/system/graphic/Shader.h"
 #include "sunspot/system/graphic/Light.h"
 #include "view/GltfCamera.h"
 
 using namespace std;
-using namespace sunspot;
 using namespace pyspot;
 using namespace mathspot;
 using namespace gltfspot;
@@ -22,6 +21,8 @@ using namespace logspot;
 /// Test GltfSpoT module with SunSpoT
 int main( int argc, char** argv )
 {
+	using namespace sunspot;
+
 	/// Check arguments
 	if ( argc < 2 )
 	{
@@ -34,8 +35,9 @@ int main( int argc, char** argv )
 
 	try
 	{
-		Interpreter interpreter{};
-		GlfwWindow window{ title.c_str(), windowSize, true, false };
+		Interpreter interpreter {};
+		Game game;
+		GlfwWindow window { game, title.c_str(), windowSize, true, false };
 
 		float aspectRatio{ static_cast<float>( windowSize.width ) / windowSize.height };
 		float fov{ radians( 45.0f ) };
@@ -74,7 +76,7 @@ int main( int argc, char** argv )
 		// TODO render to texture
 		// TODO Compare rendered texture to gold image
 
-		window.loop();
+		game.Loop();
 	}
 	catch ( const graphic::Exception& e )
 	{
