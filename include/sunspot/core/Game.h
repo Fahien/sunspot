@@ -22,6 +22,7 @@ class Game
 
 	GlfwWindow& GetWindow() { return m_Window; }
 	graphic::System& GetGraphics() { return m_Graphics; }
+	ImGui& GetGui() { return m_Gui; }
 
 	void AddEntity( Entity& entity ) { m_Entities.push_back( &entity ); m_Collisions.Add( entity ); }
 

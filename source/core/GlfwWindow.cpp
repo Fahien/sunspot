@@ -13,9 +13,8 @@ namespace lst = logspot;
 GlfwWindow::GlfwWindow( Game& game,
                         const char* title,
                         const mst::Size windowSize,
-                        const bool decorated,
                         const bool stereoscopic)
-:	Window::Window { game, title, windowSize, decorated, stereoscopic }
+:	Window::Window { game, title, windowSize, stereoscopic }
 ,	context { { 3, 3 }, GLFW_OPENGL_CORE_PROFILE }
 ,	m_Monitor      { nullptr }
 ,	m_VideoMode    { nullptr }
@@ -60,7 +59,7 @@ GlfwWindow::GlfwWindow( Game& game,
 	glfwWindowHint(GLFW_OPENGL_PROFILE,       context.profile);
 
 	glfwWindowHint(GLFW_RESIZABLE,    GL_FALSE);
-	glfwWindowHint(GLFW_DECORATED,    decorated ? GL_TRUE : GL_FALSE);
+	glfwWindowHint(GLFW_DECORATED,    GL_FALSE);
 	glfwWindowHint(GLFW_FOCUSED,      GL_TRUE);
 	glfwWindowHint(GLFW_RED_BITS,     m_VideoMode->redBits);
 	glfwWindowHint(GLFW_GREEN_BITS,   m_VideoMode->greenBits);

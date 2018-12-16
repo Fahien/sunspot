@@ -44,7 +44,7 @@ class Window
 public:
 	static const std::string tag;
 
-	Window( Game& game, const char* title, const mst::Size windowSize, const bool decorated, const bool stereoscopic );
+	Window( Game& game, const char* title, const mst::Size windowSize, const bool stereoscopic );
 	~Window();
 
 	const mst::Size& getFrameSize() const { return m_FrameSize; }
@@ -79,7 +79,6 @@ protected:
 	mst::Size m_MonitorSize;
 	mst::Size m_FrameSize;
 
-	bool mDecorated;
 	bool mStereoscopic;
 	bool mFullscreen;
 

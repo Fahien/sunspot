@@ -16,20 +16,23 @@
 
 #include "sunspot/entity/Script.h"
 
-using namespace sunspot;
 using namespace pyspot;
 namespace mst = mathspot;
 namespace lst = logspot;
 
 
-std::unique_ptr<Interpreter> Script::interpreter{ nullptr };
+namespace sunspot
+{
 
 
-void Script::Initialize(const tstring& scriptPath)
+std::unique_ptr<Interpreter> Script::interpreter { nullptr };
+
+
+void Script::Initialize(const std::string& scriptPath)
 {
 	if (!interpreter)
 	{
-		interpreter = std::make_unique<Interpreter>("sunspot", PyInit_sunspot, scriptPath.c_str());
+		interpreter = std::make_unique<Interpreter>("sunspot", PyInit_sunspot, pyspot::to_tstring( scriptPath ).c_str());
 	}
 }
 
@@ -133,3 +136,6 @@ void Script::Update( const float delta )
 	model.GetNode().matrix.RotateY( mEntity.mTransform->rotation.y );
 	model.GetNode().matrix.RotateZ( mEntity.mTransform->rotation.z );
 }
+
+
+} // namespace sunspot

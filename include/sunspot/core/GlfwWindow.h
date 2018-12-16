@@ -26,7 +26,7 @@ public:
 class GlfwWindow : public Window
 {
 public:
-	GlfwWindow( Game& game, const char* title = "SunSpot", const mst::Size windowSize = { 960, 540 }, const bool decorated = true, const bool stereoscopic = false);
+	GlfwWindow( Game& game, const char* title = "SunSpot", const mst::Size windowSize = { 960, 540 }, const bool stereoscopic = false);
 	~GlfwWindow();
 
 	GLFWwindow* GetHandle() const { return m_Window; }

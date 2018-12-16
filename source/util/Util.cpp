@@ -8,8 +8,17 @@ namespace sunspot
 
 
 CliArgs::CliArgs( const int argc, const char** argv )
-: m_Args { pack_args( argc, argv ) }
-, project { /* .name = */ find( "-project" ) }
+:	m_Args { pack_args( argc, argv ) }
+,	project {
+		/* .name = */ find( "-project" ),
+		/* .path = */ "project/" + project.name,
+		/* .db   = */ {
+			/* .path */ project.path + "/" + project.name + ".data"
+		},
+		/* .script = */ {
+			/* .path */ project.path + "/script"
+		}
+	}
 {
 	logspot::Logger::log.Info( "Project [%s]", project.name.c_str() );
 }

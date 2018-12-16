@@ -11,11 +11,11 @@ using namespace gltfspot;
 
 
 const string ModelRepository::kExt{ ".gltf" };
-const string ModelRepository::kModelDir{ "model/" };
+const string ModelRepository::kModelDir{ "model" };
 
 
 ModelRepository::ModelRepository(const string& projectDir)
-:	mProjectDir{ projectDir + kModelDir }
+:	mProjectDir{ projectDir + "/" + kModelDir }
 {}
 
 
@@ -42,7 +42,7 @@ component::Model& ModelRepository::GetModel(const int id, const string& path, co
 	else
 	{
 		// Construct the complete path
-		string modelPath { mProjectDir + path + "/" + path + kExt };
+		string modelPath { mProjectDir + "/" + path + "/" + path + kExt };
 		GltfRenderer renderer { Gltf::Load(modelPath) };
 		// Store it into the model map
 		auto itRenderer = mRenderers.emplace(path, move(renderer));

@@ -10,6 +10,7 @@
 #include <dataspot/Exception.h>
 
 #include "sunspot/util/Util.h"
+#include "sunspot/core/Config.h"
 #include "SunSpotConfig.h"
 
 #include "sunspot/core/Game.h"
@@ -35,7 +36,6 @@ using namespace std;
 using namespace pyspot;
 using namespace mathspot;
 using namespace logspot;
-using namespace dataspot;
 
 static int scale{ 1 };
 static Size windowSize{ 960, 540 };
@@ -74,29 +74,21 @@ int main( const int argc, const char **argv)
 		// Get command line arguments
 		auto arguments = CliArgs( argc, argv );
 
-		// Project name
-		string projectName { arguments.project.name };
-
 		// Load database
-		dst::DataSpot dataspot { projectDir + "/" + projectName + "/" + projectName + ".data" };
-		windowSize.width  = stoi(dataspot.GetConfigValue("window.width"));
-		windowSize.height = stoi(dataspot.GetConfigValue("window.height"));
-		bool decorated = true;
+		dataspot::DataSpot database { arguments.project.db.path };
 
-		// Initialize PySpot
-		wstring wProjectDir;
-		wProjectDir.assign( projectDir.begin(), projectDir.end() );
-		
-		wstring wProjectName;
-		wProjectName.assign( projectName.begin(), projectName.end() );
+		// Get config values
+		Config config { database };
 
-		Script::Initialize( wProjectDir + _T( "/" ) + wProjectName + _T( "/script" ) );
+		// Script has to be initialized before loading the entities
+		Script::Initialize( arguments.project.script.path );
 
 		Game game;
-		game.GetGraphics().SetViewport( graphic::System::Viewport{ { 0, 0 }, { windowSize.width, windowSize.height } } );
-		//GlfwWindow window { SST_TITLE, windowSize, decorated, stereoscopic };
 
-		float aspectRatio { static_cast<float>( windowSize.width ) / windowSize.height };
+		auto& graphic = game.GetGraphics();
+		graphic.SetViewport( graphic::System::Viewport{ { 0, 0 }, config.window.size } );
+
+		float aspectRatio { static_cast<float>( config.window.size.width ) / config.window.size.height };
 
 		{
 			GltfPerspectiveCamera camera{ aspectRatio, fov, kNear, kFar };
@@ -121,11 +113,10 @@ int main( const int argc, const char **argv)
 		light.SetPosition(0.0f, 0.0f, 8.0f);
 		game.GetGraphics().SetLight( &light );
 
-		string projectPath { projectDir + "/" + projectName + "/" };
-		ModelRepository modelRepository { projectPath };
-		EntityRepository entityRepository { dataspot, modelRepository };
+		ModelRepository modelRepository { arguments.project.path };
+		EntityRepository entityRepository { database, modelRepository };
 
-		// Read a set of objects from dataspot
+		// Read a set of objects from database
 		constexpr int entitiesCount = 4;
 		// For every object get the name
 		for ( int i{ 0 }; i < entitiesCount; ++i )
@@ -148,6 +139,30 @@ int main( const int argc, const char **argv)
 
 			game.AddEntity( *entity );
 		}
+
+		// Set up editor GUI
+		auto& gui = game.GetGui();
+
+		gui.fPreDraw = [&game]() {
+			using namespace ImGui;
+			// Main menu
+			if (BeginMainMenuBar())
+			{
+				if (BeginMenu("File"))
+				{
+					if (MenuItem("Exit"))
+					{
+						glfwSetWindowShouldClose(game.GetWindow().GetHandle(), GLFW_TRUE);
+					}
+					EndMenu();
+				}
+				if (BeginMenu("Edit"))
+				{
+					EndMenu();
+				}
+			}
+			EndMainMenuBar();
+		};
 
 		game.Loop(); // GameLoop.it
 

@@ -1,6 +1,8 @@
 #pragma once
 #pragma warning(disable: 5030) // unknown attribute
 
+#include <functional>
+
 #include <imgui/imgui.h>
 
 
@@ -33,6 +35,8 @@ class ImGui
 	void Update( const float delta ) const;
 
 	void Draw() const;
+
+	std::function<void()> fPreDraw;
 };
 
 

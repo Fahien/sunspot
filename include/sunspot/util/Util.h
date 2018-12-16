@@ -54,6 +54,13 @@ class CliArgs
   public:
 	const struct {
 		std::string name;
+		std::string path;
+		const struct {
+			std::string path;
+		} db;
+		const struct {
+			std::string path;
+		} script;
 	} project;
 
 };

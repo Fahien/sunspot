@@ -34,7 +34,7 @@ class Script : public Object
 	void Collide(Entity& other);
 	void Update(const float delta);
 
-	static void Initialize(const pst::tstring& scriptPath);
+	static void Initialize(const std::string& scriptPath);
 
   private:
 	static std::unique_ptr<pst::Interpreter> interpreter;

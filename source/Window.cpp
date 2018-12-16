@@ -27,13 +27,12 @@ namespace sunspot
 const std::string Window::tag{ "Window" };
 
 
-Window::Window( Game& game, const char* title, const mst::Size windowSize, const bool decorated, const bool stereoscopic)
+Window::Window( Game& game, const char* title, const mst::Size windowSize, const bool stereoscopic)
 :	m_Game { game }
 ,	m_Title       { title }
 ,	m_WindowSize  { windowSize }
 ,	m_MonitorSize { windowSize }
 ,	m_FrameSize   { windowSize }
-,	mDecorated{ decorated }
 ,	mStereoscopic{ stereoscopic }
 ,	mFullscreen{ false }
 ,	mCurrentTime{ 0.0f }

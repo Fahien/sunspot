@@ -156,6 +156,7 @@ add_custom_target(bindings SOURCES always)
 set(SOURCES
 	${GEN_SOURCES}
 	source/util/Util.cpp
+	source/core/Config.cpp
 	source/system/Graphic.cpp
 	source/system/graphic/Shader.cpp
 	source/core/String.cpp
