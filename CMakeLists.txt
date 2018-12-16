@@ -120,14 +120,14 @@ set(GEN_SOURCES
 	${CMAKE_CURRENT_BINARY_DIR}/include/pyspot/Bindings.h
 	${CMAKE_CURRENT_BINARY_DIR}/include/pyspot/Extension.h
 	${CMAKE_CURRENT_BINARY_DIR}/src/pyspot/Bindings.cpp
-	${CMAKE_CURRENT_BINARY_DIR}/src/pyspot/Extension.cpp
-)
+	${CMAKE_CURRENT_BINARY_DIR}/src/pyspot/Extension.cpp)
+
 # Join function
-FUNCTION(JOIN VALUES GLUE OUTPUT)
-	STRING(REGEX REPLACE "([^\\]|^);" "\\1${GLUE}" _TMP_STR "${VALUES}")
-	STRING(REGEX REPLACE "[\\](.)" "\\1" _TMP_STR "${_TMP_STR}") #fixes escaping
-	SET(${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
-ENDFUNCTION()
+function(join VALUES GLUE OUTPUT)
+	string(REGEX REPLACE "([^\\]|^);" "\\1${GLUE}" _TMP_STR "${VALUES}")
+	string(REGEX REPLACE "[\\](.)" "\\1" _TMP_STR "${_TMP_STR}") #fixes escaping
+	set(${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
+endfunction()
 
 # Sources to export
 set(EXPORT_SOURCES
@@ -140,18 +140,22 @@ set(EXPORT_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/core/Gui.h
 	${MATHSPOT_INCLUDE_DIR}/mathspot/Math.h
 )
+
 # Generation command
-JOIN("${DEPENDENCY_INCLUDE_DIRS};${MATHSPOT_INCLUDE_DIRS};${IMGUI_INCLUDE_DIR}" "\" -I\"" GEN_INCLUDE_DIRS)
+join("${DEPENDENCY_INCLUDE_DIRS};${MATHSPOT_INCLUDE_DIRS};${IMGUI_INCLUDE_DIR}" "\" -I\"" GEN_INCLUDE_DIRS)
 set(GEN_INCLUDE_DIRS "\"${GEN_INCLUDE_DIRS}\"")
-add_custom_command(OUTPUT ${GEN_SOURCES}
+add_custom_command(OUTPUT ${GEN_SOURCES} always
 	COMMAND pywrap.exe
-	ARGS ${EXPORT_SOURCES} -- -I${GEN_INCLUDE_DIRS} -xc++ -std=c++14 -DPYTHON_VERSION=${PYTHON_VERSION}
+	ARGS ${EXPORT_SOURCES} -o sunspot -- -I${GEN_INCLUDE_DIRS} -xc++ -std=c++14 -DPYTHON_VERSION=${PYTHON_VERSION}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	COMMENT "Generating Bindings and Extension"
 )
 
+add_custom_target(bindings SOURCES always)
+
 set(SOURCES
 	${GEN_SOURCES}
+	source/util/Util.cpp
 	source/system/Graphic.cpp
 	source/system/graphic/Shader.cpp
 	source/core/String.cpp
@@ -179,8 +183,6 @@ set(SOURCES
 	source/view/GltfMesh.cpp
 	source/view/GltfRenderer.h
 	source/view/GltfRenderer.cpp
-	#source/WavefrontObject.h
-	#source/WavefrontObject.cpp
 	source/Color.h
 	source/Color.cpp
 	source/system/graphic/Light.cpp
@@ -203,8 +205,7 @@ else()
 		source/core/Game.cpp
 		source/Window.h
 		source/Window.cpp
-		source/core/GlfwWindow.cpp
-	)
+		source/core/GlfwWindow.cpp)
 	set(EXE_SOURCES
 		${GLFW_SOURCES}
 		source/Main.cpp)
@@ -229,6 +230,7 @@ set(DEPENDENCY_LIBRARIES
 add_library(${SST_NAME}-lib ${SOURCES} ${SHADERS})
 target_include_directories(${SST_NAME}-lib PUBLIC ${DEPENDENCY_INCLUDE_DIRS})
 target_link_libraries(${SST_NAME}-lib ${DEPENDENCY_LIBRARIES})
+add_dependencies(${SST_NAME}-lib bindings)
 
 if(WIN32)
 	set_target_properties(${SST_NAME}-lib PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt")

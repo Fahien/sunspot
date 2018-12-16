@@ -9,6 +9,7 @@
 #include <dataspot/DataSpot.h>
 #include <dataspot/Exception.h>
 
+#include "sunspot/util/Util.h"
 #include "SunSpotConfig.h"
 
 #include "sunspot/core/Game.h"
@@ -63,13 +64,7 @@ void printLogo()
 }
 
 
-bool contains(const vector<string> &arguments, const char *s)
-{
-	return find(arguments.begin(), arguments.end(), s) != arguments.end();
-}
-
-
-int main(int argc, char **argv)
+int main( const int argc, const char **argv)
 {
 	using namespace sunspot;
 
@@ -77,47 +72,16 @@ int main(int argc, char **argv)
 
 	try {
 		// Get command line arguments
-		vector<string> arguments{};
-		for (int i{ 1 }; i < argc; ++i)
-		{
-			arguments.push_back(string{argv[i]});
-		}
-
-		// Window scale
-		vector<string>::iterator it;
-		if ((it = find(arguments.begin(), arguments.end(), "-scale")) != arguments.end())
-		{
-			if (++it != arguments.end())
-			{
-				scale = stoi(*it);
-				Logger::log.Info("Scale [%d]", scale);
-			}
-			else
-			{
-				cerr << "Scale [" << scale << "] (Default)\n";
-			}
-		}
-		windowSize *= scale;
-
-		bool decorated   { contains(arguments, "-decorated")    }; // Window decorations
-		bool stereoscopic{ contains(arguments, "-stereoscopic") }; // Stereoscopic rendering
+		auto arguments = CliArgs( argc, argv );
 
 		// Project name
-		string projectName{ "default" };
-		if ((it = find(arguments.begin(), arguments.end(), "-project")) != arguments.end())
-		{
-			if (++it != arguments.end())
-			{
-				projectName = *it;
-			}
-			Logger::log.Info("Project [%s]", projectName.c_str());
-		}
+		string projectName { arguments.project.name };
 
 		// Load database
 		dst::DataSpot dataspot { projectDir + "/" + projectName + "/" + projectName + ".data" };
 		windowSize.width  = stoi(dataspot.GetConfigValue("window.width"));
 		windowSize.height = stoi(dataspot.GetConfigValue("window.height"));
-		decorated = true;
+		bool decorated = true;
 
 		// Initialize PySpot
 		wstring wProjectDir;
@@ -156,19 +120,6 @@ int main(int argc, char **argv)
 		graphic::PointLight light { Color { 18.0f, 18.0f, 18.0f } };
 		light.SetPosition(0.0f, 0.0f, 8.0f);
 		game.GetGraphics().SetLight( &light );
-
-		// Inject dependencies into window
-		graphic::Framebuffer framebuffer { game.GetWindow().getFrameSize() / 2 };
-		graphic::shader::Program quadProgram  { "shader/quad.vert", "shader/quad.frag" };
-		graphic::shader::Program depthProgram { "shader/quad.vert", "shader/depth.frag" };
-		Quad quad{};
-		if ( stereoscopic )
-		{
-			//game.GetGraphics().setQuadProgram( &quadProgram );
-			//game.GetGraphics().setDepthProgram( &depthProgram );
-			//game.GetGraphics().setQuad( &quad );
-			//game.GetGraphics().setFramebuffer( &framebuffer );
-		}
 
 		string projectPath { projectDir + "/" + projectName + "/" };
 		ModelRepository modelRepository { projectPath };

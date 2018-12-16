@@ -50,8 +50,6 @@ void ImGui::Update(const float delta ) const
 
 void ImGui::Draw() const
 {
-	::ImGui::ShowTestWindow();
-
 	::ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData( ::ImGui::GetDrawData() );
 }
