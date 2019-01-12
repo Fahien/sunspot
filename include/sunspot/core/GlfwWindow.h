@@ -26,17 +26,25 @@ public:
 class GlfwWindow : public Window
 {
 public:
-	GlfwWindow( Game& game, const char* title = "SunSpot", const mst::Size windowSize = { 960, 540 }, const bool stereoscopic = false);
+	GlfwWindow(Game& game, const char* title = "SunSpot", const mst::Size windowSize = { 960, 540 }, const bool stereoscopic = false);
 	~GlfwWindow();
 
-	GLFWwindow* GetHandle() const { return m_Window; }
+	GLFWwindow* GetHandle() const { return handle; }
 
-	bool ShouldClose() const { return glfwWindowShouldClose( m_Window ); }
+	void ToggleMaximization() {
+		maximized ? glfwRestoreWindow( handle ) : glfwMaximizeWindow( handle );
+		maximized = !maximized;
+	}
+	void Restore() { glfwRestoreWindow( handle ); maximized = false; }
+	void SetClosing(const bool closing) const;
+	bool IsClosing() const { return glfwWindowShouldClose(handle); }
 	void PollEvents() const { glfwPollEvents(); }
 	void SwapBuffers() const {
-		glfwMakeContextCurrent( m_Window );
-		glfwSwapBuffers( m_Window );
+		glfwMakeContextCurrent(handle);
+		glfwSwapBuffers(handle);
 	}
+	const Win::Position& GetPosition() { glfwGetWindowPos(handle, &window.pos.x, &window.pos.y); return window.pos; }
+	void SetPosition(const int x, const int y) { if (!maximized) { window.pos = { x, y }; glfwSetWindowPos(handle, x, y); } }
 	const float GetTime() const { return static_cast<float>( glfwGetTime() ); }
 	void UpdateSize();
 
@@ -68,9 +76,10 @@ private:
 	void renderQuad(const float& deltaTime);
 	void renderStereoscopic(const float& deltaTime);
 
-	GLFWmonitor*       m_Monitor;
-	const GLFWvidmode* m_VideoMode;
-	GLFWwindow*        m_Window;
+	GLFWmonitor*       monitor;
+	const GLFWvidmode* videomode;
+	GLFWwindow*        handle;
+	bool maximized = false;
 };
 
 }

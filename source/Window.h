@@ -70,12 +70,22 @@ protected:
 	static void initGlew();
 	void render();
 	void handleInput( input::Input&& in );
+	Game& GetGame() { return m_Game; }
 
 	virtual void toggleFullscreen() = 0;
 	virtual const input::Input pollInput() = 0;
 
 	const char* m_Title;
-	mst::Size m_WindowSize;
+	// TODO refactor this
+	struct Win
+	{
+		// TODO Create template size
+		mst::Size size;
+		// TODO create template vectors
+		struct Position {
+			int x; int y;
+		} pos;
+	} window;
 	mst::Size m_MonitorSize;
 	mst::Size m_FrameSize;
 
@@ -97,18 +107,17 @@ protected:
 	Entity* m_Camera;
 
 private:
-	void render(const float &deltaTime);
-	void render3D(const float& deltaTime);
-	void renderGltf(const float& deltaTime);
-	void renderQuad(const float& deltaTime);
-	void renderStereoscopic(const float& deltaTime);
+	void render( const float &deltaTime );
+	void render3D( const float& deltaTime );
+	void renderGltf( const float& deltaTime );
+	void renderQuad( const float& deltaTime );
+	void renderStereoscopic( const float& deltaTime );
 
 	Game& m_Game;
 
 	const graphic::shader::Program* mBaseProgram;
 	graphic::Light* mLight;
 	std::vector<WavefrontObject*> mObjs;
-	//std::vector<std::shared_ptr<Entity>> mEntities;
 	std::vector<Entity*> mEntities{};
 	GltfRenderer* mGltfRenderer { nullptr };
 	const graphic::shader::Program* mQuadProgram;

@@ -37,7 +37,6 @@ int main( int argc, char** argv )
 	{
 		Interpreter interpreter {};
 		Game game;
-		GlfwWindow window { game, title.c_str(), windowSize, true, false };
 
 		float aspectRatio{ static_cast<float>( windowSize.width ) / windowSize.height };
 		float fov{ radians( 45.0f ) };
@@ -46,19 +45,20 @@ int main( int argc, char** argv )
 
 		GltfPerspectiveCamera camera{ aspectRatio, fov, near, far };
 		camera.Translate( Vec3{ 0.0f, 0.0f, 6.0f } );
-		window.SetCamera( &camera );
+		Entity cameraEntity {};
+		game.GetGraphics().SetCamera( cameraEntity );
 
 		// Load a Gltf model and upload the model into GPU buffers
-		string modelPath{ argv[1] };
-		Gltf gltf{ Gltf::Load( modelPath ) };
-		GltfRenderer renderer{ move( gltf ) };
-		window.AddGltf( &renderer );
+		//string modelPath{ argv[1] };
+		//Gltf gltf{ Gltf::Load( modelPath ) };
+		//GltfRenderer renderer{ move( gltf ) };
+		//window.AddGltf( &renderer );
 
 		/// Render to texture
 		/// Compare it with a reference
 
 		graphic::shader::Program baseProgram { "shader/base.vert", "shader/base.frag" };
-		window.setBaseProgram( &baseProgram );
+		game.GetGraphics().SetShaderProgram( &baseProgram );
 
 		//DirectionalLight light{ Color{ 1.0f, 1.0f, 1.0f } };
 		//light.SetDirection(0.0f, 0.0f, 4.0f);
@@ -71,7 +71,7 @@ int main( int argc, char** argv )
 		//light.GetSpecular().b /= divFactor / 2;
 		graphic::PointLight light{ Color{ 1.0f, 1.0f, 1.0f } };
 		light.SetPosition( 4.0f, 1.0f, -2.0f );
-		window.setLight( &light );
+		game.GetGraphics().SetLight( &light );
 
 		// TODO render to texture
 		// TODO Compare rendered texture to gold image

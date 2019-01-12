@@ -20,11 +20,11 @@ class Game
 {
   public:
 
-	GlfwWindow& GetWindow() { return m_Window; }
-	graphic::System& GetGraphics() { return m_Graphics; }
-	ImGui& GetGui() { return m_Gui; }
+	GlfwWindow& GetWindow() { return window; }
+	graphic::System& GetGraphics() { return graphics; }
+	ImGui& GetGui() { return gui; }
 
-	void AddEntity( Entity& entity ) { m_Entities.push_back( &entity ); m_Collisions.Add( entity ); }
+	void AddEntity( Entity& entity ) { entities.push_back( &entity ); collisions.Add( entity ); }
 
 	void Handle( input::Input&& in );
 
@@ -33,15 +33,15 @@ class Game
   private:
 	const float computeDeltaTime();
 
-	Time m_Time = {};
+	Time time = {};
 
-	GlfwWindow m_Window = { *this };
-	ImGui      m_Gui    = { m_Window };
+	GlfwWindow window = { *this };
+	ImGui      gui    = { window };
 
-	system::Collision m_Collisions = {};
-	graphic::System   m_Graphics   = {};
+	system::Collision collisions = {};
+	graphic::System   graphics   = {};
 
-	std::vector<Entity*> m_Entities = {};
+	std::vector<Entity*> entities = {};
 };
 
 

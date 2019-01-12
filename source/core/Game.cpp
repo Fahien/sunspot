@@ -9,7 +9,7 @@ namespace sunspot
 
 void Game::Handle( input::Input&& in )
 {
-	for ( auto& pEntity : m_Entities )
+	for ( auto& pEntity : entities )
 	{
 		pEntity->Handle( in );
 	}
@@ -18,36 +18,36 @@ void Game::Handle( input::Input&& in )
 
 const float Game::computeDeltaTime()
 {
-	m_Time.current = static_cast<float>( glfwGetTime() );
-	const auto delta = m_Time.current - m_Time.last;
-	m_Time.last = m_Time.current;
+	time.current = static_cast<float>( glfwGetTime() );
+	const auto delta = time.current - time.last;
+	time.last = time.current;
 	return delta;
 }
 
 
 void Game::Loop()
 {
-	while ( !m_Window.ShouldClose() )
+	while ( !window.IsClosing() )
 	{
-		m_Window.PollEvents();
-		m_Window.UpdateSize();
+		window.PollEvents();
+		window.UpdateSize();
 		
-		m_Collisions.Update();
+		collisions.Update();
 
 		auto delta = computeDeltaTime();
 
-		m_Gui.Update( delta );
+		gui.Update( delta );
 
-		for ( auto pEntity : m_Entities )
+		for ( auto pEntity : entities )
 		{
 			pEntity->Update( delta );
 		}
 
-		m_Graphics.Draw();
+		graphics.Draw();
 
-		m_Gui.Draw();
+		gui.Draw();
 
-		m_Window.SwapBuffers();
+		window.SwapBuffers();
 	}
 }
 

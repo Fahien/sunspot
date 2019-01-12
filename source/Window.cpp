@@ -28,25 +28,25 @@ const std::string Window::tag{ "Window" };
 
 
 Window::Window( Game& game, const char* title, const mst::Size windowSize, const bool stereoscopic)
-:	m_Game { game }
+:	m_Game        { game }
 ,	m_Title       { title }
-,	m_WindowSize  { windowSize }
+,	window        { /* .size = */ windowSize }
 ,	m_MonitorSize { windowSize }
 ,	m_FrameSize   { windowSize }
-,	mStereoscopic{ stereoscopic }
-,	mFullscreen{ false }
-,	mCurrentTime{ 0.0f }
-,	mLastTime{ 0.0f }
-,	mDeltaTime{ 0.0f }
-,	mCursor{}
-,	m_pCamera { nullptr }
-,	mBaseProgram{ nullptr }
-,	mLight{ nullptr }
-,	mObjs{}
-,	mQuadProgram{ nullptr }
-,	mDepthProgram{ nullptr }
-,	mFramebuffer{ nullptr }
-,	mQuad{ nullptr }
+,	mStereoscopic { stereoscopic }
+,	mFullscreen   { false }
+,	mCurrentTime  { 0.0f }
+,	mLastTime     { 0.0f }
+,	mDeltaTime    { 0.0f }
+,	mCursor       {}
+,	m_pCamera     { nullptr }
+,	mBaseProgram  { nullptr }
+,	mLight        { nullptr }
+,	mObjs         {}
+,	mQuadProgram  { nullptr }
+,	mDepthProgram { nullptr }
+,	mFramebuffer  { nullptr }
+,	mQuad         { nullptr }
 {}
 
 
@@ -57,9 +57,9 @@ Window::~Window()
 void Window::initGlew()
 {
 	glewExperimental = GL_TRUE; // Initialize GLEW and handle error
-	if (glewInit() != GLEW_OK)
+	if ( glewInit() != GLEW_OK )
 	{
-		throw GlewException(tag);
+		throw GlewException( tag );
 	}
 }
 
@@ -67,42 +67,6 @@ void Window::initGlew()
 void Window::handleInput( input::Input&& i )
 {
 	m_Game.Handle( std::move( i ) );
-/*
-	if ( i.action == input::Action::PRESS )
-	{
-		if ( i.key == input::Key::A )
-		{
-			m_Camera->GetTransform()->position.x += -1.0;
-		}
-		if ( i.key == input::Key::S )
-		{
-			m_Camera->GetTransform()->position.z += -1.0;
-		}
-		if ( i.key == input::Key::W )
-		{
-			m_Camera->GetTransform()->position.z += 1.0;
-		}
-		if ( i.key == input::Key::D )
-		{
-			m_Camera->GetTransform()->position.x += 1.0;
-		}
-		if ( i.key == input::Key::Q )
-		{
-			m_Camera->GetTransform()->rotation.x += 0.25;
-			logspot::Logger::log.Info( "Camera Rotation X: %f", m_Camera->GetTransform()->rotation.x );
-		}
-		if ( i.key == input::Key::E )
-		{
-			m_Camera->GetTransform()->rotation.x += -0.25;
-			logspot::Logger::log.Info( "Camera Rotation X: %f", m_Camera->GetTransform()->rotation.x );
-		}
-	}
-
-	for ( auto& entity : mEntities )
-	{
-		entity->Handle( i );
-	}
-*/
 }
 
 
@@ -112,36 +76,33 @@ void Window::render()
 }
 
 
-void Window::render(const float& deltaTime) // TODO comment
+void Window::render( const float& deltaTime ) // TODO comment
 {
-	// std::cout << static_cast<int>(1.0f / deltaTime) << " "; // FPS
-	//updateFrameSize();
-
 	mCollision.Update();
 
-	for (auto entity : mEntities)
+	for ( auto entity : mEntities )
 	{
-		entity->Update(deltaTime);
+		entity->Update( deltaTime );
 	}
 
-	if (mStereoscopic)
+	if ( mStereoscopic )
 	{
-		renderStereoscopic(deltaTime);
+		renderStereoscopic( deltaTime );
 	}
 	else
 	{
-		render3D(deltaTime);
+		render3D( deltaTime );
 	}
 }
 
 
-void Window::renderGltf(const float& deltaTime)
+void Window::renderGltf( const float& deltaTime )
 {
-	glEnable(GL_DEPTH_TEST);
+	glEnable( GL_DEPTH_TEST );
 	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-	glViewport(0, 0, m_FrameSize.width, m_FrameSize.height);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
+	glViewport( 0, 0, m_FrameSize.width, m_FrameSize.height );
+	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); // Clear color and depth buffer
 //	mBaseProgram->use();
 	//mCamera->update(deltaTime, *mBaseProgram);
 //	mLight->Update(*mBaseProgram);
@@ -189,10 +150,10 @@ void Window::renderQuad( const float& /* deltaTime */ )
 }
 
 #ifdef SST_PROFILING
-static int profiling_line{ 0 };
+static int profiling_line { 0 };
 #endif
 
-void Window::renderStereoscopic(const float& deltaTime)
+void Window::renderStereoscopic( const float& deltaTime )
 {
 #ifdef SST_PROFILING
 	auto t1 = std::chrono::high_resolution_clock::now();

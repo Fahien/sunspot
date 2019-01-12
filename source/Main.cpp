@@ -85,33 +85,17 @@ int main( const int argc, const char **argv)
 
 		Game game;
 
-		auto& graphic = game.GetGraphics();
-		graphic.SetViewport( graphic::System::Viewport{ { 0, 0 }, config.window.size } );
+		auto& graphics = game.GetGraphics();
+		graphics.SetViewport( graphic::System::Viewport{ { 0, 0 }, config.window.size } );
 
 		float aspectRatio { static_cast<float>( config.window.size.width ) / config.window.size.height };
 
-		{
-			GltfPerspectiveCamera camera{ aspectRatio, fov, kNear, kFar };
-			camera.Translate(Vec3{ 0.0f, 0.0f, 32.0f });
-			//camera.LookAt(0.0f, 0.0f, 0.0f);
-			//game.GetGraphics().SetCamera( &camera );
-		}
-
 		graphic::shader::Program baseProgram { "shader/base.vert", "shader/base.frag" };
-		game.GetGraphics().SetShaderProgram( &baseProgram );
+		graphics.SetShaderProgram( &baseProgram );
 
-		//DirectionalLight light{ Color{ 1.0f, 1.0f, 1.0f } };
-		//light.SetDirection(0.0f, 0.0f, 4.0f);
-		//float divFactor = 1.0f;
-		//light.GetAmbient().r /= divFactor;
-		//light.GetAmbient().g /= divFactor;
-		//light.GetAmbient().b /= divFactor;
-		//light.GetSpecular().r /= divFactor / 2;
-		//light.GetSpecular().g /= divFactor / 2;
-		//light.GetSpecular().b /= divFactor / 2;
 		graphic::PointLight light { Color { 18.0f, 18.0f, 18.0f } };
 		light.SetPosition(0.0f, 0.0f, 8.0f);
-		game.GetGraphics().SetLight( &light );
+		graphics.SetLight( &light );
 
 		ModelRepository modelRepository { arguments.project.path };
 		EntityRepository entityRepository { database, modelRepository };
@@ -129,7 +113,7 @@ int main( const int argc, const char **argv)
 				{
 					pPerspectiveCam->SetAspectRatio( aspectRatio );
 				}
-				game.GetGraphics().SetCamera( *entity );
+				graphics.SetCamera( *entity );
 			}
 
 			if ( auto model = entity->Get<component::Model>() )
@@ -145,23 +129,51 @@ int main( const int argc, const char **argv)
 
 		gui.fPreDraw = [&game]() {
 			using namespace ImGui;
+			auto& g = GetIO();
+			auto& window = game.GetWindow();
+
 			// Main menu
 			if (BeginMainMenuBar())
 			{
+				if (IsMouseDragging())
+				{
+					auto drag = GetMouseDragDelta();
+					auto& pos = window.GetPosition();
+					window.SetPosition(pos.x + static_cast<int>( drag.x ), pos.y + static_cast<int>( drag.y ));
+				}
 				if (BeginMenu("File"))
 				{
-					if (MenuItem("Exit"))
-					{
-						glfwSetWindowShouldClose(game.GetWindow().GetHandle(), GLFW_TRUE);
-					}
 					EndMenu();
 				}
 				if (BeginMenu("Edit"))
 				{
+					if (MenuItem("Toggle"))
+					{
+						window.ToggleMaximization();
+					}
 					EndMenu();
+				}
+				SetCursorPosX(window.getFrameSize().width - 41.0f );
+				if ( MenuItem( "T" ) )
+				{
+					window.ToggleMaximization();
+				}
+				if ( MenuItem( "X" ) )
+				{
+					window.SetClosing(true);
 				}
 			}
 			EndMainMenuBar();
+
+			// Frame
+			PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
+			ImGuiWindowFlags frameFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs;
+			SetNextWindowPos( { 0.0f, 0.0f } );
+			SetNextWindowSize( g.DisplaySize );
+			SetNextWindowBgAlpha( 0.0f );
+			Begin( "Frame", nullptr, frameFlags );
+			PopStyleVar( 1 );
+			End();
 		};
 
 		game.Loop(); // GameLoop.it
