@@ -1,0 +1,5 @@
+CMAKE=cmake
+OUTPUT=deploy
+
+$CMAKE -version
+$CMAKE -H. -Bbuild/mac/debug -DLST_LOGGING=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$OUTPUT

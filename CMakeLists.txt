@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 project(SunSpot LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD   11)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
 	set(ANDROID TRUE)
@@ -18,11 +18,12 @@ message(STATUS "Searching modules in ${CMAKE_MODULE_PATH}")
 option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 # Python 3
-find_package(PythonInterp 3)
+find_package(PythonInterp)
 add_definitions("-DPYTHON_VERSION=${PYTHON_VERSION}")
 
-# Modules
+# Modules and libs
 set(MODULE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/module)
+set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 include(AddLogSpot)
 include(AddMathSpot)
@@ -64,11 +65,11 @@ if(ANDROID)
 else()
 	list(APPEND CMAKE_PREFIX_PATH
 		${CMAKE_CURRENT_SOURCE_DIR}/include
-		${CMAKE_CURRENT_SOURCE_DIR}/lib)
+		${LIB_DIR})
 
 	find_package(OpenGL REQUIRED)
-	find_package(GLEW   REQUIRED)
-	find_package(GLFW   REQUIRED)
+	include(AddGlew)
+	include(AddGlfw)
 	set(DEPENDENCY_LIBRARIES
 		${OPENGL_LIBRARIES}
 		${GLEW_LIBRARIES}
@@ -130,7 +131,7 @@ function(join VALUES GLUE OUTPUT)
 endfunction()
 
 # Sources to export
-set(EXPORT_SOURCES
+set(EXPORT_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/component/Rigidbody.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/component/Transform.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Action.h
@@ -142,19 +143,32 @@ set(EXPORT_SOURCES
 )
 
 # Generation command
-join("${DEPENDENCY_INCLUDE_DIRS};${MATHSPOT_INCLUDE_DIRS};${IMGUI_INCLUDE_DIR}" "\" -I\"" GEN_INCLUDE_DIRS)
-set(GEN_INCLUDE_DIRS "\"${GEN_INCLUDE_DIRS}\"")
+set( COMMAND_ARGS
+	${EXPORT_HEADERS} -o sunspot
+	-- -xc++ -std=c++14 -DPY_MAJOR_VERSION=${PY_MAJOR_VERSION}
+	-I${DEPENDENCY_INCLUDE_DIRS}
+	-I${MATHSPOT_INCLUDE_DIRS}
+	-I${IMGUI_INCLUDE_DIR}
+)
+
+foreach( INCLUDE_DIR ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES} )
+	list( APPEND COMMAND_ARGS -I${INCLUDE_DIR} )
+endforeach()
+
 add_custom_command(OUTPUT ${GEN_SOURCES} always
-	COMMAND pywrap.exe
-	ARGS ${EXPORT_SOURCES} -o sunspot -- -I${GEN_INCLUDE_DIRS} -xc++ -std=c++14 -DPYTHON_VERSION=${PYTHON_VERSION}
+	COMMAND pywrap
+	ARGS ${COMMAND_ARGS}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	COMMENT "Generating Bindings and Extension"
 )
 
-add_custom_target(bindings SOURCES always)
+add_custom_target(gen_bindings SOURCES always)
+add_library( bindings ${GEN_SOURCES} )
+target_link_libraries( bindings ${PYSPOT_LIBRARIES})
+target_include_directories( bindings PUBLIC ${PROJECT_BINARY_DIR}/include )
 
+# Sources
 set(SOURCES
-	${GEN_SOURCES}
 	source/util/Util.cpp
 	source/core/Config.cpp
 	source/system/Graphic.cpp
@@ -225,10 +239,12 @@ set(DEPENDENCY_LIBRARIES
 	${DATASPOT_LIBRARIES}
 	${GLTFSPOT_LIBRARIES}
 	${HITSPOT_LIBRARIES}
-	${IMGUI})
+	${IMGUI}
+	bindings)
 
 # SunSpot library
 add_library(${SST_NAME}-lib ${SOURCES} ${SHADERS})
+target_compile_features( ${SST_NAME}-lib PRIVATE cxx_std_17 )
 target_include_directories(${SST_NAME}-lib PUBLIC ${DEPENDENCY_INCLUDE_DIRS})
 target_link_libraries(${SST_NAME}-lib ${DEPENDENCY_LIBRARIES})
 add_dependencies(${SST_NAME}-lib bindings)

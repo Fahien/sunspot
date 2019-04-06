@@ -10,7 +10,7 @@ void System::Draw()
 	glEnable( GL_DEPTH_TEST );
 	glViewport( m_Viewport.origin.x, m_Viewport.origin.y, m_Viewport.size.width, m_Viewport.size.height );
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); // Clear color and depth buffer
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  // Clear color and depth buffer
 	m_pProgram->Use();
 	m_pLight->Update( *m_pProgram );
 
@@ -22,4 +22,4 @@ void System::Draw()
 	}
 }
 
-} // namespace sunspot::system
+}  // namespace sunspot::graphic
