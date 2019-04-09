@@ -1,10 +1,10 @@
-#pragma once
-#pragma warning(disable: 5030) // unknown attribute
+#ifndef SST_GUI_H_
+#define SST_GUI_H_
 
 #include <functional>
-
 #include <imgui/imgui.h>
 
+#include "sunspot/util/Export.h"
 
 namespace sunspot
 {
@@ -12,10 +12,9 @@ namespace sunspot
 class GlfwWindow;
 
 
-class [[pyspot::export]] Gui
+class PYSPOT_EXPORT Gui
 {
   public:
-
 	void SetNextWindowPos( float x, float y, float px, float py ) const { ::ImGui::SetNextWindowPos( { x, y }, 0, { px, py } ); }
 	void SetWindowBorderSize( float size ) const { ::ImGui::PushStyleVar( ImGuiStyleVar_WindowBorderSize, size ); }
 	void SetFrameBorderSize( float size ) const { ::ImGui::PushStyleVar( ImGuiStyleVar_FrameBorderSize, size ); }
@@ -41,3 +40,5 @@ class ImGui
 
 
 } // namespace sunspot
+
+#endif // SST_GUI_H_

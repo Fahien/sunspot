@@ -1,21 +1,18 @@
-#ifndef SST_INPUTTYPE_H_
-#define SST_INPUTTYPE_H_
+#ifndef SST_INPUT_TYPE_H_
+#define SST_INPUT_TYPE_H_
 
-namespace sunspot
-{
-	
-namespace input
+#include "sunspot/util/Export.h"
+
+namespace sunspot::input
 {
 
-enum class [[pyspot::export]] Type
+enum class PYSPOT_EXPORT Type
 {
 	INVALID= 0,
 	KEY    = 1,
 	MOTION = 2
 };
 
-} // namespace input
+} // namespace sunspot::input
 
-} // namespace sunspot
-
-#endif // SST_INPUTACTION_H_
+#endif // SST_INPUT_TYPE_H_

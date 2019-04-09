@@ -1,13 +1,12 @@
-#ifndef SST_INPUTKEY_H_
-#define SST_INPUTKEY_H_
+#ifndef SST_INPUT_KEY_H_
+#define SST_INPUT_KEY_H_
 
-namespace sunspot
+#include "sunspot/util/Export.h"
+
+namespace sunspot::input
 {
 
-namespace input
-{
-
-enum class [[pyspot::export]] Key
+enum class PYSPOT_EXPORT Key
 {
 	NONE = 0,
 	UP   = 1,
@@ -22,8 +21,6 @@ enum class [[pyspot::export]] Key
 	E    = 10
 };
 
-} // namespace input
+} // namespace sunspot::input
 
-} // namespace sunspot
-
-#endif // SST_INPUTACTION_H_
+#endif // SST_INPUT_KEY_H_

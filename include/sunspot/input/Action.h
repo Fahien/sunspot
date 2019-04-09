@@ -1,21 +1,16 @@
-#ifndef SST_INPUTACTION_H_
-#define SST_INPUTACTION_H_
+#ifndef SST_INPUT_ACTION_H_
+#define SST_INPUT_ACTION_H_
 
-namespace sunspot
+#include "sunspot/util/Export.h"
+
+namespace sunspot::input
 {
 
-namespace input
+enum class PYSPOT_EXPORT Action
 {
-	
-enum class [[pyspot::export]] Action
-{
-	RELEASE = 0,
-	PRESS   = 1,
-	REPEAT = 2
+	RELEASE = 0, PRESS = 1, REPEAT = 2
 };
 
-}
+}  // namespace sunspot::input
 
-}
-
-#endif // SST_INPUTACTION_H_
+#endif  // SST_INPUT_ACTION_H_

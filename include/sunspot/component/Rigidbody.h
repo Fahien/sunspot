@@ -3,6 +3,8 @@
 
 #include <mathspot/Math.h>
 
+#include "sunspot/util/Export.h"
+
 
 namespace sunspot
 {
@@ -11,7 +13,7 @@ namespace component
 {
 
 
-class [[pyspot::export]] Rigidbody
+class PYSPOT_EXPORT Rigidbody
 {
   public:
 	int id;

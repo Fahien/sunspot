@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 project(SunSpot LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD   11)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
 	set(ANDROID TRUE)
@@ -16,10 +16,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 message(STATUS "Searching modules in ${CMAKE_MODULE_PATH}")
 
 option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
-
-# Python 3
-find_package(PythonInterp)
-add_definitions("-DPYTHON_VERSION=${PYTHON_VERSION}")
 
 # Modules and libs
 set(MODULE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/module)
@@ -145,15 +141,11 @@ set(EXPORT_HEADERS
 # Generation command
 set( COMMAND_ARGS
 	${EXPORT_HEADERS} -o sunspot
-	-- -xc++ -std=c++14 -DPY_MAJOR_VERSION=${PY_MAJOR_VERSION}
+	-- -xc++ -std=c++17 -DPY_MAJOR_VERSION=${PY_MAJOR_VERSION}
 	-I${DEPENDENCY_INCLUDE_DIRS}
 	-I${MATHSPOT_INCLUDE_DIRS}
 	-I${IMGUI_INCLUDE_DIR}
 )
-
-foreach( INCLUDE_DIR ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES} )
-	list( APPEND COMMAND_ARGS -I${INCLUDE_DIR} )
-endforeach()
 
 add_custom_command(OUTPUT ${GEN_SOURCES} always
 	COMMAND pywrap
@@ -165,7 +157,7 @@ add_custom_command(OUTPUT ${GEN_SOURCES} always
 add_custom_target(gen_bindings SOURCES always)
 add_library( bindings ${GEN_SOURCES} )
 target_link_libraries( bindings ${PYSPOT_LIBRARIES})
-target_include_directories( bindings PUBLIC ${PROJECT_BINARY_DIR}/include )
+target_include_directories( bindings PUBLIC ${DEPENDENCY_INCLUDE_DIRS} ${MATHSPOT_INCLUDE_DIRS} ${IMGUI_INCLUDE_DIR})
 
 # Sources
 set(SOURCES

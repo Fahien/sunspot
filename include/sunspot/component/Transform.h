@@ -3,6 +3,7 @@
 
 #include <mathspot/Math.h>
 
+#include "sunspot/util/Export.h"
 
 namespace sunspot
 {
@@ -11,7 +12,7 @@ namespace component
 {
 
 
-class [[pyspot::export]] Transform
+class PYSPOT_EXPORT Transform
 {
   public:
 	int id;

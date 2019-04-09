@@ -1,5 +1,5 @@
-#ifndef SST_INPUT_H_
-#define SST_INPUT_H_
+#ifndef SST_INPUT_INPUT_H_
+#define SST_INPUT_INPUT_H_
 
 #include "mathspot/Math.h"
 
@@ -7,23 +7,21 @@
 #include "sunspot/input/Key.h"
 #include "sunspot/input/Action.h"
 
-namespace sunspot
+#include "sunspot/util/Export.h"
+
+namespace sunspot::input
 {
 
-namespace input
-{
-
-class [[pyspot::export]] Input
+class PYSPOT_EXPORT Input
 {
   public:
-	Type    type;
-	Key     key;
-	Action  action;
+	Type   type;
+	Key    key;
+	Action action;
+
 	mathspot::Vec2 position;
 };
 
-} // namespace input
+}  // namespace sunspot::input
 
-} // namespace sunspot
-
-#endif // SST_INPUTACTION_H_
+#endif // SST_INPUT_INPUT_H_
