@@ -1,43 +1,42 @@
 #ifndef SST_ENTITYREPOSITORY_H_
 #define SST_ENTITYREPOSITORY_H_
 
-#include <string>
 #include <map>
+#include <string>
 
 #include "view/GltfCamera.h"
 
 namespace dataspot
 {
-	class DataSpot;
+class Dataspot;
 }
 
 namespace dst = dataspot;
 
 namespace sunspot
 {
-
 class Entity;
 class ModelRepository;
 
 class EntityRepository
 {
   public:
-	EntityRepository(dst::DataSpot& data, ModelRepository& modelRepo);
+	EntityRepository( dst::Dataspot& data, ModelRepository& modelRepo );
 	~EntityRepository();
 
-	Entity* LoadEntity(const int id);
+	Entity* LoadEntity( const int id );
 
   private:
-	Entity* loadEntity(const int id);
+	Entity* loadEntity( const int id );
 
-	dst::DataSpot& m_Data;
+	dst::Dataspot&   m_Data;
 	ModelRepository& m_ModelRepository;
 
 	std::map<const int, Entity*> m_Entities;
 };
 
 
-}
+}  // namespace sunspot
 
 
-#endif // SST_ENTITYREPOSITORY_H_
+#endif  // SST_ENTITYREPOSITORY_H_

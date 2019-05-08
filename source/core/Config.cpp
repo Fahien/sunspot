@@ -3,28 +3,21 @@
 
 namespace sunspot
 {
-
-
-Config::Config( dataspot::DataSpot& db )
-	: database { db }
-	, window{
-		/* .size = */ { queryWindowSize() }
-	}
-{}
-
-
-
-std::string Config::queryValue(const std::string& key) const
+Config::Config( dataspot::Dataspot& db ) : database{ db }, window{ /* .size = */ { queryWindowSize() } }
 {
+}
 
-	std::string query { "SELECT value FROM main.config WHERE key = ?;" };
 
-	auto& stmt = database.Prepare(query);
+std::string Config::queryValue( const std::string& key ) const
+{
+	std::string query{ "SELECT value FROM main.config WHERE key = ?;" };
 
-	stmt.Bind(key);
-	stmt.Step();
-	auto value { stmt.GetText(0) };
-	stmt.Reset();
+	auto& stmt = database.prepare( query );
+
+	stmt.bind( key );
+	stmt.step();
+	auto value{ stmt.get_text( 0 ) };
+	stmt.reset();
 
 	return value;
 }
@@ -32,11 +25,9 @@ std::string Config::queryValue(const std::string& key) const
 
 mathspot::Size Config::queryWindowSize()
 {
-	return mathspot::Size{
-		/* .width  = */ std::stoi( queryValue( "window.width" ) ),
-		/* .height = */ std::stoi( queryValue( "window.height" ) )
-	};
+	return mathspot::Size{ /* .width  = */ std::stoi( queryValue( "window.width" ) ),
+		                   /* .height = */ std::stoi( queryValue( "window.height" ) ) };
 }
 
 
-} // namespace sunspot
+}  // namespace sunspot
