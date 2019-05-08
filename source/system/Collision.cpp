@@ -38,14 +38,14 @@ void system::Collision::Update()
 	// Update boxes
 	for (auto& pair : mBoxes)
 	{
-		auto pTransform = pair.first->GetTransform();
+		auto& transform = pair.first->GetTransform();
 		auto& box = pair.second;
 
 		// Apply transform to the box
 		// TODO rotation and scale
 		// Fix Y-Z incoherency
-		box.x = pTransform->position.x;
-		box.y = pTransform->position.y;
+		box.x = transform.position.x;
+		box.y = transform.position.y;
 	}
 
 	mSystem.Update();

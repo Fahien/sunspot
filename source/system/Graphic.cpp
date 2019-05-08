@@ -14,7 +14,10 @@ void System::Draw()
 	m_pProgram->Use();
 	m_pLight->Update( *m_pProgram );
 
-	m_pCamera->Get<component::Camera>()->get().Update( *m_pProgram );
+	if ( auto camera = m_pCamera->Get<component::PerspectiveCamera>() )
+	{
+		camera->get().Update( *m_pProgram );
+	}
 
 	for ( auto pModel : m_Models )
 	{

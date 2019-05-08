@@ -12,7 +12,7 @@ class Entity;
 
 class Object
 {
-public:
+  public:
 	Object();
 	Object(int id);
 	Object(std::string& name);
@@ -27,7 +27,7 @@ public:
 	void SetName(std::string& name) { m_Name = name; }
 	void SetParent( Entity* pParent ) { m_pParent = pParent; }
 
-private:
+  private:
 	int m_Id;
 	std::string m_Name;
 

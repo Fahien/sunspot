@@ -23,7 +23,7 @@ ModelRepository::~ModelRepository()
 {}
 
 
-component::Model& ModelRepository::GetModel(const int id, const string& path, const string& name)
+component::Model& ModelRepository::get_model(const int id, const string& path, const string& name)
 {
 	// Check whether the model has already been loaded
 	auto itModel = mModels.find(id);
@@ -42,7 +42,7 @@ component::Model& ModelRepository::GetModel(const int id, const string& path, co
 	else
 	{
 		// Construct the complete path
-		string modelPath { mProjectDir + "/" + path + "/" + path + kExt };
+		string modelPath { mProjectDir + "/" + path };
 		GltfRenderer renderer { Gltf::Load(modelPath) };
 		// Store it into the model map
 		auto itRenderer = mRenderers.emplace(path, move(renderer));
@@ -55,7 +55,7 @@ component::Model& ModelRepository::GetModel(const int id, const string& path, co
 	// Find the nodes
 	for (auto& node : pRenderer->GetGltf().GetNodes())
 	{
-		if (node.name == name)
+		if (name == "" || node.name == name)
 		{
 			// Create a Model component
 			component::Model model { node, *pRenderer };

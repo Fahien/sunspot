@@ -9,7 +9,7 @@ using namespace sunspot;
 
 
 Entity::Entity()
-:	mScript{ new Script{ *this } }
+//:	mScript{ new Script{ *this } }
 {}
 
 
@@ -25,11 +25,6 @@ Entity::~Entity()
 	if (mCollider)
 	{
 		delete mCollider;
-	}
-
-	if (mTransform)
-	{
-		delete mTransform;
 	}
 
 	if (mScript)
@@ -66,18 +61,8 @@ void Entity::SetCollider(component::Collider* collider)
 }
 
 
-void Entity::SetTransform(component::Transform* transform)
+void Entity::SetTransform(component::Transform& transform)
 {
-	if (mTransform == transform)
-	{
-		return;
-	}
-
-	if (mTransform)
-	{
-		delete mTransform;
-	}
-
 	mTransform = transform;
 }
 

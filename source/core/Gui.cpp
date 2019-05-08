@@ -24,7 +24,7 @@ ImGui::ImGui( const GlfwWindow& window )
 	ImGui_ImplGlfw_InitForOpenGL( window.GetHandle(), true );
 	assert( result && "Cannot init ImGui for Glfw" );
 
-	ImGui_ImplOpenGL3_Init();
+	ImGui_ImplOpenGL3_Init("#version 150");
 	assert( result && "Cannot init ImGui for OpenGL 3" );
 }
 

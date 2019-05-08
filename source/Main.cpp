@@ -88,30 +88,30 @@ int main( const int argc, const char **argv)
 		auto& graphics = game.GetGraphics();
 		graphics.SetViewport( graphic::System::Viewport{ { 0, 0 }, config.window.size } );
 
-		float aspectRatio { static_cast<float>( config.window.size.width ) / config.window.size.height };
+		float aspect_ratio { static_cast<float>( config.window.size.width ) / config.window.size.height };
 
-		graphic::shader::Program baseProgram { "shader/base.vert", "shader/base.frag" };
-		graphics.SetShaderProgram( &baseProgram );
+		graphic::shader::Program base_program { "shader/base.vert", "shader/base.frag" };
+		graphics.SetShaderProgram( &base_program );
 
 		graphic::PointLight light { Color { 18.0f, 18.0f, 18.0f } };
 		light.SetPosition(0.0f, 0.0f, 8.0f);
 		graphics.SetLight( &light );
 
-		ModelRepository modelRepository { arguments.project.path };
-		EntityRepository entityRepository { database, modelRepository };
+		ModelRepository model_repo { arguments.project.path };
+		EntityRepository entity_repo { database, model_repo };
 
 		// Read a set of objects from database
-		constexpr int entitiesCount = 4;
+		constexpr int entities_count = 4;
 		// For every object get the name
-		for ( int i{ 0 }; i < entitiesCount; ++i )
+		for ( int i{ 0 }; i < entities_count; ++i )
 		{
-			Entity* entity { entityRepository.LoadEntity( i + 1 ) };
+			Entity* entity { entity_repo.LoadEntity( i + 1 ) };
 
 			if ( auto camera = entity->Get<component::Camera>() )
 			{
-				if ( auto pPerspectiveCam = dynamic_cast<component::PerspectiveCamera*>( &camera->get() ) )
+				if ( auto perspective_cam = dynamic_cast<component::PerspectiveCamera*>( &camera->get() ) )
 				{
-					pPerspectiveCam->SetAspectRatio( aspectRatio );
+					perspective_cam->SetAspectRatio( aspect_ratio );
 				}
 				graphics.SetCamera( *entity );
 			}
@@ -188,7 +188,7 @@ int main( const int argc, const char **argv)
 	}
 	catch (const dst::Exception& e)
 	{
-		Logger::log.Error("%s: %s", tag.c_str(), e.ToString());
+		Logger::log.Error("%s: %s", tag.c_str(), e.ToString().c_str());
 	}
 	catch (const runtime_error& e)
 	{

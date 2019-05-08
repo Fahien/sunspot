@@ -141,20 +141,22 @@ set(EXPORT_HEADERS
 # Generation command
 set( COMMAND_ARGS
 	${EXPORT_HEADERS} -o sunspot
-	-- -xc++ -std=c++17 -DPY_MAJOR_VERSION=${PY_MAJOR_VERSION}
+	-- -xc++ -std=c++17 -DPY_MAJOR_VERSION=3
 	-I${DEPENDENCY_INCLUDE_DIRS}
 	-I${MATHSPOT_INCLUDE_DIRS}
 	-I${IMGUI_INCLUDE_DIR}
 )
 
-add_custom_command(OUTPUT ${GEN_SOURCES} always
-	COMMAND pywrap
+add_custom_command(OUTPUT ${GEN_SOURCES}
+	COMMAND /Users/admin/Documents/C++/llvm/build/release/bin/pywrap
 	ARGS ${COMMAND_ARGS}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	COMMENT "Generating Bindings and Extension"
+	COMMAND_EXPAND_LISTS
+	VERBATIM
 )
 
-add_custom_target(gen_bindings SOURCES always)
+#add_custom_target(gen_bindings SOURCES always)
 add_library( bindings ${GEN_SOURCES} )
 target_link_libraries( bindings ${PYSPOT_LIBRARIES})
 target_include_directories( bindings PUBLIC ${DEPENDENCY_INCLUDE_DIRS} ${MATHSPOT_INCLUDE_DIRS} ${IMGUI_INCLUDE_DIR})

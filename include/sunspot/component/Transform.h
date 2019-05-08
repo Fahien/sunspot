@@ -5,10 +5,7 @@
 
 #include "sunspot/util/Export.h"
 
-namespace sunspot
-{
-
-namespace component
+namespace sunspot::component
 {
 
 
@@ -22,9 +19,7 @@ class PYSPOT_EXPORT Transform
 };
 
 
-} // namespace component
-
-} // namespace sunspot
+} // namespace sunspot::component
 
 
-#endif
+#endif // SST_TRANSFORM_H_

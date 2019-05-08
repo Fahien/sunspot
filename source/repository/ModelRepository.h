@@ -21,10 +21,10 @@ class ModelRepository
 	static const std::string kExt;
 	static const std::string kModelDir;
 
-	ModelRepository(const std::string& projectDir = "");
+	ModelRepository(const std::string& projectDir = ".");
 	~ModelRepository();
 
-	component::Model& GetModel(const int id, const std::string& path, const std::string& name);
+	component::Model& get_model(const int id, const std::string& path, const std::string& name = "");
 
   private:
 	const std::string mProjectDir;

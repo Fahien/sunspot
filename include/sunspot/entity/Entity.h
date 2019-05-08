@@ -11,6 +11,7 @@
 #include "sunspot/entity/Script.h"
 #include "sunspot/entity/Object.h"
 #include "sunspot/input/Input.h"
+#include "sunspot/component/Transform.h"
 
 
 namespace pst = pyspot;
@@ -56,8 +57,8 @@ public:
 	component::Collider* GetCollider() { return mCollider; }
 	void SetCollider(component::Collider* mCollider);
 
-	component::Transform* GetTransform() { return mTransform; }
-	void SetTransform(component::Transform* transform);
+	component::Transform& GetTransform() { return mTransform; }
+	void SetTransform(component::Transform& transform);
 
 	component::Rigidbody* GetRigidbody() { return mRigidbody; }
 	void SetRigidbody(component::Rigidbody* rigidbody);
@@ -72,7 +73,7 @@ public:
 private:
 	//component::Model*     mModel     { nullptr };
 	component::Collider*  mCollider  { nullptr };
-	component::Transform* mTransform { nullptr };
+	component::Transform  mTransform {};
 	component::Rigidbody* mRigidbody { nullptr };
 	Script*               mScript    { nullptr };
 
@@ -103,7 +104,7 @@ std::optional<std::reference_wrapper<T>> Entity::Get()
 			return *pComponent;
 		}
 	}
-	return {};
+	return std::nullopt;
 }
 
 

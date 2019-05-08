@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SUNSPOT_UTIL_H_
+#define SUNSPOT_UTIL_H_
 
 #include <vector>
 #include <string>
@@ -45,20 +46,21 @@ class CliArgs
   public:
 	CliArgs( const int argc, const char** argv );
 
-
   private:
 	std::string find( const std::string& option ) const;
 
-	std::vector<std::string> m_Args;
+	std::string set_project_name();
+
+	std::vector<std::string> args;
 
   public:
 	const struct {
 		std::string name;
 		std::string path;
-		const struct {
+		struct {
 			std::string path;
 		} db;
-		const struct {
+		struct {
 			std::string path;
 		} script;
 	} project;
@@ -66,3 +68,5 @@ class CliArgs
 };
 
 } // namespace sunspot
+
+#endif // SUNSPOT_UTIL_H_

@@ -5,20 +5,12 @@
 
 namespace sunspot
 {
-
-
 CliArgs::CliArgs( const int argc, const char** argv )
-:	m_Args { pack_args( argc, argv ) }
-,	project {
-		/* .name = */ find( "-project" ),
-		/* .path = */ "project/" + project.name,
-		/* .db   = */ {
-			/* .path */ project.path + "/" + project.name + ".data"
-		},
-		/* .script = */ {
-			/* .path */ project.path + "/script"
-		}
-	}
+    : args{ pack_args( argc, argv ) },
+      project{ .name   = set_project_name(),
+	           .path   = "project/" + project.name,
+	           .db     = { .path = project.path + "/" + project.name + ".data" },
+	           .script = { .path = project.path + "/script" } }
 {
 	logspot::Logger::log.Info( "Project [%s]", project.name.c_str() );
 }
@@ -26,11 +18,11 @@ CliArgs::CliArgs( const int argc, const char** argv )
 
 std::string CliArgs::find( const std::string& option ) const
 {
-	auto it { sunspot::find( m_Args, option ) };
+	auto it{ sunspot::find( args, option ) };
 
-	if ( it != m_Args.end() )
+	if ( it != args.end() )
 	{
-		if ( ++it != m_Args.end() )
+		if ( ++it != args.end() )
 		{
 			return *it;
 		}
@@ -39,4 +31,17 @@ std::string CliArgs::find( const std::string& option ) const
 	return {};
 }
 
-} // namespace sunspot
+
+std::string CliArgs::set_project_name()
+{
+	auto name = find( "-project" );
+	if ( name.empty() )
+	{
+		// Set temporary name
+		name = "temp";
+	}
+	return name;
+}
+
+
+}  // namespace sunspot

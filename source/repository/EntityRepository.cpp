@@ -5,7 +5,6 @@
 #include <dataspot/Exception.h>
 #include <sqlite3.h>
 
-#include "WavefrontObject.h"
 #include "ModelRepository.h"
 
 #include "sunspot/entity/Entity.h"
@@ -116,10 +115,12 @@ Entity* EntityRepository::loadEntity(const int id)
 				z = static_cast<float>(stmtComponent.GetDouble(9));
 				mathspot::Vec3 scale{ x, y, z };
 
-				// Construct the component
-				Transform* transform = new Transform{ id, position, rotation, scale };
-				// Add the component to the entity
-				pEntity->SetTransform(transform);
+				// Set the transform values
+				auto& transform = pEntity->GetTransform();
+				transform.id = id;
+				transform.position = position;
+				transform.rotation = rotation;
+				transform.scale = scale;
 			}
 			else if (type == "rigidbody")
 			{
@@ -161,7 +162,7 @@ Entity* EntityRepository::loadEntity(const int id)
 				string name{ stmtComponent.GetText(2) };
 
 				// Get the mesh
-				auto& model = m_ModelRepository.GetModel(id, path, name);
+				auto& model = m_ModelRepository.get_model(id, path, name);
 
 				// Construct the component
 				pEntity->Add<component::Model>( model );
@@ -206,20 +207,20 @@ Entity* EntityRepository::loadEntity(const int id)
 		}
 
 	// If the entity has a Mesh and a Transform
-	if ( pEntity->Has<component::Model>() && pEntity->GetTransform() )
+	if ( auto model = pEntity->Get<component::Model>() )
 	{
 		// Apply the transform to the mesh
-		auto& node      = pEntity->Get<component::Model>()->get().GetNode();
-		auto pTransform = pEntity->GetTransform();
-		node.matrix.ScaleX( pTransform->scale.x );
-		node.matrix.ScaleY( pTransform->scale.y );
-		node.matrix.ScaleZ( pTransform->scale.z );
-		node.matrix.TranslateX( pTransform->position.x );
-		node.matrix.TranslateY( pTransform->position.y );
-		node.matrix.TranslateZ( pTransform->position.z );
-		node.matrix.RotateX( pTransform->rotation.x );
-		node.matrix.RotateY( pTransform->rotation.y );
-		node.matrix.RotateZ( pTransform->rotation.z );
+		auto& node      = model->get().GetNode();
+		auto& transform = pEntity->GetTransform();
+		node.matrix.ScaleX( transform.scale.x );
+		node.matrix.ScaleY( transform.scale.y );
+		node.matrix.ScaleZ( transform.scale.z );
+		node.matrix.TranslateX( transform.position.x );
+		node.matrix.TranslateY( transform.position.y );
+		node.matrix.TranslateZ( transform.position.z );
+		node.matrix.RotateX( transform.rotation.x );
+		node.matrix.RotateY( transform.rotation.y );
+		node.matrix.RotateZ( transform.rotation.z );
 	}
 
 	if (pEntity->GetScript())

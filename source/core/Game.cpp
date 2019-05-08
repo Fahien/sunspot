@@ -9,9 +9,9 @@ namespace sunspot
 
 void Game::Handle( input::Input&& in )
 {
-	for ( auto& pEntity : entities )
+	for ( auto& entity : entities )
 	{
-		pEntity->Handle( in );
+		entity->Handle( in );
 	}
 }
 
@@ -38,9 +38,9 @@ void Game::Loop()
 
 		gui.Update( delta );
 
-		for ( auto pEntity : entities )
+		for ( auto& entity : entities )
 		{
-			pEntity->Update( delta );
+			entity->Update( delta );
 		}
 
 		graphics.Draw();
