@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 
 #include "Camera.h"
 #include "sunspot/core/Game.h"
@@ -25,7 +25,7 @@ GlfwWindow::GlfwWindow( Game& game, const char* title, const mst::Size windowSiz
 	}
 	// Set the error callback
 	glfwSetErrorCallback( []( int error, const char* description ) {
-		lst::Logger::log.Error( "%s: %s [%d]", tag.c_str(), description, error );
+		lst::Log::error( "%s: %s [%d]", tag.c_str(), description, error );
 	} );
 
 	// Get the primary monitor
@@ -50,15 +50,15 @@ GlfwWindow::GlfwWindow( Game& game, const char* title, const mst::Size windowSiz
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, context.version.minor );
 
 	// Hard constraints
-	glfwWindowHint( GLFW_DOUBLEBUFFER, GL_TRUE );
+	glfwWindowHint( GLFW_DOUBLEBUFFER, GLFW_TRUE );
 	glfwWindowHint( GLFW_CLIENT_API, GLFW_OPENGL_API );
 	glfwWindowHint( GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API );
-	glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
+	glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE );
 	glfwWindowHint( GLFW_OPENGL_PROFILE, context.profile );
 
-	glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
-	glfwWindowHint( GLFW_DECORATED, GL_TRUE );
-	glfwWindowHint( GLFW_FOCUSED, GL_TRUE );
+	glfwWindowHint( GLFW_RESIZABLE, GLFW_TRUE );
+	glfwWindowHint( GLFW_DECORATED, GLFW_TRUE );
+	glfwWindowHint( GLFW_FOCUSED, GLFW_TRUE );
 	glfwWindowHint( GLFW_RED_BITS, videomode->redBits );
 	glfwWindowHint( GLFW_GREEN_BITS, videomode->greenBits );
 	glfwWindowHint( GLFW_BLUE_BITS, videomode->blueBits );
@@ -106,7 +106,7 @@ GlfwWindow::GlfwWindow( Game& game, const char* title, const mst::Size windowSiz
 	UpdateSize();
 	glfwSwapInterval( 1 );  // Vsync
 
-	lst::Logger::log.Info( "%s created\n\tOpenGL %s\n\tGLFW %s\n\tFrame size %dx%d\n", tag.c_str(),
+	lst::Log::info( "%s created\n\tOpenGL %s\n\tGLFW %s\n\tFrame size %dx%d\n", tag.c_str(),
 	                       glGetString( GL_VERSION ), glfwGetVersionString(), m_FrameSize.width, m_FrameSize.height );
 }
 
@@ -118,7 +118,7 @@ GlfwWindow::~GlfwWindow()
 		glfwDestroyWindow( handle );
 	}
 	glfwTerminate();
-	lst::Logger::log.Info( "%s: destroyed", tag.c_str() );  // TODO remove debug log
+	lst::Log::info( "%s: destroyed", tag.c_str() );  // TODO remove debug log
 }
 
 
@@ -266,7 +266,7 @@ void GlfwWindow::loop()  // TODO comment
 void GlfwWindow::UpdateSize()
 {
 	glfwGetFramebufferSize( handle, &m_FrameSize.width, &m_FrameSize.height );
-	GetGame().GetGraphics().SetViewport( { {}, m_FrameSize } );
+	GetGame().get_graphics().SetViewport( { {}, m_FrameSize } );
 }
 
 

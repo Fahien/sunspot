@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 
 #include "ShaderProgram.h"
 #include "android/AssetManager.h"
@@ -36,7 +36,7 @@ ShaderProgram::ShaderProgram(const char* depth)
 
 	// TODO Handle some errors like vertexShader == 0, mBaseProgram == 0, etc.
 
-	Logger::log.Info("ShaderProgram: created\n"); // TODO remove debug log
+	Log::info("ShaderProgram: created\n"); // TODO remove debug log
 }
 
 
@@ -62,7 +62,7 @@ ShaderProgram::ShaderProgram(const char* vertex, const char* fragment)
 
 	// TODO Handle some errors like vertexShader == 0, mBaseProgram == 0, etc.
 
-	Logger::log.Info("ShaderProgram: created\n"); // TODO remove debug log
+	Log::info("ShaderProgram: created\n"); // TODO remove debug log
 }
 
 
@@ -70,7 +70,7 @@ ShaderProgram::~ShaderProgram()
 {
 	glDeleteProgram(mDepthProgram);
 	glDeleteProgram(mBaseProgram);
-	Logger::log.Info("ShaderProgram: destroyed\n"); // TODO remove debug log
+	Log::info("ShaderProgram: destroyed\n"); // TODO remove debug log
 }
 
 

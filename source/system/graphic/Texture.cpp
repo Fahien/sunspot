@@ -6,7 +6,7 @@
 #include <string>
 
 #include <SOIL.h>
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 
 #include "sunspot/system/graphic/Gl.h"
 
@@ -33,14 +33,14 @@ Texture::Texture(const std::string& path, const TextureType& type)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	lst::Logger::log.Info("Texture: created %s", mName.c_str()); // TODO remove debug log
+	lst::Log::info("Texture: created %s", mName.c_str()); // TODO remove debug log
 }
 
 
 Texture::~Texture()
 {
 	// TODO Release MIPMAP
-	lst::Logger::log.Info("Texture: destroyed %s", mName.c_str()); // TODO remove debug log
+	lst::Log::info("Texture: destroyed %s", mName.c_str()); // TODO remove debug log
 }
 
 
@@ -66,7 +66,7 @@ SoilData::SoilData(const std::string& path)
 		throw TextureException{ tag, "Could not load " + path + ": " + SOIL_last_result() };
 	}
 
-	lst::Logger::log.Info("SoilData: %s %s", path.c_str(), SOIL_last_result()); // TODO remove debug log
+	lst::Log::info("SoilData: %s %s", path.c_str(), SOIL_last_result()); // TODO remove debug log
 }
 
 

@@ -1,9 +1,9 @@
 #include <jni.h>
 #include <core/String.h>
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 #include <filespot/Asset.h>
 #include <filespot/File.h>
-#include <dataspot/DataSpot.h>
+#include <dataspot/Database.h>
 
 #include "core/Renderer.h"
 #include "entity/Script.h"
@@ -18,14 +18,14 @@ namespace fst = filespot;
 
 App::~App()
 {
-	lst::Logger::log.Info("App Destroyed");
+	lst::Log::info("App Destroyed");
 }
 
 
 static void printGlString(const char* name, GLenum s)
 {
 	const char* v{ (const char*)glGetString(s) };
-	lst::Logger::log.Info("GL %s: %s", name, v);
+	lst::Log::info("GL %s: %s", name, v);
 }
 
 
@@ -62,7 +62,7 @@ App::App(android_app* app)
 	jstring jpath = (jstring)env->CallObjectMethod(file, getAbsolutePath);
 	mCachePath = env->GetStringUTFChars(jpath, nullptr);
 	app->activity->vm->DetachCurrentThread();
-	lst::Logger::log.Info("Cache %s", mCachePath.c_str());
+	lst::Log::info("Cache %s", mCachePath.c_str());
 
 	sqlite3_temp_directory = sqlite3_mprintf("%s", mCachePath.c_str());
 
@@ -77,7 +77,7 @@ App::App(android_app* app)
 	std::string libPath{ mInternalPath + "/" + libName };
 	if (!fst::File::Exists(libPath))
 	{
-		lst::Logger::log.Info("Copying lib %s", libPath.c_str());
+		lst::Log::info("Copying lib %s", libPath.c_str());
 		std::ofstream ofs{ libPath };
 		if (ofs.is_open())
 		{
@@ -91,7 +91,7 @@ App::App(android_app* app)
 	std::string scriptName{ "script.zip" };
 	std::string scriptPath{ mInternalPath + "/" + scriptName };
 	
-	lst::Logger::log.Info("copying lib %s", scriptPath.c_str());
+	lst::Log::info("copying lib %s", scriptPath.c_str());
 	std::ofstream ofs{ scriptPath };
 	if (ofs.is_open())
 	{
@@ -105,14 +105,14 @@ App::App(android_app* app)
 	mDbPath = mInternalPath + "/" + dbName;
 	//if (!fst::File::Exists(mDbPath))
 	{
-		lst::Logger::log.Info("copying DB %s", mDbPath.c_str());
+		lst::Log::info("copying DB %s", mDbPath.c_str());
 		std::ofstream ofs{ mDbPath };
 		if (ofs.is_open())
 		{
 			// Open asset database
 			fst::Asset db{ dbName };
 			ofs.write(db.GetContent(), db.GetLength());
-			lst::Logger::log.Info("DB:\n %s", db.GetContent());
+			lst::Log::info("DB:\n %s", db.GetContent());
 			ofs.close();
 		}
 	}
@@ -128,9 +128,9 @@ App::App(android_app* app)
 
 void App::Loop()
 {
-	lst::Logger::log.Info("Asset test.txt %s", fst::Asset::Exists("test.txt") ? "exists" : "does not exist");
+	lst::Log::info("Asset test.txt %s", fst::Asset::Exists("test.txt") ? "exists" : "does not exist");
 	fst::Asset asset{ "test.txt" };
-	lst::Logger::log.Info("Content: %s", asset.GetContent());
+	lst::Log::info("Content: %s", asset.GetContent());
 
 	while (true)
 	{
@@ -195,7 +195,7 @@ void App::Handle(const Command command)
 			// Draw frame
 			mRenderer->render();
 			Graphics::Get().Swap();
-			lst::Logger::log.Info("InitWindow");
+			lst::Log::info("InitWindow");
 			break;
 		}
 		case Command::LostFocus:
@@ -213,7 +213,7 @@ void App::Handle(const Command command)
 			// Destroy surface
 			Graphics::Get().DestroySurface();
 			mPause = true;
-			lst::Logger::log.Info("TermWindow");
+			lst::Log::info("TermWindow");
 			break;
 		}
 		case Command::LowMemory:
@@ -225,7 +225,7 @@ void App::Handle(const Command command)
 		}
 		default:
 		{
-			lst::Logger::log.Info("OtherCommand");
+			lst::Log::info("OtherCommand");
 			break;
 		}
 	}

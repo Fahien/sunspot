@@ -4,7 +4,7 @@
 #include <sstream>
 #include <array>
 
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 
 #include "WavefrontObject.h"
 
@@ -34,14 +34,14 @@ WavefrontObject::WavefrontObject()
 	, mCurrentMaterial{ nullptr }
 	, mMaterials{}
 {
-	lst::Logger::log.Info("WavefrontObject: created\n"); // TODO remove debug log
+	lst::Log::info("WavefrontObject: created\n"); // TODO remove debug log
 }
 
 
 /// Release resources
 WavefrontObject::~WavefrontObject()
 {
-	lst::Logger::log.Info("WavefrontObject: destroyed %s\n", mName.c_str()); // TODO remove debug log
+	lst::Log::info("WavefrontObject: destroyed %s\n", mName.c_str()); // TODO remove debug log
 }
 
 
@@ -79,7 +79,7 @@ void WavefrontObject::loadName(std::stringstream& ss)
 	{
 		throw LoadingException{ "Error loading name" };
 	}
-	lst::Logger::log.Info("Obj name: %s\n", mName.c_str()); // TODO remove debug lst::Logger::log
+	lst::Log::info("Obj name: %s\n", mName.c_str()); // TODO remove debug lst::Log::log
 }
 
 
@@ -380,7 +380,7 @@ void WavefrontObject::loadDiffuseMap(std::stringstream& ss, const std::string& p
 		throw LoadingException{ "Error loading diffuse map name" };
 	}
 
-	lst::Logger::log.Info("WavefrontObject: Loading %s/%s\n", path.c_str(), textureName.c_str()); // TODO remove debug lst::Logger::log
+	lst::Log::info("WavefrontObject: Loading %s/%s\n", path.c_str(), textureName.c_str()); // TODO remove debug lst::Log::log
 	Texture texture{ path
 #ifndef WIN32
 		+ '/'
@@ -484,14 +484,14 @@ void WavefrontObject::loadMaterials(Ifstream& is)
 			}
 			catch (const LoadingException &e)
 			{
-				lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+				lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		case 'K': { // K statement
 			if (line.length() <= 1)
 			{
-				lst::Logger::log.Error("[%d] ignored: %s\n", lineNumber, line.c_str());
+				lst::Log::error("[%d] ignored: %s\n", lineNumber, line.c_str());
 				break;
 			}
 			switch (line[1]) {
@@ -502,7 +502,7 @@ void WavefrontObject::loadMaterials(Ifstream& is)
 				}
 				catch (const LoadingException &e)
 				{
-					lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+					lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
@@ -513,7 +513,7 @@ void WavefrontObject::loadMaterials(Ifstream& is)
 				}
 				catch (const LoadingException &e)
 				{
-					lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+					lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
@@ -524,12 +524,12 @@ void WavefrontObject::loadMaterials(Ifstream& is)
 				}
 				catch (const LoadingException &e)
 				{
-					lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+					lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			default: {
-				lst::Logger::log.Error("[%d] ignored: %s\n", lineNumber, line.c_str());
+				lst::Log::error("[%d] ignored: %s\n", lineNumber, line.c_str());
 			}
 			} // End switch line[1]
 			break;
@@ -537,7 +537,7 @@ void WavefrontObject::loadMaterials(Ifstream& is)
 		case 'm': { // Map statement
 			if (line.length() <= 6)
 			{
-				lst::Logger::log.Error("[%d] ignored: %s\n", lineNumber, line.c_str());
+				lst::Log::error("[%d] ignored: %s\n", lineNumber, line.c_str());
 				break;
 			}
 			switch (line[5])
@@ -549,7 +549,7 @@ void WavefrontObject::loadMaterials(Ifstream& is)
 				}
 				catch (const LoadingException &e)
 				{
-					lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+					lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
@@ -560,7 +560,7 @@ void WavefrontObject::loadMaterials(Ifstream& is)
 				}
 				catch (const LoadingException &e)
 				{
-					lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+					lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
@@ -571,19 +571,19 @@ void WavefrontObject::loadMaterials(Ifstream& is)
 				}
 				catch (const LoadingException &e)
 				{
-					lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+					lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 				}
 				break;
 			}
 			default: {
-				lst::Logger::log.Error("[%d] ignored: %s\n", lineNumber, line.c_str());
+				lst::Log::error("[%d] ignored: %s\n", lineNumber, line.c_str());
 				break;
 			}
 			} // End switch line[5]
 			break;
 		}
 		default: {
-			lst::Logger::log.Error("[%d] ignored: %s\n", lineNumber, line.c_str());
+			lst::Log::error("[%d] ignored: %s\n", lineNumber, line.c_str());
 			break;
 		}
 		} // End switch line[0]
@@ -595,7 +595,7 @@ void WavefrontObject::loadMaterials(Ifstream& is)
 	}
 	catch (const LoadingException& e)
 	{
-		lst::Logger::log.Error("WavefrontObject: No materials loaded, %s\n", e.what());
+		lst::Log::error("WavefrontObject: No materials loaded, %s\n", e.what());
 	}
 }
 
@@ -702,14 +702,14 @@ Ifstream &sunspot::operator>>(Ifstream& is, WavefrontObject& obj)
 			}
 			catch (const LoadingException& e)
 			{
-				lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+				lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		case 'v': {
 			if (line.length() < 2)
 			{
-				lst::Logger::log.Error("[%d] ignored: %s\n", lineNumber, line.c_str());
+				lst::Log::error("[%d] ignored: %s\n", lineNumber, line.c_str());
 				break;
 			}
 			switch (line[1])
@@ -721,12 +721,12 @@ Ifstream &sunspot::operator>>(Ifstream& is, WavefrontObject& obj)
 					}
 					catch (const LoadingException& e)
 					{
-						lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+						lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 					}
 					break;
 				}
 				case 'p': {
-					lst::Logger::log.Info("Point in the parameter space of a curve or a surface not supported\n");
+					lst::Log::info("Point in the parameter space of a curve or a surface not supported\n");
 					break;
 				}
 				case 'n': { // Vertex Normal command
@@ -736,7 +736,7 @@ Ifstream &sunspot::operator>>(Ifstream& is, WavefrontObject& obj)
 					}
 					catch (const LoadingException& e)
 					{
-						lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+						lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 					}
 					break;
 				}
@@ -747,7 +747,7 @@ Ifstream &sunspot::operator>>(Ifstream& is, WavefrontObject& obj)
 					}
 					catch (const LoadingException& e)
 					{
-						lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+						lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 					}
 					break;
 				}
@@ -761,7 +761,7 @@ Ifstream &sunspot::operator>>(Ifstream& is, WavefrontObject& obj)
 			}
 			catch (const LoadingException& e)
 			{
-				lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+				lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
@@ -772,7 +772,7 @@ Ifstream &sunspot::operator>>(Ifstream& is, WavefrontObject& obj)
 			}
 			catch (const LoadingException& e)
 			{
-				lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+				lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
@@ -783,7 +783,7 @@ Ifstream &sunspot::operator>>(Ifstream& is, WavefrontObject& obj)
 			}
 			catch (const LoadingException& e)
 			{
-				lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+				lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
@@ -794,12 +794,12 @@ Ifstream &sunspot::operator>>(Ifstream& is, WavefrontObject& obj)
 			}
 			catch (const LoadingException& e)
 			{
-				lst::Logger::log.Error("[%d] error: %s\n", lineNumber, e.what());
+				lst::Log::error("[%d] error: %s\n", lineNumber, e.what());
 			}
 			break;
 		}
 		default: {
-			lst::Logger::log.Error("[%d] ignored: %s\n", lineNumber, line.c_str());
+			lst::Log::error("[%d] ignored: %s\n", lineNumber, line.c_str());
 			break;
 		}}
 		++lineNumber;

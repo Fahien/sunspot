@@ -7,7 +7,7 @@ namespace sunspot
 {
 
 
-void Game::Handle( input::Input&& in )
+void Game::handle( input::Input&& in )
 {
 	for ( auto& entity : entities )
 	{
@@ -16,7 +16,7 @@ void Game::Handle( input::Input&& in )
 }
 
 
-const float Game::computeDeltaTime()
+const float Game::compute_delta_time()
 {
 	time.current = static_cast<float>( glfwGetTime() );
 	const auto delta = time.current - time.last;
@@ -25,7 +25,7 @@ const float Game::computeDeltaTime()
 }
 
 
-void Game::Loop()
+void Game::loop()
 {
 	while ( !window.IsClosing() )
 	{
@@ -34,7 +34,7 @@ void Game::Loop()
 		
 		collisions.Update();
 
-		auto delta = computeDeltaTime();
+		auto delta = compute_delta_time();
 
 		gui.Update( delta );
 

@@ -1,6 +1,6 @@
 #include "sunspot/util/Util.h"
 
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 
 
 namespace sunspot
@@ -12,7 +12,7 @@ CliArgs::CliArgs( const int argc, const char** argv )
 	           .db     = { .path = project.path + "/" + project.name + ".data" },
 	           .script = { .path = project.path + "/script" } }
 {
-	logspot::Logger::log.Info( "Project [%s]", project.name.c_str() );
+	logspot::Log::info( "Project [%s]", project.name.c_str() );
 }
 
 

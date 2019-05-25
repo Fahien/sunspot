@@ -66,7 +66,7 @@ void Window::initGlew()
 
 void Window::handleInput( input::Input&& i )
 {
-	m_Game.Handle( std::move( i ) );
+	m_Game.handle( std::move( i ) );
 }
 
 
@@ -120,13 +120,13 @@ void Window::render3D( const float& deltaTime ) // TODO comment
 	mBaseProgram->Use();
 	mLight->Update( *mBaseProgram );
 
-	m_Camera->Get<component::Camera>()->get().Update( *mBaseProgram );
+	m_Camera->get<component::Camera>()->get().Update( *mBaseProgram );
 
 	for ( auto pEntity : mEntities )
 	{
-		if ( pEntity->Has<component::Model>() )
+		if ( pEntity->has<component::Model>() )
 		{
-			auto& model = pEntity->Get<component::Model>()->get();
+			auto& model = pEntity->get<component::Model>()->get();
 			model.GetRenderer().Draw( *mBaseProgram, &model.GetNode() );
 		}
 	}

@@ -5,9 +5,9 @@
 #include <memory>
 #include <vector>
 
-#include <dataspot/Dataspot.h>
+#include <dataspot/Database.h>
 #include <dataspot/Exception.h>
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 
 #include "SunSpotConfig.h"
 #include "sunspot/core/Config.h"
@@ -50,10 +50,10 @@ static const string objExt{ ".obj" };
 
 static const string projectDir{ "project" };
 
-void printLogo()
+void print_logo()
 {
-	Logger::log.Info( "%s\n",
-	                  " ________  ___  ___  ________   ________  ________  ________  ___________ \n\
+	Log::info( "%s\n",
+	           " ________  ___  ___  ________   ________  ________  ________  ___________ \n\
 |\\   ____\\|\\  \\|\\  \\|\\   ___  \\|\\   ____\\|\\   __  \\|\\   __  \\|\\____   ___\\ \n\
 \\ \\  \\___|\\ \\  \\ \\  \\ \\  \\  \\  \\ \\  \\___|\\ \\  \\|\\  \\ \\  \\|\\  \\|___ \\  \\__| \n\
  \\ \\_____  \\ \\  \\ \\  \\ \\  \\  \\  \\ \\_____  \\ \\   ____\\ \\  \\ \\  \\   \\ \\  \\  \n\
@@ -68,7 +68,7 @@ int main( const int argc, const char** argv )
 {
 	using namespace sunspot;
 
-	printLogo();
+	print_logo();
 
 	try
 	{
@@ -76,17 +76,34 @@ int main( const int argc, const char** argv )
 		auto arguments = CliArgs( argc, argv );
 
 		// Load database
-		dataspot::Dataspot database{ arguments.project.db.path };
+		dataspot::Database* database{};
+
+		auto open_result = dataspot::Database::open( arguments.project.db.path );
+		if ( auto error = std::get_if<dataspot::Error>( &open_result ) )
+		{
+			// Create
+			auto create_result = dataspot::Database::create( arguments.project.db.path );
+			if ( auto error = std::get_if<dataspot::Error>( &create_result ) )
+			{
+				Log::error( "Cannot create data %s: %s", arguments.project.db.path.c_str(), error->get_message().c_str() );
+			}
+			database = std::get_if<dataspot::Database>( &create_result );
+		}
+		else
+		{
+			database = std::get_if<dataspot::Database>( &open_result );
+		}
+
 
 		// Get config values
-		Config config{ database };
+		Config config{ *database };
 
 		// Script has to be initialized before loading the entities
 		Script::Initialize( arguments.project.script.path );
 
 		Game game;
 
-		auto& graphics = game.GetGraphics();
+		auto& graphics = game.get_graphics();
 		graphics.SetViewport( graphic::System::Viewport{ { 0, 0 }, config.window.size } );
 
 		float aspect_ratio{ static_cast<float>( config.window.size.width ) / config.window.size.height };
@@ -99,103 +116,61 @@ int main( const int argc, const char** argv )
 		graphics.SetLight( &light );
 
 		ModelRepository  model_repo{ arguments.project.path };
-		EntityRepository entity_repo{ database, model_repo };
+		EntityRepository entity_repo{ *database, model_repo };
 
 		// Read a set of objects from database
 		constexpr int entities_count = 4;
 		// For every object get the name
-		for ( int i{ 0 }; i < entities_count; ++i )
+		for ( int i = 0; i < entities_count; ++i )
 		{
-			Entity* entity{ entity_repo.LoadEntity( i + 1 ) };
-
-			if ( auto camera = entity->Get<component::Camera>() )
+			if ( auto entity = entity_repo.load_entity( i + 1 ) )
 			{
-				if ( auto perspective_cam = dynamic_cast<component::PerspectiveCamera*>( &camera->get() ) )
+				if ( auto camera = entity->get<component::Camera>() )
 				{
-					perspective_cam->SetAspectRatio( aspect_ratio );
+					if ( auto perspective_cam = dynamic_cast<component::PerspectiveCamera*>( &camera->get() ) )
+					{
+						perspective_cam->SetAspectRatio( aspect_ratio );
+					}
+					graphics.SetCamera( *entity );
 				}
-				graphics.SetCamera( *entity );
-			}
 
-			if ( auto model = entity->Get<component::Model>() )
-			{
-				game.GetGraphics().AddModel( &model->get() );
-			}
+				if ( auto model = entity->get<component::Model>() )
+				{
+					game.get_graphics().AddModel( &model->get() );
+				}
 
-			game.AddEntity( *entity );
+				game.add_entity( *entity );
+			}
+		}
+
+		if ( game.get_entities().size() == 0 )
+		{
+			// Create model placeholder
+			auto entity = Entity( 0, "Placeholder" );
 		}
 
 		// Set up editor GUI
-		auto& gui = game.GetGui();
+		auto& gui = game.get_gui();
 
-		gui.fPreDraw = [&game]() {
-			using namespace ImGui;
-			auto& g      = GetIO();
-			auto& window = game.GetWindow();
+		gui.fPreDraw = [&game]() {};
 
-			// Main menu
-			if ( BeginMainMenuBar() )
-			{
-				if ( IsMouseDragging() )
-				{
-					auto  drag = GetMouseDragDelta();
-					auto& pos  = window.GetPosition();
-					window.SetPosition( pos.x + static_cast<int>( drag.x ), pos.y + static_cast<int>( drag.y ) );
-				}
-				if ( BeginMenu( "File" ) )
-				{
-					EndMenu();
-				}
-				if ( BeginMenu( "Edit" ) )
-				{
-					if ( MenuItem( "Toggle" ) )
-					{
-						window.ToggleMaximization();
-					}
-					EndMenu();
-				}
-				SetCursorPosX( window.getFrameSize().width - 41.0f );
-				if ( MenuItem( "T" ) )
-				{
-					window.ToggleMaximization();
-				}
-				if ( MenuItem( "X" ) )
-				{
-					window.SetClosing( true );
-				}
-			}
-			EndMainMenuBar();
-
-			// Frame
-			PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
-			ImGuiWindowFlags frameFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-			                              ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings |
-			                              ImGuiWindowFlags_NoInputs;
-			SetNextWindowPos( { 0.0f, 0.0f } );
-			SetNextWindowSize( g.DisplaySize );
-			SetNextWindowBgAlpha( 0.0f );
-			Begin( "Frame", nullptr, frameFlags );
-			PopStyleVar( 1 );
-			End();
-		};
-
-		game.Loop();  // GameLoop.it
+		game.loop();  // GameLoop.it
 
 
-		Logger::log.Info( "%s version %d.%d successful", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR );
+		Log::info( "%s version %d.%d successful", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR );
 		return EXIT_SUCCESS;
 	}
 	catch ( const graphic::Exception& e )
 	{
-		Logger::log.Error( "%s: %s", tag.c_str(), e.what() );
+		Log::error( "%s: %s", tag.c_str(), e.what() );
 	}
 	catch ( const dst::Exception& e )
 	{
-		Logger::log.Error( "%s: %s", tag.c_str(), e.to_string().c_str() );
+		Log::error( "%s: %s", tag.c_str(), e.to_string().c_str() );
 	}
 	catch ( const runtime_error& e )
 	{
-		Logger::log.Error( "%s: %s", tag.c_str(), e.what() );
+		Log::error( "%s: %s", tag.c_str(), e.what() );
 	}
 	return EXIT_FAILURE;
 }

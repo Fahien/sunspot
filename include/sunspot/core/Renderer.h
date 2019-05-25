@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "sunspot/entity/Entity.h"
-#include <dataspot/DataSpot.h>
+#include <dataspot/Database.h>
 #include "repository/ModelRepository.h"
 #include "repository/EntityRepository.h"
 #include "system/Collision.h"

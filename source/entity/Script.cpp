@@ -1,4 +1,4 @@
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 
 #include "Mesh.h"
 #include "sunspot/component/Model.h"
@@ -50,11 +50,11 @@ void Script::Initialize()
 	dict.SetItem( "transform", wTransform );
 	dict.SetItem( "rigidbody", wRigidbody );
 
-	lst::Logger::log.Info( "%s.init", mModule.GetName().c_str() );
+	lst::Log::info( "%s.init", mModule.GetName().c_str() );
 	mModule.Invoke( "init", Tuple{ dict } );
 
 	// TODO refactor this
-	auto& model = mEntity.Get<component::Model>()->get();
+	auto& model = mEntity.get<component::Model>()->get();
 	model.GetNode().matrix.ScaleX( mEntity.mTransform.scale.x );
 	model.GetNode().matrix.ScaleY( mEntity.mTransform.scale.y );
 	model.GetNode().matrix.ScaleZ( mEntity.mTransform.scale.z );
@@ -67,7 +67,7 @@ void Script::Initialize()
 }
 
 
-Script::Script( Entity& entity ) : mEntity{ entity }, mModule{ entity.Get<component::Model>()->get().GetNode().name.c_str() }
+Script::Script( Entity& entity ) : mEntity{ entity }, mModule{ entity.get<component::Model>()->get().GetNode().name.c_str() }
 {
 	Dictionary dict{};
 	auto       wTransform = Wrapper<component::Transform>( &mEntity.mTransform );
@@ -76,10 +76,10 @@ Script::Script( Entity& entity ) : mEntity{ entity }, mModule{ entity.Get<compon
 	dict.SetItem( "rigidbody", wRigidbody );
 	Tuple args{ dict };
 
-	lst::Logger::log.Info( "%s.init", mModule.GetName().c_str() );
+	lst::Log::info( "%s.init", mModule.GetName().c_str() );
 	mModule.Invoke( "init", args );
 
-	auto& model = mEntity.Get<component::Model>()->get();
+	auto& model = mEntity.get<component::Model>()->get();
 	model.GetNode().matrix.ScaleX( mEntity.mTransform.scale.x );
 	model.GetNode().matrix.ScaleY( mEntity.mTransform.scale.y );
 	model.GetNode().matrix.ScaleZ( mEntity.mTransform.scale.z );
@@ -116,7 +116,7 @@ void Script::Update( const float delta )
 	mArgs.SetItem( 0, delta );
 	mModule.Invoke( "update", mArgs );
 
-	auto& model            = mEntity.Get<component::Model>()->get();
+	auto& model            = mEntity.get<component::Model>()->get();
 	model.GetNode().matrix = mst::Mat4::identity;
 	model.GetNode().matrix.ScaleX( mEntity.mTransform.scale.x );
 	model.GetNode().matrix.ScaleY( mEntity.mTransform.scale.y );

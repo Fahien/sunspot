@@ -8,7 +8,7 @@
 
 namespace dataspot
 {
-class Dataspot;
+class Database;
 }
 
 namespace dst = dataspot;
@@ -21,18 +21,18 @@ class ModelRepository;
 class EntityRepository
 {
   public:
-	EntityRepository( dst::Dataspot& data, ModelRepository& modelRepo );
+	EntityRepository( dst::Database& data, ModelRepository& model_repo );
 	~EntityRepository();
 
-	Entity* LoadEntity( const int id );
+	Entity* load_entity( const int id );
 
   private:
-	Entity* loadEntity( const int id );
+	Entity* _load_entity( const int id );
 
-	dst::Dataspot&   m_Data;
-	ModelRepository& m_ModelRepository;
+	dst::Database&   database;
+	ModelRepository& model_repository;
 
-	std::map<const int, Entity*> m_Entities;
+	std::map<const int, Entity*> entities;
 };
 
 

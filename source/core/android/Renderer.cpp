@@ -1,7 +1,7 @@
 #include <algorithm>
 
 #include <filespot/Ifstream.h>
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 #include <mathspot/Math.h>
 
 #include "sunspot/input/Input.h"
@@ -37,7 +37,7 @@ Renderer::Renderer(const std::string& db)
 	// Test database
 	int width  = stoi(mDataSpot.GetConfigValue("window.width"));
 	int height = stoi(mDataSpot.GetConfigValue("window.height"));
-	lst::Logger::log.Info("DataSpot Size [%dx%d]", width, height);
+	lst::Log::info("DataSpot Size [%dx%d]", width, height);
 
 	// Read a set of objects from dataspot
 	constexpr size_t entitiesCount = 3;
@@ -45,7 +45,7 @@ Renderer::Renderer(const std::string& db)
 	for (size_t i{ 0 }; i < entitiesCount; ++i)
 	{
 		Entity* pEntity{ mEntityRepository.LoadEntity(i+1) };
-		lst::Logger::log.Info("Entity: %s", pEntity->GetName().c_str());
+		lst::Log::info("Entity: %s", pEntity->GetName().c_str());
 		Add(pEntity);
 	}
 }
@@ -95,7 +95,7 @@ void Renderer::Handle(input::Input& input)
 
 bool Renderer::init()
 {
-	lst::Logger::log.Info("Using OpenGL ES 3.0 renderer");
+	lst::Log::info("Using OpenGL ES 3.0 renderer");
 	return true;
 }
 
@@ -162,7 +162,7 @@ bool Renderer::checkGlError(const char* funcName)
 	GLint err = glGetError();
 	if (err != GL_NO_ERROR)
 	{
-		lst::Logger::log.Error("GL error after %s(): 0x%08x", funcName, err);
+		lst::Log::error("GL error after %s(): 0x%08x", funcName, err);
 		return true;
 	}
 	return false;

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 
 #ifdef ANDROID
 # include <filespot/Asset.h>
@@ -53,7 +53,7 @@ Program::Program(const char* depth)
 
 	// TODO Handle some errors like vertexShader == 0, m_BaseProgram == 0, etc.
 
-	lst::Logger::log.Info("Program: created\n"); // TODO remove debug log
+	lst::Log::info("Program: created\n"); // TODO remove debug log
 }
 
 
@@ -79,7 +79,7 @@ Program::Program(const char* vertex, const char* fragment)
 
 	// TODO Handle some errors like vertexShader == 0, m_BaseProgram == 0, etc.
 
-	lst::Logger::log.Info("Program: created\n"); // TODO remove debug log
+	lst::Log::info("Program: created\n"); // TODO remove debug log
 }
 
 
@@ -87,7 +87,7 @@ Program::~Program()
 {
 	glDeleteProgram(m_DepthProgram);
 	glDeleteProgram(m_BaseProgram);
-	lst::Logger::log.Info("Program: destroyed\n"); // TODO remove debug log
+	lst::Log::info("Program: destroyed\n"); // TODO remove debug log
 }
 
 

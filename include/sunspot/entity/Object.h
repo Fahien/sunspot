@@ -7,34 +7,57 @@
 
 namespace sunspot
 {
-
 class Entity;
 
 class Object
 {
   public:
 	Object();
-	Object(int id);
-	Object(std::string& name);
-	Object(int id, std::string& name);
-	virtual ~Object() {}
+	Object( int id );
+	Object( const std::string& name );
+	Object( int id, const std::string& name );
+	virtual ~Object()
+	{
+	}
 
-	int GetId() { return m_Id; }
-	void SetId(int id) { m_Id = id; }
-	Entity* GetParent() const { return m_pParent; }
+	int GetId() const
+	{
+		return id;
+	}
 
-	std::string& GetName() { return m_Name; }
-	void SetName(std::string& name) { m_Name = name; }
-	void SetParent( Entity* pParent ) { m_pParent = pParent; }
+	void SetId( int id )
+	{
+		id = id;
+	}
+
+	Entity* GetParent() const
+	{
+		return parent;
+	}
+
+	const std::string& GetName() const
+	{
+		return name;
+	}
+
+	void SetName( const std::string& n )
+	{
+		name = n;
+	}
+
+	void SetParent( Entity* p )
+	{
+		parent = p;
+	}
 
   private:
-	int m_Id;
-	std::string m_Name;
+	int         id;
+	std::string name;
 
-	Entity* m_pParent { nullptr };
+	Entity* parent{ nullptr };
 };
 
-}
+}  // namespace sunspot
 
 
-#endif // SST_OBJECT_H
+#endif  // SST_OBJECT_H

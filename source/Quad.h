@@ -1,6 +1,6 @@
 #pragma once
 
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 
 #include "sunspot/system/graphic/Gl.h"
 

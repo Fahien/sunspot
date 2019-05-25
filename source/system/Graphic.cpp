@@ -4,7 +4,6 @@
 
 namespace sunspot::graphic
 {
-
 void System::Draw()
 {
 	glEnable( GL_DEPTH_TEST );
@@ -14,9 +13,12 @@ void System::Draw()
 	m_pProgram->Use();
 	m_pLight->Update( *m_pProgram );
 
-	if ( auto camera = m_pCamera->Get<component::PerspectiveCamera>() )
+	if ( m_pCamera )
 	{
-		camera->get().Update( *m_pProgram );
+		if ( auto camera = m_pCamera->get<component::PerspectiveCamera>() )
+		{
+			camera->get().Update( *m_pProgram );
+		}
 	}
 
 	for ( auto pModel : m_Models )

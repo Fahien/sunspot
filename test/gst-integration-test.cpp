@@ -1,7 +1,7 @@
 #include <string>
 
 #include <gltfspot/Gltf.h>
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 #include <pyspot/Interpreter.h>
 
 #include "view/GltfRenderer.h"
@@ -29,7 +29,7 @@ int main( int argc, char** argv )
 	/// Check arguments
 	if ( argc < 2 )
 	{
-		Logger::log.Error( "Usage: %s <model/path>\n", argv[0] );
+		Log::error( "Usage: %s <model/path>\n", argv[0] );
 		return EXIT_FAILURE;
 	}
 
@@ -46,15 +46,15 @@ int main( int argc, char** argv )
 		float near{ 0.125f };
 		float far{ 256.0f };
 
-		game.GetGraphics().SetViewport( graphic::System::Viewport{ { 0, 0 }, window_size } );
+		game.get_graphics().SetViewport( graphic::System::Viewport{ { 0, 0 }, window_size } );
 
 		Entity                       camera_entity{};
 		component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
 		camera.SetParent( &camera_entity );
 		camera.Translate( Vec3{ 0.0f, 0.0f, -3.0f } );
 		camera.SetAspectRatio( aspect_ratio );
-		camera_entity.Add( camera );
-		game.GetGraphics().SetCamera( camera_entity );
+		camera_entity.add( camera );
+		game.get_graphics().SetCamera( camera_entity );
 
 		// Load a Gltf model and upload the model into GPU buffers
 		string          model_path{ argv[1] };
@@ -62,17 +62,17 @@ int main( int argc, char** argv )
 		int             model_id = 0;  // Just a custom id, not important for a test
 		auto&           model    = model_repo.get_model( model_id, model_path );
 
-		game.GetGraphics().AddModel( &model );
+		game.get_graphics().AddModel( &model );
 
 		Entity model_entity{};
-		model_entity.Add( model );
-		game.AddEntity( model_entity );
+		model_entity.add( model );
+		game.add_entity( model_entity );
 
 		/// Render to texture
 		/// Compare it with a reference
 
 		graphic::shader::Program base_program{ "shader/base.vert", "shader/base.frag" };
-		game.GetGraphics().SetShaderProgram( &base_program );
+		game.get_graphics().SetShaderProgram( &base_program );
 
 		// DirectionalLight light{ Color{ 1.0f, 1.0f, 1.0f } };
 		// light.SetDirection(0.0f, 0.0f, 4.0f);
@@ -85,19 +85,21 @@ int main( int argc, char** argv )
 		// light.GetSpecular().b /= divFactor / 2;
 		graphic::PointLight light{ Color{ 29.0f, 29.0f, 29.0f } };
 		light.SetPosition( 1.0f, 1.0f, -2.0f );
-		game.GetGraphics().SetLight( &light );
+		game.get_graphics().SetLight( &light );
 
 		// TODO render to texture
 		// TODO Compare rendered texture to gold image
 
-		game.Loop();
-	} catch ( const graphic::Exception& e )
+		game.loop();
+	}
+	catch ( const graphic::Exception& e )
 	{
-		Logger::log.Error( "Exception: %s\n", e.what() );
+		Log::error( "Exception: %s\n", e.what() );
 		return EXIT_FAILURE;
-	} catch ( const exception& e )
+	}
+	catch ( const exception& e )
 	{
-		Logger::log.Error( "Exception: %s\n", e.what() );
+		Log::error( "Exception: %s\n", e.what() );
 		return EXIT_FAILURE;
 	}
 

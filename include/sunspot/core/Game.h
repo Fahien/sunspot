@@ -7,8 +7,6 @@
 
 namespace sunspot
 {
-
-
 struct Time
 {
 	float current;
@@ -19,19 +17,38 @@ struct Time
 class Game
 {
   public:
+	GlfwWindow& get_window()
+	{
+		return window;
+	}
 
-	GlfwWindow& GetWindow() { return window; }
-	graphic::System& GetGraphics() { return graphics; }
-	ImGui& GetGui() { return gui; }
+	graphic::System& get_graphics()
+	{
+		return graphics;
+	}
 
-	void AddEntity( Entity& entity ) { entities.push_back( &entity ); collisions.Add( entity ); }
+	ImGui& get_gui()
+	{
+		return gui;
+	}
 
-	void Handle( input::Input&& in );
+	void add_entity( Entity& entity )
+	{
+		entities.push_back( &entity );
+		collisions.Add( entity );
+	}
 
-	void Loop();
+	const std::vector<Entity*> get_entities() const
+	{
+		return entities;
+	}
+
+	void handle( input::Input&& in );
+
+	void loop();
 
   private:
-	const float computeDeltaTime();
+	const float compute_delta_time();
 
 	Time time = {};
 
@@ -45,4 +62,4 @@ class Game
 };
 
 
-} // namespace sunspot
+}  // namespace sunspot

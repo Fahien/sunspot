@@ -1,4 +1,4 @@
-#include <dataspot/Dataspot.h>
+#include <dataspot/Database.h>
 #include <dataspot/Exception.h>
 #include <dataspot/Statement.h>
 #include <hitspot/BoundingBox.h>
@@ -23,15 +23,15 @@ using namespace pyspot;
 using namespace dataspot;
 
 
-EntityRepository::EntityRepository( Dataspot& data, ModelRepository& modelRepo )
-    : m_Data{ data }, m_ModelRepository{ modelRepo }, m_Entities{}
+EntityRepository::EntityRepository( Database& data, ModelRepository& modelRepo )
+    : database{ data }, model_repository{ modelRepo }, entities{}
 {
 }
 
 
 EntityRepository::~EntityRepository()
 {
-	for ( auto& pair : m_Entities )
+	for ( auto& pair : entities )
 	{
 		if ( pair.second )
 		{
@@ -41,76 +41,86 @@ EntityRepository::~EntityRepository()
 }
 
 
-Entity* EntityRepository::LoadEntity( const int id )
+Entity* EntityRepository::load_entity( const int id )
 {
 	// Check if already loaded
-	auto it = m_Entities.find( id );
-	if ( it != m_Entities.end() )
+	auto it = entities.find( id );
+	if ( it != entities.end() )
 	{
 		return it->second;
 	}
 
-	Entity* pEntity{ loadEntity( id ) };
-	m_Entities.emplace( id, pEntity );
+	Entity* pEntity{ _load_entity( id ) };
+	entities.emplace( id, pEntity );
 	return pEntity;
 }
 
 
-Entity* EntityRepository::loadEntity( const int id )
+Entity* EntityRepository::_load_entity( const int id )
 {
 	// Get the entity
-	Statement& stmt_entity{ m_Data.prepare( "SELECT name FROM main.entity WHERE id = ?;" ) };
-	stmt_entity.bind( id );
-	stmt_entity.step();
+	auto prepare_entity_result = database.prepare( "SELECT name FROM main.entity WHERE id = ?;" );
+	if ( auto error = std::get_if<dataspot::Error>( &prepare_entity_result ) )
+	{
+		return nullptr;
+	}
 
-	string name{ stmt_entity.get_text( 0 ) };
+	auto stmt_entity = std::get_if<Statement>( &prepare_entity_result );
+	stmt_entity->bind( id );
+	stmt_entity->step();
+
+	auto name = stmt_entity->get_text( 0 );
 
 	Entity* pEntity{ new Entity{ id, name } };
 
 	// Get the components
-	string     query{ "SELECT component_id, component_type FROM main.entity_component WHERE entity_id = ?;" };
-	Statement& stmtComponents{ m_Data.prepare( query ) };
-	stmtComponents.bind( id );
+	auto query                     = "SELECT component_id, component_type FROM main.entity_component WHERE entity_id = ?;";
+	auto prepare_components_result = database.prepare( query );
+	auto stmt_components           = std::get_if<Statement>( &prepare_components_result );
+
+	stmt_components->bind( id );
 
 	while ( true )
 	{
 		// Step multiple time
-		if ( stmtComponents.step() != SQLITE_ROW )
+		if ( stmt_components->step() != SQLITE_ROW )
 		{
 			break;
 		}
 
 		// Get the component id and type
-		int    id{ stmtComponents.get_integer( 0 ) };
-		string type{ stmtComponents.get_text( 1 ) };
+		int    id{ stmt_components->get_integer( 0 ) };
+		string type{ stmt_components->get_text( 1 ) };
 
 		// Get the component
-		string     query{ "SELECT * FROM main." + type + " WHERE id = ?;" };
-		Statement& stmtComponent{ m_Data.prepare( query ) };
-		stmtComponent.bind( id );
-		stmtComponent.step();
+		auto query                    = "SELECT * FROM main." + type + " WHERE id = ?;";
+		auto prepare_component_result = database.prepare( query );
+		auto stmt_component           = std::get_if<Statement>( &prepare_component_result );
+
+		stmt_component->bind( id );
+		stmt_component->step();
 
 		if ( type == "transform" )
 		{
 			// Get id
-			int id{ stmtComponent.get_integer( 0 ) };
+			int id{ stmt_component->get_integer( 0 ) };
 
 			// Get position.xyz
-			float          x{ static_cast<float>( stmtComponent.get_double( 1 ) ) };
-			float          y{ static_cast<float>( stmtComponent.get_double( 2 ) ) };
-			float          z{ static_cast<float>( stmtComponent.get_double( 3 ) ) };
+			float          x{ static_cast<float>( stmt_component->get_double( 1 ) ) };
+			float          y{ static_cast<float>( stmt_component->get_double( 2 ) ) };
+			float          z{ static_cast<float>( stmt_component->get_double( 3 ) ) };
 			mathspot::Vec3 position{ x, y, z };
 
 			// Get rotation.xyz
-			x = static_cast<float>( stmtComponent.get_double( 4 ) );
-			y = static_cast<float>( stmtComponent.get_double( 5 ) );
-			z = static_cast<float>( stmtComponent.get_double( 6 ) );
+			x = static_cast<float>( stmt_component->get_double( 4 ) );
+			y = static_cast<float>( stmt_component->get_double( 5 ) );
+			z = static_cast<float>( stmt_component->get_double( 6 ) );
 			mathspot::Vec3 rotation{ x, y, z };
 
 			// Get scale.xyz
-			x = static_cast<float>( stmtComponent.get_double( 7 ) );
-			y = static_cast<float>( stmtComponent.get_double( 8 ) );
-			z = static_cast<float>( stmtComponent.get_double( 9 ) );
+			x = static_cast<float>( stmt_component->get_double( 7 ) );
+			y = static_cast<float>( stmt_component->get_double( 8 ) );
+			z = static_cast<float>( stmt_component->get_double( 9 ) );
 			mathspot::Vec3 scale{ x, y, z };
 
 			// Set the transform values
@@ -123,12 +133,12 @@ Entity* EntityRepository::loadEntity( const int id )
 		else if ( type == "rigidbody" )
 		{
 			// Get id
-			int id{ stmtComponent.get_integer( 0 ) };
+			int id{ stmt_component->get_integer( 0 ) };
 
 			// Get velocity.xyz
-			float          x{ static_cast<float>( stmtComponent.get_double( 1 ) ) };
-			float          y{ static_cast<float>( stmtComponent.get_double( 2 ) ) };
-			float          z{ static_cast<float>( stmtComponent.get_double( 3 ) ) };
+			float          x{ static_cast<float>( stmt_component->get_double( 1 ) ) };
+			float          y{ static_cast<float>( stmt_component->get_double( 2 ) ) };
+			float          z{ static_cast<float>( stmt_component->get_double( 3 ) ) };
 			mathspot::Vec3 velocity{ x, y, z };
 
 			// Construct che component
@@ -139,10 +149,10 @@ Entity* EntityRepository::loadEntity( const int id )
 		else if ( type == "script" )
 		{
 			// Get id
-			int id{ stmtComponent.get_integer( 0 ) };
+			int id{ stmt_component->get_integer( 0 ) };
 
 			// Get script name
-			string name{ stmtComponent.get_text( 1 ) };
+			string name{ stmt_component->get_text( 1 ) };
 
 			// Construct the component
 			Script* script{ new Script{ id, name, *pEntity } };
@@ -151,43 +161,43 @@ Entity* EntityRepository::loadEntity( const int id )
 		else if ( type == "mesh" )
 		{
 			// Get id
-			int id{ stmtComponent.get_integer( 0 ) };
+			int id{ stmt_component->get_integer( 0 ) };
 
 			// Get model path
-			string path{ stmtComponent.get_text( 1 ) };
+			string path{ stmt_component->get_text( 1 ) };
 
 			// Get mesh name
-			string name{ stmtComponent.get_text( 2 ) };
+			string name{ stmt_component->get_text( 2 ) };
 
 			// Get the mesh
-			auto& model = m_ModelRepository.get_model( id, path, name );
+			auto& model = model_repository.get_model( id, path, name );
 
 			// Construct the component
-			pEntity->Add<component::Model>( model );
+			pEntity->add<component::Model>( model );
 		}
 		else if ( type == "collider" )
 		{
 			// Get id
-			int id{ stmtComponent.get_integer( 0 ) };
+			int id{ stmt_component->get_integer( 0 ) };
 
 			// Get name
-			string name{ stmtComponent.get_text( 1 ) };
+			string name{ stmt_component->get_text( 1 ) };
 
 			// TODO Bounding could be of different types
 			// Implement circles, etc..
 
 			// Get box width and height
 			hitspot::BoundingBox box{ pEntity };
-			box.width  = static_cast<float>( stmtComponent.get_double( 2 ) );
-			box.height = static_cast<float>( stmtComponent.get_double( 3 ) );
+			box.width  = static_cast<float>( stmt_component->get_double( 2 ) );
+			box.height = static_cast<float>( stmt_component->get_double( 3 ) );
 
 			Collider* collider{ new Collider{ id, name, *pEntity, move( box ) } };
 			pEntity->SetCollider( collider );
 		}
 		else if ( type == "camera" )
 		{
-			int    id{ stmtComponent.get_integer( 0 ) };
-			string name{ stmtComponent.get_text( 1 ) };
+			int    id{ stmt_component->get_integer( 0 ) };
+			string name{ stmt_component->get_text( 1 ) };
 
 			auto width = 50.0f;
 			auto r     = width / 2.0f;
@@ -200,12 +210,12 @@ Entity* EntityRepository::loadEntity( const int id )
 			pCamera->SetName( name );
 			pCamera->SetParent( pEntity );
 
-			pEntity->Add<component::Camera>( *pCamera );
+			pEntity->add<component::Camera>( *pCamera );
 		}
 	}
 
 	// If the entity has a Mesh and a Transform
-	if ( auto model = pEntity->Get<component::Model>() )
+	if ( auto model = pEntity->get<component::Model>() )
 	{
 		// Apply the transform to the mesh
 		auto& node      = model->get().GetNode();

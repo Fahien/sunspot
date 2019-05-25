@@ -1,5 +1,5 @@
 #include <android/native_window.h>
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 
 #include "Graphics.h"
 
@@ -46,7 +46,7 @@ void Graphics::init(ANativeWindow* window)
 	auto versionStr = reinterpret_cast<const char*>(glGetString(GL_VERSION));
 	if (strstr(versionStr, "OpenGL ES 3."))
 	{
-		lst::Logger::log.Info("glES 3 supported");
+		lst::Log::info("glES 3 supported");
 	}
 }
 
@@ -84,7 +84,7 @@ void Graphics::initEGLSurface()
 
 		if (!configCount)
 		{
-			lst::Logger::log.Error("Unable to retrieve EGL config");
+			lst::Log::error("Unable to retrieve EGL config");
 		}
 	}
 
@@ -104,7 +104,7 @@ void Graphics::initEGLContext()
 
 	if (eglMakeCurrent(mDisplay, mSurface, mSurface, mContext) == EGL_FALSE)
 	{
-		lst::Logger::log.Error("Cannot glMakeCurrent");
+		lst::Log::error("Cannot glMakeCurrent");
 	}
 }
 

@@ -1,4 +1,4 @@
-#include <dataspot/Dataspot.h>
+#include <dataspot/Database.h>
 #include <gltfspot/Gltf.h>
 #include <stdexcept>
 

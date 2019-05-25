@@ -1,4 +1,4 @@
-#include <logspot/Logger.h>
+#include <logspot/Log.h>
 
 #include "core/android/App.h"
 

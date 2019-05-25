@@ -13,7 +13,7 @@ Entity::Entity()
 {}
 
 
-Entity::Entity(int id, std::string& name)
+Entity::Entity(int id, const std::string& name)
 :	Object{ id, name }
 {}
 
