@@ -11,6 +11,7 @@
 
 #include "SunSpotConfig.h"
 #include "sunspot/core/Config.h"
+#include "sunspot/util/Cube.h"
 #include "sunspot/util/Util.h"
 
 #include "sunspot/core/Game.h"
@@ -81,11 +82,12 @@ int main( const int argc, const char** argv )
 		auto open_result = dataspot::Database::open( arguments.project.db.path );
 		if ( auto error = std::get_if<dataspot::Error>( &open_result ) )
 		{
-			// Create
+			// Create if cannot open
 			auto create_result = dataspot::Database::create( arguments.project.db.path );
 			if ( auto error = std::get_if<dataspot::Error>( &create_result ) )
 			{
 				Log::error( "Cannot create data %s: %s", arguments.project.db.path.c_str(), error->get_message().c_str() );
+				return EXIT_FAILURE;
 			}
 			database = std::get_if<dataspot::Database>( &create_result );
 		}
@@ -99,7 +101,7 @@ int main( const int argc, const char** argv )
 		Config config{ *database };
 
 		// Script has to be initialized before loading the entities
-		Script::Initialize( arguments.project.script.path );
+		Script::initialize( arguments.project.script.path );
 
 		Game game;
 
@@ -111,8 +113,8 @@ int main( const int argc, const char** argv )
 		graphic::shader::Program base_program{ "shader/base.vert", "shader/base.frag" };
 		graphics.SetShaderProgram( &base_program );
 
-		graphic::PointLight light{ Color{ 18.0f, 18.0f, 18.0f } };
-		light.SetPosition( 0.0f, 0.0f, 8.0f );
+		graphic::PointLight light{ Color{ 1.0f, 1.0f, 1.0f } };
+		light.SetPosition( 0.0f, 1.0f, 1.0f );
 		graphics.SetLight( &light );
 
 		ModelRepository  model_repo{ arguments.project.path };
@@ -143,16 +145,61 @@ int main( const int argc, const char** argv )
 			}
 		}
 
+		// Create default camera
+		Entity camera_entity{};
+		float  fov{ radians( 45.0f ) };
+		float  near{ 0.125f };
+		float  far{ 256.0f };
+
+		component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
+		camera.set_parent( camera_entity );
+		camera.Translate( Vec3{ 2.0f, 2.0f, -5.0f } );
+		camera.GetTransform().rotation.y = radians( 18.0f );
+		camera.GetTransform().rotation.x = radians( -18.0f );
+		camera.SetAspectRatio( aspect_ratio );
+		camera_entity.add( camera );
+
+		// Create model placeholder
+		auto entity   = Entity( 0, "Placeholder" );
+		auto gltf     = gltfspot::Gltf( "", nlohmann::json::parse( cube ) );
+		auto renderer = GltfRenderer( std::move( gltf ) );
+		auto model    = component::Model( renderer.GetGltf().GetNodes().back(), renderer );
+		entity.add<component::Model>( model );
+		game.get_graphics().AddModel( &model );
 		if ( game.get_entities().size() == 0 )
 		{
-			// Create model placeholder
-			auto entity = Entity( 0, "Placeholder" );
+			game.get_graphics().SetCamera( camera_entity );
+			game.add_entity( entity );
+			game.add_entity( camera_entity );
 		}
 
 		// Set up editor GUI
 		auto& gui = game.get_gui();
 
-		gui.fPreDraw = [&game]() {};
+		gui.fPreDraw = [&game]() {
+			using namespace ImGui;
+
+			// Main menu
+			if ( BeginMainMenuBar() )
+			{
+				if ( BeginMenu( "Edit" ) )
+				{
+					EndMenu();
+				}
+			}
+			EndMainMenuBar();
+
+			// Scene
+			PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f );
+			ImGuiWindowFlags scene_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings;
+			Begin( "Scene", nullptr, scene_flags );
+			PopStyleVar();
+			for ( auto& entity : game.get_entities() )
+			{
+				Text( "%s", entity->get_name().c_str() );
+			}
+			End();
+		};
 
 		game.loop();  // GameLoop.it
 

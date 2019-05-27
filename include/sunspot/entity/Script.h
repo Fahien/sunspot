@@ -1,15 +1,15 @@
 #ifndef SST_SCRIPT_H_
 #define SST_SCRIPT_H_
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include <pyspot/Interpreter.h>
 #include <pyspot/Module.h>
 #include <pyspot/Tuple.h>
 
-#include "sunspot/input/Input.h"
 #include "sunspot/entity/Object.h"
+#include "sunspot/input/Input.h"
 
 
 PyMODINIT_FUNC InitPySpot();
@@ -19,33 +19,33 @@ namespace pst = pyspot;
 
 namespace sunspot
 {
-
 class Entity;
 
 class Script : public Object
 {
   public:
-	Script(const int id, std::string& name, Entity& entity);
-	Script(Entity& entity);
-	~Script() {}
+	Script( const int id, std::string& name, Entity& entity );
+	Script( Entity& entity );
 
-	void Initialize();
-	void Handle(const input::Input& input);
-	void Collide(Entity& other);
-	void Update(const float delta);
+	virtual ~Script() = default;
 
-	static void Initialize(const std::string& scriptPath);
+	void initialize();
+	void handle( const input::Input& input );
+	void collide( Entity& other );
+	void update( const float delta );
+
+	static void initialize( const std::string& script_path );
 
   private:
 	static std::unique_ptr<pst::Interpreter> interpreter;
 
-	Entity& mEntity;
-	pst::Module mModule;
-	pst::Tuple mArgs{ 1 };
+	Entity&     entity;
+	pst::Module module;
+	pst::Tuple  args{ 1 };
 };
 
 
-}
+}  // namespace sunspot
 
 
-#endif // SST_SCRIPT_H_
+#endif  // SST_SCRIPT_H_

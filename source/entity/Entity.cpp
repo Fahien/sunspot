@@ -2,39 +2,35 @@
 
 #include "Mesh.h"
 #include "sunspot/component/Collider.h"
-#include "sunspot/component/Transform.h"
 #include "sunspot/component/Rigidbody.h"
+#include "sunspot/component/Transform.h"
 
 using namespace sunspot;
 
 
-Entity::Entity()
-//:	mScript{ new Script{ *this } }
-{}
-
-
-Entity::Entity(int id, const std::string& name)
-:	Object{ id, name }
-{}
+Entity::Entity( const int id, const std::string& name )
+    : Object{ id, name }
+{
+}
 
 
 Entity::~Entity()
 {
 	// It does not own the Model
 
-	if (mCollider)
+	if ( mCollider )
 	{
 		delete mCollider;
 	}
 
-	if (mScript)
+	if ( mScript )
 	{
 		delete mScript;
 	}
 }
 
 
-//void Entity::SetModel(component::Model* model)
+// void Entity::SetModel(component::Model* model)
 //{
 //	if (mModel == model)
 //	{
@@ -45,14 +41,14 @@ Entity::~Entity()
 //}
 
 
-void Entity::SetCollider(component::Collider* collider)
+void Entity::SetCollider( component::Collider* collider )
 {
-	if (mCollider == collider)
+	if ( mCollider == collider )
 	{
 		return;
 	}
 
-	if (mCollider)
+	if ( mCollider )
 	{
 		delete mCollider;
 	}
@@ -61,20 +57,20 @@ void Entity::SetCollider(component::Collider* collider)
 }
 
 
-void Entity::SetTransform(component::Transform& transform)
+void Entity::SetTransform( component::Transform& transform )
 {
 	mTransform = transform;
 }
 
 
-void Entity::SetRigidbody(component::Rigidbody* rigidbody)
+void Entity::SetRigidbody( component::Rigidbody* rigidbody )
 {
-	if (mRigidbody == rigidbody)
+	if ( mRigidbody == rigidbody )
 	{
 		return;
 	}
 
-	if (mRigidbody)
+	if ( mRigidbody )
 	{
 		delete mRigidbody;
 	}
@@ -83,28 +79,28 @@ void Entity::SetRigidbody(component::Rigidbody* rigidbody)
 }
 
 
-void Entity::Handle(const input::Input& input)
+void Entity::Handle( const input::Input& input )
 {
-	if (mScript)
+	if ( mScript )
 	{
-		mScript->Handle(input);
+		mScript->handle( input );
 	}
 }
 
 
-void Entity::Collide(Entity& other)
+void Entity::Collide( Entity& other )
 {
-	if (mScript)
+	if ( mScript )
 	{
-		mScript->Collide(other);
+		mScript->collide( other );
 	}
 }
 
 
-void Entity::Update(const float delta)
+void Entity::Update( const float delta )
 {
-	if (mScript)
+	if ( mScript )
 	{
-		mScript->Update(delta);
+		mScript->update( delta );
 	}
 }

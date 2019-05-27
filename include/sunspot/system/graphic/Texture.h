@@ -4,23 +4,23 @@
 #include <string>
 
 #ifdef ANDROID
-# include <filespot/Asset.h>
+#include <filespot/Asset.h>
 namespace fst = filespot;
 #endif
+#include <gltfspot/Gltf.h>
 
-#include "sunspot/system/graphic/Gl.h"
 #include "sunspot/system/graphic/Exception.h"
+#include "sunspot/system/graphic/Gl.h"
 
 
 namespace sunspot::graphic
 {
-
-
 class TextureException : public graphic::Exception
 {
   public:
-	TextureException(const std::string& tag, const std::string& message)
-		: graphic::Exception{tag + ": " + message } {}
+	TextureException( const std::string& tag, const std::string& message ) : graphic::Exception{ tag + ": " + message }
+	{
+	}
 };
 
 
@@ -29,13 +29,26 @@ class SoilData
   public:
 	static const std::string tag;
 
-	SoilData(const std::string& path);
+	SoilData( const std::string& path );
+	SoilData( const gltfspot::Gltf::BufferView& buffer_view, gltfspot::Gltf& gltf );
 	~SoilData();
 
-	GLsizei  getWidth ()   { return mWidth;    }
-	GLsizei  getHeight()   { return mHeight;   }
-	int      getChannels() { return mChannels; }
-	GLubyte* getHandle()   { return mHandle;   }
+	GLsizei getWidth() const
+	{
+		return mWidth;
+	}
+	GLsizei getHeight() const
+	{
+		return mHeight;
+	}
+	int getChannels() const
+	{
+		return mChannels;
+	}
+	GLubyte* getHandle() const
+	{
+		return mHandle;
+	}
 
   private:
 	GLsizei  mWidth;
@@ -43,7 +56,7 @@ class SoilData
 	int      mChannels;
 	GLubyte* mHandle;
 #ifdef ANDROID
-	fst::Asset    mAsset;
+	fst::Asset mAsset;
 #endif
 };
 
@@ -53,12 +66,21 @@ class TextureData
   public:
 	static const std::string tag;
 
-	TextureData(const std::string& path);
+	TextureData( const std::string& path );
 	~TextureData();
 
-	inline GLsizei& getWidth()  { return mWidth;  }
-	inline GLsizei& getHeight() { return mHeight; }
-	inline GLubyte* getData()   { return mData;   }
+	inline GLsizei& getWidth()
+	{
+		return mWidth;
+	}
+	inline GLsizei& getHeight()
+	{
+		return mHeight;
+	}
+	inline GLubyte* getData()
+	{
+		return mData;
+	}
 
   private:
 	GLsizei  mWidth;
@@ -67,27 +89,45 @@ class TextureData
 };
 
 
-enum TextureType { DIFFUSE, SPECULAR };
+enum TextureType
+{
+	DIFFUSE,
+	SPECULAR
+};
+
 static const char* textureTypeNames[] = { "diffuse", "specular" };
-const char* getTextureTypeName(const TextureType& type);
+const char*        getTextureTypeName( const TextureType& type );
 
 
 class Texture
 {
   public:
-	Texture(const std::string& path, const TextureType& type);
+	Texture( const std::string& path, const TextureType& type );
+	Texture( const SoilData& data, const TextureType& type );
+
+	Texture( Texture&& other );
+
 	~Texture();
 
-	inline void release() const { glDeleteTextures(1, &mId); }
+	inline void release() const
+	{
+		glDeleteTextures( 1, &mId );
+	}
 
-	inline GLuint&      getId()   { return mId;   }
-	inline TextureType& getType() { return mType; }
+	inline GLuint& getId()
+	{
+		return mId;
+	}
+	inline TextureType& getType()
+	{
+		return mType;
+	}
 
   private:
-	GLuint      mId;
+	GLuint      mId = 0;
 	std::string mName;
 	TextureType mType;
 };
 
 
-} // namespace sunspot::graphic
+}  // namespace sunspot::graphic

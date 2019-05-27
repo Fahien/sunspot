@@ -96,12 +96,9 @@ OrthographicCamera::OrthographicCamera( const float r, const float l, const floa
 
 component::Transform& Camera::GetTransform()
 {
-	auto pParent = GetParent();
-	assert( pParent && "Camera component is not attached to an entity" );
-
-	auto& pTransform = pParent->GetTransform();
-
-	return pTransform;
+	auto parent = get_parent();
+	assert( parent && "Camera component is not attached to an entity" );
+	return parent->GetTransform();
 }
 
 

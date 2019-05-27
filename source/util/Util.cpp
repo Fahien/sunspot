@@ -5,13 +5,13 @@
 
 namespace sunspot
 {
-CliArgs::CliArgs( const int argc, const char** argv )
-    : args{ pack_args( argc, argv ) },
-      project{ .name   = set_project_name(),
-	           .path   = "project/" + project.name,
-	           .db     = { .path = project.path + "/" + project.name + ".data" },
-	           .script = { .path = project.path + "/script" } }
+CliArgs::CliArgs( const int argc, const char** argv ) : args{ pack_args( argc, argv ) }
 {
+	project.name        = set_project_name();
+	project.path        = "project/" + project.name;
+	project.db.path     = project.path + "/" + project.name + ".data";
+	project.script.path = project.path + "/script";
+
 	logspot::Log::info( "Project [%s]", project.name.c_str() );
 }
 

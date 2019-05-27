@@ -36,8 +36,7 @@ class Rigidbody;
 class Entity : public Object
 {
   public:
-	Entity();
-	Entity( int id, const std::string& name );
+	Entity( int id = 0, const std::string& name = "Unknown" );
 
 	~Entity();
 
@@ -53,28 +52,16 @@ class Entity : public Object
 	// component::Model* GetModel() { return mModel; }
 	// void SetModel(component::Model* model);
 
-	component::Collider* GetCollider()
-	{
-		return mCollider;
-	}
-	void SetCollider( component::Collider* mCollider );
+	component::Collider* GetCollider() { return mCollider; }
+	void                 SetCollider( component::Collider* mCollider );
 
-	component::Transform& GetTransform()
-	{
-		return mTransform;
-	}
-	void SetTransform( component::Transform& transform );
+	component::Transform& GetTransform() { return mTransform; }
+	void                  SetTransform( component::Transform& transform );
 
-	component::Rigidbody* GetRigidbody()
-	{
-		return mRigidbody;
-	}
-	void SetRigidbody( component::Rigidbody* rigidbody );
+	component::Rigidbody* GetRigidbody() { return mRigidbody; }
+	void                  SetRigidbody( component::Rigidbody* rigidbody );
 
-	Script* GetScript()
-	{
-		return mScript;
-	}
+	Script*     GetScript() { return mScript; }
 	inline void SetScript( Script* script );
 
 	void Handle( const input::Input& input );

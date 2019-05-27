@@ -50,7 +50,7 @@ int main( int argc, char** argv )
 
 		Entity                       camera_entity{};
 		component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
-		camera.SetParent( &camera_entity );
+		camera.set_parent( camera_entity );
 		camera.Translate( Vec3{ 0.0f, 0.0f, -3.0f } );
 		camera.SetAspectRatio( aspect_ratio );
 		camera_entity.add( camera );

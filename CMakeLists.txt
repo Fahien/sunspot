@@ -166,6 +166,7 @@ target_include_directories( bindings PUBLIC ${DEPENDENCY_INCLUDE_DIRS} ${MATHSPO
 # Sources
 set(SOURCES
 	source/util/Util.cpp
+	source/util/Cube.cpp
 	source/core/Config.cpp
 	source/system/Graphic.cpp
 	source/system/graphic/Shader.cpp

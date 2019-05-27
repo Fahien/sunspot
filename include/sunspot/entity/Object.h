@@ -12,43 +12,22 @@ class Entity;
 class Object
 {
   public:
-	Object();
-	Object( int id );
+	Object( int id = 0 );
 	Object( const std::string& name );
 	Object( int id, const std::string& name );
-	virtual ~Object()
-	{
-	}
+	virtual ~Object() = default;
 
-	int GetId() const
-	{
-		return id;
-	}
+	int get_id() const { return id; }
 
-	void SetId( int id )
-	{
-		id = id;
-	}
+	void set_id( int i ) { id = i; }
 
-	Entity* GetParent() const
-	{
-		return parent;
-	}
+	Entity* get_parent() const { return parent; }
 
-	const std::string& GetName() const
-	{
-		return name;
-	}
+	const std::string& get_name() const { return name; }
 
-	void SetName( const std::string& n )
-	{
-		name = n;
-	}
+	void set_name( const std::string& n ) { name = n; }
 
-	void SetParent( Entity* p )
-	{
-		parent = p;
-	}
+	void set_parent( Entity& p ) { parent = &p; }
 
   private:
 	int         id;

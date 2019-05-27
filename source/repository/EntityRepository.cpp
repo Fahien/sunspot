@@ -206,9 +206,9 @@ Entity* EntityRepository::_load_entity( const int id )
 			auto b     = -t;
 
 			auto pCamera = new component::OrthographicCamera( r, l, t, b );
-			pCamera->SetId( id );
-			pCamera->SetName( name );
-			pCamera->SetParent( pEntity );
+			pCamera->set_id( id );
+			pCamera->set_name( name );
+			pCamera->set_parent( *pEntity );
 
 			pEntity->add<component::Camera>( *pCamera );
 		}
@@ -234,7 +234,7 @@ Entity* EntityRepository::_load_entity( const int id )
 	if ( pEntity->GetScript() )
 	{
 		// Call the init method in the script
-		pEntity->GetScript()->Initialize();
+		pEntity->GetScript()->initialize();
 	}
 
 	return pEntity;

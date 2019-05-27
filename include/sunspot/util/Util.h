@@ -54,7 +54,7 @@ class CliArgs
 	std::vector<std::string> args;
 
   public:
-	const struct {
+	struct {
 		std::string name;
 		std::string path;
 		struct {
