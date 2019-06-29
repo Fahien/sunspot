@@ -9,7 +9,7 @@ CliArgs::CliArgs( const int argc, const char** argv ) : args{ pack_args( argc, a
 {
 	project.name        = set_project_name();
 	project.path        = "project/" + project.name;
-	project.db.path     = project.path + "/" + project.name + ".data";
+	project.config.path = project.path + "/config.json";
 	project.script.path = project.path + "/script";
 
 	logspot::Log::info( "Project [%s]", project.name.c_str() );

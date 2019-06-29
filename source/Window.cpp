@@ -113,7 +113,7 @@ void Window::render3D( const float& deltaTime ) // TODO comment
 	mBaseProgram->Use();
 	mLight->Update( *mBaseProgram );
 
-	m_Camera->get<component::Camera>()->get().Update( *mBaseProgram );
+	m_Camera->get<component::Camera>()->Update( *mBaseProgram );
 
 	//for ( auto pEntity : mEntities )
 	//{

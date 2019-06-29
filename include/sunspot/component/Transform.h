@@ -2,24 +2,23 @@
 #define SST_TRANSFORM_H_
 
 #include <mathspot/Math.h>
+#include <sunspot/entity/Object.h>
 
 #include "sunspot/util/Export.h"
 
 namespace sunspot::component
 {
-
-
-class PYSPOT_EXPORT Transform
+class PYSPOT_EXPORT Transform : public Object
 {
   public:
-	int id;
+	int            id;
 	mathspot::Vec3 position;
 	mathspot::Vec3 rotation;
-	mathspot::Vec3 scale { 1.0f, 1.0f, 1.0f };
+	mathspot::Vec3 scale{ 1.0f, 1.0f, 1.0f };
 };
 
 
-} // namespace sunspot::component
+}  // namespace sunspot::component
 
 
-#endif // SST_TRANSFORM_H_
+#endif  // SST_TRANSFORM_H_

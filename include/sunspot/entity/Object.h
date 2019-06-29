@@ -1,13 +1,12 @@
 #ifndef SST_OBJECT_H_
 #define SST_OBJECT_H_
 
-
 #include <string>
-
 
 namespace sunspot
 {
 class Entity;
+
 
 class Object
 {
@@ -36,7 +35,7 @@ class Object
 	Entity* parent{ nullptr };
 };
 
-}  // namespace sunspot
 
+}  // namespace sunspot
 
 #endif  // SST_OBJECT_H

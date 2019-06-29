@@ -1,7 +1,7 @@
+#include "sunspot/core/Collisions.h"
 #include "sunspot/component/Collider.h"
 #include "sunspot/component/Transform.h"
 #include "sunspot/entity/Entity.h"
-#include "sunspot/core/Collisions.h"
 
 namespace sunspot
 {
@@ -11,7 +11,7 @@ void Collisions::add( Entity& entity )
 	if ( auto c = entity.get<component::Collider>() )
 	{
 		// Put a copy of the bounding box in the map
-		auto pair = boxes.emplace( &entity, c->get().GetBoundingBox() );
+		auto pair = boxes.emplace( &entity, c->GetBoundingBox() );
 
 		// If it was successfull
 		auto& success = pair.second;
@@ -36,14 +36,16 @@ void Collisions::update()
 	// Update boxes
 	for ( auto& pair : boxes )
 	{
-		auto& transform = pair.first->GetTransform();
-		auto& box       = pair.second;
+		if ( auto transform = pair.first->get<component::Transform>() )
+		{
+			auto& box = pair.second;
 
-		// Apply transform to the box
-		// TODO rotation and scale
-		// Fix Y-Z incoherency
-		box.x = transform.position.x;
-		box.y = transform.position.y;
+			// Apply transform to the box
+			// TODO rotation and scale
+			// Fix Y-Z incoherency
+			box.x = transform->position.x;
+			box.y = transform->position.y;
+		}
 	}
 
 	system.Update();

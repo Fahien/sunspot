@@ -59,7 +59,7 @@ class CliArgs
 		std::string path;
 		struct {
 			std::string path;
-		} db;
+		} config;
 		struct {
 			std::string path;
 		} script;

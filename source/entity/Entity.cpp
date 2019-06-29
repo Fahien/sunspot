@@ -10,6 +10,7 @@ namespace sunspot
 Entity::Entity( const int id, const std::string& name )
     : Object{ id, name }
 {
+	add(*(new component::Transform{}));
 }
 
 
@@ -19,12 +20,6 @@ Entity::~Entity()
 	{
 		delete mScript;
 	}
-}
-
-
-void Entity::SetTransform( component::Transform& transform )
-{
-	mTransform = transform;
 }
 
 

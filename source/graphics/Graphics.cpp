@@ -17,7 +17,7 @@ void Graphics::draw()
 	{
 		if ( auto perspective_camera = camera->get<component::PerspectiveCamera>() )
 		{
-			perspective_camera->get().Update( *program );
+			perspective_camera->Update( *program );
 		}
 	}
 

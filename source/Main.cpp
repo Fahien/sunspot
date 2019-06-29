@@ -9,6 +9,8 @@
 #include <dataspot/Exception.h>
 #include <logspot/Log.h>
 
+#include <nlohmann/json.hpp>
+
 #include "SunSpotConfig.h"
 #include "sunspot/core/Config.h"
 #include "sunspot/util/Cube.h"
@@ -65,23 +67,15 @@ void print_logo()
 }
 
 
-/// @return A database, creating it if not found
-std::variant<dataspot::Database, dataspot::Error> load_database( const std::string& path )
+/// @return A config file, creating it if not found
+std::variant<nlohmann::json, dataspot::Error> load_config( const std::string& path )
 {
-	auto open_result = dataspot::Database::open( path );
-	if ( auto error = std::get_if<dataspot::Error>( &open_result ) )
-	{
-		// Create if cannot open
-		auto create_result = dataspot::Database::create( path );
-		if ( auto error = std::get_if<dataspot::Error>( &create_result ) )
-		{
-			Log::error( "Cannot create data %s: %s", path.c_str(), error->get_message().c_str() );
-			std::exit( EXIT_FAILURE );
-		}
-		return create_result;
-	}
+	// read a JSON file
+	fst::Ifstream  i{ path };
+	nlohmann::json j;
+	i >> j;
 
-	return open_result;
+	return j;
 }
 
 
@@ -93,18 +87,18 @@ int main( const int argc, const char** argv )
 
 	try
 	{
-		// Get command line arguments
-		auto arguments = CliArgs( argc, argv );
+		// Get command line args
+		auto args = CliArgs( argc, argv );
 
-		// Load database
-		auto load_result = load_database( arguments.project.db.path );
-		auto database = std::get_if<dataspot::Database>( &load_result );
+		// Load config
+		auto load_result = load_config( args.project.config.path );
+		auto config_file = std::get_if<nlohmann::json>( &load_result );
 
 		// Get config values
-		Config config{ *database };
+		Config config{ *config_file };
 
 		// Script has to be initialized before loading the entities
-		Script::initialize( arguments.project.script.path );
+		Script::initialize( args.project.script.path );
 
 		Game game;
 
@@ -120,8 +114,8 @@ int main( const int argc, const char** argv )
 		light.SetPosition( 0.0f, 1.0f, 1.0f );
 		graphics.set_light( &light );
 
-		ModelRepository  model_repo{ arguments.project.path };
-		EntityRepository entity_repo{ *database, model_repo };
+		ModelRepository  model_repo{ args.project.path };
+		EntityRepository entity_repo{ args.project.path, model_repo };
 
 		// Read a set of objects from database
 		constexpr int entities_count = 4;
@@ -132,7 +126,7 @@ int main( const int argc, const char** argv )
 			{
 				if ( auto camera = entity->get<component::Camera>() )
 				{
-					if ( auto perspective_cam = dynamic_cast<component::PerspectiveCamera*>( &camera->get() ) )
+					if ( auto perspective_cam = dynamic_cast<component::PerspectiveCamera*>( camera ) )
 					{
 						perspective_cam->SetAspectRatio( aspect_ratio );
 					}
@@ -141,7 +135,7 @@ int main( const int argc, const char** argv )
 
 				if ( auto model = entity->get<component::Model>() )
 				{
-					game.get_graphics().add_model( &model->get() );
+					game.get_graphics().add_model( model );
 				}
 
 				game.add( *entity );
@@ -149,22 +143,22 @@ int main( const int argc, const char** argv )
 		}
 
 		// Create default camera
-		Entity camera_entity{};
-		float  fov{ radians( 45.0f ) };
-		float  near{ 0.125f };
-		float  far{ 256.0f };
+		auto  camera_entity = Entity{ 0, "Camera" };
+		float fov{ radians( 45.0f ) };
+		float near{ 0.125f };
+		float far{ 256.0f };
 
 		component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
 		camera.set_parent( camera_entity );
-		camera.Translate( Vec3{ 2.0f, 2.0f, -5.0f } );
+		camera.Translate( Vec3{ 5.0f, 5.0f, -5.0f } );
 		camera.GetTransform().rotation.y = radians( 18.0f );
 		camera.GetTransform().rotation.x = radians( -18.0f );
 		camera.SetAspectRatio( aspect_ratio );
 		camera_entity.add( camera );
 
 		// Create model placeholder
-		auto entity   = Entity( 0, "Placeholder" );
-		auto gltf     = gltfspot::Gltf( "", nlohmann::json::parse( cube ) );
+		auto entity   = Entity( 1, "Cube" );
+		auto gltf     = gltfspot::Gltf( nlohmann::json::parse( cube ) );
 		auto renderer = GltfRenderer( std::move( gltf ) );
 		auto model    = component::Model( renderer.GetGltf().GetNodes().back(), renderer );
 		entity.add<component::Model>( model );
@@ -194,15 +188,31 @@ int main( const int argc, const char** argv )
 
 			// Scene
 			PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
-			ImGuiWindowFlags scene_flags =
-			    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings;
+			ImGuiWindowFlags scene_flags = ImGuiWindowFlags_NoSavedSettings;
 			Begin( "Scene", nullptr, scene_flags );
 			PopStyleVar();
 			for ( auto& entity : game.get_scene().get_entities() )
 			{
-				Text( "%s", entity->get_name().c_str() );
+				PushID( entity );
+				auto open = TreeNode( entity->get_name().c_str() );
+				if ( open )
+				{
+					if ( auto transform = entity->get<component::Transform>() )
+					{
+						PushID( transform );
+						TreeNodeEx(
+						    "transform",
+						    ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet,
+						    "[%f,%f,%f]", transform->position.x, transform->position.y, transform->position.z );
+						PopID();
+					}
+					TreePop();
+				}
+				PopID();
 			}
 			End();
+
+			ShowDemoWindow();
 		};
 
 		game.loop();  // GameLoop.it

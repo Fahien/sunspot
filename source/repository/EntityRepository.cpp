@@ -23,8 +23,8 @@ using namespace pyspot;
 using namespace dataspot;
 
 
-EntityRepository::EntityRepository( Database& data, ModelRepository& modelRepo )
-    : database{ data }, model_repository{ modelRepo }, entities{}
+EntityRepository::EntityRepository( std::string& path, ModelRepository& modelRepo )
+    : project_path{ path }, model_repository{ modelRepo }, entities{}
 {
 }
 
@@ -59,6 +59,9 @@ Entity* EntityRepository::load_entity( const int id )
 Entity* EntityRepository::_load_entity( const int id )
 {
 	// Get the entity
+
+	return nullptr;
+	/* 
 	auto prepare_entity_result = database.prepare( "SELECT name FROM main.entity WHERE id = ?;" );
 	if ( auto error = std::get_if<dataspot::Error>( &prepare_entity_result ) )
 	{
@@ -238,4 +241,5 @@ Entity* EntityRepository::_load_entity( const int id )
 	}
 
 	return pEntity;
+	*/
 }

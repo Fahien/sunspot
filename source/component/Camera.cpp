@@ -98,7 +98,7 @@ component::Transform& Camera::GetTransform()
 {
 	auto parent = get_parent();
 	assert( parent && "Camera component is not attached to an entity" );
-	return parent->GetTransform();
+	return *parent->get<component::Transform>();
 }
 
 

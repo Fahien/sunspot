@@ -21,7 +21,7 @@ class ModelRepository;
 class EntityRepository
 {
   public:
-	EntityRepository( dst::Database& data, ModelRepository& model_repo );
+	EntityRepository( std::string& project_path, ModelRepository& model_repo );
 	~EntityRepository();
 
 	Entity* load_entity( const int id );
@@ -29,7 +29,7 @@ class EntityRepository
   private:
 	Entity* _load_entity( const int id );
 
-	dst::Database&   database;
+	std::string&   project_path;
 	ModelRepository& model_repository;
 
 	std::map<const int, Entity*> entities;

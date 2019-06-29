@@ -44,13 +44,10 @@ class Entity : public Object
 	bool has();
 
 	template <typename T>
-	std::optional<std::reference_wrapper<T>> get();
+	T* get() const;
 
 	template <typename T>
 	void add( T& );
-
-	component::Transform& GetTransform() { return mTransform; }
-	void                  SetTransform( component::Transform& transform );
 
 	component::Rigidbody* GetRigidbody() { return mRigidbody; }
 	void                  SetRigidbody( component::Rigidbody* rigidbody );
@@ -63,7 +60,6 @@ class Entity : public Object
 	void Update( const float delta );
 
   private:
-	component::Transform  mTransform{};
 	component::Rigidbody* mRigidbody{ nullptr };
 	Script*               mScript{ nullptr };
 
@@ -82,19 +78,19 @@ bool Entity::has()
 }
 
 template <typename T>
-std::optional<std::reference_wrapper<T>> Entity::get()
+T* Entity::get() const
 {
 	static_assert( std::is_base_of<Object, T>(), "Component type is not subclass of Object" );
 	auto index = std::type_index{ typeid( T ) };
 	auto it    = m_Components.find( index );
 	if ( it != m_Components.end() )
 	{
-		if ( auto pComponent = reinterpret_cast<T*>( it->second ) )
+		if ( auto component = reinterpret_cast<T*>( it->second ) )
 		{
-			return *pComponent;
+			return component;
 		}
 	}
-	return std::nullopt;
+	return nullptr;
 }
 
 

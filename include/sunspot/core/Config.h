@@ -1,6 +1,7 @@
 #pragma once
 
-#include <dataspot/Database.h>
+#include <nlohmann/json.hpp>
+
 #include <mathspot/Math.h>
 
 
@@ -9,7 +10,7 @@ namespace sunspot
 class Config
 {
   public:
-	Config( dataspot::Database& db );
+	Config( nlohmann::json& j );
 
   private:
 	/// @return A value from the config table in the database
@@ -19,7 +20,7 @@ class Config
 	/// @return The size of the window
 	mathspot::Size query_window_size();
 
-	dataspot::Database& database;
+	nlohmann::json& j;
 
   public:
 	const struct
