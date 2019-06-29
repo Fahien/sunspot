@@ -136,7 +136,7 @@ void Camera::updateView()
 	m_View = m_Rotation * m_Translation;
 }
 
-void Camera::Update( const graphic::shader::Program& program )
+void Camera::Update( const graphics::shader::Program& program )
 {
 	// View
 	updateView();

@@ -6,9 +6,9 @@
 
 #include <mathspot/Math.h>
 
-#include "sunspot/system/graphic/Shader.h"
-#include "sunspot/system/graphic/Texture.h"
-#include "sunspot/system/graphic/Material.h"
+#include "sunspot/system/graphics/Shader.h"
+#include "sunspot/system/graphics/Texture.h"
+#include "sunspot/system/graphics/Material.h"
 
 namespace mst = mathspot;
 
@@ -38,7 +38,7 @@ public:
 	Mesh(const std::string&         name,
 	     std::vector<Vertex>&       vertices,
 	     std::vector<GLuint>&       indices,
-	     std::shared_ptr<graphic::Material>& material);
+	     std::shared_ptr<graphics::Material>& material);
 	~Mesh();
 
 	/// Returns the name of the mesh
@@ -47,11 +47,11 @@ public:
 	/// Applies the value of the transform component to the member transform matrix
 	void ApplyTransform(component::Transform& pTransform);
 
-	void Draw(const graphic::shader::Program& shader) const;
+	void Draw(const graphics::shader::Program& shader) const;
 
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
-	std::vector<graphic::Texture> textures;
+	std::vector<graphics::Texture> textures;
 
 	mst::Mat4 transform;
 
@@ -60,7 +60,7 @@ private:
 	GLuint mVao;
 	GLuint mVbo;
 	GLuint mEbo;
-	std::shared_ptr<graphic::Material> mMaterial;
+	std::shared_ptr<graphics::Material> mMaterial;
 };
 
 

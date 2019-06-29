@@ -9,8 +9,8 @@
 
 #include <mathspot/Math.h>
 
-#include "sunspot/system/Graphic.h"
-#include "sunspot/system/graphic/Framebuffer.h"
+#include "sunspot/system/graphics/Graphics.h"
+#include "sunspot/system/graphics/Framebuffer.h"
 #include "Cursor.h"
 #include "sunspot/input/Input.h"
 #include "system/Collision.h"
@@ -32,10 +32,10 @@ class GltfRenderer;
 class GltfCamera;
 
 
-class GlewException : public graphic::Exception
+class GlewException : public graphics::Exception
 {
 public:
-	GlewException(const std::string& tag) : graphic::Exception{ tag + ": Could not initialize GLEW" } {}
+	GlewException(const std::string& tag) : graphics::Exception{ tag + ": Could not initialize GLEW" } {}
 };
 
 
@@ -48,20 +48,20 @@ public:
 	~Window();
 
 	const mst::Size& getFrameSize() const { return m_FrameSize; }
-	inline void setBaseProgram( const graphic::shader::Program* baseProgram ) { mBaseProgram = baseProgram; }
-	inline void setLight( graphic::Light* light ) { mLight = light; }
+	inline void setBaseProgram( const graphics::shader::Program* baseProgram ) { mBaseProgram = baseProgram; }
+	inline void setLight( graphics::Light* light ) { mLight = light; }
 	inline void addObj( WavefrontObject* obj ) { mObjs.push_back(obj); }
 	inline void AddGltf( GltfRenderer* renderer ) { mGltfRenderer = renderer; }
 	inline void AddEntity( Entity* entity ) { mEntities.push_back(entity); mCollision.Add(*entity); }
 
 	inline void setQuad( Quad* quad ) { mQuad = quad; }
-	inline void setQuadProgram( const graphic::shader::Program* quadProgram ) { mQuadProgram = quadProgram; }
-	inline void setDepthProgram( const graphic::shader::Program* depthProgram ) { mDepthProgram = depthProgram; }
+	inline void setQuadProgram( const graphics::shader::Program* quadProgram ) { mQuadProgram = quadProgram; }
+	inline void setDepthProgram( const graphics::shader::Program* depthProgram ) { mDepthProgram = depthProgram; }
 
 
 	void SetCamera( GltfCamera* camera ) { m_pCamera = camera; }
 	void SetCamera( Entity& camera ) { m_Camera = &camera; }
-	void setFramebuffer( const graphic::Framebuffer* framebuffer ) { mFramebuffer = framebuffer; }
+	void setFramebuffer( const graphics::Framebuffer* framebuffer ) { mFramebuffer = framebuffer; }
 
 	virtual void loop() = 0;
 	virtual void UpdateSize() = 0;
@@ -115,14 +115,14 @@ private:
 
 	Game& m_Game;
 
-	const graphic::shader::Program* mBaseProgram;
-	graphic::Light* mLight;
+	const graphics::shader::Program* mBaseProgram;
+	graphics::Light* mLight;
 	std::vector<WavefrontObject*> mObjs;
 	std::vector<Entity*> mEntities{};
 	GltfRenderer* mGltfRenderer { nullptr };
-	const graphic::shader::Program* mQuadProgram;
-	const graphic::shader::Program* mDepthProgram;
-	const graphic::Framebuffer* mFramebuffer;
+	const graphics::shader::Program* mQuadProgram;
+	const graphics::shader::Program* mDepthProgram;
+	const graphics::Framebuffer* mFramebuffer;
 	const Quad* mQuad;
 
 	system::Collision mCollision;

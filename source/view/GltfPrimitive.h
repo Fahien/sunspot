@@ -3,10 +3,10 @@
 
 #include <gltfspot/Gltf.h>
 
-#include "sunspot/system/graphic/Gl.h"
-#include "sunspot/system/graphic/Shader.h"
-#include "sunspot/system/graphic/Material.h"
-#include "sunspot/system/graphic/Texture.h"
+#include "sunspot/system/graphics/Gl.h"
+#include "sunspot/system/graphics/Shader.h"
+#include "sunspot/system/graphics/Material.h"
+#include "sunspot/system/graphics/Texture.h"
 
 
 namespace mst = mathspot;
@@ -33,7 +33,7 @@ public:
 
 	void SetMatrix(const mst::Mat4& matrix);
 
-	void Draw(const graphic::shader::Program& shader) const;
+	void Draw(const graphics::shader::Program& shader) const;
 
 private:
 	void readIndices(gst::Gltf& model, gst::Gltf::Mesh::Primitive& primitive);
@@ -53,9 +53,9 @@ private:
 
 	bool mHasVertexColors{};
 
-	graphic::Material mMaterial{};
+	graphics::Material mMaterial{};
 
-	std::map<gst::Gltf::Texture*, graphic::Texture> mTextures{};
+	std::map<gst::Gltf::Texture*, graphics::Texture> mTextures{};
 
 };
 

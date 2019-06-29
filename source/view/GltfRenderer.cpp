@@ -3,7 +3,7 @@
 #include "view/GltfRenderer.h"
 #include "view/GltfPrimitive.h"
 
-#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphics/Shader.h"
 #include "ShaderProgram.h"
 #include <mathspot/Math.h>
 
@@ -34,7 +34,7 @@ GltfRenderer::~GltfRenderer()
 {}
 
 
-void GltfRenderer::Draw(const graphic::shader::Program& shader,
+void GltfRenderer::Draw(const graphics::shader::Program& shader,
                         const Gltf::Node* pNode,
                         const Mat4& transform)
 {
@@ -63,7 +63,7 @@ void GltfRenderer::Draw(const graphic::shader::Program& shader,
 }
 
 
-void GltfRenderer::Draw(const graphic::shader::Program& shader)
+void GltfRenderer::Draw(const graphics::shader::Program& shader)
 {
 	auto pScene = m_Gltf.GetScene();
 

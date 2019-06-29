@@ -1,4 +1,4 @@
-#include "sunspot/system/graphic/Texture.h"
+#include "sunspot/system/graphics/Texture.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -8,11 +8,11 @@
 #include <SOIL.h>
 #include <logspot/Log.h>
 
-#include "sunspot/system/graphic/Gl.h"
+#include "sunspot/system/graphics/Gl.h"
 
 namespace lst = logspot;
 
-namespace sunspot::graphic
+namespace sunspot::graphics
 {
 const char* getTextureTypeName( const TextureType& type )
 {
@@ -211,4 +211,4 @@ TextureData::~TextureData()
 }
 
 
-}  // namespace sunspot::graphic
+}  // namespace sunspot::graphics

@@ -17,16 +17,16 @@
 #include "sunspot/core/Game.h"
 
 #include "Quad.h"
-#include "sunspot/system/graphic/Framebuffer.h"
-#include "sunspot/system/graphic/Light.h"
-#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphics/Framebuffer.h"
+#include "sunspot/system/graphics/Light.h"
+#include "sunspot/system/graphics/Shader.h"
 
 #include "Mesh.h"
 #include "WavefrontObject.h"
 #include "repository/EntityRepository.h"
 #include "repository/ModelRepository.h"
 #include "sunspot/entity/Entity.h"
-#include "sunspot/system/graphic/Texture.h"
+#include "sunspot/system/graphics/Texture.h"
 
 #include "sunspot/component/Camera.h"
 #include "sunspot/core/GlfwWindow.h"
@@ -65,6 +65,26 @@ void print_logo()
 }
 
 
+/// @return A database, creating it if not found
+std::variant<dataspot::Database, dataspot::Error> load_database( const std::string& path )
+{
+	auto open_result = dataspot::Database::open( path );
+	if ( auto error = std::get_if<dataspot::Error>( &open_result ) )
+	{
+		// Create if cannot open
+		auto create_result = dataspot::Database::create( path );
+		if ( auto error = std::get_if<dataspot::Error>( &create_result ) )
+		{
+			Log::error( "Cannot create data %s: %s", path.c_str(), error->get_message().c_str() );
+			std::exit( EXIT_FAILURE );
+		}
+		return create_result;
+	}
+
+	return open_result;
+}
+
+
 int main( const int argc, const char** argv )
 {
 	using namespace sunspot;
@@ -77,25 +97,8 @@ int main( const int argc, const char** argv )
 		auto arguments = CliArgs( argc, argv );
 
 		// Load database
-		dataspot::Database* database{};
-
-		auto open_result = dataspot::Database::open( arguments.project.db.path );
-		if ( auto error = std::get_if<dataspot::Error>( &open_result ) )
-		{
-			// Create if cannot open
-			auto create_result = dataspot::Database::create( arguments.project.db.path );
-			if ( auto error = std::get_if<dataspot::Error>( &create_result ) )
-			{
-				Log::error( "Cannot create data %s: %s", arguments.project.db.path.c_str(), error->get_message().c_str() );
-				return EXIT_FAILURE;
-			}
-			database = std::get_if<dataspot::Database>( &create_result );
-		}
-		else
-		{
-			database = std::get_if<dataspot::Database>( &open_result );
-		}
-
+		auto load_result = load_database( arguments.project.db.path );
+		auto database = std::get_if<dataspot::Database>( &load_result );
 
 		// Get config values
 		Config config{ *database };
@@ -106,16 +109,16 @@ int main( const int argc, const char** argv )
 		Game game;
 
 		auto& graphics = game.get_graphics();
-		graphics.SetViewport( graphic::System::Viewport{ { 0, 0 }, config.window.size } );
+		graphics.set_viewport( graphics::Viewport{ { 0, 0 }, config.window.size } );
 
 		float aspect_ratio{ static_cast<float>( config.window.size.width ) / config.window.size.height };
 
-		graphic::shader::Program base_program{ "shader/base.vert", "shader/base.frag" };
-		graphics.SetShaderProgram( &base_program );
+		graphics::shader::Program base_program{ "shader/base.vert", "shader/base.frag" };
+		graphics.set_shader_program( &base_program );
 
-		graphic::PointLight light{ Color{ 1.0f, 1.0f, 1.0f } };
+		graphics::PointLight light{ Color{ 1.0f, 1.0f, 1.0f } };
 		light.SetPosition( 0.0f, 1.0f, 1.0f );
-		graphics.SetLight( &light );
+		graphics.set_light( &light );
 
 		ModelRepository  model_repo{ arguments.project.path };
 		EntityRepository entity_repo{ *database, model_repo };
@@ -133,12 +136,12 @@ int main( const int argc, const char** argv )
 					{
 						perspective_cam->SetAspectRatio( aspect_ratio );
 					}
-					graphics.SetCamera( *entity );
+					graphics.set_camera( *entity );
 				}
 
 				if ( auto model = entity->get<component::Model>() )
 				{
-					game.get_graphics().AddModel( &model->get() );
+					game.get_graphics().add_model( &model->get() );
 				}
 
 				game.add_entity( *entity );
@@ -165,10 +168,10 @@ int main( const int argc, const char** argv )
 		auto renderer = GltfRenderer( std::move( gltf ) );
 		auto model    = component::Model( renderer.GetGltf().GetNodes().back(), renderer );
 		entity.add<component::Model>( model );
-		game.get_graphics().AddModel( &model );
+		game.get_graphics().add_model( &model );
 		if ( game.get_entities().size() == 0 )
 		{
-			game.get_graphics().SetCamera( camera_entity );
+			game.get_graphics().set_camera( camera_entity );
 			game.add_entity( entity );
 			game.add_entity( camera_entity );
 		}
@@ -190,8 +193,9 @@ int main( const int argc, const char** argv )
 			EndMainMenuBar();
 
 			// Scene
-			PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f );
-			ImGuiWindowFlags scene_flags = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings;
+			PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
+			ImGuiWindowFlags scene_flags =
+			    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings;
 			Begin( "Scene", nullptr, scene_flags );
 			PopStyleVar();
 			for ( auto& entity : game.get_entities() )
@@ -207,7 +211,7 @@ int main( const int argc, const char** argv )
 		Log::info( "%s version %d.%d successful", SST_TITLE, SST_VERSION_MAJOR, SST_VERSION_MINOR );
 		return EXIT_SUCCESS;
 	}
-	catch ( const graphic::Exception& e )
+	catch ( const graphics::Exception& e )
 	{
 		Log::error( "%s: %s", tag.c_str(), e.what() );
 	}

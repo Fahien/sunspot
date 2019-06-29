@@ -3,15 +3,15 @@
 
 #include <logspot/Log.h>
 
-#include "sunspot/system/graphic/Material.h"
-#include "sunspot/system/graphic/Shader.h"
-#include "sunspot/system/graphic/Texture.h"
+#include "sunspot/system/graphics/Material.h"
+#include "sunspot/system/graphics/Shader.h"
+#include "sunspot/system/graphics/Texture.h"
 
 using namespace std;
 namespace lst = logspot;
 
 
-namespace sunspot::graphic
+namespace sunspot::graphics
 {
 
 
@@ -118,4 +118,4 @@ ostream& operator<<(ostream& os, const Material& m)
 }
 
 
-} // namespace sunspot::graphic
+} // namespace sunspot::graphics

@@ -168,14 +168,14 @@ set(SOURCES
 	source/util/Util.cpp
 	source/util/Cube.cpp
 	source/core/Config.cpp
-	source/system/Graphic.cpp
-	source/system/graphic/Shader.cpp
+	source/system/graphics/Graphics.cpp
+	source/system/graphics/Shader.cpp
 	source/core/String.cpp
 	source/system/Collision.cpp
 	source/Cursor.h
 	source/Cursor.cpp
-	source/system/graphic/Texture.cpp
-	source/system/graphic/Material.cpp
+	source/system/graphics/Texture.cpp
+	source/system/graphics/Material.cpp
 	source/Mesh.h
 	source/Mesh.cpp
 	source/core/Gui.cpp
@@ -197,10 +197,10 @@ set(SOURCES
 	source/view/GltfRenderer.cpp
 	source/Color.h
 	source/Color.cpp
-	source/system/graphic/Light.cpp
+	source/system/graphics/Light.cpp
 	source/Quad.h
 	source/Quad.cpp
-	source/system/graphic/Framebuffer.cpp
+	source/system/graphics/Framebuffer.cpp
 	source/Camera.h
 	source/Camera.cpp)
 

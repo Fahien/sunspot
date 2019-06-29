@@ -2,7 +2,7 @@
 
 #include <mathspot/Math.h>
 
-#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphics/Shader.h"
 
 namespace mst = mathspot;
 
@@ -36,7 +36,7 @@ class Camera
 	void updateVectors();
 	void updateView();
 
-	void update( const float deltaTime, const graphic::shader::Program& program );
+	void update( const float deltaTime, const graphics::shader::Program& program );
 
 	inline void setVelocityX(const float x) { mVelocity.x = x; }
 	inline void setVelocityY(const float y) { mVelocity.y = y; }

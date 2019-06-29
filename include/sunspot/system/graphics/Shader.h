@@ -2,10 +2,10 @@
 
 #include <stdexcept>
 
-#include "sunspot/system/graphic/Gl.h"
+#include "sunspot/system/graphics/Gl.h"
 
 
-namespace sunspot::graphic::shader
+namespace sunspot::graphics::shader
 {
 
 

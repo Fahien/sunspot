@@ -2,7 +2,7 @@
 
 #include <logspot/Log.h>
 
-#include "sunspot/system/graphic/Gl.h"
+#include "sunspot/system/graphics/Gl.h"
 
 
 namespace sunspot

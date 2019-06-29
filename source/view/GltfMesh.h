@@ -32,7 +32,7 @@ public:
 	/// @return The list of primitives
 	std::vector<GltfPrimitive>& GetPrimitives() { return mPrimitives; }
 
-	void Draw(const graphic::shader::Program& shader) const;
+	void Draw(const graphics::shader::Program& shader) const;
 
 private:
 	std::string mName{};

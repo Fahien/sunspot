@@ -2,13 +2,13 @@
 
 #include <mathspot/Math.h>
 
-#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphics/Shader.h"
 
 #include "Color.h"
 
 namespace mst = mathspot;
 
-namespace sunspot::graphic
+namespace sunspot::graphics
 {
 
 
@@ -61,5 +61,5 @@ class PointLight : public Light
 };
 
 
-} // namespace sunspot::graphic
+} // namespace sunspot::graphics
 

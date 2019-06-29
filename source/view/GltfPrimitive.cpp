@@ -1,5 +1,5 @@
 #include "view/GltfPrimitive.h"
-#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphics/Shader.h"
 
 using namespace std;
 using namespace sunspot;
@@ -207,14 +207,14 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Gltf::Mesh::Primitive& primitive )
 			if ( t->source->uri != "" )
 			{
 				const auto&      uri = model.GetPath() + "/" + t->source->uri;
-				graphic::Texture texture{ uri, graphic::TextureType::DIFFUSE };
+				graphics::Texture texture{ uri, graphics::TextureType::DIFFUSE };
 				auto             r     = mTextures.emplace( t, move( texture ) );
 				mMaterial.colorTexture = &( r.first->second );
 			}
 			else
 			{
 				auto&            buffer_view = model.GetBufferViews().at( t->source->buffer_view );
-				graphic::Texture texture{ graphic::SoilData{ buffer_view, model }, graphic::TextureType::DIFFUSE };
+				graphics::Texture texture{ graphics::SoilData{ buffer_view, model }, graphics::TextureType::DIFFUSE };
 				auto             r     = mTextures.emplace( t, move( texture ) );
 				mMaterial.colorTexture = &( r.first->second );
 			}
@@ -252,7 +252,7 @@ void GltfPrimitive::SetMatrix( const Mat4& matrix )
 }
 
 
-void GltfPrimitive::Draw( const graphic::shader::Program& shader ) const
+void GltfPrimitive::Draw( const graphics::shader::Program& shader ) const
 {
 	// Bind transform matrix
 	glUniformMatrix4fv( shader.GetLocation( "model" ), 1, GL_FALSE, mMatrix.matrix );

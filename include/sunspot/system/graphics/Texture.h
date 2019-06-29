@@ -9,16 +9,16 @@ namespace fst = filespot;
 #endif
 #include <gltfspot/Gltf.h>
 
-#include "sunspot/system/graphic/Exception.h"
-#include "sunspot/system/graphic/Gl.h"
+#include "sunspot/system/graphics/Exception.h"
+#include "sunspot/system/graphics/Gl.h"
 
 
-namespace sunspot::graphic
+namespace sunspot::graphics
 {
-class TextureException : public graphic::Exception
+class TextureException : public graphics::Exception
 {
   public:
-	TextureException( const std::string& tag, const std::string& message ) : graphic::Exception{ tag + ": " + message }
+	TextureException( const std::string& tag, const std::string& message ) : graphics::Exception{ tag + ": " + message }
 	{
 	}
 };
@@ -130,4 +130,4 @@ class Texture
 };
 
 
-}  // namespace sunspot::graphic
+}  // namespace sunspot::graphics

@@ -17,7 +17,7 @@ namespace lst = logspot;
 Mesh::Mesh(const string&         name,
            vector<Vertex>&       v,
            vector<GLuint>&       i,
-           shared_ptr<graphic::Material>& material)
+           shared_ptr<graphics::Material>& material)
 :	vertices { v }
 ,	indices  { i }
 ,	transform{ mst::Mat4::identity }
@@ -73,7 +73,7 @@ void Mesh::ApplyTransform(Transform& pTransform)
 }
 
 
-void Mesh::Draw(const graphic::shader::Program& shader) const
+void Mesh::Draw(const graphics::shader::Program& shader) const
 {
 	// Bind transform matrix
 	glUniformMatrix4fv(shader.GetLocation("model"), 1, GL_FALSE, transform.matrix);

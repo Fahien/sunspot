@@ -8,8 +8,8 @@
 
 #include "sunspot/component/Camera.h"
 #include "sunspot/core/Game.h"
-#include "sunspot/system/graphic/Light.h"
-#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphics/Light.h"
+#include "sunspot/system/graphics/Shader.h"
 #include "view/GltfCamera.h"
 
 #include "repository/ModelRepository.h"
@@ -46,7 +46,7 @@ int main( int argc, char** argv )
 		float near{ 0.125f };
 		float far{ 256.0f };
 
-		game.get_graphics().SetViewport( graphic::System::Viewport{ { 0, 0 }, window_size } );
+		game.get_graphics().set_viewport( graphics::Viewport{ { 0, 0 }, window_size } );
 
 		Entity                       camera_entity{};
 		component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
@@ -54,7 +54,7 @@ int main( int argc, char** argv )
 		camera.Translate( Vec3{ 0.0f, 0.0f, -3.0f } );
 		camera.SetAspectRatio( aspect_ratio );
 		camera_entity.add( camera );
-		game.get_graphics().SetCamera( camera_entity );
+		game.get_graphics().set_camera( camera_entity );
 
 		// Load a Gltf model and upload the model into GPU buffers
 		string          model_path{ argv[1] };
@@ -62,7 +62,7 @@ int main( int argc, char** argv )
 		int             model_id = 0;  // Just a custom id, not important for a test
 		auto&           model    = model_repo.get_model( model_id, model_path );
 
-		game.get_graphics().AddModel( &model );
+		game.get_graphics().add_model( &model );
 
 		Entity model_entity{};
 		model_entity.add( model );
@@ -71,8 +71,8 @@ int main( int argc, char** argv )
 		/// Render to texture
 		/// Compare it with a reference
 
-		graphic::shader::Program base_program{ "shader/base.vert", "shader/base.frag" };
-		game.get_graphics().SetShaderProgram( &base_program );
+		graphics::shader::Program base_program{ "shader/base.vert", "shader/base.frag" };
+		game.get_graphics().set_shader_program( &base_program );
 
 		// DirectionalLight light{ Color{ 1.0f, 1.0f, 1.0f } };
 		// light.SetDirection(0.0f, 0.0f, 4.0f);
@@ -83,16 +83,16 @@ int main( int argc, char** argv )
 		// light.GetSpecular().r /= divFactor / 2;
 		// light.GetSpecular().g /= divFactor / 2;
 		// light.GetSpecular().b /= divFactor / 2;
-		graphic::PointLight light{ Color{ 29.0f, 29.0f, 29.0f } };
+		graphics::PointLight light{ Color{ 29.0f, 29.0f, 29.0f } };
 		light.SetPosition( 1.0f, 1.0f, -2.0f );
-		game.get_graphics().SetLight( &light );
+		game.get_graphics().set_light( &light );
 
 		// TODO render to texture
 		// TODO Compare rendered texture to gold image
 
 		game.loop();
 	}
-	catch ( const graphic::Exception& e )
+	catch ( const graphics::Exception& e )
 	{
 		Log::error( "Exception: %s\n", e.what() );
 		return EXIT_FAILURE;

@@ -26,7 +26,7 @@ GltfMesh::GltfMesh(Gltf& model, Gltf::Mesh& mesh)
 }
 
 
-void GltfMesh::Draw(const graphic::shader::Program& program) const
+void GltfMesh::Draw(const graphics::shader::Program& program) const
 {
 	for (auto& primitive : mPrimitives)
 	{

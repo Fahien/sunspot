@@ -2,8 +2,8 @@
 
 #include <logspot/Log.h>
 
-#include "sunspot/system/graphic/Shader.h"
-#include "sunspot/system/graphic/Exception.h"
+#include "sunspot/system/graphics/Shader.h"
+#include "sunspot/system/graphics/Exception.h"
 #include "Cursor.h"
 #include "Window.h"
 
@@ -15,11 +15,11 @@ namespace sunspot
 {
 
 
-class GlfwException : public graphic::Exception
+class GlfwException : public graphics::Exception
 {
 public:
 	GlfwException(const std::string& tag, const std::string& message)
-		: graphic::Exception{ tag + ": " + message } {}
+		: graphics::Exception{ tag + ": " + message } {}
 };
 
 

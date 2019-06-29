@@ -266,7 +266,7 @@ void GlfwWindow::loop()  // TODO comment
 void GlfwWindow::UpdateSize()
 {
 	glfwGetFramebufferSize( handle, &m_FrameSize.width, &m_FrameSize.height );
-	GetGame().get_graphics().SetViewport( { {}, m_FrameSize } );
+	GetGame().get_graphics().set_viewport( { {}, m_FrameSize } );
 }
 
 

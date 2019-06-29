@@ -6,7 +6,7 @@
 #include <gltfspot/Gltf.h>
 
 
-#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphics/Shader.h"
 #include "view/GltfMesh.h"
 
 
@@ -26,9 +26,9 @@ class GltfRenderer
 
 	gst::Gltf& GetGltf() { return m_Gltf; }
 
-	void Draw(const graphic::shader::Program& shader);
+	void Draw(const graphics::shader::Program& shader);
 
-	void Draw(const graphic::shader::Program& shader,
+	void Draw(const graphics::shader::Program& shader,
 	          const gst::Gltf::Node* pNode,
 	          const mst::Mat4& transform = mst::Mat4::identity);
 

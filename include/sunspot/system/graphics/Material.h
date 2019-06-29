@@ -2,11 +2,11 @@
 
 #include <fstream>
 
-#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphics/Shader.h"
 #include "Color.h"
 
 
-namespace sunspot::graphic
+namespace sunspot::graphics
 {
 
 class Texture;
@@ -49,4 +49,4 @@ struct Material
 };
 
 
-} // namespace sunspot::graphic
+} // namespace sunspot::graphics

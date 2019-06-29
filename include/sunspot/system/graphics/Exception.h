@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-namespace sunspot::graphic
+namespace sunspot::graphics
 {
 
 
@@ -13,4 +13,4 @@ class Exception : public std::runtime_error
 };
 
 
-} // namespace sunspot::graphic
+} // namespace sunspot::graphics

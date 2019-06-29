@@ -99,7 +99,7 @@ void Camera::updateView()
 }
 
 
-void Camera::update(const float deltaTime, const graphic::shader::Program& program)
+void Camera::update(const float deltaTime, const graphics::shader::Program& program)
 {
 	if (mVelocity.x != 0.0f)
 	{

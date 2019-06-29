@@ -43,7 +43,7 @@ void Game::loop()
 			entity->Update( delta );
 		}
 
-		graphics.Draw();
+		graphics.draw();
 
 		gui.Draw();
 

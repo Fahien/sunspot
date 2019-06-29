@@ -2,13 +2,13 @@
 
 #include <logspot/Log.h>
 
-#include "sunspot/system/graphic/Framebuffer.h"
-#include "sunspot/system/graphic/Texture.h"
+#include "sunspot/system/graphics/Framebuffer.h"
+#include "sunspot/system/graphics/Texture.h"
 
 namespace lst = logspot;
 
 
-namespace sunspot::graphic
+namespace sunspot::graphics
 {
 
 
@@ -97,4 +97,4 @@ void Framebuffer::bindDepthTexture(const shader::Program& shader) const
 }
 
 
-} // namespace sunspot::graphic
+} // namespace sunspot::graphics

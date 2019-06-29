@@ -5,7 +5,7 @@
 
 #include "sunspot/entity/Object.h"
 #include "sunspot/component/Transform.h"
-#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphics/Shader.h"
 
 namespace mst = mathspot;
 
@@ -40,7 +40,7 @@ class Camera : public Object
 	void Rotate( const mst::Quat& q );
 
 	void SetView( const mst::Mat4& v ) { m_View = v; }
-	void Update( const graphic::shader::Program& );
+	void Update( const graphics::shader::Program& );
 
   protected:
 

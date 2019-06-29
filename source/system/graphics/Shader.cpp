@@ -1,4 +1,4 @@
-#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphics/Shader.h"
 
 #include <iostream>
 #include <cstdio>
@@ -24,7 +24,7 @@ namespace lst = logspot;
 #define OFFSET_ATTRIB 3
 
 
-namespace sunspot::graphic::shader
+namespace sunspot::graphics::shader
 {
 
 static const char VERTEX_SHADER[]   = "shaders/base.vert";
@@ -172,4 +172,4 @@ Source::~Source()
 }
 
 
-} // namespace sunspot::graphic::shader
+} // namespace sunspot::graphics::shader

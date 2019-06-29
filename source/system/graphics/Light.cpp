@@ -1,7 +1,7 @@
-#include "sunspot/system/graphic/Light.h"
-#include "sunspot/system/graphic/Shader.h"
+#include "sunspot/system/graphics/Light.h"
+#include "sunspot/system/graphics/Shader.h"
 
-namespace sunspot::graphic
+namespace sunspot::graphics
 {
 
 
@@ -50,4 +50,4 @@ void PointLight::Update(const shader::Program& program) const
 }
 
 
-} // namespace sunspot::graphic
+} // namespace sunspot::graphics

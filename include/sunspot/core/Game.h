@@ -3,7 +3,7 @@
 #include "sunspot/core/GlfwWindow.h"
 #include "sunspot/core/Gui.h"
 #include "sunspot/system/Collision.h"
-#include "sunspot/system/Graphic.h"
+#include "sunspot/system/graphics/Graphics.h"
 
 namespace sunspot
 {
@@ -22,7 +22,7 @@ class Game
 		return window;
 	}
 
-	graphic::System& get_graphics()
+	graphics::Graphics& get_graphics()
 	{
 		return graphics;
 	}
@@ -56,7 +56,7 @@ class Game
 	ImGui      gui    = { window };
 
 	system::Collision collisions = {};
-	graphic::System   graphics   = {};
+	graphics::Graphics   graphics   = {};
 
 	std::vector<Entity*> entities = {};
 };
