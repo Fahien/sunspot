@@ -1,5 +1,5 @@
-#include "sunspot/system/graphics/Light.h"
-#include "sunspot/system/graphics/Shader.h"
+#include "sunspot/graphics/Light.h"
+#include "sunspot/graphics/Shader.h"
 
 namespace sunspot::graphics
 {

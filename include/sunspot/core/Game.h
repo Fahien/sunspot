@@ -2,8 +2,9 @@
 
 #include "sunspot/core/GlfwWindow.h"
 #include "sunspot/core/Gui.h"
-#include "sunspot/system/Collision.h"
-#include "sunspot/system/graphics/Graphics.h"
+#include "sunspot/core/Collisions.h"
+#include "sunspot/graphics/Graphics.h"
+#include "sunspot/core/Scene.h"
 
 namespace sunspot
 {
@@ -17,31 +18,15 @@ struct Time
 class Game
 {
   public:
-	GlfwWindow& get_window()
-	{
-		return window;
-	}
+	GlfwWindow& get_window() { return window; }
 
-	graphics::Graphics& get_graphics()
-	{
-		return graphics;
-	}
+	graphics::Graphics& get_graphics() { return graphics; }
 
-	ImGui& get_gui()
-	{
-		return gui;
-	}
+	ImGui& get_gui() { return gui; }
 
-	void add_entity( Entity& entity )
-	{
-		entities.push_back( &entity );
-		collisions.Add( entity );
-	}
+	Scene& get_scene() { return scene; }
 
-	const std::vector<Entity*> get_entities() const
-	{
-		return entities;
-	}
+	void add( Entity& e );
 
 	void handle( input::Input&& in );
 
@@ -55,10 +40,10 @@ class Game
 	GlfwWindow window = { *this };
 	ImGui      gui    = { window };
 
-	system::Collision collisions = {};
-	graphics::Graphics   graphics   = {};
+	Collisions collisions = {};
+	graphics::Graphics graphics   = {};
 
-	std::vector<Entity*> entities = {};
+	Scene scene;
 };
 
 

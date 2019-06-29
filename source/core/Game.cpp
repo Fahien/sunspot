@@ -7,9 +7,15 @@ namespace sunspot
 {
 
 
+void Game::add( Entity& e )
+{
+	collisions.add( e );
+	scene.add( e );
+}
+
 void Game::handle( input::Input&& in )
 {
-	for ( auto& entity : entities )
+	for ( auto& entity : scene.get_entities() )
 	{
 		entity->Handle( in );
 	}
@@ -32,13 +38,13 @@ void Game::loop()
 		window.PollEvents();
 		window.UpdateSize();
 		
-		collisions.Update();
+		collisions.update();
 
 		auto delta = compute_delta_time();
 
 		gui.Update( delta );
 
-		for ( auto& entity : entities )
+		for ( auto& entity : scene.get_entities() )
 		{
 			entity->Update( delta );
 		}

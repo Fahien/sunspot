@@ -5,7 +5,7 @@
 
 #include "sunspot/entity/Object.h"
 #include "sunspot/component/Transform.h"
-#include "sunspot/system/graphics/Shader.h"
+#include "sunspot/graphics/Shader.h"
 
 namespace mst = mathspot;
 

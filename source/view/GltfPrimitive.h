@@ -3,10 +3,10 @@
 
 #include <gltfspot/Gltf.h>
 
-#include "sunspot/system/graphics/Gl.h"
-#include "sunspot/system/graphics/Shader.h"
-#include "sunspot/system/graphics/Material.h"
-#include "sunspot/system/graphics/Texture.h"
+#include "sunspot/graphics/Gl.h"
+#include "sunspot/graphics/Shader.h"
+#include "sunspot/graphics/Material.h"
+#include "sunspot/graphics/Texture.h"
 
 
 namespace mst = mathspot;

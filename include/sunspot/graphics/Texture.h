@@ -9,8 +9,8 @@ namespace fst = filespot;
 #endif
 #include <gltfspot/Gltf.h>
 
-#include "sunspot/system/graphics/Exception.h"
-#include "sunspot/system/graphics/Gl.h"
+#include "sunspot/graphics/Exception.h"
+#include "sunspot/graphics/Gl.h"
 
 
 namespace sunspot::graphics

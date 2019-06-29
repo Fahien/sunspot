@@ -8,8 +8,8 @@
 
 #include "sunspot/component/Camera.h"
 #include "sunspot/core/Game.h"
-#include "sunspot/system/graphics/Light.h"
-#include "sunspot/system/graphics/Shader.h"
+#include "sunspot/graphics/Light.h"
+#include "sunspot/graphics/Shader.h"
 #include "view/GltfCamera.h"
 
 #include "repository/ModelRepository.h"
@@ -66,7 +66,7 @@ int main( int argc, char** argv )
 
 		Entity model_entity{};
 		model_entity.add( model );
-		game.add_entity( model_entity );
+		game.add( model_entity );
 
 		/// Render to texture
 		/// Compare it with a reference

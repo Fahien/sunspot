@@ -6,9 +6,9 @@
 
 #include <mathspot/Math.h>
 
-#include "sunspot/system/graphics/Shader.h"
-#include "sunspot/system/graphics/Texture.h"
-#include "sunspot/system/graphics/Material.h"
+#include "sunspot/graphics/Shader.h"
+#include "sunspot/graphics/Texture.h"
+#include "sunspot/graphics/Material.h"
 
 namespace mst = mathspot;
 

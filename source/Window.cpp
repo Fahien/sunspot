@@ -10,10 +10,10 @@
 #include "sunspot/core/Game.h"
 #include "view/GltfRenderer.h"
 #include "view/GltfCamera.h"
-#include "sunspot/system/graphics/Gl.h"
-#include "sunspot/system/graphics/Shader.h"
-#include "sunspot/system/graphics/Light.h"
-#include "sunspot/system/graphics/Framebuffer.h"
+#include "sunspot/graphics/Gl.h"
+#include "sunspot/graphics/Shader.h"
+#include "sunspot/graphics/Light.h"
+#include "sunspot/graphics/Framebuffer.h"
 #include "Camera.h"
 #include "Quad.h"
 #include "entity/Entity.h"
@@ -78,13 +78,6 @@ void Window::render()
 
 void Window::render( const float& deltaTime ) // TODO comment
 {
-	mCollision.Update();
-
-	for ( auto entity : mEntities )
-	{
-		entity->Update( deltaTime );
-	}
-
 	if ( mStereoscopic )
 	{
 		renderStereoscopic( deltaTime );
@@ -122,14 +115,14 @@ void Window::render3D( const float& deltaTime ) // TODO comment
 
 	m_Camera->get<component::Camera>()->get().Update( *mBaseProgram );
 
-	for ( auto pEntity : mEntities )
-	{
-		if ( pEntity->has<component::Model>() )
-		{
-			auto& model = pEntity->get<component::Model>()->get();
-			model.GetRenderer().Draw( *mBaseProgram, &model.GetNode() );
-		}
-	}
+	//for ( auto pEntity : mEntities )
+	//{
+	//	if ( pEntity->has<component::Model>() )
+	//	{
+	//		auto& model = pEntity->get<component::Model>()->get();
+	//		model.GetRenderer().Draw( *mBaseProgram, &model.GetNode() );
+	//	}
+	//}
 
 	if ( mGltfRenderer )
 	{

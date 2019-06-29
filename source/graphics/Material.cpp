@@ -3,9 +3,9 @@
 
 #include <logspot/Log.h>
 
-#include "sunspot/system/graphics/Material.h"
-#include "sunspot/system/graphics/Shader.h"
-#include "sunspot/system/graphics/Texture.h"
+#include "sunspot/graphics/Material.h"
+#include "sunspot/graphics/Shader.h"
+#include "sunspot/graphics/Texture.h"
 
 using namespace std;
 namespace lst = logspot;

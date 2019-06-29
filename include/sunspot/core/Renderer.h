@@ -9,7 +9,7 @@
 #include <dataspot/Database.h>
 #include "repository/ModelRepository.h"
 #include "repository/EntityRepository.h"
-#include "system/Collision.h"
+#include "sunspot/core/Collisions.h"
 
 namespace sunspot
 {
@@ -57,7 +57,7 @@ class Renderer
 	ModelRepository mModelRepository;
 	EntityRepository mEntityRepository;
 
-	system::Collision mCollision;
+	CollisionsmCollision;
 };
 
 

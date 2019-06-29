@@ -9,11 +9,11 @@
 
 #include <mathspot/Math.h>
 
-#include "sunspot/system/graphics/Graphics.h"
-#include "sunspot/system/graphics/Framebuffer.h"
+#include "sunspot/graphics/Graphics.h"
+#include "sunspot/graphics/Framebuffer.h"
 #include "Cursor.h"
 #include "sunspot/input/Input.h"
-#include "system/Collision.h"
+#include "sunspot/core/Collisions.h"
 #include "sunspot/component/Camera.h"
 
 namespace mst = mathspot;
@@ -52,7 +52,6 @@ public:
 	inline void setLight( graphics::Light* light ) { mLight = light; }
 	inline void addObj( WavefrontObject* obj ) { mObjs.push_back(obj); }
 	inline void AddGltf( GltfRenderer* renderer ) { mGltfRenderer = renderer; }
-	inline void AddEntity( Entity* entity ) { mEntities.push_back(entity); mCollision.Add(*entity); }
 
 	inline void setQuad( Quad* quad ) { mQuad = quad; }
 	inline void setQuadProgram( const graphics::shader::Program* quadProgram ) { mQuadProgram = quadProgram; }
@@ -118,14 +117,11 @@ private:
 	const graphics::shader::Program* mBaseProgram;
 	graphics::Light* mLight;
 	std::vector<WavefrontObject*> mObjs;
-	std::vector<Entity*> mEntities{};
 	GltfRenderer* mGltfRenderer { nullptr };
 	const graphics::shader::Program* mQuadProgram;
 	const graphics::shader::Program* mDepthProgram;
 	const graphics::Framebuffer* mFramebuffer;
 	const Quad* mQuad;
-
-	system::Collision mCollision;
 };
 
 

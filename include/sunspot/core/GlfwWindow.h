@@ -2,8 +2,8 @@
 
 #include <logspot/Log.h>
 
-#include "sunspot/system/graphics/Shader.h"
-#include "sunspot/system/graphics/Exception.h"
+#include "sunspot/graphics/Shader.h"
+#include "sunspot/graphics/Exception.h"
 #include "Cursor.h"
 #include "Window.h"
 

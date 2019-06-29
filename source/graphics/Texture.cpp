@@ -1,4 +1,4 @@
-#include "sunspot/system/graphics/Texture.h"
+#include "sunspot/graphics/Texture.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -8,7 +8,7 @@
 #include <SOIL.h>
 #include <logspot/Log.h>
 
-#include "sunspot/system/graphics/Gl.h"
+#include "sunspot/graphics/Gl.h"
 
 namespace lst = logspot;
 

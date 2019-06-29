@@ -7,7 +7,7 @@
 #include <mathspot/Math.h>
 #include <filespot/Ifstream.h>
 
-#include "sunspot/system/graphics/Gl.h"
+#include "sunspot/graphics/Gl.h"
 #include "Mesh.h"
 
 namespace fst = filespot;

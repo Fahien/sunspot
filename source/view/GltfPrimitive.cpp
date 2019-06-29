@@ -1,5 +1,5 @@
 #include "view/GltfPrimitive.h"
-#include "sunspot/system/graphics/Shader.h"
+#include "sunspot/graphics/Shader.h"
 
 using namespace std;
 using namespace sunspot;

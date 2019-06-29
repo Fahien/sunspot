@@ -3,7 +3,7 @@
 #include "view/GltfRenderer.h"
 #include "view/GltfPrimitive.h"
 
-#include "sunspot/system/graphics/Shader.h"
+#include "sunspot/graphics/Shader.h"
 #include "ShaderProgram.h"
 #include <mathspot/Math.h>
 

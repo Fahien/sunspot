@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-#include "sunspot/system/graphics/Shader.h"
+#include "sunspot/graphics/Shader.h"
 #include "Color.h"
 
 

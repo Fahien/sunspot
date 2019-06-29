@@ -17,16 +17,16 @@
 #include "sunspot/core/Game.h"
 
 #include "Quad.h"
-#include "sunspot/system/graphics/Framebuffer.h"
-#include "sunspot/system/graphics/Light.h"
-#include "sunspot/system/graphics/Shader.h"
+#include "sunspot/graphics/Framebuffer.h"
+#include "sunspot/graphics/Light.h"
+#include "sunspot/graphics/Shader.h"
 
 #include "Mesh.h"
 #include "WavefrontObject.h"
 #include "repository/EntityRepository.h"
 #include "repository/ModelRepository.h"
 #include "sunspot/entity/Entity.h"
-#include "sunspot/system/graphics/Texture.h"
+#include "sunspot/graphics/Texture.h"
 
 #include "sunspot/component/Camera.h"
 #include "sunspot/core/GlfwWindow.h"
@@ -144,7 +144,7 @@ int main( const int argc, const char** argv )
 					game.get_graphics().add_model( &model->get() );
 				}
 
-				game.add_entity( *entity );
+				game.add( *entity );
 			}
 		}
 
@@ -169,11 +169,11 @@ int main( const int argc, const char** argv )
 		auto model    = component::Model( renderer.GetGltf().GetNodes().back(), renderer );
 		entity.add<component::Model>( model );
 		game.get_graphics().add_model( &model );
-		if ( game.get_entities().size() == 0 )
+		if ( game.get_scene().get_entities().size() == 0 )
 		{
 			game.get_graphics().set_camera( camera_entity );
-			game.add_entity( entity );
-			game.add_entity( camera_entity );
+			game.add( entity );
+			game.add( camera_entity );
 		}
 
 		// Set up editor GUI
@@ -198,7 +198,7 @@ int main( const int argc, const char** argv )
 			    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings;
 			Begin( "Scene", nullptr, scene_flags );
 			PopStyleVar();
-			for ( auto& entity : game.get_entities() )
+			for ( auto& entity : game.get_scene().get_entities() )
 			{
 				Text( "%s", entity->get_name().c_str() );
 			}

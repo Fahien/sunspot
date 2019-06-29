@@ -2,8 +2,8 @@
 
 #include <logspot/Log.h>
 
-#include "sunspot/system/graphics/Framebuffer.h"
-#include "sunspot/system/graphics/Texture.h"
+#include "sunspot/graphics/Framebuffer.h"
+#include "sunspot/graphics/Texture.h"
 
 namespace lst = logspot;
 

@@ -6,7 +6,7 @@
 #include <gltfspot/Gltf.h>
 
 
-#include "sunspot/system/graphics/Shader.h"
+#include "sunspot/graphics/Shader.h"
 #include "view/GltfMesh.h"
 
 

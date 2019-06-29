@@ -1,4 +1,4 @@
-#include "sunspot/system/graphics/Graphics.h"
+#include "sunspot/graphics/Graphics.h"
 
 #include "sunspot/component/Camera.h"
 
