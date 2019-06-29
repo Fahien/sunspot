@@ -49,12 +49,6 @@ class Entity : public Object
 	template <typename T>
 	void add( T& );
 
-	// component::Model* GetModel() { return mModel; }
-	// void SetModel(component::Model* model);
-
-	component::Collider* GetCollider() { return mCollider; }
-	void                 SetCollider( component::Collider* mCollider );
-
 	component::Transform& GetTransform() { return mTransform; }
 	void                  SetTransform( component::Transform& transform );
 
@@ -69,8 +63,6 @@ class Entity : public Object
 	void Update( const float delta );
 
   private:
-	// component::Model*     mModel     { nullptr };
-	component::Collider*  mCollider{ nullptr };
 	component::Transform  mTransform{};
 	component::Rigidbody* mRigidbody{ nullptr };
 	Script*               mScript{ nullptr };

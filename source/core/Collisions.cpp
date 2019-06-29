@@ -7,12 +7,11 @@ namespace sunspot
 {
 void Collisions::add( Entity& entity )
 {
-	auto c = entity.GetCollider();
 	// Check whether the entity has a collider
-	if ( c )
+	if ( auto c = entity.get<component::Collider>() )
 	{
 		// Put a copy of the bounding box in the map
-		auto pair = boxes.emplace( &entity, c->GetBoundingBox() );
+		auto pair = boxes.emplace( &entity, c->get().GetBoundingBox() );
 
 		// If it was successfull
 		auto& success = pair.second;

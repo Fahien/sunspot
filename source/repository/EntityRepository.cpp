@@ -191,8 +191,8 @@ Entity* EntityRepository::_load_entity( const int id )
 			box.width  = static_cast<float>( stmt_component->get_double( 2 ) );
 			box.height = static_cast<float>( stmt_component->get_double( 3 ) );
 
-			Collider* collider{ new Collider{ id, name, *pEntity, move( box ) } };
-			pEntity->SetCollider( collider );
+			auto collider = new Collider{ id, name, *pEntity, move( box ) };
+			pEntity->add( *collider );
 		}
 		else if ( type == "camera" )
 		{

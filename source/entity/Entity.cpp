@@ -5,9 +5,8 @@
 #include "sunspot/component/Rigidbody.h"
 #include "sunspot/component/Transform.h"
 
-using namespace sunspot;
-
-
+namespace sunspot
+{
 Entity::Entity( const int id, const std::string& name )
     : Object{ id, name }
 {
@@ -16,44 +15,10 @@ Entity::Entity( const int id, const std::string& name )
 
 Entity::~Entity()
 {
-	// It does not own the Model
-
-	if ( mCollider )
-	{
-		delete mCollider;
-	}
-
 	if ( mScript )
 	{
 		delete mScript;
 	}
-}
-
-
-// void Entity::SetModel(component::Model* model)
-//{
-//	if (mModel == model)
-//	{
-//		return;
-//	}
-//
-//	mModel = model;
-//}
-
-
-void Entity::SetCollider( component::Collider* collider )
-{
-	if ( mCollider == collider )
-	{
-		return;
-	}
-
-	if ( mCollider )
-	{
-		delete mCollider;
-	}
-
-	mCollider = collider;
 }
 
 
@@ -104,3 +69,6 @@ void Entity::Update( const float delta )
 		mScript->update( delta );
 	}
 }
+
+
+}  // namespace sunspot 
