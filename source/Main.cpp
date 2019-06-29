@@ -150,9 +150,7 @@ int main( const int argc, const char** argv )
 
 		component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
 		camera.set_parent( camera_entity );
-		camera.Translate( Vec3{ 5.0f, 5.0f, -5.0f } );
-		camera.GetTransform().rotation.y = radians( 18.0f );
-		camera.GetTransform().rotation.x = radians( -18.0f );
+		camera.Translate( Vec3{ 2.0f, 2.0f, 5.0f } );
 		camera.SetAspectRatio( aspect_ratio );
 		camera_entity.add( camera );
 
@@ -191,26 +189,41 @@ int main( const int argc, const char** argv )
 			ImGuiWindowFlags scene_flags = ImGuiWindowFlags_NoSavedSettings;
 			Begin( "Scene", nullptr, scene_flags );
 			PopStyleVar();
+
+			PushStyleVar( ImGuiStyleVar_FramePadding, ImVec2( 2, 2 ) );
+			Columns( 2 );
 			for ( auto& entity : game.get_scene().get_entities() )
 			{
 				PushID( entity );
+				AlignTextToFramePadding();
 				auto open = TreeNode( entity->get_name().c_str() );
+				NextColumn();
+				NextColumn();
 				if ( open )
 				{
 					if ( auto transform = entity->get<component::Transform>() )
 					{
 						PushID( transform );
+						AlignTextToFramePadding();
 						TreeNodeEx(
 						    "transform",
 						    ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet,
 						    "[%f,%f,%f]", transform->position.x, transform->position.y, transform->position.z );
+						NextColumn();
+						InputFloat("x", &transform->position.x, 0.5f);
+						InputFloat("y", &transform->position.y, 0.5f);
+						InputFloat("z", &transform->position.z, 0.5f);
+						NextColumn();
 						PopID();
 					}
 					TreePop();
 				}
 				PopID();
 			}
-			End();
+			Columns( 1 );
+			PopStyleVar();
+
+			End();  // Scene
 
 			ShowDemoWindow();
 		};

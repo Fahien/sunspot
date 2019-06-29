@@ -104,11 +104,11 @@ component::Transform& Camera::GetTransform()
 
 void Camera::Translate( const Vec3& t )
 {
-	m_Translation.Translate( -t );
+	m_Translation.Translate( t );
 
-	GetTransform().position.x = -m_Translation[12];
-	GetTransform().position.y = -m_Translation[13];
-	GetTransform().position.z = -m_Translation[14];
+	GetTransform().position.x = m_Translation[12];
+	GetTransform().position.y = m_Translation[13];
+	GetTransform().position.z = m_Translation[14];
 
 	updateView();
 }
@@ -124,9 +124,9 @@ void Camera::Rotate( const Quat& q )
 void Camera::updateView()
 {
 	auto& transform = GetTransform();
-	m_Translation[12] = transform.position.x;
-	m_Translation[13] = transform.position.y;
-	m_Translation[14] = transform.position.z;
+	m_Translation[12] = -transform.position.x;
+	m_Translation[13] = -transform.position.y;
+	m_Translation[14] = -transform.position.z;
 
 	m_Rotation = mst::Mat4::identity;
 	m_Rotation.RotateX( transform.rotation.x );

@@ -3,6 +3,7 @@
 #include "Mesh.h"
 #include "sunspot/component/Collider.h"
 #include "sunspot/component/Rigidbody.h"
+#include "sunspot/component/Model.h"
 #include "sunspot/component/Transform.h"
 
 namespace sunspot
@@ -62,6 +63,14 @@ void Entity::Update( const float delta )
 	if ( mScript )
 	{
 		mScript->update( delta );
+	}
+
+	if ( auto model = get<component::Model>() )
+	{
+		if (auto transform = get<component::Transform>() )
+		{
+			model->GetNode().translation = transform->position;
+		}
 	}
 }
 
