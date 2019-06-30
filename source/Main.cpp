@@ -9,11 +9,8 @@
 #include <dataspot/Exception.h>
 #include <logspot/Log.h>
 
-#include <nlohmann/json.hpp>
-
 #include "SunSpotConfig.h"
 #include "sunspot/core/Config.h"
-#include "sunspot/util/Cube.h"
 #include "sunspot/util/Util.h"
 
 #include "sunspot/core/Game.h"
@@ -153,74 +150,37 @@ int main( const int argc, const char** argv )
 		camera.Translate( Vec3{ 2.0f, 2.0f, 5.0f } );
 		camera.SetAspectRatio( aspect_ratio );
 		camera_entity.add( camera );
-
-		// Create model placeholder
-		auto entity   = Entity( 1, "Cube" );
-		auto gltf     = gltfspot::Gltf( nlohmann::json::parse( cube ) );
-		auto renderer = GltfRenderer( std::move( gltf ) );
-		auto model    = component::Model( renderer.GetGltf().GetNodes().back(), renderer );
-		entity.add<component::Model>( model );
-		game.get_graphics().add_model( &model );
-		if ( game.get_scene().get_entities().size() == 0 )
-		{
-			game.get_graphics().set_camera( camera_entity );
-			game.add( entity );
-			game.add( camera_entity );
-		}
+		game.get_graphics().set_camera( camera_entity );
 
 		// Set up editor GUI
 		auto& gui = game.get_gui();
 
 		gui.fPreDraw = [&game]() {
 			using namespace ImGui;
-
-			// Main menu
-			if ( BeginMainMenuBar() )
-			{
-				if ( BeginMenu( "Edit" ) )
-				{
-					EndMenu();
-				}
-			}
-			EndMainMenuBar();
-
 			// Scene
+			SetNextWindowPos( ImVec2( 0, 0 ) );
 			PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
-			ImGuiWindowFlags scene_flags = ImGuiWindowFlags_NoSavedSettings;
+			ImGuiWindowFlags scene_flags =
+			    ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize;
 			Begin( "Scene", nullptr, scene_flags );
 			PopStyleVar();
 
 			PushStyleVar( ImGuiStyleVar_FramePadding, ImVec2( 2, 2 ) );
-			Columns( 2 );
-			for ( auto& entity : game.get_scene().get_entities() )
+			for ( auto& node : game.get_scene().nodes )
 			{
-				PushID( entity );
-				AlignTextToFramePadding();
-				auto open = TreeNode( entity->get_name().c_str() );
-				NextColumn();
-				NextColumn();
+				PushID( node );
+				// AlignTextToFramePadding();
+				auto open = TreeNode( node->name.c_str() );
 				if ( open )
 				{
-					if ( auto transform = entity->get<component::Transform>() )
-					{
-						PushID( transform );
-						AlignTextToFramePadding();
-						TreeNodeEx(
-						    "transform",
-						    ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet,
-						    "[%f,%f,%f]", transform->position.x, transform->position.y, transform->position.z );
-						NextColumn();
-						InputFloat("x", &transform->position.x, 0.5f);
-						InputFloat("y", &transform->position.y, 0.5f);
-						InputFloat("z", &transform->position.z, 0.5f);
-						NextColumn();
-						PopID();
-					}
+					PushID( &node->translation );
+					// AlignTextToFramePadding();
+					DragFloat3( "Position", &node->translation.x, 0.25f, -16.0f, 16.0f, "%.1f" );
+					PopID();
 					TreePop();
 				}
 				PopID();
 			}
-			Columns( 1 );
 			PopStyleVar();
 
 			End();  // Scene

@@ -109,7 +109,8 @@ void GltfPrimitive::readIndices( Gltf& model, Gltf::Mesh::Primitive& primitive )
 
 
 GltfPrimitive::GltfPrimitive( Gltf& model, Gltf::Mesh::Primitive& primitive )
-    : mMode{ to_gl_mode( primitive.mode ) }, mMatrix{ Mat4::identity.matrix }
+    : mMode{ to_gl_mode( primitive.mode ) }
+    , mMatrix{ Mat4::identity.matrix }
 {
 	// Generate a vertex array
 	glGenVertexArrays( 1, &mVao );
@@ -206,16 +207,16 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Gltf::Mesh::Primitive& primitive )
 		{
 			if ( t->source->uri != "" )
 			{
-				const auto&      uri = model.GetPath() + "/" + t->source->uri;
+				const auto&       uri = model.GetPath() + "/" + t->source->uri;
 				graphics::Texture texture{ uri, graphics::TextureType::DIFFUSE };
-				auto             r     = mTextures.emplace( t, move( texture ) );
+				auto              r    = mTextures.emplace( t, move( texture ) );
 				mMaterial.colorTexture = &( r.first->second );
 			}
 			else
 			{
-				auto&            buffer_view = model.GetBufferViews().at( t->source->buffer_view );
+				auto&             buffer_view = model.GetBufferViews().at( t->source->buffer_view );
 				graphics::Texture texture{ graphics::SoilData{ buffer_view, model }, graphics::TextureType::DIFFUSE };
-				auto             r     = mTextures.emplace( t, move( texture ) );
+				auto              r    = mTextures.emplace( t, move( texture ) );
 				mMaterial.colorTexture = &( r.first->second );
 			}
 		}

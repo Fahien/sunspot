@@ -12,9 +12,7 @@ const char* cube = R"--(
     "scenes" : [
         {
             "nodes" : [
-                0,
-                1,
-                2
+                0
             ],
             "name" : "Scene"
         }

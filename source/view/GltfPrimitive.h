@@ -4,8 +4,8 @@
 #include <gltfspot/Gltf.h>
 
 #include "sunspot/graphics/Gl.h"
-#include "sunspot/graphics/Shader.h"
 #include "sunspot/graphics/Material.h"
+#include "sunspot/graphics/Shader.h"
 #include "sunspot/graphics/Texture.h"
 
 
@@ -14,39 +14,37 @@ namespace gst = gltfspot;
 
 namespace sunspot
 {
-
-
 class GltfPrimitive
 {
-public:
+  public:
 	/// Base constructor
-	GltfPrimitive(){}
+	GltfPrimitive() = default;
 
 	/// Move constructor
-	GltfPrimitive(GltfPrimitive&& other);
+	GltfPrimitive( GltfPrimitive&& other );
 
 	/// Normal constructor
-	GltfPrimitive(gst::Gltf& model, gst::Gltf::Mesh::Primitive& primitive);
+	GltfPrimitive( gst::Gltf& model, gst::Gltf::Mesh::Primitive& primitive );
 
 	/// Destructor
 	~GltfPrimitive();
 
-	void SetMatrix(const mst::Mat4& matrix);
+	void SetMatrix( const mst::Mat4& matrix );
 
-	void Draw(const graphics::shader::Program& shader) const;
+	void Draw( const graphics::shader::Program& shader ) const;
 
-private:
-	void readIndices(gst::Gltf& model, gst::Gltf::Mesh::Primitive& primitive);
+  private:
+	void readIndices( gst::Gltf& model, gst::Gltf::Mesh::Primitive& primitive );
 
-	bool mHasVao{};
-	GLuint mVao{};
+	bool                     mHasVao{};
+	GLuint                   mVao{};
 	std::map<size_t, GLuint> mVbos{};
-	bool mHasEbo{};
-	GLuint mEbo{};
+	bool                     mHasEbo{};
+	GLuint                   mEbo{};
 
-	GLenum  mMode{};
-	GLsizei mIndicesCount{};
-	GLenum  mIndicesType{};
+	GLenum      mMode{};
+	GLsizei     mIndicesCount{};
+	GLenum      mIndicesType{};
 	const void* mIndicesOffset{};
 
 	mst::Mat4 mMatrix{};
@@ -56,11 +54,10 @@ private:
 	graphics::Material mMaterial{};
 
 	std::map<gst::Gltf::Texture*, graphics::Texture> mTextures{};
-
 };
 
 
-}
+}  // namespace sunspot
 
 
-#endif // SST_GLTPRIMITIVE_H_
+#endif  // SST_GLTPRIMITIVE_H_

@@ -126,7 +126,7 @@ void Window::render3D( const float& deltaTime ) // TODO comment
 
 	if ( mGltfRenderer )
 	{
-		mGltfRenderer->Draw( *mBaseProgram );
+		mGltfRenderer->draw( *mBaseProgram );
 	}
 }
 

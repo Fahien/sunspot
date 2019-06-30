@@ -10,14 +10,14 @@ namespace sunspot
 void Game::add( Entity& e )
 {
 	collisions.add( e );
-	scene.add( e );
 }
 
 void Game::handle( input::Input&& in )
 {
-	for ( auto& entity : scene.get_entities() )
+	for ( auto node : get_scene().nodes )
 	{
-		entity->Handle( in );
+		// TODO get script component to handle input
+		// entity->Handle( in );
 	}
 }
 
@@ -44,12 +44,13 @@ void Game::loop()
 
 		gui.Update( delta );
 
-		for ( auto& entity : scene.get_entities() )
+		for ( auto node : get_scene().nodes )
 		{
-			entity->Update( delta );
+			// Update node's components
+			// entity->Update( delta );
 		}
 
-		graphics.draw();
+		graphics.draw( gltf );
 
 		gui.Draw();
 

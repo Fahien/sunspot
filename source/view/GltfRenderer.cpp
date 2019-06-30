@@ -1,11 +1,11 @@
 #include <tuple>
 
-#include "view/GltfRenderer.h"
 #include "view/GltfPrimitive.h"
+#include "view/GltfRenderer.h"
 
-#include "sunspot/graphics/Shader.h"
-#include "ShaderProgram.h"
 #include <mathspot/Math.h>
+#include "ShaderProgram.h"
+#include "sunspot/graphics/Shader.h"
 
 using namespace std;
 using namespace mathspot;
@@ -13,62 +13,76 @@ using namespace gltfspot;
 using namespace sunspot;
 
 
-GltfRenderer::GltfRenderer(Gltf&& gltf)
-:	m_Gltf { move(gltf) }
+GltfRenderer::GltfRenderer( Gltf* gltf )
 {
-	for (auto& m : m_Gltf.GetMeshes())
+	if ( gltf )
 	{
-		GltfMesh mesh { m_Gltf, m };
-		m_Meshes.emplace(&m, move(mesh));
+		set_gltf( *gltf );
 	}
 }
 
-
-GltfRenderer::GltfRenderer(GltfRenderer&& other)
-: m_Gltf   { move(other.m_Gltf)   }
-, m_Meshes { move(other.m_Meshes) }
-{}
-
-
-GltfRenderer::~GltfRenderer()
-{}
-
-
-void GltfRenderer::Draw(const graphics::shader::Program& shader,
-                        const Gltf::Node* pNode,
-                        const Mat4& transform)
+void GltfRenderer::set_gltf( Gltf& gltf )
 {
-	// Current transform
-	Mat4 tTransform { pNode->matrix };
-	tTransform.Translate(pNode->translation);
-	tTransform.Rotate(pNode->rotation);
-	tTransform = transform * tTransform;
-
-	// Render its children
-	for (auto pChild : pNode->children)
+	if ( m_Gltf != &gltf )
 	{
-		Draw(shader, pChild, tTransform);
-	}
-
-	// Render the node
-	if (pNode->pMesh)
-	{
-		auto& mesh = m_Meshes[pNode->pMesh];
-		for (auto& primitive : mesh.GetPrimitives())
+		m_Gltf = &gltf;
+		m_Meshes.clear();
+		for ( auto& m : gltf.GetMeshes() )
 		{
-			primitive.SetMatrix(tTransform);
-			primitive.Draw(shader);
+			GltfMesh mesh{ gltf, m };
+			m_Meshes.emplace( &m, move( mesh ) );
 		}
 	}
 }
 
 
-void GltfRenderer::Draw(const graphics::shader::Program& shader)
+GltfRenderer::GltfRenderer( GltfRenderer&& other )
+    : m_Gltf{ move( other.m_Gltf ) }
+    , m_Meshes{ move( other.m_Meshes ) }
 {
-	auto pScene = m_Gltf.GetScene();
+	other.m_Gltf = nullptr;
+}
 
-	for(auto pNode : pScene->nodes)
+
+GltfRenderer::~GltfRenderer() {}
+
+
+void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::Node* pNode, const Mat4& transform )
+{
+	// Current transform
+	Mat4 tTransform{ pNode->matrix };
+	tTransform.Translate( pNode->translation );
+	tTransform.Rotate( pNode->rotation );
+	tTransform = transform * tTransform;
+
+	// Render its children
+	if ( pNode->children.size() > 0 )
 	{
-		Draw(shader, pNode);
+		for ( auto pChild : pNode->children )
+		{
+			draw( shader, pChild, tTransform );
+		}
+	}
+
+	// Render the node
+	if ( pNode->pMesh )
+	{
+		auto& mesh = m_Meshes[pNode->pMesh];
+		for ( auto& primitive : mesh.GetPrimitives() )
+		{
+			primitive.SetMatrix( tTransform );
+			primitive.Draw( shader );
+		}
+	}
+}
+
+
+void GltfRenderer::draw( const graphics::shader::Program& shader )
+{
+	auto pScene = m_Gltf->GetScene();
+
+	for ( auto pNode : pScene->nodes )
+	{
+		draw( shader, pNode );
 	}
 }

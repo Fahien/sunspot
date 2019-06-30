@@ -26,6 +26,7 @@ ModelRepository::~ModelRepository()
 
 component::Model& ModelRepository::get_model( const int id, const string& path, const string& name )
 {
+	/*
 	// Check whether the model has already been loaded
 	auto itModel = mModels.find( id );
 	if ( itModel != mModels.end() )
@@ -67,6 +68,7 @@ component::Model& ModelRepository::get_model( const int id, const string& path, 
 			}
 		}
 	}
+	*/
 
 	std::string msg{ "Node not found: " };
 	msg += name;

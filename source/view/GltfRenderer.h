@@ -2,8 +2,8 @@
 
 #include <unordered_map>
 
-#include <mathspot/Math.h>
 #include <gltfspot/Gltf.h>
+#include <mathspot/Math.h>
 
 
 #include "sunspot/graphics/Shader.h"
@@ -16,25 +16,26 @@ namespace gst = gltfspot;
 
 namespace sunspot
 {
-
 class GltfRenderer
 {
   public:
-	GltfRenderer(gst::Gltf&& gltf);
-	GltfRenderer(GltfRenderer&& other);
+	GltfRenderer( gst::Gltf* g = nullptr );
+	GltfRenderer( GltfRenderer&& other );
 	~GltfRenderer();
 
-	gst::Gltf& GetGltf() { return m_Gltf; }
+	void set_gltf( gst::Gltf& g );
 
-	void Draw(const graphics::shader::Program& shader);
+	gst::Gltf* get_gltf() { return m_Gltf; }
 
-	void Draw(const graphics::shader::Program& shader,
-	          const gst::Gltf::Node* pNode,
-	          const mst::Mat4& transform = mst::Mat4::identity);
+	void draw( const graphics::shader::Program& shader );
+
+	void draw( const graphics::shader::Program& shader, const gst::Gltf::Node* pNode,
+	           const mst::Mat4& transform = mst::Mat4::identity );
 
   private:
-	gst::Gltf m_Gltf;
+	// TODO either GLTF and GLTF Meshes should go somewhere else
+	gst::Gltf*                                     m_Gltf   = {};
 	std::unordered_map<gst::Gltf::Mesh*, GltfMesh> m_Meshes = {};
 };
 
-} // namespace sunspot
+}  // namespace sunspot

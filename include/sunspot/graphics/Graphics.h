@@ -59,7 +59,8 @@ class Graphics
 	void set_camera( Entity& c ) { camera = &c; }
 	void add_model( component::Model* model ) { models.emplace( model ); }
 
-	void draw();
+	/// @param g Gltf with the scene to draw
+	void draw( gltfspot::Gltf& g );
 
   private:
 	Viewport viewport = {};
@@ -71,6 +72,8 @@ class Graphics
 	Entity* camera = {};
 
 	std::unordered_set<component::Model*> models = {};
+
+	GltfRenderer renderer = {};
 };
 
 #endif  // ANDROID

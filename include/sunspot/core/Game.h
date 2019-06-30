@@ -1,10 +1,14 @@
-#pragma once
+#ifndef SST_GAME_H_
+#define SST_GAME_H_
 
+#include <nlohmann/json.hpp>
+
+#include "sunspot/core/Collisions.h"
 #include "sunspot/core/GlfwWindow.h"
 #include "sunspot/core/Gui.h"
-#include "sunspot/core/Collisions.h"
-#include "sunspot/graphics/Graphics.h"
 #include "sunspot/core/Scene.h"
+#include "sunspot/graphics/Graphics.h"
+#include "sunspot/util/Cube.h"
 
 namespace sunspot
 {
@@ -24,7 +28,9 @@ class Game
 
 	ImGui& get_gui() { return gui; }
 
-	Scene& get_scene() { return scene; }
+	gltfspot::Gltf::Scene& get_scene() { return *gltf.GetScene(); }
+
+	void set_gltf( gltfspot::Gltf&& g ) { gltf = std::move( g ); }
 
 	void add( Entity& e );
 
@@ -40,11 +46,13 @@ class Game
 	GlfwWindow window = { *this };
 	ImGui      gui    = { window };
 
-	Collisions collisions = {};
-	graphics::Graphics graphics   = {};
+	gltfspot::Gltf gltf = gltfspot::Gltf( nlohmann::json::parse( cube ) );
 
-	Scene scene;
+	Collisions         collisions = {};
+	graphics::Graphics graphics   = {};
 };
 
 
 }  // namespace sunspot
+
+#endif  // SST_GAME_H_

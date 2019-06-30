@@ -4,8 +4,10 @@
 
 namespace sunspot::graphics
 {
-void Graphics::draw()
+void Graphics::draw( gltfspot::Gltf& gltf )
 {
+	renderer.set_gltf( gltf );
+
 	glEnable( GL_DEPTH_TEST );
 	glViewport( viewport.origin.x, viewport.origin.y, viewport.size.width, viewport.size.height );
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
@@ -21,9 +23,10 @@ void Graphics::draw()
 		}
 	}
 
-	for ( auto model : models )
+	// Draw every node in the scene
+	for ( auto node : gltf.GetScene()->nodes )
 	{
-		model->GetRenderer().Draw( *program, &model->GetNode() );
+		renderer.draw( *program, node );
 	}
 }
 
