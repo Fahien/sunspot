@@ -53,6 +53,7 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::No
 	Mat4 tTransform{ pNode->matrix };
 	tTransform.Translate( pNode->translation );
 	tTransform.Rotate( pNode->rotation );
+	tTransform.Scale( pNode->scale );
 	tTransform = transform * tTransform;
 
 	// Render its children

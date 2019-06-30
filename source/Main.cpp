@@ -192,6 +192,8 @@ int main( const int argc, const char** argv )
 					PushID( &node->translation );
 					// AlignTextToFramePadding();
 					DragFloat3( "Position", &node->translation.x, 0.25f, -16.0f, 16.0f, "%.1f" );
+					DragFloat4( "Rotation", &node->rotation.x, 0.125f, -1.0f, 1.0f, "%.2f" );
+					DragFloat3( "Scale", &node->scale.x, 0.25f, 0.25f, 4.0f, "%.2f");
 					PopID();
 					TreePop();
 				}
