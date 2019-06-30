@@ -38,7 +38,7 @@ std::string CliArgs::set_project_name()
 	if ( name.empty() )
 	{
 		// Set temporary name
-		name = "temp";
+		name = "cube";
 	}
 	return name;
 }

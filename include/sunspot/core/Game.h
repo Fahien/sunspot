@@ -46,7 +46,7 @@ class Game
 	GlfwWindow window = { *this };
 	ImGui      gui    = { window };
 
-	gltfspot::Gltf gltf = gltfspot::Gltf( nlohmann::json::parse( cube ) );
+	gltfspot::Gltf gltf = gltfspot::Gltf( nlohmann::json::parse( util::cube ) );
 
 	Collisions         collisions = {};
 	graphics::Graphics graphics   = {};

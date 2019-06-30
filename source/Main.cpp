@@ -11,6 +11,7 @@
 
 #include "SunSpotConfig.h"
 #include "sunspot/core/Config.h"
+#include "sunspot/util/Config.h"
 #include "sunspot/util/Util.h"
 
 #include "sunspot/core/Game.h"
@@ -68,9 +69,17 @@ void print_logo()
 std::variant<nlohmann::json, dataspot::Error> load_config( const std::string& path )
 {
 	// read a JSON file
-	fst::Ifstream  i{ path };
 	nlohmann::json j;
-	i >> j;
+
+	fst::Ifstream i{ path };
+	if ( i.IsOpen() )
+	{
+		i >> j;
+	}
+	else
+	{
+		j = j.parse( sunspot::util::config );
+	}
 
 	return j;
 }
@@ -98,6 +107,13 @@ int main( const int argc, const char** argv )
 		Script::initialize( args.project.script.path );
 
 		Game game;
+
+		if ( args.project.name != "cube" )
+		{
+			auto gltf_path = args.project.path + "/" + args.project.name + ".gltf";
+			auto gltf      = gst::Gltf::Load( gltf_path );
+			game.set_gltf( std::move( gltf ) );
+		}
 
 		auto& graphics = game.get_graphics();
 		graphics.set_viewport( graphics::Viewport{ { 0, 0 }, config.window.size } );
@@ -147,7 +163,7 @@ int main( const int argc, const char** argv )
 
 		component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
 		camera.set_parent( camera_entity );
-		camera.Translate( Vec3{ 2.0f, 2.0f, 5.0f } );
+		camera.Translate( Vec3{ 1.0f, 1.0f, 3.0f } );
 		camera.SetAspectRatio( aspect_ratio );
 		camera_entity.add( camera );
 		game.get_graphics().set_camera( camera_entity );

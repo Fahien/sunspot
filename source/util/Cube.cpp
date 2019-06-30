@@ -1,6 +1,6 @@
 #include "sunspot/util/Cube.h"
 
-namespace sunspot
+namespace sunspot::util
 {
 const char* cube = R"--(
 {

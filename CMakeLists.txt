@@ -167,15 +167,16 @@ target_include_directories( bindings PUBLIC ${DEPENDENCY_INCLUDE_DIRS} ${MATHSPO
 set(SOURCES
 	source/util/Util.cpp
 	source/util/Cube.cpp
+	source/util/Config.cpp
 	source/core/Config.cpp
-	source//graphics/Graphics.cpp
-	source//graphics/Shader.cpp
+	source/graphics/Graphics.cpp
+	source/graphics/Shader.cpp
 	source/core/String.cpp
 	source/core/Collisions.cpp
 	source/Cursor.h
 	source/Cursor.cpp
-	source//graphics/Texture.cpp
-	source//graphics/Material.cpp
+	source/graphics/Texture.cpp
+	source/graphics/Material.cpp
 	source/Mesh.h
 	source/Mesh.cpp
 	source/core/Gui.cpp
@@ -197,10 +198,10 @@ set(SOURCES
 	source/view/GltfRenderer.cpp
 	source/Color.h
 	source/Color.cpp
-	source//graphics/Light.cpp
+	source/graphics/Light.cpp
 	source/Quad.h
 	source/Quad.cpp
-	source//graphics/Framebuffer.cpp
+	source/graphics/Framebuffer.cpp
 	source/Camera.h
 	source/Camera.cpp)
 
