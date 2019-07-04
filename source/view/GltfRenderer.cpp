@@ -32,6 +32,13 @@ void GltfRenderer::set_gltf( Gltf& gltf )
 			GltfMesh mesh{ gltf, m };
 			m_Meshes.emplace( &m, move( mesh ) );
 		}
+
+		cameras.clear();
+		for( auto& c : gltf.GetCameras() )
+		{
+			auto camera = GltfCamera::create(c);
+			cameras.emplace( &c, std::move(camera));
+		}
 	}
 }
 
@@ -74,6 +81,14 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::No
 			primitive.SetMatrix( tTransform );
 			primitive.Draw( shader );
 		}
+	}
+
+	// Whether it is a camera
+	if ( pNode->pCamera )
+	{
+		auto& camera = cameras[pNode->pCamera];
+		camera->SetView( tTransform );
+		camera->Update( shader );
 	}
 }
 

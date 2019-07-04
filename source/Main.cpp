@@ -108,17 +108,56 @@ int main( const int argc, const char** argv )
 
 		Game game;
 
+
 		if ( args.project.name != "cube" )
 		{
 			auto gltf_path = args.project.path + "/" + args.project.name + ".gltf";
 			auto gltf      = gst::Gltf::Load( gltf_path );
+
+			auto& cameras = gltf.GetCameras();
+			if ( cameras.empty() )
+			{
+				// Create default camera
+				auto camera = gst::Gltf::Camera();
+				camera.name = "Default";
+				camera.type = gst::Gltf::Camera::Type::Perspective;
+
+				float aspect_ratio{ static_cast<float>( config.window.size.width ) / config.window.size.height };
+				camera.perspective.aspectRatio = aspect_ratio;
+
+				float fov{ radians( 45.0f ) };
+				camera.perspective.yfov = fov;
+
+				float near{ 0.125f };
+				camera.perspective.znear = near;
+
+				float far{ 256.0f };
+				camera.perspective.zfar = far;
+
+				cameras.push_back(camera);
+
+				// Create node for camera
+				auto node = gst::Gltf::Node();
+				node.pCamera = &cameras[0];
+				node.name = "Camera";
+				node.translation = Vec3{1.0f, 1.0f, 3.0f};
+
+				auto& nodes = gltf.GetNodes();
+				nodes.push_back(node);
+
+				auto scene = gltf.GetScene();
+				scene->nodes_indices.push_back(nodes.size() - 1);
+
+				// Reload scene nodes
+				gltf.load_nodes();
+			}
+
 			game.set_gltf( std::move( gltf ) );
 		}
 
 		auto& graphics = game.get_graphics();
 		graphics.set_viewport( graphics::Viewport{ { 0, 0 }, config.window.size } );
 
-		float aspect_ratio{ static_cast<float>( config.window.size.width ) / config.window.size.height };
 
 		graphics::shader::Program base_program{ "shader/base.vert", "shader/base.frag" };
 		graphics.set_shader_program( &base_program );
@@ -127,46 +166,15 @@ int main( const int argc, const char** argv )
 		light.SetPosition( 0.0f, 1.0f, 1.0f );
 		graphics.set_light( &light );
 
-		ModelRepository  model_repo{ args.project.path };
-		EntityRepository entity_repo{ args.project.path, model_repo };
-
-		// Read a set of objects from database
-		constexpr int entities_count = 4;
-		// For every object get the name
-		for ( int i = 0; i < entities_count; ++i )
-		{
-			if ( auto entity = entity_repo.load_entity( i + 1 ) )
-			{
-				if ( auto camera = entity->get<component::Camera>() )
-				{
-					if ( auto perspective_cam = dynamic_cast<component::PerspectiveCamera*>( camera ) )
-					{
-						perspective_cam->SetAspectRatio( aspect_ratio );
-					}
-					graphics.set_camera( *entity );
-				}
-
-				if ( auto model = entity->get<component::Model>() )
-				{
-					game.get_graphics().add_model( model );
-				}
-
-				game.add( *entity );
-			}
-		}
-
 		// Create default camera
-		auto  camera_entity = Entity{ 0, "Camera" };
-		float fov{ radians( 45.0f ) };
-		float near{ 0.125f };
-		float far{ 256.0f };
+		auto camera_entity = Entity{ 0, "Camera" };
 
-		component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
-		camera.set_parent( camera_entity );
-		camera.Translate( Vec3{ 1.0f, 1.0f, 3.0f } );
-		camera.SetAspectRatio( aspect_ratio );
-		camera_entity.add( camera );
-		game.get_graphics().set_camera( camera_entity );
+		//component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
+		//camera.set_parent( camera_entity );
+		//camera.Translate( Vec3{ 1.0f, 1.0f, 3.0f } );
+		//camera.SetAspectRatio( aspect_ratio );
+		//camera_entity.add( camera );
+		//game.get_graphics().set_camera( camera_entity );
 
 		// Set up editor GUI
 		auto& gui = game.get_gui();
@@ -185,15 +193,16 @@ int main( const int argc, const char** argv )
 			for ( auto& node : game.get_scene().nodes )
 			{
 				PushID( node );
-				// AlignTextToFramePadding();
-				auto open = TreeNode( node->name.c_str() );
-				if ( open )
+				if ( TreeNode( node->name.c_str() ) )
 				{
 					PushID( &node->translation );
-					// AlignTextToFramePadding();
-					DragFloat3( "Position", &node->translation.x, 0.25f, -16.0f, 16.0f, "%.1f" );
-					DragFloat4( "Rotation", &node->rotation.x, 0.125f, -1.0f, 1.0f, "%.2f" );
-					DragFloat3( "Scale", &node->scale.x, 0.25f, 0.25f, 4.0f, "%.2f");
+					if ( TreeNode( "Transform" ) )
+					{
+						DragFloat3( "Position", &node->translation.x, 0.25f, -32.0f, 32.0f, "%.1f" );
+						DragFloat4( "Rotation", &node->rotation.x, 0.125f, -1.0f, 1.0f, "%.2f" );
+						DragFloat3( "Scale", &node->scale.x, 0.05f, 0.05f, 4.0f, "%.2f" );
+						TreePop();
+					}
 					PopID();
 					TreePop();
 				}

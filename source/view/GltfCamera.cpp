@@ -1,11 +1,8 @@
-#include <cmath>
-#include <mathspot/Math.h>
-
-#include "ShaderProgram.h"
-
-
 #include "view/GltfCamera.h"
 
+#include <cmath>
+
+#include "ShaderProgram.h"
 
 using namespace sunspot;
 using namespace mathspot;
@@ -14,39 +11,49 @@ using namespace mathspot;
 GltfCamera& GltfPerspectiveCamera::Default()
 {
 	static GltfPerspectiveCamera camera;
-	camera.Translate(Vec3{ 0.0f, 0.0f, 3.0f });
+	camera.Translate( Vec3{ 0.0f, 0.0f, 3.0f } );
 	return camera;
 }
 
+std::unique_ptr<GltfCamera> GltfCamera::create( gltfspot::Gltf::Camera& c ) {
 
-GltfPerspectiveCamera::GltfPerspectiveCamera(const float a, const float y, const float f, const float n)
-:	GltfCamera{ f , n }
-,	m_AspectRatio{ a }
-,	m_YFov{ y }
+	if (c.type == gltfspot::Gltf::Camera::Type::Perspective)
+	{
+		return std::make_unique<GltfPerspectiveCamera>(c.perspective.aspectRatio, c.perspective.yfov, c.perspective.zfar, c.perspective.znear);
+	}
+
+	return std::make_unique<GltfOrthographicCamera>(c.orthographic.xmag, c.orthographic.ymag, c.orthographic.zfar, c.orthographic.znear);
+
+}
+
+GltfPerspectiveCamera::GltfPerspectiveCamera( const float a, const float y, const float f, const float n )
+    : GltfCamera{ f, n }
+    , m_AspectRatio{ a }
+    , m_YFov{ y }
 {
 	// Calculate projection matrix
-	float cotfov{ 1.0f / std::tan(0.5f * y) };
+	float cotfov{ 1.0f / std::tan( 0.5f * y ) };
 	m_Projection[0]  = cotfov / a;
 	m_Projection[5]  = cotfov;
-	m_Projection[10] = -(n + f) / (n - f);
-	m_Projection[14] = -2.0f * n * f / (n - f);
+	m_Projection[10] = -( n + f ) / ( f - n );
+	m_Projection[14] = -2.0f * n * f / ( f - n );
 	m_Projection[11] = -1.0f;
 
 	// Calculate view matrix
 	auto direction = Vec3{ 0.0f, 0.0f, 1.0f };
-	auto right     = Vec3::Cross(direction, Vec3{ 0.0f, 1.0f, 0.0f });
-	auto up        = Vec3::Cross(right, direction);
+	auto right     = Vec3::Cross( direction, Vec3{ 0.0f, 1.0f, 0.0f } );
+	auto up        = Vec3::Cross( right, direction );
 	up.Normalize();
 
-	m_Rotation[0]  = right.x;
-	m_Rotation[1]  = up.x;
-	m_Rotation[2]  = direction.x;
-	m_Rotation[4]  = right.y;
-	m_Rotation[5]  = up.y;
-	m_Rotation[6]  = direction.y;
-	m_Rotation[8]  = right.z;
-	m_Rotation[9]  = up.z;
-	m_Rotation[10] = direction.z;
+	m_Rotation[0]     = right.x;
+	m_Rotation[1]     = up.x;
+	m_Rotation[2]     = direction.x;
+	m_Rotation[4]     = right.y;
+	m_Rotation[5]     = up.y;
+	m_Rotation[6]     = direction.y;
+	m_Rotation[8]     = right.z;
+	m_Rotation[9]     = up.z;
+	m_Rotation[10]    = direction.z;
 	m_Translation[12] = -m_Transform.position.x;
 	m_Translation[13] = -m_Transform.position.y;
 	m_Translation[14] = -m_Transform.position.z;
@@ -67,23 +74,23 @@ void GltfCamera::Translate( const Vec3& t )
 }
 
 
-void GltfCamera::Rotate(const Quat& q)
+void GltfCamera::Rotate( const Quat& q )
 {
-	m_Rotation.Rotate(q);
+	m_Rotation.Rotate( q );
 
 	updateView();
 }
 
 
-void GltfCamera::Update(const graphics::shader::Program& program)
+void GltfCamera::Update( const graphics::shader::Program& program )
 {
-	auto location = program.GetLocation("view");
-	glUniformMatrix4fv(location, 1, GL_FALSE, m_View.matrix);
+	auto location = program.GetLocation( "view" );
+	glUniformMatrix4fv( location, 1, GL_FALSE, m_View.matrix );
 
-	location = program.GetLocation("projection");
-	glUniformMatrix4fv(location, 1, GL_FALSE, m_Projection.matrix);
+	location = program.GetLocation( "projection" );
+	glUniformMatrix4fv( location, 1, GL_FALSE, m_Projection.matrix );
 
-	location = program.GetLocation("camera.position");
+	location       = program.GetLocation( "camera.position" );
 	auto& position = m_Transform.position;
-	glUniform3fv(location, 1, &position.x);
+	glUniform3fv( location, 1, &position.x );
 }

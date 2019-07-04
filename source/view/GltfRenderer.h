@@ -8,6 +8,7 @@
 
 #include "sunspot/graphics/Shader.h"
 #include "view/GltfMesh.h"
+#include "view/GltfCamera.h"
 
 
 namespace mst = mathspot;
@@ -36,6 +37,7 @@ class GltfRenderer
 	// TODO either GLTF and GLTF Meshes should go somewhere else
 	gst::Gltf*                                     m_Gltf   = {};
 	std::unordered_map<gst::Gltf::Mesh*, GltfMesh> m_Meshes = {};
+	std::unordered_map<gst::Gltf::Camera*, std::unique_ptr<GltfCamera>> cameras = {};
 };
 
 }  // namespace sunspot

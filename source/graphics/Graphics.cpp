@@ -15,19 +15,8 @@ void Graphics::draw( gltfspot::Gltf& gltf )
 	program->Use();
 	light->Update( *program );
 
-	if ( camera )
-	{
-		if ( auto perspective_camera = camera->get<component::PerspectiveCamera>() )
-		{
-			perspective_camera->Update( *program );
-		}
-	}
-
 	// Draw every node in the scene
-	for ( auto node : gltf.GetScene()->nodes )
-	{
-		renderer.draw( *program, node );
-	}
+	renderer.draw( *program );
 }
 
 }  // namespace sunspot::graphics
