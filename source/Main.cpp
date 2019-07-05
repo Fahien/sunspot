@@ -153,6 +153,18 @@ int main( const int argc, const char** argv )
 				auto scene = gltf.GetScene();
 				scene->nodes_indices.push_back( nodes.size() - 1 );
 
+				// Create default light
+				auto  light  = gst::Gltf::Light();
+				auto& lights = gltf.get_lights();
+				lights.push_back( light );
+
+				node             = gst::Gltf::Node();
+				node.name        = "Light";
+				node.light_index = 0;
+
+				nodes.push_back( node );
+				scene->nodes_indices.push_back( nodes.size() - 1 );
+
 				// Reload scene nodes
 				gltf.load_nodes();
 			}
@@ -163,23 +175,8 @@ int main( const int argc, const char** argv )
 		auto& graphics = game.get_graphics();
 		graphics.set_viewport( graphics::Viewport{ { 0, 0 }, config.window.size } );
 
-
 		graphics::shader::Program base_program{ "shader/base.vert", "shader/base.frag" };
 		graphics.set_shader_program( &base_program );
-
-		graphics::PointLight light{ Color{ 1.0f, 1.0f, 1.0f } };
-		light.SetPosition( 0.0f, 1.0f, 1.0f );
-		graphics.set_light( &light );
-
-		// Create default camera
-		auto camera_entity = Entity{ 0, "Camera" };
-
-		// component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
-		// camera.set_parent( camera_entity );
-		// camera.Translate( Vec3{ 1.0f, 1.0f, 3.0f } );
-		// camera.SetAspectRatio( aspect_ratio );
-		// camera_entity.add( camera );
-		// game.get_graphics().set_camera( camera_entity );
 
 		// Set up editor GUI
 		auto& gui = game.get_gui();
@@ -237,7 +234,20 @@ int main( const int argc, const char** argv )
 						}
 						PopID();
 					}
-					TreePop();
+
+					// Light
+					if ( node->light )
+					{
+						PushID( node->light );
+						if ( TreeNode( "Light" ) )
+						{
+							DragFloat3( "Color", &node->light->color.x, 0.125f, 0.0f, 1.0f, "%.3f" );
+							TreePop();
+						}
+						PopID();
+					}
+
+					TreePop(); // Node name
 				}
 				PopID();
 			}

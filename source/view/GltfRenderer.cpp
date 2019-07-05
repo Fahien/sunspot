@@ -54,6 +54,25 @@ GltfRenderer::GltfRenderer( GltfRenderer&& other )
 GltfRenderer::~GltfRenderer() {}
 
 
+void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Gltf::Light& light, const mst::Mat4& transform )
+{
+	GLuint location{ shader.GetLocation( "pointLightActive" ) };
+	glUniform1i( location, true );
+
+	location = shader.GetLocation( "pLight.position" );
+	glUniform3fv( location, 1, &transform.matrix[12] );
+
+	location = shader.GetLocation( "pLight.ambient" );
+	glUniform3fv( location, 1, &light.color.x );
+
+	location = shader.GetLocation( "pLight.diffuse" );
+	glUniform3fv( location, 1, &light.color.x );
+
+	location = shader.GetLocation( "pLight.specular" );
+	glUniform3fv( location, 1, &light.color.x );
+}
+
+
 void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::Node& node, const Mat4& transform )
 {
 	// Current transform
@@ -88,7 +107,14 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::No
 	{
 		draw( shader, *node.pCamera, tTransform );
 	}
+
+	// Whether it has a light
+	if ( node.light )
+	{
+		draw( shader, *node.light, tTransform );
+	}
 }
+
 
 mst::Mat4 create_projection_matrix( const gst::Gltf::Camera& camera )
 {

@@ -36,6 +36,8 @@ class GltfRenderer
 	void draw( const graphics::shader::Program& shader, const gst::Gltf::Camera& camera,
 	           const mst::Mat4& transform = mst::Mat4::identity );
 
+	void draw( const graphics::shader::Program& shader, const gst::Gltf::Light& light, const mst::Mat4& transform );
+
   private:
 	// TODO either GLTF and GLTF Meshes should go somewhere else
 	gst::Gltf*                                                          m_Gltf   = {};
