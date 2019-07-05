@@ -15,15 +15,16 @@ GltfCamera& GltfPerspectiveCamera::Default()
 	return camera;
 }
 
-std::unique_ptr<GltfCamera> GltfCamera::create( gltfspot::Gltf::Camera& c ) {
-
-	if (c.type == gltfspot::Gltf::Camera::Type::Perspective)
+std::unique_ptr<GltfCamera> GltfCamera::create( gltfspot::Gltf::Camera& c )
+{
+	if ( c.type == gltfspot::Gltf::Camera::Type::Perspective )
 	{
-		return std::make_unique<GltfPerspectiveCamera>(c.perspective.aspectRatio, c.perspective.yfov, c.perspective.zfar, c.perspective.znear);
+		return std::make_unique<GltfPerspectiveCamera>( c.perspective.aspectRatio, c.perspective.yfov, c.perspective.zfar,
+		                                                c.perspective.znear );
 	}
 
-	return std::make_unique<GltfOrthographicCamera>(c.orthographic.xmag, c.orthographic.ymag, c.orthographic.zfar, c.orthographic.znear);
-
+	return std::make_unique<GltfOrthographicCamera>( c.orthographic.xmag, c.orthographic.ymag, c.orthographic.zfar,
+	                                                 c.orthographic.znear );
 }
 
 GltfPerspectiveCamera::GltfPerspectiveCamera( const float a, const float y, const float f, const float n )
@@ -90,7 +91,6 @@ void GltfCamera::Update( const graphics::shader::Program& program )
 	location = program.GetLocation( "projection" );
 	glUniformMatrix4fv( location, 1, GL_FALSE, m_Projection.matrix );
 
-	location       = program.GetLocation( "camera.position" );
-	auto& position = m_Transform.position;
-	glUniform3fv( location, 1, &position.x );
+	location = program.GetLocation( "camera.position" );
+	glUniform3fv( location, 1, &m_View.matrix[12] );
 }

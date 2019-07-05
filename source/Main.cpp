@@ -84,6 +84,26 @@ std::variant<nlohmann::json, dataspot::Error> load_config( const std::string& pa
 	return j;
 }
 
+gst::Gltf::Camera create_default_camera( const sunspot::Config& config )
+{
+	auto camera = gst::Gltf::Camera();
+	camera.name = "Default";
+	camera.type = gst::Gltf::Camera::Type::Perspective;
+
+	float aspect_ratio{ static_cast<float>( config.window.size.width ) / config.window.size.height };
+	camera.perspective.aspectRatio = aspect_ratio;
+
+	float fov{ radians( 45.0f ) };
+	camera.perspective.yfov = fov;
+
+	float near{ 0.125f };
+	camera.perspective.znear = near;
+
+	float far{ 256.0f };
+	camera.perspective.zfar = far;
+
+	return camera;
+}
 
 int main( const int argc, const char** argv )
 {
@@ -118,35 +138,20 @@ int main( const int argc, const char** argv )
 			if ( cameras.empty() )
 			{
 				// Create default camera
-				auto camera = gst::Gltf::Camera();
-				camera.name = "Default";
-				camera.type = gst::Gltf::Camera::Type::Perspective;
-
-				float aspect_ratio{ static_cast<float>( config.window.size.width ) / config.window.size.height };
-				camera.perspective.aspectRatio = aspect_ratio;
-
-				float fov{ radians( 45.0f ) };
-				camera.perspective.yfov = fov;
-
-				float near{ 0.125f };
-				camera.perspective.znear = near;
-
-				float far{ 256.0f };
-				camera.perspective.zfar = far;
-
-				cameras.push_back(camera);
+				auto camera = create_default_camera( config );
+				cameras.push_back( camera );
 
 				// Create node for camera
-				auto node = gst::Gltf::Node();
-				node.pCamera = &cameras[0];
-				node.name = "Camera";
-				node.translation = Vec3{1.0f, 1.0f, 3.0f};
+				auto node        = gst::Gltf::Node();
+				node.pCamera     = &cameras[0];
+				node.name        = "Camera";
+				node.translation = Vec3{ 1.0f, 1.0f, 3.0f };
 
 				auto& nodes = gltf.GetNodes();
-				nodes.push_back(node);
+				nodes.push_back( node );
 
 				auto scene = gltf.GetScene();
-				scene->nodes_indices.push_back(nodes.size() - 1);
+				scene->nodes_indices.push_back( nodes.size() - 1 );
 
 				// Reload scene nodes
 				gltf.load_nodes();
@@ -169,12 +174,12 @@ int main( const int argc, const char** argv )
 		// Create default camera
 		auto camera_entity = Entity{ 0, "Camera" };
 
-		//component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
-		//camera.set_parent( camera_entity );
-		//camera.Translate( Vec3{ 1.0f, 1.0f, 3.0f } );
-		//camera.SetAspectRatio( aspect_ratio );
-		//camera_entity.add( camera );
-		//game.get_graphics().set_camera( camera_entity );
+		// component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
+		// camera.set_parent( camera_entity );
+		// camera.Translate( Vec3{ 1.0f, 1.0f, 3.0f } );
+		// camera.SetAspectRatio( aspect_ratio );
+		// camera_entity.add( camera );
+		// game.get_graphics().set_camera( camera_entity );
 
 		// Set up editor GUI
 		auto& gui = game.get_gui();
@@ -195,6 +200,7 @@ int main( const int argc, const char** argv )
 				PushID( node );
 				if ( TreeNode( node->name.c_str() ) )
 				{
+					// Transform
 					PushID( &node->translation );
 					if ( TreeNode( "Transform" ) )
 					{
@@ -204,6 +210,33 @@ int main( const int argc, const char** argv )
 						TreePop();
 					}
 					PopID();
+
+					// Camera
+					if ( node->pCamera )
+					{
+						PushID( node->pCamera );
+						if ( TreeNode( "Camera" ) )
+						{
+							if ( node->pCamera->type == gltfspot::Gltf::Camera::Type::Perspective )
+							{
+								DragFloat( "Y Fov", &node->pCamera->perspective.yfov, 0.125f, 0.0f, 3.25f, "%.2f" );
+								DragFloat( "Aspect Ratio", &node->pCamera->perspective.aspectRatio, 0.125f, 0.125f, 2.0f,
+								           "%.3f" );
+								DragFloat( "Z Near", &node->pCamera->perspective.znear, 0.125f, 0.125f, 1.0f, "%.3f" );
+								DragFloat( "Z Far", &node->pCamera->perspective.zfar, 1.0f, 2.0f, 256.0f, "%.0f" );
+							}
+							else
+							{
+								DragFloat( "X Mag", &node->pCamera->orthographic.xmag, 0.125f, 0.0f, 2.0f, "%.3f" );
+								DragFloat( "Y Mag", &node->pCamera->orthographic.ymag, 0.125f, 0.0f, 2.0f, "%.3f" );
+								DragFloat( "Z Near", &node->pCamera->orthographic.znear, 0.125f, 0.125f, 1.0f, "%.3f" );
+								DragFloat( "Z Far", &node->pCamera->orthographic.zfar, 1.0f, 2.0f, 256.0f, "%.0f" );
+							}
+
+							TreePop();
+						}
+						PopID();
+					}
 					TreePop();
 				}
 				PopID();

@@ -34,10 +34,10 @@ void GltfRenderer::set_gltf( Gltf& gltf )
 		}
 
 		cameras.clear();
-		for( auto& c : gltf.GetCameras() )
+		for ( auto& c : gltf.GetCameras() )
 		{
-			auto camera = GltfCamera::create(c);
-			cameras.emplace( &c, std::move(camera));
+			auto camera = GltfCamera::create( c );
+			cameras.emplace( &c, std::move( camera ) );
 		}
 	}
 }
@@ -54,28 +54,28 @@ GltfRenderer::GltfRenderer( GltfRenderer&& other )
 GltfRenderer::~GltfRenderer() {}
 
 
-void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::Node* pNode, const Mat4& transform )
+void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::Node& node, const Mat4& transform )
 {
 	// Current transform
-	Mat4 tTransform{ pNode->matrix };
-	tTransform.Translate( pNode->translation );
-	tTransform.Rotate( pNode->rotation );
-	tTransform.Scale( pNode->scale );
+	Mat4 tTransform{ node.matrix };
+	tTransform.Translate( node.translation );
+	tTransform.Rotate( node.rotation );
+	tTransform.Scale( node.scale );
 	tTransform = transform * tTransform;
 
 	// Render its children
-	if ( pNode->children.size() > 0 )
+	if ( node.children.size() > 0 )
 	{
-		for ( auto pChild : pNode->children )
+		for ( auto child : node.children )
 		{
-			draw( shader, pChild, tTransform );
+			draw( shader, *child, tTransform );
 		}
 	}
 
 	// Render the node
-	if ( pNode->pMesh )
+	if ( node.pMesh )
 	{
-		auto& mesh = m_Meshes[pNode->pMesh];
+		auto& mesh = m_Meshes[node.pMesh];
 		for ( auto& primitive : mesh.GetPrimitives() )
 		{
 			primitive.SetMatrix( tTransform );
@@ -84,21 +84,66 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::No
 	}
 
 	// Whether it is a camera
-	if ( pNode->pCamera )
+	if ( node.pCamera )
 	{
-		auto& camera = cameras[pNode->pCamera];
-		camera->SetView( tTransform );
-		camera->Update( shader );
+		draw( shader, *node.pCamera, tTransform );
 	}
 }
 
+mst::Mat4 create_projection_matrix( const gst::Gltf::Camera& camera )
+{
+	mst::Mat4 projection;
+
+	if ( camera.type == gst::Gltf::Camera::Type::Perspective )
+	{
+		auto y = camera.perspective.yfov;
+		auto a = camera.perspective.aspectRatio;
+		auto n = camera.perspective.znear;
+		auto f = camera.perspective.zfar;
+
+		float cotfov{ 1.0f / std::tan( 0.5f * y ) };
+		projection[0]  = cotfov / a;
+		projection[5]  = cotfov;
+		projection[10] = -( n + f ) / ( f - n );
+		projection[14] = -2.0f * n * f / ( f - n );
+		projection[11] = -1.0f;
+	}
+	else
+	{
+		// TODO implement orthographic camera
+		assert( false && "Orthographic camera not supported" );
+	}
+
+
+	return projection;
+}
+
+void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Gltf::Camera& camera,
+                         const mst::Mat4& transform )
+{
+	auto view = transform;
+	view[12] *= -1;
+	view[13] *= -1;
+	view[14] *= -1;
+
+	auto location = shader.GetLocation( "view" );
+	glUniformMatrix4fv( location, 1, GL_FALSE, &view[0] );
+
+	auto projection = create_projection_matrix( camera );
+
+	location = shader.GetLocation( "projection" );
+	glUniformMatrix4fv( location, 1, GL_FALSE, &projection[0] );
+
+	location = shader.GetLocation( "camera.position" );
+	glUniform3fv( location, 1, &transform[12] );
+}
 
 void GltfRenderer::draw( const graphics::shader::Program& shader )
 {
 	auto pScene = m_Gltf->GetScene();
 
-	for ( auto pNode : pScene->nodes )
+	for ( auto node : pScene->nodes )
 	{
-		draw( shader, pNode );
+		draw( shader, *node );
 	}
 }
