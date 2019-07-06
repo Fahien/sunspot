@@ -148,6 +148,7 @@ int main( const int argc, const char** argv )
 				node.translation = Vec3{ 1.0f, 1.0f, 3.0f };
 
 				auto& nodes = gltf.GetNodes();
+				node.index  = nodes.size();
 				nodes.push_back( node );
 
 				auto scene = gltf.GetScene();
@@ -161,6 +162,7 @@ int main( const int argc, const char** argv )
 				node             = gst::Gltf::Node();
 				node.name        = "Light";
 				node.light_index = 0;
+				node.index       = nodes.size();
 
 				nodes.push_back( node );
 				scene->nodes_indices.push_back( nodes.size() - 1 );
@@ -177,86 +179,6 @@ int main( const int argc, const char** argv )
 
 		graphics::shader::Program base_program{ "shader/base.vert", "shader/base.frag" };
 		graphics.set_shader_program( &base_program );
-
-		// Set up editor GUI
-		auto& gui = game.get_gui();
-
-		gui.fPreDraw = [&game]() {
-			using namespace ImGui;
-			// Scene
-			SetNextWindowPos( ImVec2( 0, 0 ) );
-			PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
-			ImGuiWindowFlags scene_flags =
-			    ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize;
-			Begin( "Scene", nullptr, scene_flags );
-			PopStyleVar();
-
-			PushStyleVar( ImGuiStyleVar_FramePadding, ImVec2( 2, 2 ) );
-			for ( auto& node : game.get_scene().nodes )
-			{
-				PushID( node );
-				if ( TreeNode( node->name.c_str() ) )
-				{
-					// Transform
-					PushID( &node->translation );
-					if ( TreeNode( "Transform" ) )
-					{
-						DragFloat3( "Position", &node->translation.x, 0.25f, -32.0f, 32.0f, "%.1f" );
-						DragFloat4( "Rotation", &node->rotation.x, 0.125f, -1.0f, 1.0f, "%.2f" );
-						DragFloat3( "Scale", &node->scale.x, 0.05f, 0.05f, 4.0f, "%.2f" );
-						TreePop();
-					}
-					PopID();
-
-					// Camera
-					if ( node->pCamera )
-					{
-						PushID( node->pCamera );
-						if ( TreeNode( "Camera" ) )
-						{
-							if ( node->pCamera->type == gltfspot::Gltf::Camera::Type::Perspective )
-							{
-								DragFloat( "Y Fov", &node->pCamera->perspective.yfov, 0.125f, 0.0f, 3.25f, "%.2f" );
-								DragFloat( "Aspect Ratio", &node->pCamera->perspective.aspectRatio, 0.125f, 0.125f, 2.0f,
-								           "%.3f" );
-								DragFloat( "Z Near", &node->pCamera->perspective.znear, 0.125f, 0.125f, 1.0f, "%.3f" );
-								DragFloat( "Z Far", &node->pCamera->perspective.zfar, 1.0f, 2.0f, 256.0f, "%.0f" );
-							}
-							else
-							{
-								DragFloat( "X Mag", &node->pCamera->orthographic.xmag, 0.125f, 0.0f, 2.0f, "%.3f" );
-								DragFloat( "Y Mag", &node->pCamera->orthographic.ymag, 0.125f, 0.0f, 2.0f, "%.3f" );
-								DragFloat( "Z Near", &node->pCamera->orthographic.znear, 0.125f, 0.125f, 1.0f, "%.3f" );
-								DragFloat( "Z Far", &node->pCamera->orthographic.zfar, 1.0f, 2.0f, 256.0f, "%.0f" );
-							}
-
-							TreePop();
-						}
-						PopID();
-					}
-
-					// Light
-					if ( node->light )
-					{
-						PushID( node->light );
-						if ( TreeNode( "Light" ) )
-						{
-							DragFloat3( "Color", &node->light->color.x, 0.125f, 0.0f, 1.0f, "%.3f" );
-							TreePop();
-						}
-						PopID();
-					}
-
-					TreePop(); // Node name
-				}
-				PopID();
-			}
-			PopStyleVar();
-
-			End();  // Scene
-
-			ShowDemoWindow();
-		};
 
 		game.loop();  // GameLoop.it
 

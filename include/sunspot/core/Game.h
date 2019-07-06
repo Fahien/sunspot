@@ -7,6 +7,7 @@
 #include "sunspot/core/GlfwWindow.h"
 #include "sunspot/core/Gui.h"
 #include "sunspot/core/Scene.h"
+#include "sunspot/editor/Editor.h"
 #include "sunspot/graphics/Graphics.h"
 #include "sunspot/util/Cube.h"
 
@@ -28,6 +29,8 @@ class Game
 
 	ImGui& get_gui() { return gui; }
 
+	gltfspot::Gltf& get_gltf() { return gltf; }
+
 	gltfspot::Gltf::Scene& get_scene() { return *gltf.GetScene(); }
 
 	void set_gltf( gltfspot::Gltf&& g ) { gltf = std::move( g ); }
@@ -45,6 +48,7 @@ class Game
 
 	GlfwWindow window = { *this };
 	ImGui      gui    = { window };
+	Editor     editor;
 
 	gltfspot::Gltf gltf = gltfspot::Gltf( nlohmann::json::parse( util::cube ) );
 

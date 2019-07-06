@@ -11,8 +11,6 @@
 
 namespace sunspot
 {
-
-
 ImGui::ImGui( const GlfwWindow& window )
 {
 	auto result = ::IMGUI_CHECKVERSION();
@@ -24,7 +22,7 @@ ImGui::ImGui( const GlfwWindow& window )
 	ImGui_ImplGlfw_InitForOpenGL( window.GetHandle(), true );
 	assert( result && "Cannot init ImGui for Glfw" );
 
-	ImGui_ImplOpenGL3_Init("#version 150");
+	ImGui_ImplOpenGL3_Init( "#version 150" );
 	assert( result && "Cannot init ImGui for OpenGL 3" );
 }
 
@@ -37,9 +35,9 @@ ImGui::~ImGui()
 }
 
 
-void ImGui::Update(const float delta ) const
+void ImGui::update( const float delta )
 {
-	auto& io = ::ImGui::GetIO();
+	auto& io     = ::ImGui::GetIO();
 	io.DeltaTime = delta;
 
 	ImGui_ImplOpenGL3_NewFrame();
@@ -48,7 +46,7 @@ void ImGui::Update(const float delta ) const
 }
 
 
-void ImGui::Draw() const
+void ImGui::draw()
 {
 	if ( fPreDraw )
 	{
@@ -56,8 +54,8 @@ void ImGui::Draw() const
 	}
 
 	::ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData( ::ImGui::GetDrawData() );
+	ImGui_ImplOpenGL3_RenderDrawData(::ImGui::GetDrawData() );
 }
 
 
-} // namespace sunspot
+}  // namespace sunspot

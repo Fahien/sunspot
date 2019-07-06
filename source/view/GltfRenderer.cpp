@@ -77,9 +77,9 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::No
 {
 	// Current transform
 	Mat4 tTransform{ node.matrix };
-	tTransform.Translate( node.translation );
-	tTransform.Rotate( node.rotation );
 	tTransform.Scale( node.scale );
+	tTransform.Rotate( node.rotation );
+	tTransform.Translate( node.translation );
 	tTransform = transform * tTransform;
 
 	// Render its children

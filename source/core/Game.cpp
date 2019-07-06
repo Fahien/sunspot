@@ -5,8 +5,6 @@
 
 namespace sunspot
 {
-
-
 void Game::add( Entity& e )
 {
 	collisions.add( e );
@@ -24,9 +22,9 @@ void Game::handle( input::Input&& in )
 
 const float Game::compute_delta_time()
 {
-	time.current = static_cast<float>( glfwGetTime() );
+	time.current     = static_cast<float>( glfwGetTime() );
 	const auto delta = time.current - time.last;
-	time.last = time.current;
+	time.last        = time.current;
 	return delta;
 }
 
@@ -37,12 +35,12 @@ void Game::loop()
 	{
 		window.PollEvents();
 		window.UpdateSize();
-		
+
 		collisions.update();
 
 		auto delta = compute_delta_time();
 
-		gui.Update( delta );
+		gui.update( delta );
 
 		for ( auto node : get_scene().nodes )
 		{
@@ -52,11 +50,13 @@ void Game::loop()
 
 		graphics.draw( gltf );
 
-		gui.Draw();
+		editor.draw( gltf );
+
+		gui.draw();
 
 		window.SwapBuffers();
 	}
 }
 
 
-} // namespace sunspot
+}  // namespace sunspot

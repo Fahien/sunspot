@@ -196,6 +196,7 @@ set(SOURCES
 	source/view/GltfMesh.cpp
 	source/view/GltfRenderer.h
 	source/view/GltfRenderer.cpp
+	source/editor/Editor.cpp
 	source/Color.h
 	source/Color.cpp
 	source/graphics/Light.cpp
