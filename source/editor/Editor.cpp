@@ -15,7 +15,7 @@ void Editor::draw( gltfspot::Gltf::Node& node )
 	}
 	auto node_open = TreeNodeEx( &node, flags, "%s", node.name.c_str() );
 
-	// A node is a drag source and target
+	// Drag source
 	if ( BeginDragDropSource( ImGuiDragDropFlags_None ) )
 	{
 		auto node_address = &node;
@@ -31,18 +31,7 @@ void Editor::draw( gltfspot::Gltf::Node& node )
 		{
 			IM_ASSERT( payload->DataSize == sizeof( &node ) );
 			auto payload_node = *reinterpret_cast<gltfspot::Gltf::Node**>( payload->Data );
-
-			// Get previous parent to remove payload node from its children
-			if ( auto old_parent = payload_node->parent )
-			{
-				auto index_it = std::find( std::begin( old_parent->children_indices ),
-				                           std::end( old_parent->children_indices ), payload_node->index );
-				old_parent->children_indices.erase( index_it );
-
-				auto node_it =
-				    std::find( std::begin( old_parent->children ), std::end( old_parent->children ), payload_node );
-				old_parent->children.erase( node_it );
-			}
+			payload_node->remove_from_parent();
 
 			// Add payload node to new parent
 			payload_node->parent = &node;
@@ -145,24 +134,16 @@ void Editor::draw( gltfspot::Gltf& gltf )
 			{
 				if ( MenuItem( "Node" ) )
 				{
-					auto node = gltfspot::Gltf::Node();
-					node.name = "New";
-
-					auto& nodes = gltf.GetNodes();
-					node.index  = nodes.size();
-
 					if ( !selected || selected == &scene )
 					{
-						scene.nodes_indices.push_back( node.index );
+						scene.create_node( "New" );
 					}
 					else
 					{
 						auto selected_node = reinterpret_cast<gltfspot::Gltf::Node*>( selected );
-						selected_node->children_indices.push_back( node.index );
+						selected_node->create_child( "New" );
 					}
 
-					nodes.push_back( node );
-					gltf.load_nodes();
 					selected = nullptr;
 				}
 				EndMenu();
@@ -177,6 +158,22 @@ void Editor::draw( gltfspot::Gltf& gltf )
 	// Scene node
 	if ( TreeNodeEx( &scene, 0, "%s", scene.name.c_str() ) )
 	{
+		// Drag target
+		if ( BeginDragDropTarget() )
+		{
+			if ( auto payload = AcceptDragDropPayload( "GLTF_NODE" ) )
+			{
+				IM_ASSERT( payload->DataSize == sizeof( void* ) );
+				auto payload_node = *reinterpret_cast<gltfspot::Gltf::Node**>( payload->Data );
+				payload_node->remove_from_parent();
+
+				// Add payload node to new parent (scene)
+				scene.nodes_indices.push_back( payload_node->index );
+				scene.nodes.push_back( payload_node );
+			}
+			EndDragDropTarget();
+		}
+
 		if ( IsItemClicked() )
 		{
 			selected = &scene;
