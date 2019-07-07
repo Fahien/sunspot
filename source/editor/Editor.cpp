@@ -56,6 +56,29 @@ void Editor::draw( gltfspot::Gltf::Light& light )
 }
 
 
+void Editor::draw( gltfspot::Gltf::Mesh& mesh )
+{
+	using namespace ImGui;
+
+	if ( TreeNodeEx( &mesh, 0, "Mesh" ) )
+	{
+		for ( auto& primitive : mesh.primitives )
+		{
+			if ( TreeNodeEx( &primitive, 0, "%s", gltfspot::to_string( primitive.mode ).c_str() ) )
+			{
+				for ( auto& attribute : primitive.attributes )
+				{
+					Text( "%s", gltfspot::to_string( attribute.first ).c_str() );
+				}
+
+				TreePop();
+			}
+		}
+		TreePop();
+	}
+}
+
+
 void Editor::draw( gltfspot::Gltf::Node& node )
 {
 	using namespace ImGui;
@@ -110,6 +133,11 @@ void Editor::draw( gltfspot::Gltf::Node& node )
 		if ( node.light )
 		{
 			draw( *node.light );
+		}
+
+		if ( node.pMesh )
+		{
+			draw( *node.pMesh );
 		}
 
 		// Children

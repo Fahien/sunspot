@@ -63,6 +63,7 @@ GltfPrimitive::GltfPrimitive( GltfPrimitive&& other )
     , mIndicesCount{ other.mIndicesCount }
     , mIndicesType{ other.mIndicesType }
     , mIndicesOffset{ other.mIndicesOffset }
+    , vertex_count{ other.vertex_count }
     , mMatrix{ other.mMatrix }
     , mHasVertexColors{ other.mHasVertexColors }
     , mMaterial{ move( other.mMaterial ) }
@@ -77,13 +78,20 @@ GltfPrimitive::GltfPrimitive( GltfPrimitive&& other )
 
 void GltfPrimitive::readIndices( Gltf& model, Gltf::Mesh::Primitive& primitive )
 {
+	auto indicesIndex = primitive.indices;
+	if ( indicesIndex < 0 )
+	{
+		// The primitive has no indices
+		// Should be rendered with drawArrays()
+		return;
+	}
+
 	// Generate an element buffer for indices
 	glGenBuffers( 1, &mEbo );
 	mHasEbo = true;
 
 	// Get the accessor
-	unsigned indicesIndex    = primitive.indices;
-	auto&    indicesAccessor = model.GetAccessors()[indicesIndex];
+	auto& indicesAccessor = model.GetAccessors()[indicesIndex];
 
 	// Number of indices
 	mIndicesCount = static_cast<GLsizei>( indicesAccessor.count );
@@ -97,7 +105,7 @@ void GltfPrimitive::readIndices( Gltf& model, Gltf::Mesh::Primitive& primitive )
 	// Get the bufferview
 	auto  bufferViewIndex = indicesAccessor.bufferView;
 	auto& bufferView      = model.GetBufferViews()[bufferViewIndex];
-	// assert(bufferView.target == Gltf::BufferView::Target::ELEMENT_ARRAY_BUFFER);
+	assert( bufferView.target == Gltf::BufferView::Target::ELEMENT_ARRAY_BUFFER );
 
 	// Get the buffer
 	auto          bufferIndex = bufferView.buffer;
@@ -161,6 +169,8 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Gltf::Mesh::Primitive& primitive )
 			GLvoid* offset{ reinterpret_cast<GLvoid*>( accessor.byteOffset ) };
 			auto    stride = static_cast<GLsizei>( bufferView.byteStride );
 			glVertexAttribPointer( 0, 3, componentType, GL_FALSE, stride, offset );
+
+			vertex_count += 3;
 		}
 		else if ( attribute.first == Gltf::Mesh::Primitive::Semantic::TEXCOORD_0 )
 		{
@@ -263,6 +273,13 @@ void GltfPrimitive::Draw( const graphics::shader::Program& shader ) const
 	mMaterial.bind( shader );
 
 	glBindVertexArray( mVao );
-	glDrawElements( mMode, mIndicesCount, mIndicesType, mIndicesOffset );
+	if ( mIndicesCount > 0 )
+	{
+		glDrawElements( mMode, mIndicesCount, mIndicesType, mIndicesOffset );
+	}
+	else
+	{
+		glDrawArrays( mMode, 0, vertex_count );
+	}
 	glBindVertexArray( 0 );
 }

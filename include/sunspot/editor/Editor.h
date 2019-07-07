@@ -17,6 +17,8 @@ class Editor
 
 	void draw( gltfspot::Gltf::Light& light );
 
+	void draw( gltfspot::Gltf::Mesh& mesh );
+
 	void draw( gltfspot::Gltf::Node& node );
 
 	/// Keep track of selected node

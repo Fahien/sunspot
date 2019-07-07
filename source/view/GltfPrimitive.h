@@ -43,9 +43,11 @@ class GltfPrimitive
 	GLuint                   mEbo{};
 
 	GLenum      mMode{};
-	GLsizei     mIndicesCount{};
+	GLsizei     mIndicesCount = 0;
 	GLenum      mIndicesType{};
 	const void* mIndicesOffset{};
+
+	GLsizei vertex_count = 0;
 
 	mst::Mat4 mMatrix{};
 

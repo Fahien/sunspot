@@ -29,7 +29,7 @@ struct Material
 	Color color;
 	float metallic;
 	float roughness;
-	float ambientOcclusion;
+	float ambientOcclusion = 0.25f;
 
 	Texture* colorTexture = nullptr;
 

@@ -192,7 +192,7 @@ void applyPBRPointLight(in PointLight light, in Camera camera, inout Fragment fr
 
 	lightOutput += (kD * fragment.color / pi + specular) * radiance * diffuseFactor;
 
-	vec3 ambient = vec3(0.005) * fragment.color * material.ambientOcclusion;
+	vec3 ambient = vec3(0.25) * fragment.color * material.ambientOcclusion;
 	vec3 color = ambient + lightOutput;
 	color = color / (color + vec3(one));
 	color = pow(color, vec3(one / 2.2));
@@ -217,4 +217,5 @@ void main()
 	applyPBRPointLight(pLight, camera, fragment);
 
 	color = vec4(fragment.color, vertColor.a);
+	//color = vec4(material.color, vertColor.a);
 }
