@@ -11,6 +11,12 @@ class Editor
 	void draw( gltfspot::Gltf& gltf );
 
   private:
+	void draw_transform( gltfspot::Gltf::Node& node );
+
+	void draw( gltfspot::Gltf::Camera& camera );
+
+	void draw( gltfspot::Gltf::Light& light );
+
 	void draw( gltfspot::Gltf::Node& node );
 
 	/// Keep track of selected node

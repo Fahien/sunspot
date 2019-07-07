@@ -4,6 +4,58 @@
 
 namespace sunspot
 {
+void Editor::draw_transform( gltfspot::Gltf::Node& node )
+{
+	using namespace ImGui;
+
+	if ( TreeNodeEx( &node.translation, 0, "Transform" ) )
+	{
+		DragFloat3( "Position", &node.translation.x, 0.25f, -32.0f, 32.0f, "%.1f" );
+		DragFloat4( "Rotation", &node.rotation.x, 0.125f, -1.0f, 1.0f, "%.2f" );
+		DragFloat3( "Scale", &node.scale.x, 0.05f, 0.05f, 4.0f, "%.2f" );
+		TreePop();
+	}
+}
+
+
+void Editor::draw( gltfspot::Gltf::Camera& camera )
+{
+	using namespace ImGui;
+
+	if ( TreeNodeEx( &camera, 0, "Camera" ) )
+	{
+		if ( camera.type == gltfspot::Gltf::Camera::Type::Perspective )
+		{
+			DragFloat( "Y Fov", &camera.perspective.yfov, 0.125f, 0.0f, 3.25f, "%.2f" );
+			DragFloat( "Aspect Ratio", &camera.perspective.aspectRatio, 0.125f, 0.125f, 2.0f, "%.3f" );
+			DragFloat( "Z Near", &camera.perspective.znear, 0.125f, 0.125f, 1.0f, "%.3f" );
+			DragFloat( "Z Far", &camera.perspective.zfar, 1.0f, 2.0f, 256.0f, "%.0f" );
+		}
+		else
+		{
+			DragFloat( "X Mag", &camera.orthographic.xmag, 0.125f, 0.0f, 2.0f, "%.3f" );
+			DragFloat( "Y Mag", &camera.orthographic.ymag, 0.125f, 0.0f, 2.0f, "%.3f" );
+			DragFloat( "Z Near", &camera.orthographic.znear, 0.125f, 0.125f, 1.0f, "%.3f" );
+			DragFloat( "Z Far", &camera.orthographic.zfar, 1.0f, 2.0f, 256.0f, "%.0f" );
+		}
+
+		TreePop();
+	}
+}
+
+
+void Editor::draw( gltfspot::Gltf::Light& light )
+{
+	using namespace ImGui;
+
+	if ( TreeNodeEx( &light, 0, "Light" ) )
+	{
+		DragFloat3( "Color", &light.color.x, 0.125f, 0.0f, 1.0f, "%.3f" );
+		TreePop();
+	}
+}
+
+
 void Editor::draw( gltfspot::Gltf::Node& node )
 {
 	using namespace ImGui;
@@ -48,47 +100,16 @@ void Editor::draw( gltfspot::Gltf::Node& node )
 
 	if ( node_open )
 	{
-		// Transform
-		if ( TreeNodeEx( &node.translation, 0, "Transform" ) )
-		{
-			DragFloat3( "Position", &node.translation.x, 0.25f, -32.0f, 32.0f, "%.1f" );
-			DragFloat4( "Rotation", &node.rotation.x, 0.125f, -1.0f, 1.0f, "%.2f" );
-			DragFloat3( "Scale", &node.scale.x, 0.05f, 0.05f, 4.0f, "%.2f" );
-			TreePop();
-		}
+		draw_transform( node );
 
-		// Camera
 		if ( node.pCamera )
 		{
-			if ( TreeNodeEx( node.pCamera, 0, "Camera" ) )
-			{
-				if ( node.pCamera->type == gltfspot::Gltf::Camera::Type::Perspective )
-				{
-					DragFloat( "Y Fov", &node.pCamera->perspective.yfov, 0.125f, 0.0f, 3.25f, "%.2f" );
-					DragFloat( "Aspect Ratio", &node.pCamera->perspective.aspectRatio, 0.125f, 0.125f, 2.0f, "%.3f" );
-					DragFloat( "Z Near", &node.pCamera->perspective.znear, 0.125f, 0.125f, 1.0f, "%.3f" );
-					DragFloat( "Z Far", &node.pCamera->perspective.zfar, 1.0f, 2.0f, 256.0f, "%.0f" );
-				}
-				else
-				{
-					DragFloat( "X Mag", &node.pCamera->orthographic.xmag, 0.125f, 0.0f, 2.0f, "%.3f" );
-					DragFloat( "Y Mag", &node.pCamera->orthographic.ymag, 0.125f, 0.0f, 2.0f, "%.3f" );
-					DragFloat( "Z Near", &node.pCamera->orthographic.znear, 0.125f, 0.125f, 1.0f, "%.3f" );
-					DragFloat( "Z Far", &node.pCamera->orthographic.zfar, 1.0f, 2.0f, 256.0f, "%.0f" );
-				}
-
-				TreePop();
-			}
+			draw( *node.pCamera );
 		}
 
-		// Light
 		if ( node.light )
 		{
-			if ( TreeNodeEx( node.light, 0, "Light" ) )
-			{
-				DragFloat3( "Color", &node.light->color.x, 0.125f, 0.0f, 1.0f, "%.3f" );
-				TreePop();
-			}
+			draw( *node.light );
 		}
 
 		// Children
@@ -107,6 +128,7 @@ void Editor::draw( gltfspot::Gltf::Node& node )
 		TreePop();  // Node name
 	}
 }
+
 
 void Editor::draw( gltfspot::Gltf& gltf )
 {

@@ -159,10 +159,12 @@ int main( const int argc, const char** argv )
 				auto& lights = gltf.get_lights();
 				lights.push_back( light );
 
-				node             = gst::Gltf::Node();
-				node.name        = "Light";
-				node.light_index = 0;
-				node.index       = nodes.size();
+				node               = gst::Gltf::Node();
+				node.name          = "Light";
+				node.light_index   = 0;
+				node.index         = nodes.size();
+				node.translation.x = 1.0f;
+				node.translation.z = 2.0f;
 
 				nodes.push_back( node );
 				scene->nodes_indices.push_back( nodes.size() - 1 );
