@@ -10,6 +10,7 @@
 #include "sunspot/editor/Editor.h"
 #include "sunspot/graphics/Graphics.h"
 #include "sunspot/util/Cube.h"
+#include "sunspot/core/Animations.h"
 
 namespace sunspot
 {
@@ -53,6 +54,7 @@ class Game
 	gltfspot::Gltf gltf = gltfspot::Gltf( nlohmann::json::parse( util::cube ) );
 
 	Collisions         collisions = {};
+	Animations animations = {};
 	graphics::Graphics graphics   = {};
 };
 

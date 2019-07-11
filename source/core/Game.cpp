@@ -48,6 +48,8 @@ void Game::loop()
 			// entity->Update( delta );
 		}
 
+		animations.update( delta, gltf );
+
 		graphics.draw( gltf );
 
 		editor.draw( gltf );

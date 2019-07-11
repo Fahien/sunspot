@@ -50,7 +50,7 @@ void Editor::draw( gltfspot::Gltf::Light& light )
 
 	if ( TreeNodeEx( &light, 0, "Light" ) )
 	{
-		DragFloat3( "Color", &light.color.x, 0.125f, 0.0f, 1.0f, "%.3f" );
+		DragFloat3( "Color", &light.color.x, 0.125f, 0.0f, 32.0f, "%.3f" );
 		TreePop();
 	}
 }

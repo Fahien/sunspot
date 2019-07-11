@@ -173,6 +173,7 @@ set(SOURCES
 	source/graphics/Shader.cpp
 	source/core/String.cpp
 	source/core/Collisions.cpp
+	source/core/Animations.cpp
 	source/Cursor.h
 	source/Cursor.cpp
 	source/graphics/Texture.cpp
