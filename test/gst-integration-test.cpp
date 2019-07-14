@@ -39,7 +39,8 @@ int main( int argc, char** argv )
 	try
 	{
 		Interpreter interpreter{};
-		Game        game;
+		Config      config;
+		Game        game{ config };
 
 		float aspect_ratio{ static_cast<float>( window_size.width ) / window_size.height };
 		float fov{ radians( 45.0f ) };

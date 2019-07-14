@@ -11,12 +11,12 @@ namespace lst = logspot;
 
 namespace sunspot
 {
-GlfwWindow::GlfwWindow( Game& game, const char* title, const mst::Size windowSize, const bool stereoscopic )
-    : Window::Window{ game, title, windowSize, stereoscopic },
-      context{ { 3, 3 }, GLFW_OPENGL_CORE_PROFILE },
-      monitor{ nullptr },
-      videomode{ nullptr },
-      handle{ nullptr }
+GlfwWindow::GlfwWindow( Game& game, const std::string& title, const mst::Size& window_size, const bool stereoscopic )
+    : Window::Window{ game, title, window_size, stereoscopic }
+    , context{ { 3, 3 }, GLFW_OPENGL_CORE_PROFILE }
+    , monitor{ nullptr }
+    , videomode{ nullptr }
+    , handle{ nullptr }
 {
 	// Initialize GLFW and handle error
 	if ( glfwInit() != GLFW_TRUE )
@@ -24,9 +24,8 @@ GlfwWindow::GlfwWindow( Game& game, const char* title, const mst::Size windowSiz
 		throw GlfwException{ tag, "Could not initialize GLFW" };
 	}
 	// Set the error callback
-	glfwSetErrorCallback( []( int error, const char* description ) {
-		lst::Log::error( "%s: %s [%d]", tag.c_str(), description, error );
-	} );
+	glfwSetErrorCallback(
+	    []( int error, const char* description ) { lst::Log::error( "%s: %s [%d]", tag.c_str(), description, error ); } );
 
 	// Get the primary monitor
 	monitor = glfwGetPrimaryMonitor();
@@ -65,7 +64,7 @@ GlfwWindow::GlfwWindow( Game& game, const char* title, const mst::Size windowSiz
 	glfwWindowHint( GLFW_REFRESH_RATE, videomode->refreshRate );
 
 	// Create a window object
-	handle = glfwCreateWindow( window.size.width, window.size.height, m_Title, nullptr, nullptr );
+	handle = glfwCreateWindow( window.size.width, window.size.height, title.c_str(), nullptr, nullptr );
 	if ( handle == nullptr )  // Handle window creation error
 	{
 		glfwTerminate();
@@ -73,6 +72,7 @@ GlfwWindow::GlfwWindow( Game& game, const char* title, const mst::Size windowSiz
 	}
 	glfwSetWindowUserPointer( handle, this );
 	glfwMakeContextCurrent( handle );
+	glfwSwapInterval( 1 );  // Vsync
 
 	// Hide the cursor and capture it, perfect for an FPS camera system
 	// glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -96,7 +96,8 @@ GlfwWindow::GlfwWindow( Game& game, const char* title, const mst::Size windowSiz
 	try  // Initialize glew
 	{
 		Window::initGlew();
-	} catch ( const GlewException& )  // Handle error
+	}
+	catch ( const GlewException& )  // Handle error
 	{
 		glfwDestroyWindow( handle );
 		glfwTerminate();
@@ -104,10 +105,9 @@ GlfwWindow::GlfwWindow( Game& game, const char* title, const mst::Size windowSiz
 	}
 
 	UpdateSize();
-	glfwSwapInterval( 1 );  // Vsync
 
-	lst::Log::info( "%s created\n\tOpenGL %s\n\tGLFW %s\n\tFrame size %dx%d\n", tag.c_str(),
-	                       glGetString( GL_VERSION ), glfwGetVersionString(), m_FrameSize.width, m_FrameSize.height );
+	lst::Log::info( "%s created\n\tOpenGL %s\n\tGLFW %s\n\tFrame size %dx%d\n", tag.c_str(), glGetString( GL_VERSION ),
+	                glfwGetVersionString(), m_FrameSize.width, m_FrameSize.height );
 }
 
 
@@ -135,7 +135,8 @@ void GlfwWindow::handleMouse( const int action )
 	if ( action == GLFW_PRESS )
 	{
 		mAction = input::Action::PRESS;
-	} else if ( action == GLFW_RELEASE )
+	}
+	else if ( action == GLFW_RELEASE )
 	{
 		mAction = input::Action::RELEASE;
 	}
@@ -165,10 +166,12 @@ void GlfwWindow::handleInput( const int key, const int action )  // TODO comment
 	if ( action == GLFW_PRESS )
 	{
 		mAction = input::Action::PRESS;
-	} else if ( action == GLFW_RELEASE )
+	}
+	else if ( action == GLFW_RELEASE )
 	{
 		mAction = input::Action::RELEASE;
-	} else if ( action == GLFW_REPEAT )
+	}
+	else if ( action == GLFW_REPEAT )
 	{
 		mAction = input::Action::REPEAT;
 	}
@@ -235,7 +238,8 @@ void GlfwWindow::toggleFullscreen()
 		                      videomode->width / 2 - window.size.width / 2,    // X center
 		                      videomode->height / 2 - window.size.height / 2,  // Y center
 		                      window.size.width, window.size.height, videomode->refreshRate );
-	} else  // Set window size for fullscreen-windowed mode to the desktop resolution
+	}
+	else  // Set window size for fullscreen-windowed mode to the desktop resolution
 	{
 		glfwSetWindowMonitor( handle, monitor,
 		                      0,  // left
@@ -266,7 +270,7 @@ void GlfwWindow::loop()  // TODO comment
 void GlfwWindow::UpdateSize()
 {
 	glfwGetFramebufferSize( handle, &m_FrameSize.width, &m_FrameSize.height );
-	GetGame().get_graphics().set_viewport( { {}, m_FrameSize } );
+	get_game().set_size( m_FrameSize );
 }
 
 

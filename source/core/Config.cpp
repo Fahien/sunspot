@@ -1,41 +1,74 @@
 #include "sunspot/core/Config.h"
 
+#include <filespot/Ifstream.h>
 #include <logspot/Log.h>
+
+#include "sunspot/util/Config.h"
 
 namespace sunspot
 {
-Config::Config( nlohmann::json& jj ) : j{ jj }, window{ /* .size = */ { query_window_size() } }
+/// @return A default config json
+nlohmann::json default_json()
+{
+	return nlohmann::json::parse( sunspot::util::config );
+}
+
+
+/// @return A config file, creating it if not found
+nlohmann::json load_json( const std::string& path )
+{
+	// read a JSON file
+	nlohmann::json j;
+
+	filespot::Ifstream i{ path };
+	if ( i.IsOpen() )
+	{
+		i >> j;
+	}
+	else
+	{
+		j = default_json();
+	}
+
+	return j;
+}
+
+
+Config::Config()
+    : Config{ default_json() }
 {
 }
 
 
-std::string Config::query_value( const std::string& key ) const
+Config::Config( const CliArgs& args )
+    : Config{ load_json( args.project.config.path ) }
 {
-	//auto query = "SELECT value FROM main.config WHERE key = ?;";
-
-	//auto prepare_result = database.prepare( query );
-	//if ( auto error = std::get_if<dataspot::Error>( &prepare_result ) )
-	//{
-	//	logspot::Log::error( "Cannote query key %s: %s", key.c_str(), error->get_message().c_str() );
-	//	return {};
-	//}
-	//auto statement = std::get_if<dataspot::Statement>( &prepare_result );
-
-	//statement->bind( key );
-	//statement->step();
-	//auto value = statement->get_text();
-	//statement->reset();
-
-	//return value;
-	return "";
 }
 
 
-mathspot::Size Config::query_window_size()
+Config::Config( const nlohmann::json& jj )
+    : j{ jj }
+    , window{ /* .size = */ { query_window_size() } }
+    , project{ /* .name = */ { query_project_name() } }
+{
+}
+
+
+mathspot::Size Config::query_window_size() const
 {
 	return mathspot::Size{ /* .width  = */ j["window"]["size"][0].get<int>(),
-		                   /* .height = */ j["window"]["size"][1].get<int>()};
+		                   /* .height = */ j["window"]["size"][1].get<int>() };
 }
 
+
+std::string Config::query_project_name() const
+{
+	if ( j.count( "project" ) && j["project"].count( "name" ) )
+	{
+		return j["project"]["name"].get<std::string>();
+	}
+
+	return {};
+}
 
 }  // namespace sunspot

@@ -240,8 +240,6 @@ void Editor::draw( gltfspot::Gltf& gltf )
 	PopStyleVar();
 
 	End();  // Scene
-
-	ShowDemoWindow();
 }
 
 }  // namespace sunspot

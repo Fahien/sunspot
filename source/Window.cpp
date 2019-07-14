@@ -6,57 +6,56 @@
 #include <chrono>
 #endif
 
-#include "SunSpotConfig.h"
-#include "sunspot/core/Game.h"
-#include "view/GltfRenderer.h"
-#include "view/GltfCamera.h"
-#include "sunspot/graphics/Gl.h"
-#include "sunspot/graphics/Shader.h"
-#include "sunspot/graphics/Light.h"
-#include "sunspot/graphics/Framebuffer.h"
 #include "Camera.h"
 #include "Quad.h"
-#include "entity/Entity.h"
+#include "SunSpotConfig.h"
 #include "component/Model.h"
+#include "entity/Entity.h"
+#include "sunspot/core/Game.h"
+#include "sunspot/graphics/Framebuffer.h"
+#include "sunspot/graphics/Gl.h"
+#include "sunspot/graphics/Light.h"
+#include "sunspot/graphics/Shader.h"
+#include "view/GltfCamera.h"
+#include "view/GltfRenderer.h"
 
 using namespace mathspot;
 
 namespace sunspot
 {
-
 const std::string Window::tag{ "Window" };
 
 
-Window::Window( Game& game, const char* title, const mst::Size windowSize, const bool stereoscopic)
-:	m_Game        { game }
-,	m_Title       { title }
-,	window        { /* .size = */ windowSize }
-,	m_MonitorSize { windowSize }
-,	m_FrameSize   { windowSize }
-,	mStereoscopic { stereoscopic }
-,	mFullscreen   { false }
-,	mCurrentTime  { 0.0f }
-,	mLastTime     { 0.0f }
-,	mDeltaTime    { 0.0f }
-,	mCursor       {}
-,	m_pCamera     { nullptr }
-,	mBaseProgram  { nullptr }
-,	mLight        { nullptr }
-,	mObjs         {}
-,	mQuadProgram  { nullptr }
-,	mDepthProgram { nullptr }
-,	mFramebuffer  { nullptr }
-,	mQuad         { nullptr }
-{}
+Window::Window( Game& g, const std::string& t, const mst::Size& window_size, const bool stereoscopic )
+    : game{ g }
+    , title{ t }
+    , window{ /* .size = */ window_size }
+    , m_MonitorSize{ window_size }
+    , m_FrameSize{ window_size }
+    , mStereoscopic{ stereoscopic }
+    , mFullscreen{ false }
+    , mCurrentTime{ 0.0f }
+    , mLastTime{ 0.0f }
+    , mDeltaTime{ 0.0f }
+    , mCursor{}
+    , m_pCamera{ nullptr }
+    , mBaseProgram{ nullptr }
+    , mLight{ nullptr }
+    , mObjs{}
+    , mQuadProgram{ nullptr }
+    , mDepthProgram{ nullptr }
+    , mFramebuffer{ nullptr }
+    , mQuad{ nullptr }
+{
+}
 
 
-Window::~Window()
-{}
+Window::~Window() {}
 
 
 void Window::initGlew()
 {
-	glewExperimental = GL_TRUE; // Initialize GLEW and handle error
+	glewExperimental = GL_TRUE;  // Initialize GLEW and handle error
 	if ( glewInit() != GLEW_OK )
 	{
 		throw GlewException( tag );
@@ -66,7 +65,7 @@ void Window::initGlew()
 
 void Window::handleInput( input::Input&& i )
 {
-	m_Game.handle( std::move( i ) );
+	game.handle( std::move( i ) );
 }
 
 
@@ -76,7 +75,7 @@ void Window::render()
 }
 
 
-void Window::render( const float& deltaTime ) // TODO comment
+void Window::render( const float& deltaTime )  // TODO comment
 {
 	if ( mStereoscopic )
 	{
@@ -92,30 +91,30 @@ void Window::render( const float& deltaTime ) // TODO comment
 void Window::renderGltf( const float& deltaTime )
 {
 	glEnable( GL_DEPTH_TEST );
-	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	// glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	glViewport( 0, 0, m_FrameSize.width, m_FrameSize.height );
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); // Clear color and depth buffer
-//	mBaseProgram->use();
-	//mCamera->update(deltaTime, *mBaseProgram);
-//	mLight->Update(*mBaseProgram);
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  // Clear color and depth buffer
+	//	mBaseProgram->use();
+	// mCamera->update(deltaTime, *mBaseProgram);
+	//	mLight->Update(*mBaseProgram);
 
-//	mGltfRenderer->Draw(*mBaseProgram);
+	//	mGltfRenderer->Draw(*mBaseProgram);
 }
 
 
-void Window::render3D( const float& deltaTime ) // TODO comment
+void Window::render3D( const float& deltaTime )  // TODO comment
 {
 	glEnable( GL_DEPTH_TEST );
 	glViewport( 0, 0, m_FrameSize.width, m_FrameSize.height );
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); // Clear color and depth buffer
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  // Clear color and depth buffer
 	mBaseProgram->Use();
 	mLight->Update( *mBaseProgram );
 
 	m_Camera->get<component::Camera>()->Update( *mBaseProgram );
 
-	//for ( auto pEntity : mEntities )
+	// for ( auto pEntity : mEntities )
 	//{
 	//	if ( pEntity->has<component::Model>() )
 	//	{
@@ -135,7 +134,7 @@ void Window::renderQuad( const float& /* deltaTime */ )
 {
 	glViewport( 0, 0, m_FrameSize.width, m_FrameSize.height );
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); // Clear color buffer
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  // Clear color buffer
 	mQuadProgram->Use();
 	mQuad->bind();
 	mQuad->render();
@@ -143,7 +142,7 @@ void Window::renderQuad( const float& /* deltaTime */ )
 }
 
 #ifdef SST_PROFILING
-static int profiling_line { 0 };
+static int profiling_line{ 0 };
 #endif
 
 void Window::renderStereoscopic( const float& deltaTime )
@@ -153,15 +152,15 @@ void Window::renderStereoscopic( const float& deltaTime )
 #endif
 
 	// First pass
-	glEnable(GL_DEPTH_TEST);
-	mFramebuffer->bind(); // Render the scene on a framebuffer
-	glViewport(0, 0, mFramebuffer->getWidth(), mFramebuffer->getHeight()); // Viewport for framebuffer
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffer
+	glEnable( GL_DEPTH_TEST );
+	mFramebuffer->bind();                                                     // Render the scene on a framebuffer
+	glViewport( 0, 0, mFramebuffer->getWidth(), mFramebuffer->getHeight() );  // Viewport for framebuffer
+	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );                                   // Black
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );                     // Clear color and depth buffer
 	mBaseProgram->Use();
-	m_pCamera->Update(*mBaseProgram);
-	mLight->Update(*mBaseProgram);
-//	for (WavefrontObject *obj : mObjs) { obj->draw(*mBaseProgram); }
+	m_pCamera->Update( *mBaseProgram );
+	mLight->Update( *mBaseProgram );
+	//	for (WavefrontObject *obj : mObjs) { obj->draw(*mBaseProgram); }
 	mFramebuffer->unbind();
 	// End First pass
 
@@ -170,20 +169,20 @@ void Window::renderStereoscopic( const float& deltaTime )
 #endif
 
 	// Second pass
-	glDisable(GL_DEPTH_TEST);
+	glDisable( GL_DEPTH_TEST );
 	mQuad->bind();
-	glViewport(0, 0, m_FrameSize.width / 2, m_FrameSize.height);
+	glViewport( 0, 0, m_FrameSize.width / 2, m_FrameSize.height );
 	mQuadProgram->Use();
-	mFramebuffer->bindColorTexture(*mQuadProgram); // Render color on the left
+	mFramebuffer->bindColorTexture( *mQuadProgram );  // Render color on the left
 	mQuad->render();
 
 #ifdef SST_PROFILING
 	auto t3 = std::chrono::high_resolution_clock::now();
 #endif
 
-	glViewport(m_FrameSize.width / 2, 0, m_FrameSize.width / 2, m_FrameSize.height);
+	glViewport( m_FrameSize.width / 2, 0, m_FrameSize.width / 2, m_FrameSize.height );
 	mDepthProgram->Use();
-	mFramebuffer->bindDepthTexture(*mDepthProgram); // Render depth on the right
+	mFramebuffer->bindDepthTexture( *mDepthProgram );  // Render depth on the right
 	mQuad->render();
 	mQuad->unbind();
 	// End Second pass
@@ -191,19 +190,19 @@ void Window::renderStereoscopic( const float& deltaTime )
 #ifdef SST_PROFILING
 	auto t4 = std::chrono::high_resolution_clock::now();
 
-	float pass1 = (t2 - t1).count(); // Pass 1
-	float pass2_1 = (t3 - t2).count(); // Pass 2.1
-	float pass2_2 = (t4 - t3).count(); // Pass 2.2
-	float pass2 = pass2_1 + pass2_2;
-	float total = pass1 + pass2_1 + pass2_2;
-	std::cout << ++profiling_line << "\t" // Frame number
-		<< pass1 << "\t" // Pass 1
-		<< pass2_1 << "\t" // Pass 2.1
-		<< pass2_2 << "\t" // Pass 2.2
-		<< total << "\t" // Total
-		<< pass2 / total * 100.0f // Overhead
-		<< std::endl;
+	float pass1   = ( t2 - t1 ).count();  // Pass 1
+	float pass2_1 = ( t3 - t2 ).count();  // Pass 2.1
+	float pass2_2 = ( t4 - t3 ).count();  // Pass 2.2
+	float pass2   = pass2_1 + pass2_2;
+	float total   = pass1 + pass2_1 + pass2_2;
+	std::cout << ++profiling_line << "\t"  // Frame number
+	          << pass1 << "\t"             // Pass 1
+	          << pass2_1 << "\t"           // Pass 2.1
+	          << pass2_2 << "\t"           // Pass 2.2
+	          << total << "\t"             // Total
+	          << pass2 / total * 100.0f    // Overhead
+	          << std::endl;
 #endif
 }
 
-} // namespace sunspot
+}  // namespace sunspot

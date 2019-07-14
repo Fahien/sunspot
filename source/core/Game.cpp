@@ -5,10 +5,30 @@
 
 namespace sunspot
 {
+Game::Game( Config& c )
+    : config{ c }
+{
+}
+
 void Game::add( Entity& e )
 {
 	collisions.add( e );
 }
+
+
+void Game::set_size( const mathspot::Size& size )
+{
+	graphics.set_viewport( { {}, size } );
+
+	for ( auto& camera : gltf.GetCameras() )
+	{
+		if ( camera.type == gst::Gltf::Camera::Type::Perspective )
+		{
+			camera.perspective.aspectRatio = static_cast<float>( size.width ) / size.height;
+		}
+	}
+}
+
 
 void Game::handle( input::Input&& in )
 {

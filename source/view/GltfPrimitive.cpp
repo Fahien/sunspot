@@ -105,7 +105,6 @@ void GltfPrimitive::readIndices( Gltf& model, Gltf::Mesh::Primitive& primitive )
 	// Get the bufferview
 	auto  bufferViewIndex = indicesAccessor.bufferView;
 	auto& bufferView      = model.GetBufferViews()[bufferViewIndex];
-	assert( bufferView.target == Gltf::BufferView::Target::ELEMENT_ARRAY_BUFFER );
 
 	// Get the buffer
 	auto          bufferIndex = bufferView.buffer;
@@ -136,8 +135,6 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Gltf::Mesh::Primitive& primitive )
 		auto              bufferViewIndex = accessor.bufferView;
 		Gltf::BufferView& bufferView      = model.GetBufferViews().at( bufferViewIndex );
 		vector<char>&     buffer          = model.GetBuffer( bufferView.buffer );
-
-		assert( bufferView.target == Gltf::BufferView::Target::ARRAY_BUFFER );
 
 		auto it = mVbos.find( bufferViewIndex );
 		if ( it == mVbos.end() )

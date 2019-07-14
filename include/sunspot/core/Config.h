@@ -4,13 +4,19 @@
 
 #include <mathspot/Math.h>
 
+#include "util/Util.h"
+
 
 namespace sunspot
 {
 class Config
 {
   public:
-	Config( nlohmann::json& j );
+	Config();
+
+	Config( const CliArgs& cli_args );
+
+	Config( const nlohmann::json& j );
 
   private:
 	/// @return A value from the config table in the database
@@ -18,15 +24,23 @@ class Config
 	std::string query_value( const std::string& key ) const;
 
 	/// @return The size of the window
-	mathspot::Size query_window_size();
+	mathspot::Size query_window_size() const;
 
-	nlohmann::json& j;
+	/// @return The name of the project
+	std::string query_project_name() const;
+
+	const nlohmann::json& j;
 
   public:
-	const struct
+	const struct Window
 	{
 		mathspot::Size size;
 	} window;
+
+	struct Project
+	{
+		std::string name;
+	} project;
 };
 
 

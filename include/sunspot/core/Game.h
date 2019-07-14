@@ -3,14 +3,15 @@
 
 #include <nlohmann/json.hpp>
 
+#include "sunspot/core/Animations.h"
 #include "sunspot/core/Collisions.h"
+#include "sunspot/core/Config.h"
 #include "sunspot/core/GlfwWindow.h"
 #include "sunspot/core/Gui.h"
 #include "sunspot/core/Scene.h"
 #include "sunspot/editor/Editor.h"
 #include "sunspot/graphics/Graphics.h"
 #include "sunspot/util/Cube.h"
-#include "sunspot/core/Animations.h"
 
 namespace sunspot
 {
@@ -24,6 +25,8 @@ struct Time
 class Game
 {
   public:
+	Game( Config& config );
+
 	GlfwWindow& get_window() { return window; }
 
 	graphics::Graphics& get_graphics() { return graphics; }
@@ -36,6 +39,8 @@ class Game
 
 	void set_gltf( gltfspot::Gltf&& g ) { gltf = std::move( g ); }
 
+	void set_size( const mathspot::Size& s );
+
 	void add( Entity& e );
 
 	void handle( input::Input&& in );
@@ -45,16 +50,18 @@ class Game
   private:
 	const float compute_delta_time();
 
+	Config& config;
+
 	Time time = {};
 
-	GlfwWindow window = { *this };
+	GlfwWindow window = { *this, config.project.name, config.window.size };
 	ImGui      gui    = { window };
 	Editor     editor;
 
 	gltfspot::Gltf gltf = gltfspot::Gltf( nlohmann::json::parse( util::cube ) );
 
 	Collisions         collisions = {};
-	Animations animations = {};
+	Animations         animations = {};
 	graphics::Graphics graphics   = {};
 };
 

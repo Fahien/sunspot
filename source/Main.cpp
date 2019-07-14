@@ -38,8 +38,6 @@ using namespace pyspot;
 using namespace mathspot;
 using namespace logspot;
 
-static int  scale{ 1 };
-static Size windowSize{ 960, 540 };
 
 static float fov{ 45.0f };
 static float kNear{ 0.125f };
@@ -64,25 +62,6 @@ void print_logo()
     \\|_________|                   \\|_________|                       \\|__| " );
 }
 
-
-/// @return A config file, creating it if not found
-std::variant<nlohmann::json, dataspot::Error> load_config( const std::string& path )
-{
-	// read a JSON file
-	nlohmann::json j;
-
-	fst::Ifstream i{ path };
-	if ( i.IsOpen() )
-	{
-		i >> j;
-	}
-	else
-	{
-		j = j.parse( sunspot::util::config );
-	}
-
-	return j;
-}
 
 gst::Gltf::Camera create_default_camera( const sunspot::Config& config )
 {
@@ -116,18 +95,18 @@ int main( const int argc, const char** argv )
 		// Get command line args
 		auto args = CliArgs( argc, argv );
 
-		// Load config
-		auto load_result = load_config( args.project.config.path );
-		auto config_file = std::get_if<nlohmann::json>( &load_result );
-
 		// Get config values
-		Config config{ *config_file };
+		Config config{ args };
+
+		if ( config.project.name.empty() )
+		{
+			config.project.name = args.project.name;
+		}
 
 		// Script has to be initialized before loading the entities
 		Script::initialize( args.project.script.path );
 
-		Game game;
-
+		Game game{ config };
 
 		if ( args.project.name != "cube" )
 		{
@@ -145,7 +124,7 @@ int main( const int argc, const char** argv )
 				auto node        = gst::Gltf::Node();
 				node.pCamera     = &cameras[0];
 				node.name        = "Camera";
-				node.translation = Vec3{ 1.0f, 1.0f, 3.0f };
+				node.translation = Vec3{ -0.8f, 1.2f, 5.4f };
 
 				auto& nodes = gltf.GetNodes();
 				node.index  = nodes.size();
@@ -163,8 +142,9 @@ int main( const int argc, const char** argv )
 				node.name          = "Light";
 				node.light_index   = 0;
 				node.index         = nodes.size();
-				node.translation.x = 1.0f;
-				node.translation.z = 2.0f;
+				node.translation.x = -1.0f;
+				node.translation.y = 1.0f;
+				node.translation.z = 1.0f;
 
 				nodes.push_back( node );
 				scene->nodes_indices.push_back( nodes.size() - 1 );
@@ -172,6 +152,21 @@ int main( const int argc, const char** argv )
 				// Reload scene nodes
 				gltf.load_nodes();
 			}
+			else
+			{
+				for ( auto& camera : cameras )
+				{
+					if ( camera.type == gst::Gltf::Camera::Type::Perspective )
+					{
+						if ( camera.perspective.aspectRatio == 0.0f )
+						{
+							float aspect_ratio{ static_cast<float>( config.window.size.width ) / config.window.size.height };
+							camera.perspective.aspectRatio = aspect_ratio;
+						}
+					}
+				}
+			}
+
 
 			game.set_gltf( std::move( gltf ) );
 		}

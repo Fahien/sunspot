@@ -130,8 +130,8 @@ mst::Mat4 create_projection_matrix( const gst::Gltf::Camera& camera )
 		float cotfov{ 1.0f / std::tan( 0.5f * y ) };
 		projection[0]  = cotfov / a;
 		projection[5]  = cotfov;
-		projection[10] = -( n + f ) / ( f - n );
-		projection[14] = -2.0f * n * f / ( f - n );
+		projection[10] = ( n + f ) / ( n - f );
+		projection[14] = 2.0f * n * f / ( n - f);
 		projection[11] = -1.0f;
 	}
 	else
