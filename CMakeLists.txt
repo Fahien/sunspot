@@ -138,14 +138,17 @@ set(EXPORT_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Type.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/core/Gui.h
 	${MATHSPOT_INCLUDE_DIR}/mathspot/Math.h
+	${GLTFSPOT_INCLUDE_DIR}/gltfspot/Node.h
 )
 
+message(STATUS "Gltf include dirs ${GLTFSPOT_INCLUDE_DIRS}")
 # Generation command
 set( COMMAND_ARGS
 	${EXPORT_HEADERS} -o sunspot
 	-- -xc++ -std=c++17 -DPY_MAJOR_VERSION=3
 	-I${DEPENDENCY_INCLUDE_DIRS}
 	-I${MATHSPOT_INCLUDE_DIRS}
+	-I${GLTFSPOT_INCLUDE_DIRS}
 	-I${IMGUI_INCLUDE_DIR}
 )
 
@@ -161,7 +164,7 @@ add_custom_command(OUTPUT ${GEN_SOURCES}
 #add_custom_target(gen_bindings SOURCES always)
 add_library( bindings ${GEN_SOURCES} )
 target_link_libraries( bindings ${PYSPOT_LIBRARIES})
-target_include_directories( bindings PUBLIC ${DEPENDENCY_INCLUDE_DIRS} ${MATHSPOT_INCLUDE_DIRS} ${IMGUI_INCLUDE_DIR})
+target_include_directories( bindings PUBLIC ${DEPENDENCY_INCLUDE_DIRS} ${MATHSPOT_INCLUDE_DIRS} ${GLTFSPOT_INCLUDE_DIRS} ${IMGUI_INCLUDE_DIR})
 
 # Sources
 set(SOURCES
@@ -174,6 +177,7 @@ set(SOURCES
 	source/core/String.cpp
 	source/core/Collisions.cpp
 	source/core/Animations.cpp
+	source/core/Scripts.cpp
 	source/Cursor.h
 	source/Cursor.cpp
 	source/graphics/Texture.cpp

@@ -63,14 +63,14 @@ void print_logo()
 }
 
 
-gst::Gltf::Camera create_default_camera( const sunspot::Config& config )
+gst::Camera create_default_camera( const sunspot::Config& config )
 {
-	auto camera = gst::Gltf::Camera();
+	auto camera = gst::Camera();
 	camera.name = "Default";
-	camera.type = gst::Gltf::Camera::Type::Perspective;
+	camera.type = gst::Camera::Type::Perspective;
 
 	float aspect_ratio{ static_cast<float>( config.window.size.width ) / config.window.size.height };
-	camera.perspective.aspectRatio = aspect_ratio;
+	camera.perspective.aspect_ratio = aspect_ratio;
 
 	float fov{ radians( 45.0f ) };
 	camera.perspective.yfov = fov;
@@ -104,7 +104,7 @@ int main( const int argc, const char** argv )
 		}
 
 		// Script has to be initialized before loading the entities
-		Script::initialize( args.project.script.path );
+		Script::init( args.project.script.path );
 
 		Game game{ config };
 
@@ -113,7 +113,7 @@ int main( const int argc, const char** argv )
 			auto gltf_path = args.project.path + "/" + args.project.name + ".gltf";
 			auto gltf      = gst::Gltf::Load( gltf_path );
 
-			auto& cameras = gltf.GetCameras();
+			auto& cameras = gltf.get_cameras();
 			if ( cameras.empty() )
 			{
 				// Create default camera
@@ -121,12 +121,12 @@ int main( const int argc, const char** argv )
 				cameras.push_back( camera );
 
 				// Create node for camera
-				auto node        = gst::Gltf::Node();
-				node.pCamera     = &cameras[0];
+				auto node        = gst::Node();
+				node.camera      = &cameras[0];
 				node.name        = "Camera";
 				node.translation = Vec3{ -0.8f, 1.2f, 5.4f };
 
-				auto& nodes = gltf.GetNodes();
+				auto& nodes = gltf.get_nodes();
 				node.index  = nodes.size();
 				nodes.push_back( node );
 
@@ -134,11 +134,11 @@ int main( const int argc, const char** argv )
 				scene->nodes_indices.push_back( nodes.size() - 1 );
 
 				// Create default light
-				auto  light  = gst::Gltf::Light();
+				auto  light  = gst::Light();
 				auto& lights = gltf.get_lights();
 				lights.push_back( light );
 
-				node               = gst::Gltf::Node();
+				node               = gst::Node();
 				node.name          = "Light";
 				node.light_index   = 0;
 				node.index         = nodes.size();
@@ -156,12 +156,12 @@ int main( const int argc, const char** argv )
 			{
 				for ( auto& camera : cameras )
 				{
-					if ( camera.type == gst::Gltf::Camera::Type::Perspective )
+					if ( camera.type == gst::Camera::Type::Perspective )
 					{
-						if ( camera.perspective.aspectRatio == 0.0f )
+						if ( camera.perspective.aspect_ratio == 0.0f )
 						{
 							float aspect_ratio{ static_cast<float>( config.window.size.width ) / config.window.size.height };
-							camera.perspective.aspectRatio = aspect_ratio;
+							camera.perspective.aspect_ratio = aspect_ratio;
 						}
 					}
 				}

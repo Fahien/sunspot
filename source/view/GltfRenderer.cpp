@@ -27,14 +27,14 @@ void GltfRenderer::set_gltf( Gltf& gltf )
 	{
 		m_Gltf = &gltf;
 		m_Meshes.clear();
-		for ( auto& m : gltf.GetMeshes() )
+		for ( auto& m : gltf.get_meshes() )
 		{
 			GltfMesh mesh{ gltf, m };
 			m_Meshes.emplace( &m, move( mesh ) );
 		}
 
 		cameras.clear();
-		for ( auto& c : gltf.GetCameras() )
+		for ( auto& c : gltf.get_cameras() )
 		{
 			auto camera = GltfCamera::create( c );
 			cameras.emplace( &c, std::move( camera ) );
@@ -54,7 +54,7 @@ GltfRenderer::GltfRenderer( GltfRenderer&& other )
 GltfRenderer::~GltfRenderer() {}
 
 
-void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Gltf::Light& light, const mst::Mat4& transform )
+void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Light& light, const mst::Mat4& transform )
 {
 	GLuint location{ shader.GetLocation( "pointLightActive" ) };
 	glUniform1i( location, true );
@@ -73,7 +73,7 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Glt
 }
 
 
-void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::Node& node, const Mat4& transform )
+void GltfRenderer::draw( const graphics::shader::Program& shader, const Node& node, const Mat4& transform )
 {
 	// Current transform
 	Mat4 tTransform{ node.matrix };
@@ -92,9 +92,9 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::No
 	}
 
 	// Render the node
-	if ( node.pMesh )
+	if ( node.mesh )
 	{
-		auto& mesh = m_Meshes[node.pMesh];
+		auto& mesh = m_Meshes[node.mesh];
 		for ( auto& primitive : mesh.GetPrimitives() )
 		{
 			primitive.SetMatrix( tTransform );
@@ -103,9 +103,9 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::No
 	}
 
 	// Whether it is a camera
-	if ( node.pCamera )
+	if ( node.camera )
 	{
-		draw( shader, *node.pCamera, tTransform );
+		draw( shader, *node.camera, tTransform );
 	}
 
 	// Whether it has a light
@@ -116,14 +116,14 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const Gltf::No
 }
 
 
-mst::Mat4 create_projection_matrix( const gst::Gltf::Camera& camera )
+mst::Mat4 create_projection_matrix( const gst::Camera& camera )
 {
 	mst::Mat4 projection;
 
-	if ( camera.type == gst::Gltf::Camera::Type::Perspective )
+	if ( camera.type == gst::Camera::Type::Perspective )
 	{
 		auto y = camera.perspective.yfov;
-		auto a = camera.perspective.aspectRatio;
+		auto a = camera.perspective.aspect_ratio;
 		auto n = camera.perspective.znear;
 		auto f = camera.perspective.zfar;
 
@@ -144,7 +144,7 @@ mst::Mat4 create_projection_matrix( const gst::Gltf::Camera& camera )
 	return projection;
 }
 
-void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Gltf::Camera& camera,
+void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Camera& camera,
                          const mst::Mat4& transform )
 {
 	auto view = transform;

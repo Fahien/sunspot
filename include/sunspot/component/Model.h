@@ -15,18 +15,18 @@ namespace sunspot::component
 class Model : public Object
 {
   public:
-	Model( gst::Gltf::Node& node, GltfRenderer& renderer )
+	Model( gst::Node& node, GltfRenderer& renderer )
 	: mNode     { node     }
 	, mRenderer { renderer }
 	{}
 
 	~Model() {}
 
-	gst::Gltf::Node&  GetNode()     { return mNode;     }
+	gst::Node&  GetNode()     { return mNode;     }
 	GltfRenderer&     GetRenderer() { return mRenderer; }
 
   private:
-	gst::Gltf::Node  mNode;
+	gst::Node  mNode;
 	GltfRenderer&    mRenderer;
 };
 

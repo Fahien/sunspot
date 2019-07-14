@@ -15,11 +15,11 @@ GltfCamera& GltfPerspectiveCamera::Default()
 	return camera;
 }
 
-std::unique_ptr<GltfCamera> GltfCamera::create( gltfspot::Gltf::Camera& c )
+std::unique_ptr<GltfCamera> GltfCamera::create( gltfspot::Camera& c )
 {
-	if ( c.type == gltfspot::Gltf::Camera::Type::Perspective )
+	if ( c.type == gltfspot::Camera::Type::Perspective )
 	{
-		return std::make_unique<GltfPerspectiveCamera>( c.perspective.aspectRatio, c.perspective.yfov, c.perspective.zfar,
+		return std::make_unique<GltfPerspectiveCamera>( c.perspective.aspect_ratio, c.perspective.yfov, c.perspective.zfar,
 		                                                c.perspective.znear );
 	}
 

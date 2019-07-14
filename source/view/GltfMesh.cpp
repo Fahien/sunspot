@@ -16,7 +16,7 @@ GltfMesh::GltfMesh( GltfMesh&& other )
 }
 
 
-GltfMesh::GltfMesh( Gltf& model, Gltf::Mesh& mesh )
+GltfMesh::GltfMesh( Gltf& model, Mesh& mesh )
     : mName{ mesh.name }
 {
 	for ( auto p : mesh.primitives )

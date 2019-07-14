@@ -8,6 +8,8 @@
 #include <pyspot/Module.h>
 #include <pyspot/Tuple.h>
 
+#include <gltfspot/Gltf.h>
+
 #include "sunspot/entity/Object.h"
 #include "sunspot/input/Input.h"
 
@@ -16,32 +18,27 @@ PyMODINIT_FUNC InitPySpot();
 
 namespace pst = pyspot;
 
-
 namespace sunspot
 {
 class Entity;
 
-class Script : public Object
+class Script
 {
   public:
-	Script( const int id, std::string& name, Entity& entity );
-	Script( Entity& entity );
+	Script( const std::string& uri );
 
-	virtual ~Script() = default;
+	void init( gltfspot::Node& n );
+	void handle( gltfspot::Node& n, const input::Input& i );
+	void collide( gltfspot::Node& a, gltfspot::Node& b );
+	void update( gltfspot::Node& n, const float delta );
 
-	void initialize();
-	void handle( const input::Input& input );
-	void collide( Entity& other );
-	void update( const float delta );
-
-	static void initialize( const std::string& script_path );
+	static void init( const std::string& script_path = "." );
 
   private:
 	static std::unique_ptr<pst::Interpreter> interpreter;
 
-	Entity&     entity;
 	pst::Module module;
-	pst::Tuple  args{ 1 };
+	pst::Tuple  args = { 2 };
 };
 
 

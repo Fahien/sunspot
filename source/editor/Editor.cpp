@@ -4,7 +4,7 @@
 
 namespace sunspot
 {
-void Editor::draw_transform( gltfspot::Gltf::Node& node )
+void Editor::draw_transform( gltfspot::Node& node )
 {
 	using namespace ImGui;
 
@@ -18,16 +18,16 @@ void Editor::draw_transform( gltfspot::Gltf::Node& node )
 }
 
 
-void Editor::draw( gltfspot::Gltf::Camera& camera )
+void Editor::draw( gltfspot::Camera& camera )
 {
 	using namespace ImGui;
 
 	if ( TreeNodeEx( &camera, 0, "Camera" ) )
 	{
-		if ( camera.type == gltfspot::Gltf::Camera::Type::Perspective )
+		if ( camera.type == gltfspot::Camera::Type::Perspective )
 		{
 			DragFloat( "Y Fov", &camera.perspective.yfov, 0.125f, 0.0f, 3.25f, "%.2f" );
-			DragFloat( "Aspect Ratio", &camera.perspective.aspectRatio, 0.125f, 0.125f, 2.0f, "%.3f" );
+			DragFloat( "Aspect Ratio", &camera.perspective.aspect_ratio, 0.125f, 0.125f, 2.0f, "%.3f" );
 			DragFloat( "Z Near", &camera.perspective.znear, 0.125f, 0.125f, 1.0f, "%.3f" );
 			DragFloat( "Z Far", &camera.perspective.zfar, 1.0f, 2.0f, 256.0f, "%.0f" );
 		}
@@ -44,7 +44,7 @@ void Editor::draw( gltfspot::Gltf::Camera& camera )
 }
 
 
-void Editor::draw( gltfspot::Gltf::Light& light )
+void Editor::draw( gltfspot::Light& light )
 {
 	using namespace ImGui;
 
@@ -56,7 +56,7 @@ void Editor::draw( gltfspot::Gltf::Light& light )
 }
 
 
-void Editor::draw( gltfspot::Gltf::Mesh& mesh )
+void Editor::draw( gltfspot::Mesh& mesh )
 {
 	using namespace ImGui;
 
@@ -79,7 +79,7 @@ void Editor::draw( gltfspot::Gltf::Mesh& mesh )
 }
 
 
-void Editor::draw( gltfspot::Gltf::Node& node )
+void Editor::draw( gltfspot::Node& node )
 {
 	using namespace ImGui;
 
@@ -105,7 +105,7 @@ void Editor::draw( gltfspot::Gltf::Node& node )
 		if ( auto payload = AcceptDragDropPayload( "GLTF_NODE" ) )
 		{
 			IM_ASSERT( payload->DataSize == sizeof( &node ) );
-			auto payload_node = *reinterpret_cast<gltfspot::Gltf::Node**>( payload->Data );
+			auto payload_node = *reinterpret_cast<gltfspot::Node**>( payload->Data );
 			payload_node->remove_from_parent();
 
 			// Add payload node to new parent
@@ -125,9 +125,9 @@ void Editor::draw( gltfspot::Gltf::Node& node )
 	{
 		draw_transform( node );
 
-		if ( node.pCamera )
+		if ( node.camera )
 		{
-			draw( *node.pCamera );
+			draw( *node.camera );
 		}
 
 		if ( node.light )
@@ -135,9 +135,9 @@ void Editor::draw( gltfspot::Gltf::Node& node )
 			draw( *node.light );
 		}
 
-		if ( node.pMesh )
+		if ( node.mesh )
 		{
-			draw( *node.pMesh );
+			draw( *node.mesh );
 		}
 
 		// Children
@@ -190,7 +190,7 @@ void Editor::draw( gltfspot::Gltf& gltf )
 					}
 					else
 					{
-						auto selected_node = reinterpret_cast<gltfspot::Gltf::Node*>( selected );
+						auto selected_node = reinterpret_cast<gltfspot::Node*>( selected );
 						selected_node->create_child( "New" );
 					}
 
@@ -214,7 +214,7 @@ void Editor::draw( gltfspot::Gltf& gltf )
 			if ( auto payload = AcceptDragDropPayload( "GLTF_NODE" ) )
 			{
 				IM_ASSERT( payload->DataSize == sizeof( void* ) );
-				auto payload_node = *reinterpret_cast<gltfspot::Gltf::Node**>( payload->Data );
+				auto payload_node = *reinterpret_cast<gltfspot::Node**>( payload->Data );
 				payload_node->remove_from_parent();
 
 				// Add payload node to new parent (scene)

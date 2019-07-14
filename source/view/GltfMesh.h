@@ -22,7 +22,7 @@ class GltfMesh
 
 	GltfMesh( GltfMesh&& other );
 
-	GltfMesh( gst::Gltf& model, gst::Gltf::Mesh& mesh );
+	GltfMesh( gst::Gltf& model, gst::Mesh& mesh );
 
 	/// @return The name
 	const std::string& GetName() const { return mName; }

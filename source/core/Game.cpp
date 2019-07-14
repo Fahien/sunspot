@@ -20,11 +20,11 @@ void Game::set_size( const mathspot::Size& size )
 {
 	graphics.set_viewport( { {}, size } );
 
-	for ( auto& camera : gltf.GetCameras() )
+	for ( auto& camera : gltf.get_cameras() )
 	{
-		if ( camera.type == gst::Gltf::Camera::Type::Perspective )
+		if ( camera.type == gst::Camera::Type::Perspective )
 		{
-			camera.perspective.aspectRatio = static_cast<float>( size.width ) / size.height;
+			camera.perspective.aspect_ratio = static_cast<float>( size.width ) / size.height;
 		}
 	}
 }
@@ -67,6 +67,8 @@ void Game::loop()
 			// Update node's components
 			// entity->Update( delta );
 		}
+
+		scripts.update( gltf, delta );
 
 		animations.update( delta, gltf );
 

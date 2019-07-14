@@ -7,23 +7,23 @@ using namespace mathspot;
 using namespace gltfspot;
 
 
-GLenum to_gl_mode( const Gltf::Mesh::Primitive::Mode& mode )
+GLenum to_gl_mode( const Mesh::Primitive::Mode& mode )
 {
 	switch ( mode )
 	{
-		case Gltf::Mesh::Primitive::Mode::POINTS:
+		case Mesh::Primitive::Mode::POINTS:
 			return GL_POINTS;
-		case Gltf::Mesh::Primitive::Mode::LINES:
+		case Mesh::Primitive::Mode::LINES:
 			return GL_LINES;
-		case Gltf::Mesh::Primitive::Mode::LINE_LOOP:
+		case Mesh::Primitive::Mode::LINE_LOOP:
 			return GL_LINE_LOOP;
-		case Gltf::Mesh::Primitive::Mode::LINE_STRIP:
+		case Mesh::Primitive::Mode::LINE_STRIP:
 			return GL_LINE_STRIP;
-		case Gltf::Mesh::Primitive::Mode::TRIANGLES:
+		case Mesh::Primitive::Mode::TRIANGLES:
 			return GL_TRIANGLES;
-		case Gltf::Mesh::Primitive::Mode::TRIANGLE_STRIP:
+		case Mesh::Primitive::Mode::TRIANGLE_STRIP:
 			return GL_TRIANGLE_STRIP;
-		case Gltf::Mesh::Primitive::Mode::TRIANGLE_FAN:
+		case Mesh::Primitive::Mode::TRIANGLE_FAN:
 			return GL_TRIANGLE_FAN;
 		default:
 			return GL_TRIANGLES;
@@ -76,7 +76,7 @@ GltfPrimitive::GltfPrimitive( GltfPrimitive&& other )
 }
 
 
-void GltfPrimitive::readIndices( Gltf& model, Gltf::Mesh::Primitive& primitive )
+void GltfPrimitive::readIndices( Gltf& model, Mesh::Primitive& primitive )
 {
 	auto indicesIndex = primitive.indices;
 	if ( indicesIndex < 0 )
@@ -115,7 +115,7 @@ void GltfPrimitive::readIndices( Gltf& model, Gltf::Mesh::Primitive& primitive )
 }
 
 
-GltfPrimitive::GltfPrimitive( Gltf& model, Gltf::Mesh::Primitive& primitive )
+GltfPrimitive::GltfPrimitive( Gltf& model, Mesh::Primitive& primitive )
     : mMode{ to_gl_mode( primitive.mode ) }
     , mMatrix{ Mat4::identity.matrix }
 {
@@ -153,14 +153,14 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Gltf::Mesh::Primitive& primitive )
 
 		GLenum componentType{ to_gl_component_type( accessor.componentType ) };
 
-		if ( attribute.first == Gltf::Mesh::Primitive::Semantic::NORMAL )
+		if ( attribute.first == Mesh::Primitive::Semantic::NORMAL )
 		{
 			glEnableVertexAttribArray( 1 );  // Vertex Normals
 			GLvoid* offset{ reinterpret_cast<GLvoid*>( accessor.byteOffset ) };
 			auto    stride = static_cast<GLsizei>( bufferView.byteStride );
 			glVertexAttribPointer( 1, 3, componentType, GL_FALSE, stride, offset );
 		}
-		else if ( attribute.first == Gltf::Mesh::Primitive::Semantic::POSITION )
+		else if ( attribute.first == Mesh::Primitive::Semantic::POSITION )
 		{
 			glEnableVertexAttribArray( 0 );  // Vertex Position
 			GLvoid* offset{ reinterpret_cast<GLvoid*>( accessor.byteOffset ) };
@@ -169,14 +169,14 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Gltf::Mesh::Primitive& primitive )
 
 			vertex_count += 3;
 		}
-		else if ( attribute.first == Gltf::Mesh::Primitive::Semantic::TEXCOORD_0 )
+		else if ( attribute.first == Mesh::Primitive::Semantic::TEXCOORD_0 )
 		{
 			glEnableVertexAttribArray( 2 );  // Tex coords
 			GLvoid* offset{ reinterpret_cast<GLvoid*>( accessor.byteOffset ) };
 			auto    stride = static_cast<GLsizei>( bufferView.byteStride );
 			glVertexAttribPointer( 2, 2, componentType, GL_FALSE, stride, offset );
 		}
-		else if ( attribute.first == Gltf::Mesh::Primitive::Semantic::COLOR_0 )
+		else if ( attribute.first == Mesh::Primitive::Semantic::COLOR_0 )
 		{
 			mHasVertexColors = true;
 			glEnableVertexAttribArray( 3 );  // Color

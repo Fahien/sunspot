@@ -24,7 +24,7 @@ class GltfPrimitive
 	GltfPrimitive( GltfPrimitive&& other );
 
 	/// Normal constructor
-	GltfPrimitive( gst::Gltf& model, gst::Gltf::Mesh::Primitive& primitive );
+	GltfPrimitive( gst::Gltf& model, gst::Mesh::Primitive& primitive );
 
 	/// Destructor
 	~GltfPrimitive();
@@ -34,7 +34,7 @@ class GltfPrimitive
 	void Draw( const graphics::shader::Program& shader ) const;
 
   private:
-	void readIndices( gst::Gltf& model, gst::Gltf::Mesh::Primitive& primitive );
+	void readIndices( gst::Gltf& model, gst::Mesh::Primitive& primitive );
 
 	bool                     mHasVao{};
 	GLuint                   mVao{};

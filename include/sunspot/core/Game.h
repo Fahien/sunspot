@@ -5,6 +5,7 @@
 
 #include "sunspot/core/Animations.h"
 #include "sunspot/core/Collisions.h"
+#include "sunspot/core/Scripts.h"
 #include "sunspot/core/Config.h"
 #include "sunspot/core/GlfwWindow.h"
 #include "sunspot/core/Gui.h"
@@ -61,6 +62,7 @@ class Game
 	gltfspot::Gltf gltf = gltfspot::Gltf( nlohmann::json::parse( util::cube ) );
 
 	Collisions         collisions = {};
+	Scripts            scripts    = {};
 	Animations         animations = {};
 	graphics::Graphics graphics   = {};
 };

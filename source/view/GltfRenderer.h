@@ -30,19 +30,19 @@ class GltfRenderer
 
 	void draw( const graphics::shader::Program& shader );
 
-	void draw( const graphics::shader::Program& shader, const gst::Gltf::Node& node,
+	void draw( const graphics::shader::Program& shader, const gst::Node& node,
 	           const mst::Mat4& transform = mst::Mat4::identity );
 
-	void draw( const graphics::shader::Program& shader, const gst::Gltf::Camera& camera,
+	void draw( const graphics::shader::Program& shader, const gst::Camera& camera,
 	           const mst::Mat4& transform = mst::Mat4::identity );
 
-	void draw( const graphics::shader::Program& shader, const gst::Gltf::Light& light, const mst::Mat4& transform );
+	void draw( const graphics::shader::Program& shader, const gst::Light& light, const mst::Mat4& transform );
 
   private:
 	// TODO either GLTF and GLTF Meshes should go somewhere else
 	gst::Gltf*                                                          m_Gltf   = {};
-	std::unordered_map<gst::Gltf::Mesh*, GltfMesh>                      m_Meshes = {};
-	std::unordered_map<gst::Gltf::Camera*, std::unique_ptr<GltfCamera>> cameras  = {};
+	std::unordered_map<gst::Mesh*, GltfMesh>                      m_Meshes = {};
+	std::unordered_map<gst::Camera*, std::unique_ptr<GltfCamera>> cameras  = {};
 };
 
 }  // namespace sunspot

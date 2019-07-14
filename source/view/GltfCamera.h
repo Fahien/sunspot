@@ -12,7 +12,7 @@ class GltfCamera
 {
   public:
 	GltfCamera() {}
-	static std::unique_ptr<GltfCamera> create( gltfspot::Gltf::Camera& c );
+	static std::unique_ptr<GltfCamera> create( gltfspot::Camera& c );
 
 	void Translate( const mathspot::Vec3& t );
 	void Rotate( const mathspot::Quat& q );
