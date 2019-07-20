@@ -1,9 +1,0 @@
-{
-	"namespace": "input",
-	"name": "Type",
-	"values": {
-		"INVALID": 0,
-		"KEY"    : 1,
-		"MOTION" : 2
-	}
-}
