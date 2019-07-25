@@ -116,8 +116,6 @@ source_group("shader" FILES ${SHADERS})
 
 # Pyspot extension files
 set(GEN_SOURCES
-	${CMAKE_CURRENT_BINARY_DIR}/include/pyspot/Bindings.h
-	${CMAKE_CURRENT_BINARY_DIR}/include/pyspot/Extension.h
 	${CMAKE_CURRENT_BINARY_DIR}/src/pyspot/Bindings.cpp
 	${CMAKE_CURRENT_BINARY_DIR}/src/pyspot/Extension.cpp)
 
@@ -130,15 +128,12 @@ endfunction()
 
 # Sources to export
 set(EXPORT_HEADERS
-	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/component/Rigidbody.h
-	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/component/Transform.h
-	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Action.h
-	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Input.h
-	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Key.h
-	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/input/Type.h
-	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/core/Gui.h
-	${MATHSPOT_INCLUDE_DIR}/mathspot/Math.h
-	${GLTFSPOT_INCLUDE_DIR}/gltfspot/Node.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/util/Export.hpp
+)
+
+# Includes for export
+set(EXPORT_INCLUDES
+	${DEPENDENCY_INCLUDE_DIRS} ${MATHSPOT_INCLUDE_DIRS} ${GLTFSPOT_INCLUDE_DIRS} ${IMGUI_INCLUDE_DIR} ${PYSPOT_INCLUDE_DIRS}
 )
 
 message(STATUS "Gltf include dirs ${GLTFSPOT_INCLUDE_DIRS}")
@@ -153,7 +148,7 @@ set( COMMAND_ARGS
 )
 
 add_custom_command(OUTPUT ${GEN_SOURCES}
-	COMMAND /Users/admin/Documents/C++/llvm/build/release/bin/pywrap
+	COMMAND pywrap
 	ARGS ${COMMAND_ARGS}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	COMMENT "Generating Bindings and Extension"
@@ -161,10 +156,27 @@ add_custom_command(OUTPUT ${GEN_SOURCES}
 	VERBATIM
 )
 
-#add_custom_target(gen_bindings SOURCES always)
 add_library( bindings ${GEN_SOURCES} )
 target_link_libraries( bindings ${PYSPOT_LIBRARIES})
-target_include_directories( bindings PUBLIC ${DEPENDENCY_INCLUDE_DIRS} ${MATHSPOT_INCLUDE_DIRS} ${GLTFSPOT_INCLUDE_DIRS} ${IMGUI_INCLUDE_DIR})
+target_include_directories( bindings PUBLIC ${EXPORT_INCLUDES})
+
+set(EXPORT_LIBRARIES
+	$<TARGET_FILE:pyspot>
+	$<TARGET_FILE:mathspot>
+	$<TARGET_FILE:gltfspot>
+	$<TARGET_FILE:sunspot-lib>
+)
+
+# Build extension module with distutils
+find_package(Python3 COMPONENTS Interpreter)
+add_custom_command( OUTPUT sunspot.so
+COMMAND ${Python3_EXECUTABLE}
+ARGS ${CMAKE_CURRENT_SOURCE_DIR}/script/build-module.py sunspot ${GEN_SOURCES} --includes ${EXPORT_INCLUDES} --libraries ${EXPORT_LIBRARIES}
+WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/script
+COMMENT "Building python module"
+COMMAND_EXPAND_LISTS
+)
+add_custom_target(gen_bindings SOURCES sunspot.so)
 
 # Sources
 set(SOURCES

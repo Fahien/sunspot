@@ -65,10 +65,6 @@ int main( int argc, char** argv )
 
 		game.get_graphics().add_model( &model );
 
-		Entity model_entity{};
-		model_entity.add( model );
-		game.add( model_entity );
-
 		/// Render to texture
 		/// Compare it with a reference
 

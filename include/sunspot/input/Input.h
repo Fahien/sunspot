@@ -1,13 +1,13 @@
 #ifndef SST_INPUT_INPUT_H_
 #define SST_INPUT_INPUT_H_
 
+#define PYSPOT_EXPORT __attribute__( ( annotate( "pyspot" ) ) )
+
 #include "mathspot/Math.h"
 
 #include "sunspot/input/Type.h"
 #include "sunspot/input/Key.h"
 #include "sunspot/input/Action.h"
-
-#include "sunspot/util/Export.h"
 
 namespace sunspot::input
 {

@@ -1,11 +1,11 @@
 #ifndef SST_GUI_H_
 #define SST_GUI_H_
 
+#define PYSPOT_EXPORT __attribute__( ( annotate( "pyspot" ) ) )
+
 #include <functional>
 
 #include <imgui/imgui.h>
-
-#include "sunspot/util/Export.h"
 
 namespace sunspot
 {

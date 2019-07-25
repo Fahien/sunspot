@@ -5,6 +5,7 @@
 
 #include <hitspot/BoundingBox.h>
 #include <hitspot/CollisionSystem.h>
+#include <gltfspot/Gltf.h>
 
 namespace hst = hitspot;
 
@@ -20,10 +21,12 @@ class Collisions
 	void add( Entity& e );
 
 	/// @brief Updates collisions
-	void update();
+	void update( gltfspot::Gltf::Scene& scene);
+	void update( const gltfspot::Node& node, const mathspot::Mat4& transform = mathspot::Mat4::identity );
 
+	void resolve();
   private:
-	std::unordered_map<Entity*, hst::BoundingBox> boxes{};
+	std::vector<gltfspot::Shape*> shapes = {};
 
 	hst::CollisionSystem system{};
 };

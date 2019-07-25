@@ -42,8 +42,6 @@ class Game
 
 	void set_size( const mathspot::Size& s );
 
-	void add( Entity& e );
-
 	void handle( input::Input&& in );
 
 	void loop();

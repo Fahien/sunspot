@@ -4,13 +4,12 @@
 #include <mathspot/Math.h>
 #include <sunspot/entity/Object.h>
 
-#include "sunspot/util/Export.h"
+#define PYSPOT_EXPORT __attribute__( ( annotate( "pyspot" ) ) )
 
 namespace sunspot::component
 {
-class PYSPOT_EXPORT Rigidbody : public Object
+struct PYSPOT_EXPORT Rigidbody
 {
-  public:
 	int            id;
 	mathspot::Vec3 velocity;
 };

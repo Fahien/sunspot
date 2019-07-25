@@ -27,7 +27,31 @@ void Scripts::set_gltf( gltfspot::Gltf& g )
 			{
 				auto& script = scripts[script_index];
 				script.init( *node );
+
+				// Collision callbacks
+				if ( node->bounds )
+				{
+					node->bounds->colliding_with = [node, &script]( const gltfspot::Shape& s ) {
+						if ( s.node )
+						{
+							script.collide( *node, *s.node );
+						}
+					};
+				}
 			}
+		}
+	}
+}
+
+
+void Scripts::handle( input::Input& in )
+{
+	for ( auto node : gltf->GetScene()->nodes )
+	{
+		for ( auto script_index : node->scripts_indices )
+		{
+			auto& script = scripts[script_index];
+			script.handle( *node, in );
 		}
 	}
 }

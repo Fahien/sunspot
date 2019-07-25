@@ -15,9 +15,14 @@ namespace sunspot
 class Scripts
 {
   public:
-	void update( gltfspot::Gltf& g, float delta );
+	std::vector<Script*> get_active_scripts() const;
 
 	void set_gltf( gltfspot::Gltf& g );
+
+	void handle( input::Input& i );
+
+	void update( gltfspot::Gltf& g, float delta );
+
 
   private:
 

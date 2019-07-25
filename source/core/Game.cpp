@@ -10,12 +10,6 @@ Game::Game( Config& c )
 {
 }
 
-void Game::add( Entity& e )
-{
-	collisions.add( e );
-}
-
-
 void Game::set_size( const mathspot::Size& size )
 {
 	graphics.set_viewport( { {}, size } );
@@ -32,11 +26,7 @@ void Game::set_size( const mathspot::Size& size )
 
 void Game::handle( input::Input&& in )
 {
-	for ( auto node : get_scene().nodes )
-	{
-		// TODO get script component to handle input
-		// entity->Handle( in );
-	}
+	scripts.handle( in );
 }
 
 
@@ -56,7 +46,7 @@ void Game::loop()
 		window.PollEvents();
 		window.UpdateSize();
 
-		collisions.update();
+		collisions.update( get_scene() );
 
 		auto delta = compute_delta_time();
 

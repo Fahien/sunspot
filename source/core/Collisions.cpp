@@ -5,50 +5,90 @@
 
 namespace sunspot
 {
-void Collisions::add( Entity& entity )
+void Collisions::update( const gltfspot::Node& node, const mathspot::Mat4& transform )
 {
-	// Check whether the entity has a collider
-	if ( auto c = entity.get<component::Collider>() )
+	// Current transform
+	auto temp_transform = node.matrix;
+	temp_transform.Scale( node.scale );
+	temp_transform.Rotate( node.rotation );
+	temp_transform.Translate( node.translation );
+	temp_transform = transform * temp_transform;
+
+	for ( auto child : node.children )
 	{
-		// Put a copy of the bounding box in the map
-		auto pair = boxes.emplace( &entity, c->GetBoundingBox() );
+		update( *child, temp_transform );
+	}
 
-		// If it was successfull
-		auto& success = pair.second;
-		if ( success )
-		{
-			auto& box = pair.first->second;
-
-			// Set callback
-			box.fStartCollidingWith = [&entity]( hst::BoundingBox* other ) {
-				entity.Collide( *reinterpret_cast<Entity*>( other->GetPayload() ) );
-			};
-
-			// Add that copy to the collision system
-			system.AddBox( &box );
-		}
+	// Save its shape
+	if ( node.bounds )
+	{
+		node.bounds->set_matrix( temp_transform );
+		shapes.emplace_back( node.bounds );
 	}
 }
 
-
-void Collisions::update()
+void Collisions::update( gltfspot::Gltf::Scene& scene )
 {
-	// Update boxes
-	for ( auto& pair : boxes )
+	shapes.clear();
+	for ( auto node : scene.nodes )
 	{
-		if ( auto transform = pair.first->get<component::Transform>() )
-		{
-			auto& box = pair.second;
-
-			// Apply transform to the box
-			// TODO rotation and scale
-			// Fix Y-Z incoherency
-			box.x = transform->position.x;
-			box.y = transform->position.y;
-		}
+		update( *node );
 	}
 
-	system.Update();
+	resolve();
+}
+
+void Collisions::resolve()
+{
+	for ( size_t i = 0; i < shapes.size(); ++i )
+	{
+		auto box = shapes[i];
+
+		for ( size_t j = i + 1; j < shapes.size(); ++j )
+		{
+			auto other        = shapes[j];
+			auto is_colliding = box->is_colliding_with( *other );
+
+			if ( box->intersects( *other ) )
+			{
+				if ( !is_colliding )
+				{
+					box->add_collision( *other );
+					other->add_collision( *box );
+					if ( box->start_colliding_with )
+					{
+						box->start_colliding_with( *other );
+					}
+					if ( other->start_colliding_with )
+					{
+						other->start_colliding_with( *box );
+					}
+				}
+
+				if ( box->colliding_with )
+				{
+					box->colliding_with( *other );
+				}
+				if ( other->colliding_with )
+				{
+					other->colliding_with( *box );
+				}
+			}
+			else if ( is_colliding )
+			{
+				box->remove_collision( *other );
+				other->remove_collision( *box );
+				if ( box->end_colliding_with )
+				{
+					box->end_colliding_with( *other );
+				}
+				if ( other->end_colliding_with )
+				{
+					other->end_colliding_with( *box );
+				}
+			}
+		}
+	}
 }
 
 

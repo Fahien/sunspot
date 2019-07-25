@@ -44,26 +44,29 @@ Script::Script( const std::string& uri )
 void Script::init( gltfspot::Node& n )
 {
 	auto w_node = Wrapper<gltfspot::Node>( &n );
-	lst::Log::info( "%s.init", module.GetName().c_str() );
-	module.Invoke( "init", Tuple{ w_node } );
+	module.call( "init", Tuple{ w_node } );
 }
 
 
 void Script::handle( gltfspot::Node& n, const input::Input& input )
 {
-	auto w_node  = Wrapper<gltfspot::Node>( &n );
-	auto w_input = Wrapper<input::Input>( &(input::Input&)input );
-	lst::Log::info( "%s.handle", module.GetName().c_str() );
-	module.Invoke( "handle", Tuple{ w_node, w_input } );
+	if ( auto method = module.get_method( "handle" ) )
+	{
+		auto w_node  = Wrapper<gltfspot::Node>( &n );
+		auto w_input = Wrapper<input::Input>( &(input::Input&)input );
+		method->call( Tuple{ w_node, w_input } );
+	}
 }
 
 
 void Script::collide( gltfspot::Node& a, gltfspot::Node& b )
 {
-	auto w_a = Wrapper<gltfspot::Node>( &a );
-	auto w_b = Wrapper<gltfspot::Node>( &b );
-	lst::Log::info( "%s.collide", module.GetName().c_str() );
-	module.Invoke( "collide", Tuple{ w_a, w_b } );
+	if ( auto method = module.get_method( "collide" ) )
+	{
+		auto w_a = Wrapper<gltfspot::Node>( &a );
+		auto w_b = Wrapper<gltfspot::Node>( &b );
+		method->call( Tuple{ w_a, w_b } );
+	}
 }
 
 
@@ -72,8 +75,7 @@ void Script::update( gltfspot::Node& n, const float delta )
 	auto w_node = Wrapper<gltfspot::Node>( &n );
 	args.SetItem( 0, w_node );
 	args.SetItem( 1, delta );
-	lst::Log::info( "%s.update", module.GetName().c_str() );
-	module.Invoke( "update", args );
+	module.call( "update", args );
 }
 
 

@@ -1,7 +1,7 @@
 #ifndef SST_INPUT_KEY_H_
 #define SST_INPUT_KEY_H_
 
-#include "sunspot/util/Export.h"
+#define PYSPOT_EXPORT __attribute__( ( annotate( "pyspot" ) ) )
 
 namespace sunspot::input
 {

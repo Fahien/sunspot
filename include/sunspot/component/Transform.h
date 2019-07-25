@@ -4,7 +4,7 @@
 #include <mathspot/Math.h>
 #include <sunspot/entity/Object.h>
 
-#include "sunspot/util/Export.h"
+#define PYSPOT_EXPORT __attribute__( ( annotate( "pyspot" ) ) )
 
 namespace sunspot::component
 {
