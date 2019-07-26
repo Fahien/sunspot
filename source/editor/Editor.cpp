@@ -8,21 +8,42 @@ void Editor::draw_transform( gltfspot::Node& node )
 {
 	using namespace ImGui;
 
-	if ( TreeNodeEx( &node.translation, 0, "Transform" ) )
+	if ( TreeNodeEx( &node.translation, 0, "transform" ) )
 	{
-		DragFloat3( "Position", &node.translation.x, 0.25f, -32.0f, 32.0f, "%.1f" );
-		DragFloat4( "Rotation", &node.rotation.x, 0.125f, -1.0f, 1.0f, "%.2f" );
-		DragFloat3( "Scale", &node.scale.x, 0.05f, 0.05f, 4.0f, "%.2f" );
+		DragFloat3( "position", &node.translation.x, 0.25f, -32.0f, 32.0f, "%.1f" );
+		DragFloat4( "rotation", &node.rotation.x, 0.125f, -1.0f, 1.0f, "%.2f" );
+		DragFloat3( "scale", &node.scale.x, 0.05f, 0.05f, 4.0f, "%.2f" );
 		TreePop();
 	}
 }
 
 
+void Editor::draw( gltfspot::Shape& bounds )
+{
+	using namespace ImGui;
+
+	if ( TreeNodeEx( &bounds, 0, "bounds" ) )
+	{
+		if (!bounds.collisions.empty())
+		{
+			Text("Colliding!");
+		}
+		if (auto box = dynamic_cast<gltfspot::Box*>(&bounds))
+		{
+			auto a = box->get_abs_a();
+			DragFloat3( "a", &a.x, 0.25f, -32.0f, 32.0f, "%.2f" );
+			auto b = box->get_abs_b();
+			DragFloat3( "b", &b.x, 0.25f, -32.0f, 32.0f, "%.2f" );
+			TreePop();
+		}
+	}
+}
+
 void Editor::draw( gltfspot::Camera& camera )
 {
 	using namespace ImGui;
 
-	if ( TreeNodeEx( &camera, 0, "Camera" ) )
+	if ( TreeNodeEx( &camera, 0, "camera" ) )
 	{
 		if ( camera.type == gltfspot::Camera::Type::Perspective )
 		{
@@ -48,9 +69,9 @@ void Editor::draw( gltfspot::Light& light )
 {
 	using namespace ImGui;
 
-	if ( TreeNodeEx( &light, 0, "Light" ) )
+	if ( TreeNodeEx( &light, 0, "light" ) )
 	{
-		DragFloat3( "Color", &light.color.x, 0.125f, 0.0f, 32.0f, "%.3f" );
+		DragFloat3( "color", &light.color.x, 0.125f, 0.0f, 32.0f, "%.3f" );
 		TreePop();
 	}
 }
@@ -60,7 +81,7 @@ void Editor::draw( gltfspot::Mesh& mesh )
 {
 	using namespace ImGui;
 
-	if ( TreeNodeEx( &mesh, 0, "Mesh" ) )
+	if ( TreeNodeEx( &mesh, 0, "mesh" ) )
 	{
 		for ( auto& primitive : mesh.primitives )
 		{
@@ -95,7 +116,7 @@ void Editor::draw( gltfspot::Node& node )
 	{
 		auto node_address = &node;
 		SetDragDropPayload( "GLTF_NODE", &node_address, sizeof( node_address ) );
-		Text( "Move %s", node.name.c_str() );
+		Text( "move %s", node.name.c_str() );
 		EndDragDropSource();
 	}
 
@@ -125,6 +146,11 @@ void Editor::draw( gltfspot::Node& node )
 	{
 		draw_transform( node );
 
+		if ( node.bounds )
+		{
+			draw( *node.bounds );
+		}
+
 		if ( node.camera )
 		{
 			draw( *node.camera );
@@ -143,7 +169,7 @@ void Editor::draw( gltfspot::Node& node )
 		// Children
 		if ( !node.children.empty() )
 		{
-			if ( TreeNodeEx( &node.children, 0, "Children" ) )
+			if ( TreeNodeEx( &node.children, 0, "children" ) )
 			{
 				for ( auto child : node.children )
 				{
@@ -178,20 +204,20 @@ void Editor::draw( gltfspot::Gltf& gltf )
 	// Editor menu
 	if ( BeginMenuBar() )
 	{
-		if ( BeginMenu( "Edit" ) )
+		if ( BeginMenu( "edit" ) )
 		{
-			if ( BeginMenu( "New" ) )
+			if ( BeginMenu( "new" ) )
 			{
-				if ( MenuItem( "Node" ) )
+				if ( MenuItem( "node" ) )
 				{
 					if ( !selected || selected == &scene )
 					{
-						scene.create_node( "New" );
+						scene.create_node( "new" );
 					}
 					else
 					{
 						auto selected_node = reinterpret_cast<gltfspot::Node*>( selected );
-						selected_node->create_child( "New" );
+						selected_node->create_child( "new" );
 					}
 
 					selected = nullptr;

@@ -13,6 +13,8 @@ class Editor
   private:
 	void draw_transform( gltfspot::Node& node );
 
+	void draw( gltfspot::Shape& bounds );
+
 	void draw( gltfspot::Camera& camera );
 
 	void draw( gltfspot::Light& light );
