@@ -21,37 +21,32 @@ GltfRenderer::GltfRenderer( Gltf* gltf )
 	}
 }
 
-void GltfRenderer::set_gltf( Gltf& gltf )
+void GltfRenderer::set_gltf( Gltf& g )
 {
-	if ( m_Gltf != &gltf )
+	if ( gltf != &g )
 	{
-		m_Gltf = &gltf;
-		m_Meshes.clear();
-		for ( auto& m : gltf.get_meshes() )
+		gltf = &g;
+		meshes.clear();
+		for ( auto& m : g.get_meshes() )
 		{
-			GltfMesh mesh{ gltf, m };
-			m_Meshes.emplace( &m, move( mesh ) );
+			GltfMesh mesh{ g, m };
+			meshes.emplace( &m, move( mesh ) );
+		}
+
+		shapes.clear();
+		for ( auto& s : g.get_shapes() )
+		{
+			shapes.emplace_back( g, *s );
 		}
 
 		cameras.clear();
-		for ( auto& c : gltf.get_cameras() )
+		for ( auto& c : g.get_cameras() )
 		{
 			auto camera = GltfCamera::create( c );
 			cameras.emplace( &c, std::move( camera ) );
 		}
 	}
 }
-
-
-GltfRenderer::GltfRenderer( GltfRenderer&& other )
-    : m_Gltf{ move( other.m_Gltf ) }
-    , m_Meshes{ move( other.m_Meshes ) }
-{
-	other.m_Gltf = nullptr;
-}
-
-
-GltfRenderer::~GltfRenderer() {}
 
 
 void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Light& light, const mst::Mat4& transform )
@@ -94,13 +89,10 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const Node& no
 	// Render the node
 	if ( node.mesh )
 	{
-		auto& mesh = m_Meshes[node.mesh];
-		for ( auto& primitive : mesh.GetPrimitives() )
-		{
-			primitive.SetMatrix( tTransform );
-			primitive.Draw( shader );
-		}
+		auto& mesh = meshes[node.mesh];
+		mesh.draw( shader, tTransform );
 	}
+
 
 	// Whether it is a camera
 	if ( node.camera )
@@ -112,6 +104,17 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const Node& no
 	if ( node.light )
 	{
 		draw( shader, *node.light, tTransform );
+	}
+
+	// Render the shape
+	if ( node.bounds )
+	{
+		glDisable(GL_DEPTH_TEST);
+		shape_shader.Use();
+		auto& shape = shapes[node.bounds_index];
+		shape.draw( shape_shader, tTransform );
+		shader.Use();
+		glEnable(GL_DEPTH_TEST);
 	}
 }
 
@@ -131,7 +134,7 @@ mst::Mat4 create_projection_matrix( const gst::Camera& camera )
 		projection[0]  = cotfov / a;
 		projection[5]  = cotfov;
 		projection[10] = ( n + f ) / ( n - f );
-		projection[14] = 2.0f * n * f / ( n - f);
+		projection[14] = 2.0f * n * f / ( n - f );
 		projection[11] = -1.0f;
 	}
 	else
@@ -144,8 +147,7 @@ mst::Mat4 create_projection_matrix( const gst::Camera& camera )
 	return projection;
 }
 
-void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Camera& camera,
-                         const mst::Mat4& transform )
+void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Camera& camera, const mst::Mat4& transform )
 {
 	auto view = transform;
 	view[12] *= -1;
@@ -155,10 +157,20 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Cam
 	auto location = shader.GetLocation( "view" );
 	glUniformMatrix4fv( location, 1, GL_FALSE, &view[0] );
 
+	shape_shader.Use();
+	location = shape_shader.GetLocation( "view" );
+	glUniformMatrix4fv( location, 1, GL_FALSE, &view[0] );
+	shader.Use();
+
 	auto projection = create_projection_matrix( camera );
 
 	location = shader.GetLocation( "projection" );
 	glUniformMatrix4fv( location, 1, GL_FALSE, &projection[0] );
+
+	shape_shader.Use();
+	location = shape_shader.GetLocation( "projection" );
+	glUniformMatrix4fv( location, 1, GL_FALSE, &projection[0] );
+	shader.Use();
 
 	location = shader.GetLocation( "camera.position" );
 	glUniform3fv( location, 1, &transform[12] );
@@ -166,7 +178,7 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Cam
 
 void GltfRenderer::draw( const graphics::shader::Program& shader )
 {
-	auto pScene = m_Gltf->GetScene();
+	auto pScene = gltf->GetScene();
 
 	for ( auto node : pScene->nodes )
 	{

@@ -26,15 +26,15 @@ class GltfPrimitive
 	/// Normal constructor
 	GltfPrimitive( gst::Gltf& model, gst::Mesh::Primitive& primitive );
 
+	GltfPrimitive( gst::Gltf& model, gst::Shape& shape );
+
 	/// Destructor
 	~GltfPrimitive();
 
-	void SetMatrix( const mst::Mat4& matrix );
-
-	void Draw( const graphics::shader::Program& shader ) const;
+	void draw( const graphics::shader::Program& shader, const mst::Mat4& transform = mst::Mat4::identity ) const;
 
   private:
-	void readIndices( gst::Gltf& model, gst::Mesh::Primitive& primitive );
+	void read_indices( gst::Gltf& model, gst::Mesh::Primitive& primitive );
 
 	bool                     mHasVao{};
 	GLuint                   mVao{};
@@ -48,8 +48,6 @@ class GltfPrimitive
 	const void* mIndicesOffset{};
 
 	GLsizei vertex_count = 0;
-
-	mst::Mat4 mMatrix{};
 
 	bool mHasVertexColors{};
 

@@ -20,21 +20,19 @@ class GltfMesh
   public:
 	GltfMesh() = default;
 
-	GltfMesh( GltfMesh&& other );
-
 	GltfMesh( gst::Gltf& model, gst::Mesh& mesh );
 
 	/// @return The name
-	const std::string& GetName() const { return mName; }
+	const std::string& get_name() const { return name; }
 
 	/// @return The list of primitives
-	std::vector<GltfPrimitive>& GetPrimitives() { return mPrimitives; }
+	std::vector<GltfPrimitive>& get_primitives() { return primitives; }
 
-	void Draw( const graphics::shader::Program& shader ) const;
+	void draw( const graphics::shader::Program& shader, const mathspot::Mat4& transform = mst::Mat4::identity ) const;
 
   private:
-	std::string                mName{};
-	std::vector<GltfPrimitive> mPrimitives{};
+	std::string                name{};
+	std::vector<GltfPrimitive> primitives{};
 };
 
 

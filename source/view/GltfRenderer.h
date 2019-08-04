@@ -21,12 +21,10 @@ class GltfRenderer
 {
   public:
 	GltfRenderer( gst::Gltf* g = nullptr );
-	GltfRenderer( GltfRenderer&& other );
-	~GltfRenderer();
 
 	void set_gltf( gst::Gltf& g );
 
-	gst::Gltf* get_gltf() { return m_Gltf; }
+	gst::Gltf* get_gltf() { return gltf; }
 
 	void draw( const graphics::shader::Program& shader );
 
@@ -40,9 +38,12 @@ class GltfRenderer
 
   private:
 	// TODO either GLTF and GLTF Meshes should go somewhere else
-	gst::Gltf*                                                          m_Gltf   = {};
-	std::unordered_map<gst::Mesh*, GltfMesh>                      m_Meshes = {};
-	std::unordered_map<gst::Camera*, std::unique_ptr<GltfCamera>> cameras  = {};
+	gst::Gltf*                                                    gltf    = {};
+	std::unordered_map<gst::Mesh*, GltfMesh>                      meshes  = {};
+	std::vector<GltfPrimitive>                                    shapes  = {};
+	std::unordered_map<gst::Camera*, std::unique_ptr<GltfCamera>> cameras = {};
+
+	graphics::shader::Program shape_shader = {"shader/shape.vert", "shader/shape.frag"};
 };
 
 }  // namespace sunspot

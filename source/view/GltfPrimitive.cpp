@@ -64,7 +64,6 @@ GltfPrimitive::GltfPrimitive( GltfPrimitive&& other )
     , mIndicesType{ other.mIndicesType }
     , mIndicesOffset{ other.mIndicesOffset }
     , vertex_count{ other.vertex_count }
-    , mMatrix{ other.mMatrix }
     , mHasVertexColors{ other.mHasVertexColors }
     , mMaterial{ move( other.mMaterial ) }
     , mTextures{ move( other.mTextures ) }
@@ -76,7 +75,7 @@ GltfPrimitive::GltfPrimitive( GltfPrimitive&& other )
 }
 
 
-void GltfPrimitive::readIndices( Gltf& model, Mesh::Primitive& primitive )
+void GltfPrimitive::read_indices( Gltf& model, Mesh::Primitive& primitive )
 {
 	auto indicesIndex = primitive.indices;
 	if ( indicesIndex < 0 )
@@ -114,10 +113,37 @@ void GltfPrimitive::readIndices( Gltf& model, Mesh::Primitive& primitive )
 	glBufferData( GL_ELEMENT_ARRAY_BUFFER, bufferView.byteLength, &( buffer[bufferView.byteOffset] ), GL_STATIC_DRAW );
 }
 
+GltfPrimitive::GltfPrimitive( Gltf& model, Shape& shape )
+    : mMode{ to_gl_mode( Mesh::Primitive::Mode::LINES ) }
+{
+	// Generate a vertex array
+	glGenVertexArrays( 1, &mVao );
+	mHasVao = true;
+	glBindVertexArray( mVao );
+
+	if ( auto rect = dynamic_cast<Box*>( &shape ) )
+	{
+		auto [it, success] = mVbos.emplace( 0, 0 );
+		glGenBuffers( 1, &it->second );
+
+		std::vector<mst::Vec3> points = { mst::Vec3{ rect->a.x, rect->a.y }, mst::Vec3{ rect->b.x, rect->a.y },
+			                              mst::Vec3{ rect->b.x, rect->a.y }, mst::Vec3{ rect->b.x, rect->b.y },
+			                              mst::Vec3{ rect->b.x, rect->b.y }, mst::Vec3{ rect->a.x, rect->b.y },
+			                              mst::Vec3{ rect->a.x, rect->b.y }, mst::Vec3{ rect->a.x, rect->a.y } };
+
+		vertex_count = points.size();
+
+		glBufferData( GL_ARRAY_BUFFER, points.size() * sizeof( mst::Vec3 ), points.data(), GL_STATIC_DRAW );
+
+		glEnableVertexAttribArray( 0 );  // Vertex Position
+		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+	}
+
+	glBindVertexArray( 0 );  // Unbind vao
+}
 
 GltfPrimitive::GltfPrimitive( Gltf& model, Mesh::Primitive& primitive )
     : mMode{ to_gl_mode( primitive.mode ) }
-    , mMatrix{ Mat4::identity.matrix }
 {
 	// Generate a vertex array
 	glGenVertexArrays( 1, &mVao );
@@ -125,7 +151,7 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Mesh::Primitive& primitive )
 	glBindVertexArray( mVao );
 
 	// Indices
-	readIndices( model, primitive );
+	read_indices( model, primitive );
 
 	// Vertex attributes
 	for ( auto& attribute : primitive.attributes )
@@ -254,16 +280,10 @@ GltfPrimitive::~GltfPrimitive()
 }
 
 
-void GltfPrimitive::SetMatrix( const Mat4& matrix )
-{
-	mMatrix = matrix;
-}
-
-
-void GltfPrimitive::Draw( const graphics::shader::Program& shader ) const
+void GltfPrimitive::draw( const graphics::shader::Program& shader, const mst::Mat4& transform ) const
 {
 	// Bind transform matrix
-	glUniformMatrix4fv( shader.GetLocation( "model" ), 1, GL_FALSE, mMatrix.matrix );
+	glUniformMatrix4fv( shader.GetLocation( "model" ), 1, GL_FALSE, transform.matrix );
 	// Bind PBR base color texture
 	glUniform1i( shader.GetLocation( "vertex.hasColor" ), mHasVertexColors );
 

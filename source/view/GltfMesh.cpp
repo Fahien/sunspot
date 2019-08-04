@@ -9,28 +9,21 @@ using namespace gltfspot;
 using namespace sunspot;
 
 
-GltfMesh::GltfMesh( GltfMesh&& other )
-    : mName{ move( other.mName ) }
-    , mPrimitives{ move( other.mPrimitives ) }
-{
-}
-
-
 GltfMesh::GltfMesh( Gltf& model, Mesh& mesh )
-    : mName{ mesh.name }
+    : name{ mesh.name }
 {
 	for ( auto p : mesh.primitives )
 	{
 		GltfPrimitive primitive{ model, p };
-		mPrimitives.push_back( move( primitive ) );
+		primitives.push_back( move( primitive ) );
 	}
 }
 
 
-void GltfMesh::Draw( const graphics::shader::Program& program ) const
+void GltfMesh::draw( const graphics::shader::Program& program, const mathspot::Mat4& transform ) const
 {
-	for ( auto& primitive : mPrimitives )
+	for ( auto& primitive : primitives )
 	{
-		primitive.Draw( program );
+		primitive.draw( program, transform );
 	}
 }

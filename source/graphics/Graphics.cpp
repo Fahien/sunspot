@@ -16,6 +16,8 @@ void Graphics::draw( gltfspot::Gltf& gltf )
 
 	// Draw every node in the scene
 	renderer.draw( *program );
+
+
 }
 
 }  // namespace sunspot::graphics
