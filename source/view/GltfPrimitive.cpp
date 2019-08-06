@@ -123,16 +123,34 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Shape& shape )
 
 	if ( auto rect = dynamic_cast<Box*>( &shape ) )
 	{
+		// Gen indices
+		glGenBuffers( 1, &mEbo );
+		mHasEbo                    = true;
+		std::vector<GLuint> indices = { // front
+			                           0, 1, 1, 2, 2, 3, 3, 0,
+			                           // back
+			                           4, 5, 5, 6, 6, 7, 7, 4,
+			                           // sides
+			                           0, 4, 3, 7, 1, 5, 2, 6
+		};
+		mIndicesCount = indices.size();
+		mIndicesType = GL_UNSIGNED_INT;
+
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mEbo );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof( indices[0] ), indices.data(), GL_STATIC_DRAW );
+
 		auto [it, success] = mVbos.emplace( 0, 0 );
 		glGenBuffers( 1, &it->second );
 
-		std::vector<mst::Vec3> points = { mst::Vec3{ rect->a.x, rect->a.y }, mst::Vec3{ rect->b.x, rect->a.y },
-			                              mst::Vec3{ rect->b.x, rect->a.y }, mst::Vec3{ rect->b.x, rect->b.y },
-			                              mst::Vec3{ rect->b.x, rect->b.y }, mst::Vec3{ rect->a.x, rect->b.y },
-			                              mst::Vec3{ rect->a.x, rect->b.y }, mst::Vec3{ rect->a.x, rect->a.y } };
+		auto& a = rect->a;
+		auto& b = rect->b;
+
+		std::vector<mst::Vec3> points = { { a.x, a.y, b.z }, { b.x, a.y, b.z }, b, { a.x, b.y, b.z }, a, { b.x, a.y, a.z },
+			                              { b.x, b.y, a.z }, { a.x, b.y, a.z } };
 
 		vertex_count = points.size();
 
+		glBindBuffer( GL_ARRAY_BUFFER, it->second );
 		glBufferData( GL_ARRAY_BUFFER, points.size() * sizeof( mst::Vec3 ), points.data(), GL_STATIC_DRAW );
 
 		glEnableVertexAttribArray( 0 );  // Vertex Position

@@ -11,5 +11,5 @@ uniform Vertex vertex;
 
 void main()
 {
-	o_color = vec4(1.0, 1.0, 1.0, 1.0);
+	o_color = vec4(.5, .5, .5, 0.5);
 }
