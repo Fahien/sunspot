@@ -24,11 +24,11 @@ void Editor::draw( gltfspot::Shape& bounds )
 
 	if ( TreeNodeEx( &bounds, 0, "bounds" ) )
 	{
-		if (!bounds.collisions.empty())
+		if ( !bounds.collisions.empty() )
 		{
-			Text("Colliding!");
+			Text( "Colliding!" );
 		}
-		if (auto box = dynamic_cast<gltfspot::Box*>(&bounds))
+		if ( auto box = dynamic_cast<gltfspot::Box*>( &bounds ) )
 		{
 			auto a = box->get_abs_a();
 			DragFloat3( "a", &a.x, 0.25f, -32.0f, 32.0f, "%.2f" );
@@ -92,6 +92,23 @@ void Editor::draw( gltfspot::Mesh& mesh )
 					Text( "%s", gltfspot::to_string( attribute.first ).c_str() );
 				}
 
+				if ( auto material = primitive.material )
+				{
+					// TODO draw material
+					if ( TreeNodeEx( material, 0, "%s", material->name.c_str() ) )
+					{
+						if ( material->pbr_metallic_roughness.base_color_texture )
+						{
+							Text( "%s", material->pbr_metallic_roughness.base_color_texture->name.c_str() );
+						}
+						else
+						{
+							DragFloat4( "color", material->pbr_metallic_roughness.base_color_factor.data(), 0.05f, 0.0f,
+							            1.0f, "%.2f" );
+						}
+						TreePop();
+					}
+				}
 				TreePop();
 			}
 		}

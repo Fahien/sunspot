@@ -18,7 +18,8 @@ namespace sunspot::graphics
 class TextureException : public graphics::Exception
 {
   public:
-	TextureException( const std::string& tag, const std::string& message ) : graphics::Exception{ tag + ": " + message }
+	TextureException( const std::string& tag, const std::string& message )
+	    : graphics::Exception{ tag + ": " + message }
 	{
 	}
 };
@@ -33,22 +34,10 @@ class SoilData
 	SoilData( const gltfspot::Gltf::BufferView& buffer_view, gltfspot::Gltf& gltf );
 	~SoilData();
 
-	GLsizei getWidth() const
-	{
-		return mWidth;
-	}
-	GLsizei getHeight() const
-	{
-		return mHeight;
-	}
-	int getChannels() const
-	{
-		return mChannels;
-	}
-	GLubyte* getHandle() const
-	{
-		return mHandle;
-	}
+	GLsizei  getWidth() const { return mWidth; }
+	GLsizei  getHeight() const { return mHeight; }
+	int      getChannels() const { return mChannels; }
+	GLubyte* getHandle() const { return mHandle; }
 
   private:
 	GLsizei  mWidth;
@@ -69,18 +58,9 @@ class TextureData
 	TextureData( const std::string& path );
 	~TextureData();
 
-	inline GLsizei& getWidth()
-	{
-		return mWidth;
-	}
-	inline GLsizei& getHeight()
-	{
-		return mHeight;
-	}
-	inline GLubyte* getData()
-	{
-		return mData;
-	}
+	inline GLsizei& getWidth() { return mWidth; }
+	inline GLsizei& getHeight() { return mHeight; }
+	inline GLubyte* getData() { return mData; }
 
   private:
 	GLsizei  mWidth;
@@ -109,19 +89,10 @@ class Texture
 
 	~Texture();
 
-	inline void release() const
-	{
-		glDeleteTextures( 1, &mId );
-	}
+	void release() const { glDeleteTextures( 1, &mId ); }
 
-	inline GLuint& getId()
-	{
-		return mId;
-	}
-	inline TextureType& getType()
-	{
-		return mType;
-	}
+	GLuint      getId() const { return mId; }
+	TextureType getType() const { return mType; }
 
   private:
 	GLuint      mId = 0;

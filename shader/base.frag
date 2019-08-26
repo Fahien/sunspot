@@ -17,14 +17,6 @@ struct Material
 	float metallic;
 	float roughness;
 	float ambientOcclusion;
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-	float shininess;
-	bool hasDiffuseMap;
-	sampler2D diffuseMap;
-	bool hasSpecularMap;
-	sampler2D specularMap;
 };
 
 struct DirectionalLight
@@ -73,42 +65,6 @@ in vec2 texCoords;
 in vec4 vertColor;
 
 out vec4 color;
-
-
-void applyDirectionalLight(in DirectionalLight light, in Camera camera, inout Fragment fragment)
-{
-	vec3 ambient = light.ambient * material.ambient * fragment.color;
-
-	vec3 lightDirection = normalize(-light.direction);
-	float diffuseFactor = max(dot(fragment.normal, lightDirection), zero);
-	vec3 diffuse = diffuseFactor * light.diffuse * material.diffuse * fragment.color;
-
-	vec3 cameraDirection = normalize(camera.position - fragment.position);
-	vec3 reflectDirection = reflect(-lightDirection, fragment.normal);
-	float specularFactor = pow(max(dot(cameraDirection, reflectDirection), zero), material.shininess);
-	vec3 specular = material.hasSpecularMap ? vec3(texture(material.specularMap, fragment.coords)) : vec3(one);
-	specular *= specularFactor * light.specular * material.specular;
-
-	fragment.color = ambient + diffuse + specular;
-}
-
-
-void applyPointLight(in PointLight light, in Camera camera, inout Fragment fragment)
-{
-	vec3 ambient = light.ambient * material.ambient * fragment.color;
-
-	vec3 lightDirection = normalize(light.position - fragment.position);
-	float diffuseFactor = max(dot(fragment.normal, lightDirection), zero);
-	vec3 diffuse = diffuseFactor * light.diffuse * material.diffuse * fragment.color;
-
-	vec3 cameraDirection = normalize(camera.position - fragment.position);
-	vec3 reflectDirection = reflect(-lightDirection, fragment.normal);
-	float specularFactor = pow(max(dot(cameraDirection, reflectDirection), zero), material.shininess);
-	vec3 specular = material.hasSpecularMap ? vec3(texture(material.specularMap, fragment.coords)) : vec3(one);
-	specular *= specularFactor * light.specular * material.specular;
-
-	fragment.color = ambient + diffuse + specular;
-}
 
 
 float calculateDistributionGGX(vec3 N, vec3 H, float roughness)

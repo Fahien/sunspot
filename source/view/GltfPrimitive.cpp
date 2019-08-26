@@ -1,50 +1,46 @@
 #include "view/GltfPrimitive.h"
 #include "sunspot/graphics/Shader.h"
 
-using namespace std;
-using namespace sunspot;
-using namespace mathspot;
-using namespace gltfspot;
-
-
-GLenum to_gl_mode( const Mesh::Primitive::Mode& mode )
+namespace sunspot
+{
+GLenum to_gl_mode( const gltfspot::Mesh::Primitive::Mode& mode )
 {
 	switch ( mode )
 	{
-		case Mesh::Primitive::Mode::POINTS:
+		case gltfspot::Mesh::Primitive::Mode::POINTS:
 			return GL_POINTS;
-		case Mesh::Primitive::Mode::LINES:
+		case gltfspot::Mesh::Primitive::Mode::LINES:
 			return GL_LINES;
-		case Mesh::Primitive::Mode::LINE_LOOP:
+		case gltfspot::Mesh::Primitive::Mode::LINE_LOOP:
 			return GL_LINE_LOOP;
-		case Mesh::Primitive::Mode::LINE_STRIP:
+		case gltfspot::Mesh::Primitive::Mode::LINE_STRIP:
 			return GL_LINE_STRIP;
-		case Mesh::Primitive::Mode::TRIANGLES:
+		case gltfspot::Mesh::Primitive::Mode::TRIANGLES:
 			return GL_TRIANGLES;
-		case Mesh::Primitive::Mode::TRIANGLE_STRIP:
+		case gltfspot::Mesh::Primitive::Mode::TRIANGLE_STRIP:
 			return GL_TRIANGLE_STRIP;
-		case Mesh::Primitive::Mode::TRIANGLE_FAN:
+		case gltfspot::Mesh::Primitive::Mode::TRIANGLE_FAN:
 			return GL_TRIANGLE_FAN;
 		default:
 			return GL_TRIANGLES;
 	}
 }
 
-GLenum to_gl_component_type( const Gltf::Accessor::ComponentType& type )
+GLenum to_gl_component_type( const gltfspot::Gltf::Accessor::ComponentType& type )
 {
 	switch ( type )
 	{
-		case Gltf::Accessor::ComponentType::BYTE:
+		case gltfspot::Gltf::Accessor::ComponentType::BYTE:
 			return GL_BYTE;
-		case Gltf::Accessor::ComponentType::FLOAT:
+		case gltfspot::Gltf::Accessor::ComponentType::FLOAT:
 			return GL_FLOAT;
-		case Gltf::Accessor::ComponentType::SHORT:
+		case gltfspot::Gltf::Accessor::ComponentType::SHORT:
 			return GL_SHORT;
-		case Gltf::Accessor::ComponentType::UNSIGNED_BYTE:
+		case gltfspot::Gltf::Accessor::ComponentType::UNSIGNED_BYTE:
 			return GL_UNSIGNED_BYTE;
-		case Gltf::Accessor::ComponentType::UNSIGNED_SHORT:
+		case gltfspot::Gltf::Accessor::ComponentType::UNSIGNED_SHORT:
 			return GL_UNSIGNED_SHORT;
-		case Gltf::Accessor::ComponentType::UNSIGNED_INT:
+		case gltfspot::Gltf::Accessor::ComponentType::UNSIGNED_INT:
 			return GL_UNSIGNED_INT;
 		default:
 			assert( "Invalid Component Type" );
@@ -56,7 +52,7 @@ GLenum to_gl_component_type( const Gltf::Accessor::ComponentType& type )
 GltfPrimitive::GltfPrimitive( GltfPrimitive&& other )
     : mHasVao{ other.mHasVao }
     , mVao{ other.mVao }
-    , mVbos{ move( other.mVbos ) }
+    , mVbos{ std::move( other.mVbos ) }
     , mHasEbo{ other.mHasEbo }
     , mEbo{ other.mEbo }
     , mMode{ other.mMode }
@@ -65,22 +61,50 @@ GltfPrimitive::GltfPrimitive( GltfPrimitive&& other )
     , mIndicesOffset{ other.mIndicesOffset }
     , vertex_count{ other.vertex_count }
     , mHasVertexColors{ other.mHasVertexColors }
-    , mMaterial{ move( other.mMaterial ) }
-    , mTextures{ move( other.mTextures ) }
+    , primitive{ other.primitive }
+    , mMaterial{ std::move( other.mMaterial ) }
+    , mTextures{ std::move( other.mTextures ) }
 {
-	other.mHasVao = false;
-	other.mHasEbo = false;
+	other.mHasVao   = false;
+	other.mHasEbo   = false;
+	other.primitive = nullptr;
 	assert( other.mVbos.empty() );
 	assert( other.mTextures.empty() );
 }
 
-
-void GltfPrimitive::read_indices( Gltf& model, Mesh::Primitive& primitive )
+GltfPrimitive& GltfPrimitive::operator=( GltfPrimitive&& other )
 {
-	auto indicesIndex = primitive.indices;
+	mHasVao          = other.mHasVao;
+	mVao             = other.mVao;
+	mVbos            = std::move( other.mVbos );
+	mHasEbo          = other.mHasEbo;
+	mEbo             = other.mEbo;
+	mMode            = other.mMode;
+	mIndicesCount    = other.mIndicesCount;
+	mIndicesType     = other.mIndicesType;
+	mIndicesOffset   = other.mIndicesOffset;
+	vertex_count     = other.vertex_count;
+	mHasVertexColors = other.mHasVertexColors;
+	primitive        = other.primitive;
+	mMaterial        = std::move( other.mMaterial );
+	mTextures        = std::move( other.mTextures );
+
+	other.mHasVao   = false;
+	other.mHasEbo   = false;
+	other.primitive = nullptr;
+
+	assert( other.mVbos.empty() );
+	assert( other.mTextures.empty() );
+
+	return *this;
+}
+
+void GltfPrimitive::read_indices( gltfspot::Gltf& model, gltfspot::Mesh::Primitive& p )
+{
+	auto indicesIndex = p.indices;
 	if ( indicesIndex < 0 )
 	{
-		// The primitive has no indices
+		// The p has no indices
 		// Should be rendered with drawArrays()
 		return;
 	}
@@ -106,35 +130,35 @@ void GltfPrimitive::read_indices( Gltf& model, Mesh::Primitive& primitive )
 	auto& bufferView      = model.GetBufferViews()[bufferViewIndex];
 
 	// Get the buffer
-	auto          bufferIndex = bufferView.buffer;
-	vector<char>& buffer      = model.GetBuffer( bufferIndex );
+	auto               bufferIndex = bufferView.buffer;
+	std::vector<char>& buffer      = model.GetBuffer( bufferIndex );
 
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mEbo );
 	glBufferData( GL_ELEMENT_ARRAY_BUFFER, bufferView.byteLength, &( buffer[bufferView.byteOffset] ), GL_STATIC_DRAW );
 }
 
-GltfPrimitive::GltfPrimitive( Gltf& model, Shape& shape )
-    : mMode{ to_gl_mode( Mesh::Primitive::Mode::LINES ) }
+GltfPrimitive::GltfPrimitive( gltfspot::Gltf& model, gltfspot::Shape& shape )
+    : mMode{ to_gl_mode( gltfspot::Mesh::Primitive::Mode::LINES ) }
 {
 	// Generate a vertex array
 	glGenVertexArrays( 1, &mVao );
 	mHasVao = true;
 	glBindVertexArray( mVao );
 
-	if ( auto rect = dynamic_cast<Box*>( &shape ) )
+	if ( auto rect = dynamic_cast<gltfspot::Box*>( &shape ) )
 	{
 		// Gen indices
 		glGenBuffers( 1, &mEbo );
-		mHasEbo                    = true;
+		mHasEbo                     = true;
 		std::vector<GLuint> indices = { // front
-			                           0, 1, 1, 2, 2, 3, 3, 0,
-			                           // back
-			                           4, 5, 5, 6, 6, 7, 7, 4,
-			                           // sides
-			                           0, 4, 3, 7, 1, 5, 2, 6
+			                            0, 1, 1, 2, 2, 3, 3, 0,
+			                            // back
+			                            4, 5, 5, 6, 6, 7, 7, 4,
+			                            // sides
+			                            0, 4, 3, 7, 1, 5, 2, 6
 		};
 		mIndicesCount = indices.size();
-		mIndicesType = GL_UNSIGNED_INT;
+		mIndicesType  = GL_UNSIGNED_INT;
 
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mEbo );
 		glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof( indices[0] ), indices.data(), GL_STATIC_DRAW );
@@ -145,13 +169,15 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Shape& shape )
 		auto& a = rect->a;
 		auto& b = rect->b;
 
-		std::vector<mst::Vec3> points = { { a.x, a.y, b.z }, { b.x, a.y, b.z }, b, { a.x, b.y, b.z }, a, { b.x, a.y, a.z },
-			                              { b.x, b.y, a.z }, { a.x, b.y, a.z } };
+		std::vector<mathspot::Vec3> points = {
+			{ a.x, a.y, b.z }, { b.x, a.y, b.z }, b, { a.x, b.y, b.z }, a, { b.x, a.y, a.z },
+			{ b.x, b.y, a.z }, { a.x, b.y, a.z }
+		};
 
 		vertex_count = points.size();
 
 		glBindBuffer( GL_ARRAY_BUFFER, it->second );
-		glBufferData( GL_ARRAY_BUFFER, points.size() * sizeof( mst::Vec3 ), points.data(), GL_STATIC_DRAW );
+		glBufferData( GL_ARRAY_BUFFER, points.size() * sizeof( mathspot::Vec3 ), points.data(), GL_STATIC_DRAW );
 
 		glEnableVertexAttribArray( 0 );  // Vertex Position
 		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
@@ -160,8 +186,9 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Shape& shape )
 	glBindVertexArray( 0 );  // Unbind vao
 }
 
-GltfPrimitive::GltfPrimitive( Gltf& model, Mesh::Primitive& primitive )
-    : mMode{ to_gl_mode( primitive.mode ) }
+GltfPrimitive::GltfPrimitive( gltfspot::Gltf& model, gltfspot::Mesh::Primitive& p )
+    : mMode{ to_gl_mode( p.mode ) }
+    , primitive{ &p }
 {
 	// Generate a vertex array
 	glGenVertexArrays( 1, &mVao );
@@ -169,16 +196,16 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Mesh::Primitive& primitive )
 	glBindVertexArray( mVao );
 
 	// Indices
-	read_indices( model, primitive );
+	read_indices( model, p );
 
 	// Vertex attributes
-	for ( auto& attribute : primitive.attributes )
+	for ( auto& attribute : p.attributes )
 	{
-		unsigned          accessorIndex   = attribute.second;
-		auto&             accessor        = model.GetAccessors().at( accessorIndex );
-		auto              bufferViewIndex = accessor.bufferView;
-		Gltf::BufferView& bufferView      = model.GetBufferViews().at( bufferViewIndex );
-		vector<char>&     buffer          = model.GetBuffer( bufferView.buffer );
+		unsigned                    accessorIndex   = attribute.second;
+		auto&                       accessor        = model.GetAccessors().at( accessorIndex );
+		auto                        bufferViewIndex = accessor.bufferView;
+		gltfspot::Gltf::BufferView& bufferView      = model.GetBufferViews().at( bufferViewIndex );
+		std::vector<char>&          buffer          = model.GetBuffer( bufferView.buffer );
 
 		auto it = mVbos.find( bufferViewIndex );
 		if ( it == mVbos.end() )
@@ -197,14 +224,14 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Mesh::Primitive& primitive )
 
 		GLenum componentType{ to_gl_component_type( accessor.componentType ) };
 
-		if ( attribute.first == Mesh::Primitive::Semantic::NORMAL )
+		if ( attribute.first == gltfspot::Mesh::Primitive::Semantic::NORMAL )
 		{
 			glEnableVertexAttribArray( 1 );  // Vertex Normals
 			GLvoid* offset{ reinterpret_cast<GLvoid*>( accessor.byteOffset ) };
 			auto    stride = static_cast<GLsizei>( bufferView.byteStride );
 			glVertexAttribPointer( 1, 3, componentType, GL_FALSE, stride, offset );
 		}
-		else if ( attribute.first == Mesh::Primitive::Semantic::POSITION )
+		else if ( attribute.first == gltfspot::Mesh::Primitive::Semantic::POSITION )
 		{
 			glEnableVertexAttribArray( 0 );  // Vertex Position
 			GLvoid* offset{ reinterpret_cast<GLvoid*>( accessor.byteOffset ) };
@@ -213,14 +240,14 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Mesh::Primitive& primitive )
 
 			vertex_count += 3;
 		}
-		else if ( attribute.first == Mesh::Primitive::Semantic::TEXCOORD_0 )
+		else if ( attribute.first == gltfspot::Mesh::Primitive::Semantic::TEXCOORD_0 )
 		{
 			glEnableVertexAttribArray( 2 );  // Tex coords
 			GLvoid* offset{ reinterpret_cast<GLvoid*>( accessor.byteOffset ) };
 			auto    stride = static_cast<GLsizei>( bufferView.byteStride );
 			glVertexAttribPointer( 2, 2, componentType, GL_FALSE, stride, offset );
 		}
-		else if ( attribute.first == Mesh::Primitive::Semantic::COLOR_0 )
+		else if ( attribute.first == gltfspot::Mesh::Primitive::Semantic::COLOR_0 )
 		{
 			mHasVertexColors = true;
 			glEnableVertexAttribArray( 3 );  // Color
@@ -233,47 +260,43 @@ GltfPrimitive::GltfPrimitive( Gltf& model, Mesh::Primitive& primitive )
 	glBindVertexArray( 0 );  // Unbind vao
 
 	// TODO extract method
-	auto  materialIndex = primitive.material;
-	auto& materials     = model.GetMaterials();
-	if ( materials.empty() )
+	if ( auto material = p.material )
 	{
-		return;
-	}
-	auto        material = model.GetMaterials().at( materialIndex );
-	const auto& color    = material.pbrMetallicRoughness.baseColorFactor;
+		const auto& color = material->pbr_metallic_roughness.base_color_factor;
 
-	mMaterial.color.r = color[0];
-	mMaterial.color.g = color[1];
-	mMaterial.color.b = color[2];
+		mMaterial.color.r = color[0];
+		mMaterial.color.g = color[1];
+		mMaterial.color.b = color[2];
 
-	mMaterial.metallic         = material.pbrMetallicRoughness.metallicFactor;
-	mMaterial.roughness        = material.pbrMetallicRoughness.roughnessFactor;
-	mMaterial.ambientOcclusion = 0.25f;
+		mMaterial.metallic          = material->pbr_metallic_roughness.metallic_factor;
+		mMaterial.roughness         = material->pbr_metallic_roughness.roughness_factor;
+		mMaterial.ambient_occlusion = 0.25f;
 
-	if ( material.pbrMetallicRoughness.baseColorTexture )
-	{
-		const auto& t  = material.pbrMetallicRoughness.baseColorTexture;
-		const auto& it = mTextures.find( t );
-		if ( it == mTextures.end() )
+		if ( material->pbr_metallic_roughness.base_color_texture )
 		{
-			if ( t->source->uri != "" )
+			const auto& t  = material->pbr_metallic_roughness.base_color_texture;
+			const auto& it = mTextures.find( t );
+			if ( it == mTextures.end() )
 			{
-				const auto&       uri = model.GetPath() + "/" + t->source->uri;
-				graphics::Texture texture{ uri, graphics::TextureType::DIFFUSE };
-				auto              r    = mTextures.emplace( t, move( texture ) );
-				mMaterial.colorTexture = &( r.first->second );
+				if ( t->source->uri != "" )
+				{
+					const auto&       uri = model.GetPath() + "/" + t->source->uri;
+					graphics::Texture texture{ uri, graphics::TextureType::DIFFUSE };
+					auto              r     = mTextures.emplace( t, std::move( texture ) );
+					mMaterial.color_texture = &( r.first->second );
+				}
+				else
+				{
+					auto&             buffer_view = model.GetBufferViews().at( t->source->buffer_view );
+					graphics::Texture texture{ graphics::SoilData{ buffer_view, model }, graphics::TextureType::DIFFUSE };
+					auto              r     = mTextures.emplace( t, std::move( texture ) );
+					mMaterial.color_texture = &( r.first->second );
+				}
 			}
 			else
 			{
-				auto&             buffer_view = model.GetBufferViews().at( t->source->buffer_view );
-				graphics::Texture texture{ graphics::SoilData{ buffer_view, model }, graphics::TextureType::DIFFUSE };
-				auto              r    = mTextures.emplace( t, move( texture ) );
-				mMaterial.colorTexture = &( r.first->second );
+				mMaterial.color_texture = &( it->second );
 			}
-		}
-		else
-		{
-			mMaterial.colorTexture = &( it->second );
 		}
 	}
 }
@@ -298,14 +321,45 @@ GltfPrimitive::~GltfPrimitive()
 }
 
 
-void GltfPrimitive::draw( const graphics::shader::Program& shader, const mst::Mat4& transform ) const
+void GltfPrimitive::bind_material( const graphics::shader::Program& shader, gltfspot::Material& material ) const
+{
+	auto& pbr = material.pbr_metallic_roughness;
+
+	// Bind PBR base colour
+	glUniform3fv( shader.GetLocation( "material.color" ), 1, pbr.base_color_factor.data() );
+
+	// Bind PBR base color texture
+	glUniform1i( shader.GetLocation( "material.hasColorTexture" ), pbr.base_color_texture != nullptr );
+	if ( pbr.base_color_texture )
+	{
+		glUniform1i( shader.GetLocation( "material.colorTexture" ), 0 );
+		glActiveTexture( GL_TEXTURE0 );
+		auto& texture = mTextures.at( pbr.base_color_texture );
+		glBindTexture( GL_TEXTURE_2D, texture.getId() );
+	}
+
+	// Bind PBR metallic factor
+	glUniform1f( shader.GetLocation( "material.metallic" ), pbr.metallic_factor );
+
+	// Bind PBR roughness factor
+	glUniform1f( shader.GetLocation( "material.roughness" ), pbr.roughness_factor );
+
+	// Bind PBR ambient occlusion
+	glUniform1f( shader.GetLocation( "material.ambientOcclusion" ), 0.25f );
+}
+
+
+void GltfPrimitive::draw( const graphics::shader::Program& shader, const mathspot::Mat4& transform ) const
 {
 	// Bind transform matrix
 	glUniformMatrix4fv( shader.GetLocation( "model" ), 1, GL_FALSE, transform.matrix );
 	// Bind PBR base color texture
 	glUniform1i( shader.GetLocation( "vertex.hasColor" ), mHasVertexColors );
 
-	mMaterial.bind( shader );
+	if ( primitive && primitive->material )
+	{
+		bind_material( shader, *primitive->material );
+	}
 
 	glBindVertexArray( mVao );
 	if ( mIndicesCount > 0 )
@@ -318,3 +372,5 @@ void GltfPrimitive::draw( const graphics::shader::Program& shader, const mst::Ma
 	}
 	glBindVertexArray( 0 );
 }
+
+}  // namespace sunspot

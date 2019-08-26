@@ -2,22 +2,17 @@
 
 #include <fstream>
 
-#include "sunspot/graphics/Shader.h"
 #include "Color.h"
+#include "sunspot/graphics/Shader.h"
 
 
 namespace sunspot::graphics
 {
-
 class Texture;
 
 struct Material
 {
-  public:
-	Material();
-	Material( const char* n );
-	Material( std::string& n );
-	~Material();
+	Material( const std::string& n = "Unknown" );
 
 	/// Bind the material to the shader
 	void bind( const shader::Program& shader ) const;
@@ -26,27 +21,13 @@ struct Material
 
 	std::string name;
 
-	Color color;
-	float metallic;
-	float roughness;
-	float ambientOcclusion = 0.25f;
+	Color color             = { 1.0f, 1.0f, 0.0f };
+	float metallic          = 1.0f;
+	float roughness         = 1.0f;
+	float ambient_occlusion = 0.25f;
 
-	Texture* colorTexture = nullptr;
-
-	Color ambient;
-	Color diffuse;
-	Color specular;
-	float shininess = 32.0f;
-
-	bool hasAmbientMap;
-	GLuint ambientMap;
-
-	bool hasDiffuseMap;
-	GLuint diffuseMap;
-
-	bool hasSpecularMap;
-	GLuint specularMap;
+	Texture* color_texture = nullptr;
 };
 
 
-} // namespace sunspot::graphics
+}  // namespace sunspot::graphics

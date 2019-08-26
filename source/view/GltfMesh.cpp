@@ -2,20 +2,18 @@
 
 #include "ShaderProgram.h"
 #include "view/GltfMesh.h"
-#include "view/GltfPrimitive.h"
 
-using namespace std;
-using namespace gltfspot;
-using namespace sunspot;
+namespace sunspot
+{
 
 
-GltfMesh::GltfMesh( Gltf& model, Mesh& mesh )
+GltfMesh::GltfMesh( gltfspot::Gltf& model, gltfspot::Mesh& mesh )
     : name{ mesh.name }
 {
-	for ( auto p : mesh.primitives )
+	for ( auto& p : mesh.primitives )
 	{
-		GltfPrimitive primitive{ model, p };
-		primitives.push_back( move( primitive ) );
+		auto primitive = GltfPrimitive{ model, p };
+		primitives.push_back( std::move( primitive ) );
 	}
 }
 
@@ -26,4 +24,6 @@ void GltfMesh::draw( const graphics::shader::Program& program, const mathspot::M
 	{
 		primitive.draw( program, transform );
 	}
+}
+
 }

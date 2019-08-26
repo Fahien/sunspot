@@ -31,7 +31,8 @@ void Scripts::set_gltf( gltfspot::Gltf& g )
 				// Collision callbacks
 				if ( node->bounds )
 				{
-					node->bounds->colliding_with = [node, &script]( const gltfspot::Shape& s ) {
+					// TODO add other callbacks
+					node->bounds->start_colliding_with = [node, &script]( const gltfspot::Shape& s ) {
 						if ( s.node )
 						{
 							script.collide( *node, *s.node );

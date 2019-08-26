@@ -170,11 +170,11 @@ set(EXPORT_LIBRARIES
 # Build extension module with distutils
 find_package(Python3 COMPONENTS Interpreter)
 add_custom_command( OUTPUT sunspot.so
-COMMAND ${Python3_EXECUTABLE}
-ARGS ${CMAKE_CURRENT_SOURCE_DIR}/script/build-module.py sunspot ${GEN_SOURCES} --includes ${EXPORT_INCLUDES} --libraries ${EXPORT_LIBRARIES}
-WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/script
-COMMENT "Building python module"
-COMMAND_EXPAND_LISTS
+	COMMAND ${Python3_EXECUTABLE}
+	ARGS ${CMAKE_CURRENT_SOURCE_DIR}/script/build-module.py sunspot ${GEN_SOURCES} --includes ${EXPORT_INCLUDES} --libraries ${EXPORT_LIBRARIES}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/script
+	COMMENT "Building python module"
+	COMMAND_EXPAND_LISTS
 )
 add_custom_target(gen_bindings SOURCES sunspot.so)
 

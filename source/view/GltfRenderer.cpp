@@ -29,8 +29,7 @@ void GltfRenderer::set_gltf( Gltf& g )
 		meshes.clear();
 		for ( auto& m : g.get_meshes() )
 		{
-			GltfMesh mesh{ g, m };
-			meshes.emplace( &m, move( mesh ) );
+			meshes.emplace( &m, GltfMesh{ g, m } );
 		}
 
 		shapes.clear();

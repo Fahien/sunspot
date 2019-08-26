@@ -9,9 +9,6 @@
 #include "sunspot/graphics/Texture.h"
 
 
-namespace mst = mathspot;
-namespace gst = gltfspot;
-
 namespace sunspot
 {
 class GltfPrimitive
@@ -20,21 +17,28 @@ class GltfPrimitive
 	/// Base constructor
 	GltfPrimitive() = default;
 
+	GltfPrimitive( const GltfPrimitive& ) = delete;
+
 	/// Move constructor
 	GltfPrimitive( GltfPrimitive&& other );
 
-	/// Normal constructor
-	GltfPrimitive( gst::Gltf& model, gst::Mesh::Primitive& primitive );
+	/// Move assignment
+	GltfPrimitive& operator=( GltfPrimitive&& other );
 
-	GltfPrimitive( gst::Gltf& model, gst::Shape& shape );
+	/// Normal constructor
+	GltfPrimitive( gltfspot::Gltf& model, gltfspot::Mesh::Primitive& primitive );
+
+	GltfPrimitive( gltfspot::Gltf& model, gltfspot::Shape& shape );
 
 	/// Destructor
 	~GltfPrimitive();
 
-	void draw( const graphics::shader::Program& shader, const mst::Mat4& transform = mst::Mat4::identity ) const;
+	void bind_material( const graphics::shader::Program& shader, gltfspot::Material& material ) const;
+
+	void draw( const graphics::shader::Program& shader, const mathspot::Mat4& transform = mathspot::Mat4::identity ) const;
 
   private:
-	void read_indices( gst::Gltf& model, gst::Mesh::Primitive& primitive );
+	void read_indices( gltfspot::Gltf& model, gltfspot::Mesh::Primitive& primitive );
 
 	bool                     mHasVao{};
 	GLuint                   mVao{};
@@ -51,9 +55,11 @@ class GltfPrimitive
 
 	bool mHasVertexColors{};
 
+	gltfspot::Mesh::Primitive* primitive = nullptr;
+
 	graphics::Material mMaterial{};
 
-	std::map<gst::Gltf::Texture*, graphics::Texture> mTextures{};
+	std::unordered_map<gltfspot::Texture*, graphics::Texture> mTextures{};
 };
 
 
