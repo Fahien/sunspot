@@ -219,7 +219,6 @@ set(SOURCES
 	source/graphics/Light.cpp
 	source/Quad.h
 	source/Quad.cpp
-	source/graphics/Framebuffer.cpp
 	source/Camera.h
 	source/Camera.cpp)
 

@@ -12,7 +12,6 @@
 #include "component/Model.h"
 #include "entity/Entity.h"
 #include "sunspot/core/Game.h"
-#include "sunspot/graphics/Framebuffer.h"
 #include "sunspot/graphics/Gl.h"
 #include "sunspot/graphics/Light.h"
 #include "sunspot/graphics/Shader.h"
@@ -44,7 +43,6 @@ Window::Window( Game& g, const std::string& t, const mst::Size& window_size, con
     , mObjs{}
     , mQuadProgram{ nullptr }
     , mDepthProgram{ nullptr }
-    , mFramebuffer{ nullptr }
     , mQuad{ nullptr }
 {
 }

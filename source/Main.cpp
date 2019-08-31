@@ -17,7 +17,6 @@
 #include "sunspot/core/Game.h"
 
 #include "Quad.h"
-#include "sunspot/graphics/Framebuffer.h"
 #include "sunspot/graphics/Light.h"
 #include "sunspot/graphics/Shader.h"
 

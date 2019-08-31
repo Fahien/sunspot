@@ -12,7 +12,6 @@
 #include "Cursor.h"
 #include "sunspot/component/Camera.h"
 #include "sunspot/core/Collisions.h"
-#include "sunspot/graphics/Framebuffer.h"
 #include "sunspot/graphics/Graphics.h"
 #include "sunspot/input/Input.h"
 
@@ -63,7 +62,6 @@ class Window
 
 	void SetCamera( GltfCamera* camera ) { m_pCamera = camera; }
 	void SetCamera( Entity& camera ) { m_Camera = &camera; }
-	void setFramebuffer( const graphics::Framebuffer* framebuffer ) { mFramebuffer = framebuffer; }
 
 	virtual void UpdateSize() = 0;
 
@@ -118,7 +116,6 @@ class Window
 	GltfRenderer*                    mGltfRenderer{ nullptr };
 	const graphics::shader::Program* mQuadProgram;
 	const graphics::shader::Program* mDepthProgram;
-	const graphics::Framebuffer*     mFramebuffer;
 	const Quad*                      mQuad;
 };
 
