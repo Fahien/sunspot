@@ -32,7 +32,7 @@ void Game::handle( input::Input&& in )
 
 const float Game::compute_delta_time()
 {
-	time.current     = static_cast<float>( glfwGetTime() );
+	time.current     = window.get_time();
 	const auto delta = time.current - time.last;
 	time.last        = time.current;
 	return delta;
@@ -41,10 +41,10 @@ const float Game::compute_delta_time()
 
 void Game::loop()
 {
-	while ( !window.IsClosing() )
+	while ( !window.is_closing() )
 	{
-		window.PollEvents();
-		window.UpdateSize();
+		window.poll_events();
+		window.update_size();
 
 		collisions.update( get_scene() );
 
@@ -68,7 +68,7 @@ void Game::loop()
 
 		gui.draw();
 
-		window.SwapBuffers();
+		window.swap_buffers();
 	}
 }
 

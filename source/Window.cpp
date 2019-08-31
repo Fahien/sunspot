@@ -22,36 +22,20 @@ using namespace mathspot;
 
 namespace sunspot
 {
-const std::string Window::tag{ "Window" };
+const std::string tag{ "Window" };
 
 
-Window::Window( Game& g, const std::string& t, const mst::Size& window_size, const bool stereoscopic )
+Window::Window( Game& g, const std::string& t, const mst::Size& window_size )
     : game{ g }
     , title{ t }
     , window{ /* .size = */ window_size }
-    , m_MonitorSize{ window_size }
-    , m_FrameSize{ window_size }
-    , mStereoscopic{ stereoscopic }
-    , mFullscreen{ false }
-    , mCurrentTime{ 0.0f }
-    , mLastTime{ 0.0f }
-    , mDeltaTime{ 0.0f }
-    , mCursor{}
-    , m_pCamera{ nullptr }
-    , mBaseProgram{ nullptr }
-    , mLight{ nullptr }
-    , mObjs{}
-    , mQuadProgram{ nullptr }
-    , mDepthProgram{ nullptr }
-    , mQuad{ nullptr }
+    , monitor_size{ window_size }
+    , frame_size{ window_size }
+    , fullscreen{ false }
 {
 }
 
-
-Window::~Window() {}
-
-
-void Window::initGlew()
+void Window::init_glew()
 {
 	glewExperimental = GL_TRUE;  // Initialize GLEW and handle error
 	if ( glewInit() != GLEW_OK )
@@ -61,7 +45,7 @@ void Window::initGlew()
 }
 
 
-void Window::handleInput( input::Input&& i )
+void Window::handle( input::Input&& i )
 {
 	game.handle( std::move( i ) );
 }

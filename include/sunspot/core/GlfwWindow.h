@@ -26,36 +26,42 @@ class GlfwException : public graphics::Exception
 class GlfwWindow : public Window
 {
   public:
-	GlfwWindow( Game& game, const std::string& title = "SunSpot", const mst::Size& window_size = { 960, 540 },
-	            const bool stereoscopic = false );
-	~GlfwWindow();
+	GlfwWindow( Game& game, const std::string& title = "SunSpot", const mst::Size& window_size = { 960, 540 } );
+	~GlfwWindow() override;
 
-	GLFWwindow* GetHandle() const { return handle; }
+	GLFWwindow* get_handle() const { return handle; }
 
-	void ToggleMaximization()
+	void toggle_maximization()
 	{
 		maximized ? glfwRestoreWindow( handle ) : glfwMaximizeWindow( handle );
 		maximized = !maximized;
 	}
-	void Restore()
+
+	void restore()
 	{
 		glfwRestoreWindow( handle );
 		maximized = false;
 	}
-	void SetClosing( const bool closing ) const;
-	bool IsClosing() const { return glfwWindowShouldClose( handle ); }
-	void PollEvents() const { glfwPollEvents(); }
-	void SwapBuffers() const
+
+	void set_closing( const bool closing ) const;
+
+	bool is_closing() const { return glfwWindowShouldClose( handle ); }
+
+	void poll_events() const { glfwPollEvents(); }
+
+	void swap_buffers() const
 	{
 		glfwMakeContextCurrent( handle );
 		glfwSwapBuffers( handle );
 	}
-	const Win::Position& GetPosition()
+
+	const Win::Position& get_position()
 	{
 		glfwGetWindowPos( handle, &window.pos.x, &window.pos.y );
 		return window.pos;
 	}
-	void SetPosition( const int x, const int y )
+
+	void set_position( const int x, const int y )
 	{
 		if ( !maximized )
 		{
@@ -63,8 +69,10 @@ class GlfwWindow : public Window
 			glfwSetWindowPos( handle, x, y );
 		}
 	}
-	const float GetTime() const { return static_cast<float>( glfwGetTime() ); }
-	void        UpdateSize();
+
+	const float get_time() const { return static_cast<float>( glfwGetTime() ); }
+
+	void update_size();
 
 	struct Context
 	{
@@ -77,17 +85,18 @@ class GlfwWindow : public Window
 	} context;
 
   protected:
-	void               toggleFullscreen();
-	const input::Input pollInput();
+	void toggle_fullscreen() override;
+
+	const input::Input poll_input() override;
 
   private:
-	void handleMouse( const int action );
-	void handleMouse( const double x, const double y );
-	void handleInput( const int key, const int action );
+	void handle_mouse( const int action );
+	void handle_mouse( const double x, const double y );
+	void handle_input( const int key, const int action );
 
-	GLFWmonitor*       monitor;
-	const GLFWvidmode* videomode;
-	GLFWwindow*        handle;
+	GLFWmonitor*       monitor   = nullptr;
+	const GLFWvidmode* videomode = nullptr;
+	GLFWwindow*        handle    = nullptr;
 	bool               maximized = false;
 };
 

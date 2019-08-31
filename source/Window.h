@@ -44,34 +44,19 @@ class GlewException : public graphics::Exception
 class Window
 {
   public:
-	static const std::string tag;
+	Window( Game& game, const std::string& title, const mst::Size& window_size );
+	virtual ~Window() = default;
 
-	Window( Game& game, const std::string& title, const mst::Size& window_size, const bool stereoscopic );
-	~Window();
-
-	const mst::Size& getFrameSize() const { return m_FrameSize; }
-	inline void      setBaseProgram( const graphics::shader::Program* baseProgram ) { mBaseProgram = baseProgram; }
-	inline void      setLight( graphics::Light* light ) { mLight = light; }
-	inline void      addObj( WavefrontObject* obj ) { mObjs.push_back( obj ); }
-	inline void      AddGltf( GltfRenderer* renderer ) { mGltfRenderer = renderer; }
-
-	inline void setQuad( Quad* quad ) { mQuad = quad; }
-	inline void setQuadProgram( const graphics::shader::Program* quadProgram ) { mQuadProgram = quadProgram; }
-	inline void setDepthProgram( const graphics::shader::Program* depthProgram ) { mDepthProgram = depthProgram; }
-
-
-	void SetCamera( GltfCamera* camera ) { m_pCamera = camera; }
-	void SetCamera( Entity& camera ) { m_Camera = &camera; }
-
-	virtual void UpdateSize() = 0;
+	const mst::Size& get_frame_size() const { return frame_size; }
 
   protected:
-	static void initGlew();
-	void        handleInput( input::Input&& in );
+	static void init_glew();
+	void        handle( input::Input&& in );
 	Game&       get_game() { return game; }
 
-	virtual void               toggleFullscreen() = 0;
-	virtual const input::Input pollInput()        = 0;
+	virtual void toggle_fullscreen() = 0;
+
+	virtual const input::Input poll_input() = 0;
 
 	std::string title;
 
@@ -87,36 +72,20 @@ class Window
 			int y;
 		} pos;
 	} window;
-	mst::Size m_MonitorSize;
-	mst::Size m_FrameSize;
+	mst::Size monitor_size;
+	mst::Size frame_size;
 
-	bool mStereoscopic;
-	bool mFullscreen;
+	bool fullscreen;
 
-	float mCurrentTime;
-	float mLastTime;
-	float mDeltaTime;
+	input::Type   type     = input::Type::INVALID;
+	input::Key    key      = input::Key::NONE;
+	input::Action action   = input::Action::RELEASE;
+	mst::Vec2     position = { 0.0f, 0.0f };
 
-	input::Type   mType{ input::Type::INVALID };
-	input::Key    mKey{ input::Key::NONE };
-	input::Action mAction{ input::Action::RELEASE };
-	mst::Vec2     mPosition{ 0.0f, 0.0f };
-
-	Cursor mCursor;
-
-	GltfCamera* m_pCamera;
-	Entity*     m_Camera;
+	Cursor cursor;
 
   private:
 	Game& game;
-
-	const graphics::shader::Program* mBaseProgram;
-	graphics::Light*                 mLight;
-	std::vector<WavefrontObject*>    mObjs;
-	GltfRenderer*                    mGltfRenderer{ nullptr };
-	const graphics::shader::Program* mQuadProgram;
-	const graphics::shader::Program* mDepthProgram;
-	const Quad*                      mQuad;
 };
 
 

@@ -11,18 +11,18 @@ namespace lst = logspot;
 
 namespace sunspot
 {
-GlfwWindow::GlfwWindow( Game& game, const std::string& title, const mst::Size& window_size, const bool stereoscopic )
-    : Window::Window{ game, title, window_size, stereoscopic }
+const std::string tag{ "GlfwWindow" };
+
+GlfwWindow::GlfwWindow( Game& game, const std::string& title, const mst::Size& window_size )
+    : Window::Window{ game, title, window_size }
     , context{ { 3, 3 }, GLFW_OPENGL_CORE_PROFILE }
-    , monitor{ nullptr }
-    , videomode{ nullptr }
-    , handle{ nullptr }
 {
 	// Initialize GLFW and handle error
 	if ( glfwInit() != GLFW_TRUE )
 	{
 		throw GlfwException{ tag, "Could not initialize GLFW" };
 	}
+
 	// Set the error callback
 	glfwSetErrorCallback(
 	    []( int error, const char* description ) { lst::Log::error( "%s: %s [%d]", tag.c_str(), description, error ); } );
@@ -42,8 +42,8 @@ GlfwWindow::GlfwWindow( Game& game, const std::string& title, const mst::Size& w
 		glfwTerminate();
 		throw GlfwException{ tag, "Could not get video mode" };
 	}
-	m_MonitorSize.width  = videomode->width;
-	m_MonitorSize.height = videomode->height;
+	monitor_size.width  = videomode->width;
+	monitor_size.height = videomode->height;
 
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, context.version.major );
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, context.version.minor );
@@ -78,24 +78,24 @@ GlfwWindow::GlfwWindow( Game& game, const std::string& title, const mst::Size& w
 	// glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Listen to mouse events
-	glfwSetMouseButtonCallback( handle, []( GLFWwindow* handle, int button, int action, int mods ) {
+	glfwSetMouseButtonCallback( handle, []( GLFWwindow* handle, int button, int act, int mods ) {
 		auto win = reinterpret_cast<GlfwWindow*>( glfwGetWindowUserPointer( handle ) );
-		win->handleMouse( action );
+		win->handle_mouse( act );
 	} );
 	glfwSetCursorPosCallback( handle, []( GLFWwindow* handle, double xpos, double ypos ) {
 		auto win = reinterpret_cast<GlfwWindow*>( glfwGetWindowUserPointer( handle ) );
-		win->handleMouse( xpos, ypos );
+		win->handle_mouse( xpos, ypos );
 	} );
 
 	// Listen to keyboard events
-	glfwSetKeyCallback( handle, []( GLFWwindow* handle, int key, int /* scancode */, int action, int /* mode */ ) {
+	glfwSetKeyCallback( handle, []( GLFWwindow* handle, int k, int /* scancode */, int act, int /* mode */ ) {
 		auto win = reinterpret_cast<GlfwWindow*>( glfwGetWindowUserPointer( handle ) );
-		win->handleInput( key, action );
+		win->handle_input( k, act );
 	} );
 
 	try  // Initialize glew
 	{
-		Window::initGlew();
+		Window::init_glew();
 	}
 	catch ( const GlewException& )  // Handle error
 	{
@@ -104,10 +104,10 @@ GlfwWindow::GlfwWindow( Game& game, const std::string& title, const mst::Size& w
 		throw;
 	}
 
-	UpdateSize();
+	update_size();
 
 	lst::Log::info( "%s created\n\tOpenGL %s\n\tGLFW %s\n\tFrame size %dx%d\n", tag.c_str(), glGetString( GL_VERSION ),
-	                glfwGetVersionString(), m_FrameSize.width, m_FrameSize.height );
+	                glfwGetVersionString(), frame_size.width, frame_size.height );
 }
 
 
@@ -118,11 +118,10 @@ GlfwWindow::~GlfwWindow()
 		glfwDestroyWindow( handle );
 	}
 	glfwTerminate();
-	lst::Log::info( "%s: destroyed", tag.c_str() );  // TODO remove debug log
 }
 
 
-void GlfwWindow::SetClosing( const bool closing ) const
+void GlfwWindow::set_closing( const bool closing ) const
 {
 	if ( closing )
 	{
@@ -130,109 +129,109 @@ void GlfwWindow::SetClosing( const bool closing ) const
 	}
 }
 
-void GlfwWindow::handleMouse( const int action )
+void GlfwWindow::handle_mouse( const int act )
 {
-	if ( action == GLFW_PRESS )
+	if ( act == GLFW_PRESS )
 	{
-		mAction = input::Action::PRESS;
+		action = input::Action::PRESS;
 	}
-	else if ( action == GLFW_RELEASE )
+	else if ( act == GLFW_RELEASE )
 	{
-		mAction = input::Action::RELEASE;
+		action = input::Action::RELEASE;
 	}
-	Window::handleInput( input::Input{ mType, mKey, mAction, mPosition } );
+	Window::handle( input::Input{ type, key, action, position } );
 }
 
 
-void GlfwWindow::handleMouse( const double x, const double y )  // TODO comment
+void GlfwWindow::handle_mouse( const double x, const double y )  // TODO comment
 {
-	mCursor.setPosition( static_cast<float>( x ), static_cast<float>( y ) );
-	mType       = input::Type::MOTION;
-	mPosition.x = static_cast<float>( x );
-	mPosition.y = static_cast<float>( y );
-	Window::handleInput( input::Input{ mType, mKey, mAction, mPosition } );
+	cursor.setPosition( static_cast<float>( x ), static_cast<float>( y ) );
+	type       = input::Type::MOTION;
+	position.x = static_cast<float>( x );
+	position.y = static_cast<float>( y );
+	Window::handle( input::Input{ type, key, action, position } );
 }
 
 
-const input::Input GlfwWindow::pollInput()
+const input::Input GlfwWindow::poll_input()
 {
 	glfwPollEvents();
 	return input::Input{};
 }
 
 
-void GlfwWindow::handleInput( const int key, const int action )  // TODO comment
+void GlfwWindow::handle_input( const int k, const int act )  // TODO comment
 {
-	if ( action == GLFW_PRESS )
+	if ( act == GLFW_PRESS )
 	{
-		mAction = input::Action::PRESS;
+		action = input::Action::PRESS;
 	}
-	else if ( action == GLFW_RELEASE )
+	else if ( act == GLFW_RELEASE )
 	{
-		mAction = input::Action::RELEASE;
+		action = input::Action::RELEASE;
 	}
-	else if ( action == GLFW_REPEAT )
+	else if ( act == GLFW_REPEAT )
 	{
-		mAction = input::Action::REPEAT;
+		action = input::Action::REPEAT;
 	}
 
-	switch ( key )
+	switch ( k )
 	{
 		case GLFW_KEY_A:
-			mKey = input::Key::A;
+			key = input::Key::A;
 			break;
 		case GLFW_KEY_Q:
-			mKey = input::Key::Q;
+			key = input::Key::Q;
 			break;
 		case GLFW_KEY_W:
-			mKey = input::Key::W;
+			key = input::Key::W;
 			break;
 		case GLFW_KEY_E:
-			mKey = input::Key::E;
+			key = input::Key::E;
 			break;
 		case GLFW_KEY_S:
-			mKey = input::Key::S;
+			key = input::Key::S;
 			break;
 		case GLFW_KEY_D:
-			mKey = input::Key::D;
+			key = input::Key::D;
 			break;
 		case GLFW_KEY_UP:
-			mKey = input::Key::UP;
+			key = input::Key::UP;
 			break;
 		case GLFW_KEY_LEFT:
-			mKey = input::Key::LEFT;
+			key = input::Key::LEFT;
 			break;
 		case GLFW_KEY_RIGHT:
-			mKey = input::Key::RIGHT;
+			key = input::Key::RIGHT;
 			break;
 		case GLFW_KEY_DOWN:
-			mKey = input::Key::DOWN;
+			key = input::Key::DOWN;
 			break;
 		case GLFW_KEY_F:
-			mKey = input::Key::NONE;
-			if ( action == GLFW_PRESS )
+			key = input::Key::NONE;
+			if ( act == GLFW_PRESS )
 			{
-				toggleFullscreen();
+				toggle_fullscreen();
 			}
 			break;
 		case GLFW_KEY_ESCAPE:
 			glfwSetWindowShouldClose( handle, GLFW_TRUE );
 			break;
 		default:
-			mKey = input::Key::NONE;
+			key = input::Key::NONE;
 			break;
 	}
 
-	mType = input::Type::KEY;
-	Window::handleInput( input::Input{ mType, mKey, mAction, mPosition } );
+	type = input::Type::KEY;
+	Window::handle( input::Input{ type, key, action, position } );
 }
 
 
-void GlfwWindow::toggleFullscreen()
+void GlfwWindow::toggle_fullscreen()
 {
 	monitor   = glfwGetPrimaryMonitor();
 	videomode = glfwGetVideoMode( monitor );
-	if ( mFullscreen )  // Use start-up values for windowed mode
+	if ( fullscreen )  // Use start-up values for windowed mode
 	{
 		glfwSetWindowMonitor( handle, nullptr,
 		                      videomode->width / 2 - window.size.width / 2,    // X center
@@ -247,14 +246,14 @@ void GlfwWindow::toggleFullscreen()
 		                      videomode->width, videomode->height, videomode->refreshRate );
 	}
 	glfwSwapInterval( 1 );  // Vsync
-	mFullscreen = !mFullscreen;
+	fullscreen = !fullscreen;
 }
 
 
-void GlfwWindow::UpdateSize()
+void GlfwWindow::update_size()
 {
-	glfwGetFramebufferSize( handle, &m_FrameSize.width, &m_FrameSize.height );
-	get_game().set_size( m_FrameSize );
+	glfwGetFramebufferSize( handle, &frame_size.width, &frame_size.height );
+	get_game().set_size( frame_size );
 }
 
 

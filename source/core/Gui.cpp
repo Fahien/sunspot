@@ -19,7 +19,7 @@ ImGui::ImGui( const GlfwWindow& window )
 	::ImGui::CreateContext();
 	assert( result && "Cannot create ImGui Context" );
 
-	ImGui_ImplGlfw_InitForOpenGL( window.GetHandle(), true );
+	ImGui_ImplGlfw_InitForOpenGL( window.get_handle(), true );
 	assert( result && "Cannot init ImGui for Glfw" );
 
 	ImGui_ImplOpenGL3_Init( "#version 150" );
