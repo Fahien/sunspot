@@ -106,6 +106,10 @@ void Editor::draw( gltfspot::Mesh& mesh )
 							DragFloat4( "color", material->pbr_metallic_roughness.base_color_factor.data(), 0.05f, 0.0f,
 							            1.0f, "%.2f" );
 						}
+						DragFloat("metallic", &material->pbr_metallic_roughness.metallic_factor, 0.05f, 0.0f,
+							            1.0f, "%.2f" );
+						DragFloat("roughness", &material->pbr_metallic_roughness.roughness_factor, 0.05f, 0.0f,
+							            1.0f, "%.2f" );
 						TreePop();
 					}
 				}
@@ -128,7 +132,7 @@ void Editor::draw( gltfspot::Node& node )
 	}
 	auto node_open = TreeNodeEx( &node, flags, "%s", node.name.c_str() );
 
-	// Drag source
+	// Draggable node starting
 	if ( BeginDragDropSource( ImGuiDragDropFlags_None ) )
 	{
 		auto node_address = &node;
@@ -137,7 +141,7 @@ void Editor::draw( gltfspot::Node& node )
 		EndDragDropSource();
 	}
 
-	// Drag target
+	// Draggable node dropping to a target
 	if ( BeginDragDropTarget() )
 	{
 		if ( auto payload = AcceptDragDropPayload( "GLTF_NODE" ) )

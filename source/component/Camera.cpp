@@ -1,7 +1,7 @@
 #include "sunspot/component/Camera.h"
 
-#include <cmath>
 #include <mathspot/Math.h>
+#include <cmath>
 
 #include "sunspot/entity/Entity.h"
 
@@ -9,8 +9,6 @@ using namespace mathspot;
 
 namespace sunspot::component
 {
-
-
 Camera& PerspectiveCamera::Default()
 {
 	static PerspectiveCamera camera;
@@ -19,12 +17,12 @@ Camera& PerspectiveCamera::Default()
 
 
 PerspectiveCamera::PerspectiveCamera( const float a, const float y, const float f, const float n )
-:	Camera        { f , n }
-,	m_AspectRatio { a }
-,	m_YFov        { y }
+    : Camera{ f, n }
+    , m_AspectRatio{ a }
+    , m_YFov{ y }
 {
 	// Calculate projection matrix
-	float cotfov { 1.0f / std::tan( 0.5f * y ) };
+	float cotfov{ 1.0f / std::tan( 0.5f * y ) };
 	m_Projection[0]  = cotfov / a;
 	m_Projection[5]  = cotfov;
 	m_Projection[10] = -( n + f ) / ( f - n );
@@ -32,7 +30,7 @@ PerspectiveCamera::PerspectiveCamera( const float a, const float y, const float 
 	m_Projection[11] = -1.0f;
 
 	// Calculate view matrix
-	auto direction = Vec3 { 0.0f, 0.0f, 1.0f };
+	auto direction = Vec3{ 0.0f, 0.0f, 1.0f };
 	auto right     = Vec3::Cross( direction, Vec3{ 0.0f, 1.0f, 0.0f } );
 	auto up        = Vec3::Cross( right, direction );
 	up.Normalize();
@@ -50,9 +48,9 @@ PerspectiveCamera::PerspectiveCamera( const float a, const float y, const float 
 
 void PerspectiveCamera::SetAspectRatio( const float a )
 {
-	const float cotfov { 1.0f / std::tan( 0.5f * m_YFov ) };
+	const float cotfov{ 1.0f / std::tan( 0.5f * m_YFov ) };
 	m_Projection[0] = cotfov / a;
-	m_AspectRatio = a;
+	m_AspectRatio   = a;
 }
 
 constexpr float OrthographicCamera::kRight  = 20.0f;
@@ -62,26 +60,27 @@ constexpr float OrthographicCamera::kBottom = -20.0f;
 constexpr float OrthographicCamera::kNear   = 0.0f;
 constexpr float OrthographicCamera::kFar    = 20.0f;
 
-OrthographicCamera::OrthographicCamera( const float r, const float l, const float t, const float b, const float f, const float n )
-:	Camera   { f , n }
-,	m_Right  { r }
-,	m_Left   { l }
-,	m_Top    { t }
-,	m_Bottom { b }
+OrthographicCamera::OrthographicCamera( const float r, const float l, const float t, const float b, const float f,
+                                        const float n )
+    : Camera{ f, n }
+    , m_Right{ r }
+    , m_Left{ l }
+    , m_Top{ t }
+    , m_Bottom{ b }
 {
 	// Calculate projection matrix
 	m_Projection[0]  = 2.0f / ( r - l );
 	m_Projection[5]  = 2.0f / ( t - b );
 	m_Projection[10] = -2.0f / ( f - n );
-	m_Projection[12] = - ( r + l ) / ( r - l );
-	m_Projection[13] = - ( t + b) / ( t - b );
+	m_Projection[12] = -( r + l ) / ( r - l );
+	m_Projection[13] = -( t + b ) / ( t - b );
 	m_Projection[14] = -( f + n ) / ( f - n );
 	m_Projection[15] = 1.0f;
 
 	// Calculate view matrix
-	auto direction = Vec3 { 0.0f, 0.0f, 1.0f };
-	auto right     = Vec3 { 1.0f, 0.0f, 0.0f };
-	auto up        = Vec3 { 0.0f, 1.0f, 0.0f };
+	auto direction = Vec3{ 0.0f, 0.0f, 1.0f };
+	auto right     = Vec3{ 1.0f, 0.0f, 0.0f };
+	auto up        = Vec3{ 0.0f, 1.0f, 0.0f };
 
 	m_Rotation[0]  = right.x;
 	m_Rotation[1]  = up.x;
@@ -123,7 +122,7 @@ void Camera::Rotate( const Quat& q )
 
 void Camera::updateView()
 {
-	auto& transform = GetTransform();
+	auto& transform   = GetTransform();
 	m_Translation[12] = -transform.position.x;
 	m_Translation[13] = -transform.position.y;
 	m_Translation[14] = -transform.position.z;
@@ -140,19 +139,19 @@ void Camera::Update( const graphics::shader::Program& program )
 {
 	// View
 	updateView();
-	auto location = program.GetLocation( "view" );
+	auto location = program.get_location( "view" );
 	glUniformMatrix4fv( location, 1, GL_FALSE, m_View.matrix );
 
 	// Projection
-	location = program.GetLocation( "projection" );
+	location = program.get_location( "projection" );
 	glUniformMatrix4fv( location, 1, GL_FALSE, m_Projection.matrix );
 
 	// Position
-	location = program.GetLocation( "camera.position" );
+	location = program.get_location( "camera.position" );
 
 	auto& position = GetTransform().position;
 	glUniform3fv( location, 1, &position.x );
 }
 
 
-} // namespace sunspot::component
+}  // namespace sunspot::component

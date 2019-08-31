@@ -76,23 +76,23 @@ Framebuffer::~Framebuffer()
 
 void Framebuffer::bindColorTexture(const shader::Program& shader) const
 {
-	glUniform1i(shader.GetLocation("colorTexture"), 0);
+	glUniform1i(shader.get_location("colorTexture"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, mColorTexture);
-	glUniform1i(shader.GetLocation("headerTexture"), 1);
+	glUniform1i(shader.get_location("headerTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, mHeaderTexture);
-	glUniform2f(shader.GetLocation("frameSize"),
+	glUniform2f(shader.get_location("frameSize"),
 		static_cast<GLfloat>(mSize.width), static_cast<GLfloat>(mSize.height));
 }
 
 
 void Framebuffer::bindDepthTexture(const shader::Program& shader) const
 {
-	glUniform1i(shader.GetLocation("depthTexture"), 0);
+	glUniform1i(shader.get_location("depthTexture"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, mDepthTexture);
-	glUniform2f(shader.GetLocation("frameSize"),
+	glUniform2f(shader.get_location("frameSize"),
 		static_cast<GLfloat>(mSize.width), static_cast<GLfloat>(mSize.height));
 }
 

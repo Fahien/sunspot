@@ -21,25 +21,25 @@ Material::Material( const string& n )
 void Material::bind( const shader::Program& shader ) const
 {
 	// Bind PBR base colour
-	glUniform3f( shader.GetLocation( "material.color" ), color.r, color.g, color.b );
+	glUniform3f( shader.get_location( "material.color" ), color.r, color.g, color.b );
 
 	// Bind PBR base color texture
-	glUniform1i( shader.GetLocation( "material.hasColorTexture" ), color_texture != nullptr );
+	glUniform1i( shader.get_location( "material.hasColorTexture" ), color_texture != nullptr );
 	if ( color_texture )
 	{
-		glUniform1i( shader.GetLocation( "material.colorTexture" ), 0 );
+		glUniform1i( shader.get_location( "material.colorTexture" ), 0 );
 		glActiveTexture( GL_TEXTURE0 );
 		glBindTexture( GL_TEXTURE_2D, color_texture->getId() );
 	}
 
 	// Bind PBR metallic factor
-	glUniform1f( shader.GetLocation( "material.metallic" ), metallic );
+	glUniform1f( shader.get_location( "material.metallic" ), metallic );
 
 	// Bind PBR roughness factor
-	glUniform1f( shader.GetLocation( "material.roughness" ), roughness );
+	glUniform1f( shader.get_location( "material.roughness" ), roughness );
 
 	// Bind PBR ambient occlusion
-	glUniform1f( shader.GetLocation( "material.ambientOcclusion" ), ambient_occlusion );
+	glUniform1f( shader.get_location( "material.ambientOcclusion" ), ambient_occlusion );
 }
 
 }  // namespace sunspot::graphics

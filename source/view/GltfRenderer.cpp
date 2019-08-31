@@ -50,19 +50,19 @@ void GltfRenderer::set_gltf( Gltf& g )
 
 void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Light& light, const mst::Mat4& transform )
 {
-	GLuint location{ shader.GetLocation( "pointLightActive" ) };
+	GLuint location{ shader.get_location( "pointLightActive" ) };
 	glUniform1i( location, true );
 
-	location = shader.GetLocation( "pLight.position" );
+	location = shader.get_location( "pLight.position" );
 	glUniform3fv( location, 1, &transform.matrix[12] );
 
-	location = shader.GetLocation( "pLight.ambient" );
+	location = shader.get_location( "pLight.ambient" );
 	glUniform3fv( location, 1, &light.color.x );
 
-	location = shader.GetLocation( "pLight.diffuse" );
+	location = shader.get_location( "pLight.diffuse" );
 	glUniform3fv( location, 1, &light.color.x );
 
-	location = shader.GetLocation( "pLight.specular" );
+	location = shader.get_location( "pLight.specular" );
 	glUniform3fv( location, 1, &light.color.x );
 }
 
@@ -108,12 +108,12 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const Node& no
 	// Render the shape
 	if ( node.bounds )
 	{
-		glDisable(GL_DEPTH_TEST);
-		shape_shader.Use();
+		glDisable( GL_DEPTH_TEST );
+		shape_shader.use();
 		auto& shape = shapes[node.bounds_index];
 		shape.draw( shape_shader, tTransform );
-		shader.Use();
-		glEnable(GL_DEPTH_TEST);
+		shader.use();
+		glEnable( GL_DEPTH_TEST );
 	}
 }
 
@@ -153,25 +153,25 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Cam
 	view[13] *= -1;
 	view[14] *= -1;
 
-	auto location = shader.GetLocation( "view" );
+	auto location = shader.get_location( "view" );
 	glUniformMatrix4fv( location, 1, GL_FALSE, &view[0] );
 
-	shape_shader.Use();
-	location = shape_shader.GetLocation( "view" );
+	shape_shader.use();
+	location = shape_shader.get_location( "view" );
 	glUniformMatrix4fv( location, 1, GL_FALSE, &view[0] );
-	shader.Use();
+	shader.use();
 
 	auto projection = create_projection_matrix( camera );
 
-	location = shader.GetLocation( "projection" );
+	location = shader.get_location( "projection" );
 	glUniformMatrix4fv( location, 1, GL_FALSE, &projection[0] );
 
-	shape_shader.Use();
-	location = shape_shader.GetLocation( "projection" );
+	shape_shader.use();
+	location = shape_shader.get_location( "projection" );
 	glUniformMatrix4fv( location, 1, GL_FALSE, &projection[0] );
-	shader.Use();
+	shader.use();
 
-	location = shader.GetLocation( "camera.position" );
+	location = shader.get_location( "camera.position" );
 	glUniform3fv( location, 1, &transform[12] );
 }
 

@@ -251,22 +251,6 @@ void GlfwWindow::toggleFullscreen()
 }
 
 
-void GlfwWindow::loop()  // TODO comment
-{
-	// glEnable(GL_CULL_FACE);
-	// glCullFace(GL_FRONT);
-#ifdef SST_PROFILING
-	std::cout << "#Frame\tPass1\tPass2.1\tPass2.2\tTotal\tOverhead\n";
-#endif
-	while ( !glfwWindowShouldClose( handle ) )
-	{
-		glfwPollEvents();
-		Window::render();
-		glfwSwapBuffers( handle );
-	}
-}
-
-
 void GlfwWindow::UpdateSize()
 {
 	glfwGetFramebufferSize( handle, &m_FrameSize.width, &m_FrameSize.height );

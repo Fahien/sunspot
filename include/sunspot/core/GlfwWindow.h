@@ -66,8 +66,6 @@ class GlfwWindow : public Window
 	const float GetTime() const { return static_cast<float>( glfwGetTime() ); }
 	void        UpdateSize();
 
-	void loop();
-
 	struct Context
 	{
 		struct
@@ -81,18 +79,11 @@ class GlfwWindow : public Window
   protected:
 	void               toggleFullscreen();
 	const input::Input pollInput();
-	void               render( const float& deltaTime );
 
   private:
 	void handleMouse( const int action );
 	void handleMouse( const double x, const double y );
 	void handleInput( const int key, const int action );
-
-	void renderMesh( const float& deltaTime );
-	void render3D( const float& deltaTime );
-	void render3DplusDepth( const float& deltaTime );
-	void renderQuad( const float& deltaTime );
-	void renderStereoscopic( const float& deltaTime );
 
 	GLFWmonitor*       monitor;
 	const GLFWvidmode* videomode;

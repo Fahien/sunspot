@@ -85,12 +85,12 @@ void GltfCamera::Rotate( const Quat& q )
 
 void GltfCamera::Update( const graphics::shader::Program& program )
 {
-	auto location = program.GetLocation( "view" );
+	auto location = program.get_location( "view" );
 	glUniformMatrix4fv( location, 1, GL_FALSE, m_View.matrix );
 
-	location = program.GetLocation( "projection" );
+	location = program.get_location( "projection" );
 	glUniformMatrix4fv( location, 1, GL_FALSE, m_Projection.matrix );
 
-	location = program.GetLocation( "camera.position" );
+	location = program.get_location( "camera.position" );
 	glUniform3fv( location, 1, &m_View.matrix[12] );
 }

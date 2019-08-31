@@ -326,35 +326,35 @@ void GltfPrimitive::bind_material( const graphics::shader::Program& shader, gltf
 	auto& pbr = material.pbr_metallic_roughness;
 
 	// Bind PBR base colour
-	glUniform3fv( shader.GetLocation( "material.color" ), 1, pbr.base_color_factor.data() );
+	glUniform3fv( shader.get_location( "material.color" ), 1, pbr.base_color_factor.data() );
 
 	// Bind PBR base color texture
-	glUniform1i( shader.GetLocation( "material.hasColorTexture" ), pbr.base_color_texture != nullptr );
+	glUniform1i( shader.get_location( "material.hasColorTexture" ), pbr.base_color_texture != nullptr );
 	if ( pbr.base_color_texture )
 	{
-		glUniform1i( shader.GetLocation( "material.colorTexture" ), 0 );
+		glUniform1i( shader.get_location( "material.colorTexture" ), 0 );
 		glActiveTexture( GL_TEXTURE0 );
 		auto& texture = mTextures.at( pbr.base_color_texture );
 		glBindTexture( GL_TEXTURE_2D, texture.getId() );
 	}
 
 	// Bind PBR metallic factor
-	glUniform1f( shader.GetLocation( "material.metallic" ), pbr.metallic_factor );
+	glUniform1f( shader.get_location( "material.metallic" ), pbr.metallic_factor );
 
 	// Bind PBR roughness factor
-	glUniform1f( shader.GetLocation( "material.roughness" ), pbr.roughness_factor );
+	glUniform1f( shader.get_location( "material.roughness" ), pbr.roughness_factor );
 
 	// Bind PBR ambient occlusion
-	glUniform1f( shader.GetLocation( "material.ambientOcclusion" ), 0.25f );
+	glUniform1f( shader.get_location( "material.ambientOcclusion" ), 0.25f );
 }
 
 
 void GltfPrimitive::draw( const graphics::shader::Program& shader, const mathspot::Mat4& transform ) const
 {
 	// Bind transform matrix
-	glUniformMatrix4fv( shader.GetLocation( "model" ), 1, GL_FALSE, transform.matrix );
+	glUniformMatrix4fv( shader.get_location( "model" ), 1, GL_FALSE, transform.matrix );
 	// Bind PBR base color texture
-	glUniform1i( shader.GetLocation( "vertex.hasColor" ), mHasVertexColors );
+	glUniform1i( shader.get_location( "vertex.hasColor" ), mHasVertexColors );
 
 	if ( primitive && primitive->material )
 	{

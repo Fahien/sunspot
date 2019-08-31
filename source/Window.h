@@ -65,12 +65,10 @@ class Window
 	void SetCamera( Entity& camera ) { m_Camera = &camera; }
 	void setFramebuffer( const graphics::Framebuffer* framebuffer ) { mFramebuffer = framebuffer; }
 
-	virtual void loop()       = 0;
 	virtual void UpdateSize() = 0;
 
   protected:
 	static void initGlew();
-	void        render();
 	void        handleInput( input::Input&& in );
 	Game&       get_game() { return game; }
 
@@ -112,12 +110,6 @@ class Window
 	Entity*     m_Camera;
 
   private:
-	void render( const float& deltaTime );
-	void render3D( const float& deltaTime );
-	void renderGltf( const float& deltaTime );
-	void renderQuad( const float& deltaTime );
-	void renderStereoscopic( const float& deltaTime );
-
 	Game& game;
 
 	const graphics::shader::Program* mBaseProgram;

@@ -1,175 +1,134 @@
 #include "sunspot/graphics/Shader.h"
 
-#include <iostream>
 #include <cstdio>
 #include <cstdlib>
-#include <logspot/Log.h>
+#include <iostream>
 
 #ifdef ANDROID
-# include <filespot/Asset.h>
+#include <filespot/Asset.h>
 namespace fst = filespot;
 #endif
 
 
-using namespace sunspot;
-namespace lst = logspot;
-
-
-#define STR(s) #s
-#define STRV(s) STR(s)
-
-#define POS_ATTRIB 0
-#define COLOR_ATTRIB 1
-#define SCALEROT_ATTRIB 2
-#define OFFSET_ATTRIB 3
-
-
 namespace sunspot::graphics::shader
 {
-
-static const char VERTEX_SHADER[]   = "shaders/base.vert";
-static const char FRAGMENT_SHADER[] = "shaders/base.frag";
-
-Program::Program(const char* depth)
-:	m_BaseProgram { glCreateProgram() }
-,	m_DepthProgram{ glCreateProgram() }
-{
-	Source vertexSource  { VERTEX_SHADER   };
-	Source fragmentSource{ FRAGMENT_SHADER };
-
-	GLuint vertexShader  { Compile(GL_VERTEX_SHADER,   vertexSource) };
-	GLuint fragmentShader{ Compile(GL_FRAGMENT_SHADER, fragmentSource) };
-
-	Link(m_BaseProgram, vertexShader, fragmentShader);
-
-	Source depthSource{ depth };
-	GLuint depthShader{ Compile(GL_FRAGMENT_SHADER, depthSource) };
-
-	Link(m_DepthProgram, vertexShader, depthShader);
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-	glDeleteShader(depthShader);
-
-	// TODO Handle some errors like vertexShader == 0, m_BaseProgram == 0, etc.
-
-	lst::Log::info("Program: created\n"); // TODO remove debug log
-}
+const std::string vertex_shader_path   = "shaders/base.vert";
+const std::string fragment_shader_path = "shaders/base.frag";
 
 
 Program::Program()
-:	Program{ VERTEX_SHADER, FRAGMENT_SHADER }
-{}
-
-
-Program::Program(const char* vertex, const char* fragment)
-:	m_BaseProgram { glCreateProgram() }
-,	m_DepthProgram{ glCreateProgram() }
+    : Program{ vertex_shader_path, fragment_shader_path }
 {
-	Source vertexSource  { vertex   };
-	Source fragmentSource{ fragment };
+}
 
-	GLuint vertexShader  { Compile(GL_VERTEX_SHADER,   vertexSource)   };
-	GLuint fragmentShader{ Compile(GL_FRAGMENT_SHADER, fragmentSource) };
 
-	Link(m_BaseProgram, vertexShader, fragmentShader);
+Program::Program( const std::string& vertex, const std::string& fragment )
+    : program{ glCreateProgram() }
+{
+	Source vertex_source{ vertex };
+	Source fragment_source{ fragment };
 
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	GLuint vertex_shader   = compile( GL_VERTEX_SHADER, vertex_source );
+	GLuint fragment_shader = compile( GL_FRAGMENT_SHADER, fragment_source );
 
-	// TODO Handle some errors like vertexShader == 0, m_BaseProgram == 0, etc.
+	link( vertex_shader, fragment_shader );
 
-	lst::Log::info("Program: created\n"); // TODO remove debug log
+	glDeleteShader( vertex_shader );
+	glDeleteShader( fragment_shader );
+
+	// TODO Handle some errors like vertexShader == 0, program == 0, etc.
 }
 
 
 Program::~Program()
 {
-	glDeleteProgram(m_DepthProgram);
-	glDeleteProgram(m_BaseProgram);
-	lst::Log::info("Program: destroyed\n"); // TODO remove debug log
+	glDeleteProgram( program );
 }
 
 
-void Program::Link(const GLuint program, const GLuint vertex, const GLuint fragment)
+void Program::link( const GLuint vertex, const GLuint fragment )
 {
-	glAttachShader(program, vertex);
-	glAttachShader(program, fragment);
-	glLinkProgram(program);
+	glAttachShader( program, vertex );
+	glAttachShader( program, fragment );
+	glLinkProgram( program );
 
 	GLint success;
-	glGetProgramiv(program, GL_LINK_STATUS, &success);
-	if (!success)
+	glGetProgramiv( program, GL_LINK_STATUS, &success );
+	if ( !success )
 	{
-		GLchar infoLog[512];
-		glGetProgramInfoLog(program, 512, nullptr, infoLog);
+		GLchar info_log[512];
+		glGetProgramInfoLog( program, 512, nullptr, info_log );
 		std::string message{ "Error linking shader program: " };
-		throw shader::Exception{ message + infoLog };
+		throw shader::Exception{ message + info_log };
 	}
-	glDetachShader(program, vertex);
-	glDetachShader(program, fragment);
+
+	glDetachShader( program, vertex );
+	glDetachShader( program, fragment );
 }
 
 
-GLuint Program::Compile(const GLenum type, const Source& source)
+GLuint Program::compile( const GLenum type, const Source& source )
 {
-	GLuint shader{ glCreateShader(type) }; // Create a shader object
-	glShaderSource(shader, 1, &source.handle, nullptr);
-	glCompileShader(shader);
+	GLuint shader = glCreateShader( type );  // Create a shader object
+	glShaderSource( shader, 1, &source.handle, nullptr );
+	glCompileShader( shader );
 
 	GLint success;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-	if (!success)
+	glGetShaderiv( shader, GL_COMPILE_STATUS, &success );
+	if ( !success )
 	{
-		GLchar infoLog[512];
-		glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-		std::string message{ "Error compiling "};
-		throw shader::Exception{ message + source.path + ": " + infoLog };
+		GLchar info_log[512];
+		glGetShaderInfoLog( shader, 512, nullptr, info_log );
+		throw shader::Exception{ "Error compiling " + source.path + ": " + info_log };
 	}
+
 	return shader;
 }
 
 
-Source::Source(const char* p)
-:	path{ p }
-,	handle{ nullptr }
+Source::Source( const std::string& p )
+    : path{ p }
+    , handle{ nullptr }
 {
 #ifdef ANDROID
 	fst::Asset file{ p };
-	char* content{ file.GetContent() };
-	size_t length{ file.GetLength() };
-	handle = static_cast<GLchar*>(malloc(length * sizeof(char)));
-	memcpy(handle, content, length);
-#else // other systems
-	#ifdef WIN32
-	FILE *file{};
-	fopen_s(&file, path, "r");
-	#else
-	FILE *file {fopen(path, "r")};
-	#endif
-	if (file == nullptr) {
-		std::string message{ "Could not open shader file: " };
-		throw shader::Exception{ message + path };
-	}
-	fseek(file, 0, SEEK_END); // Calculate length
-	long length {ftell(file) + 1};
-	fseek(file, 0, SEEK_SET);
-	handle = static_cast<GLchar *>(malloc(length * sizeof(GLchar)));
-	fread(handle, 1, length, file);
-	if (ferror(file))
+	char*      content{ file.GetContent() };
+	size_t     length{ file.GetLength() };
+	handle = new GLchar[length];
+	memcpy( handle, content, length );
+#else
+#if WIN32
+	FILE* file{};
+	fopen_s( &file, path.c_str(), "r" );
+#else
+	FILE* file{ fopen( path.c_str(), "r" ) };
+#endif
+	if ( !file )
 	{
-		std::string message{ "Could not read shader file: " };
-		throw shader::Exception{ message + path };
+		throw shader::Exception{ "Could not open shader file: " + path };
+	}
+	fseek( file, 0, SEEK_END );  // Calculate length
+	long length{ ftell( file ) + 1 };
+	fseek( file, 0, SEEK_SET );
+	handle = new GLchar[length];
+	fread( handle, 1, length, file );
+	if ( ferror( file ) )
+	{
+		throw shader::Exception{ "Could not read shader file: " + path };
 	}
 	handle[length - 1] = 0;
-	fclose(file);
-#endif // ANDROID
+	fclose( file );
+#endif  // ANDROID
 }
+
 
 Source::~Source()
 {
-	free(handle);
+	if ( handle )
+	{
+		delete[] handle;
+	}
 }
 
 
-} // namespace sunspot::graphics::shader
+}  // namespace sunspot::graphics::shader
