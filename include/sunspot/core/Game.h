@@ -5,11 +5,11 @@
 
 #include "sunspot/core/Animations.h"
 #include "sunspot/core/Collisions.h"
-#include "sunspot/core/Scripts.h"
 #include "sunspot/core/Config.h"
 #include "sunspot/core/GlfwWindow.h"
 #include "sunspot/core/Gui.h"
 #include "sunspot/core/Scene.h"
+#include "sunspot/core/Scripts.h"
 #include "sunspot/editor/Editor.h"
 #include "sunspot/graphics/Graphics.h"
 #include "sunspot/util/Cube.h"
@@ -55,14 +55,16 @@ class Game
 
 	GlfwWindow window = { *this, config.project.name, config.window.size };
 	ImGui      gui    = { window };
-	Editor     editor;
+	Editor     editor = { *this };
 
 	gltfspot::Gltf gltf = gltfspot::Gltf( nlohmann::json::parse( util::cube ) );
 
-	Collisions         collisions = {};
-	Scripts            scripts    = {};
-	Animations         animations = {};
-	graphics::Graphics graphics   = {};
+	Collisions collisions = {};
+	Scripts    scripts    = {};
+	Animations animations = {};
+
+  public:
+	graphics::Graphics graphics = {};
 };
 
 

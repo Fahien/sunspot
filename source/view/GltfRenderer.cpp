@@ -106,7 +106,7 @@ void GltfRenderer::draw( const graphics::shader::Program& shader, const Node& no
 	}
 
 	// Render the shape
-	if ( node.bounds )
+	if ( render_bounds && node.bounds )
 	{
 		glDisable( GL_DEPTH_TEST );
 		shape_shader.use();
@@ -142,9 +142,9 @@ mst::Mat4 create_projection_matrix( const gst::Camera& camera )
 		assert( false && "Orthographic camera not supported" );
 	}
 
-
 	return projection;
 }
+
 
 void GltfRenderer::draw( const graphics::shader::Program& shader, const gst::Camera& camera, const mst::Mat4& transform )
 {

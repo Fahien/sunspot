@@ -1,5 +1,6 @@
 #include "sunspot/editor/Editor.h"
 
+#include "sunspot/core/Game.h"
 #include "sunspot/core/Gui.h"
 
 namespace sunspot
@@ -106,10 +107,10 @@ void Editor::draw( gltfspot::Mesh& mesh )
 							DragFloat4( "color", material->pbr_metallic_roughness.base_color_factor.data(), 0.05f, 0.0f,
 							            1.0f, "%.2f" );
 						}
-						DragFloat("metallic", &material->pbr_metallic_roughness.metallic_factor, 0.05f, 0.0f,
-							            1.0f, "%.2f" );
-						DragFloat("roughness", &material->pbr_metallic_roughness.roughness_factor, 0.05f, 0.0f,
-							            1.0f, "%.2f" );
+						DragFloat( "metallic", &material->pbr_metallic_roughness.metallic_factor, 0.05f, 0.0f, 1.0f,
+						           "%.2f" );
+						DragFloat( "roughness", &material->pbr_metallic_roughness.roughness_factor, 0.05f, 0.0f, 1.0f,
+						           "%.2f" );
 						TreePop();
 					}
 				}
@@ -213,80 +214,95 @@ void Editor::draw( gltfspot::Gltf& gltf )
 	this->gltf = &gltf;
 
 	// Scene
-	SetNextWindowPos( ImVec2( 0, 0 ) );
-	PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
-	ImGuiWindowFlags scene_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove |
-	                               ImGuiWindowFlags_AlwaysAutoResize;
-	Begin( "Editor", nullptr, scene_flags );
-	PopStyleVar();
-
-	auto& scene = *gltf.GetScene();
-
-	// Editor menu
-	if ( BeginMenuBar() )
 	{
-		if ( BeginMenu( "edit" ) )
-		{
-			if ( BeginMenu( "new" ) )
-			{
-				if ( MenuItem( "node" ) )
-				{
-					if ( !selected || selected == &scene )
-					{
-						scene.create_node( "new" );
-					}
-					else
-					{
-						auto selected_node = reinterpret_cast<gltfspot::Node*>( selected );
-						selected_node->create_child( "new" );
-					}
+		SetNextWindowPos( ImVec2( 0.0f, 0.0f ) );
+		PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
+		ImGuiWindowFlags scene_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize;
+		Begin( "Editor", nullptr, scene_flags );
+		PopStyleVar();
 
-					selected = nullptr;
+		auto& scene = *gltf.GetScene();
+
+		// Editor menu
+		if ( BeginMenuBar() )
+		{
+			if ( BeginMenu( "edit" ) )
+			{
+				if ( BeginMenu( "new" ) )
+				{
+					if ( MenuItem( "node" ) )
+					{
+						if ( !selected || selected == &scene )
+						{
+							scene.create_node( "new" );
+						}
+						else
+						{
+							auto selected_node = reinterpret_cast<gltfspot::Node*>( selected );
+							selected_node->create_child( "new" );
+						}
+
+						selected = nullptr;
+					}
+					EndMenu();
 				}
 				EndMenu();
 			}
-			EndMenu();
+			EndMenuBar();
 		}
-		EndMenuBar();
-	}
 
-	PushStyleVar( ImGuiStyleVar_FramePadding, ImVec2( 2, 2 ) );
+		PushStyleVar( ImGuiStyleVar_FramePadding, ImVec2( 2.0f, 2.0f ) );
 
-	// Scene node
-	if ( TreeNodeEx( &scene, 0, "%s", scene.name.c_str() ) )
-	{
-		// Drag target
-		if ( BeginDragDropTarget() )
+		// Scene node
+		if ( TreeNodeEx( &scene, 0, "%s", scene.name.c_str() ) )
 		{
-			if ( auto payload = AcceptDragDropPayload( "GLTF_NODE" ) )
+			// Drag target
+			if ( BeginDragDropTarget() )
 			{
-				IM_ASSERT( payload->DataSize == sizeof( void* ) );
-				auto payload_node = *reinterpret_cast<gltfspot::Node**>( payload->Data );
-				payload_node->remove_from_parent();
+				if ( auto payload = AcceptDragDropPayload( "GLTF_NODE" ) )
+				{
+					IM_ASSERT( payload->DataSize == sizeof( void* ) );
+					auto payload_node = *reinterpret_cast<gltfspot::Node**>( payload->Data );
+					payload_node->remove_from_parent();
 
-				// Add payload node to new parent (scene)
-				scene.nodes_indices.push_back( payload_node->index );
-				scene.nodes.push_back( payload_node );
+					// Add payload node to new parent (scene)
+					scene.nodes_indices.push_back( payload_node->index );
+					scene.nodes.push_back( payload_node );
+				}
+				EndDragDropTarget();
 			}
-			EndDragDropTarget();
+
+			if ( IsItemClicked() )
+			{
+				selected = &scene;
+			}
+
+			for ( auto& node : scene.nodes )
+			{
+				draw( *node );
+			}
+			TreePop();  // Scene
 		}
 
-		if ( IsItemClicked() )
-		{
-			selected = &scene;
-		}
 
-		for ( auto& node : scene.nodes )
-		{
-			draw( *node );
-		}
-		TreePop();  // Scene
+		PopStyleVar();
+
+		End();  // Scene
 	}
 
+	// Context
+	{
+		float contextual_size = 512.0f;
+		SetNextWindowPos( ImVec2( GetIO().DisplaySize.x - contextual_size, 0.0f ) );
+		PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
+		ImGuiWindowFlags context_flags = ImGuiWindowFlags_AlwaysAutoResize;
+		Begin( "Context", nullptr, context_flags );
+		PopStyleVar();
 
-	PopStyleVar();
+		Checkbox( "Collision shapes", &game.graphics.renderer.render_bounds );
 
-	End();  // Scene
+		End();  // Context
+	}
 }
 
 }  // namespace sunspot

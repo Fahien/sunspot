@@ -54,9 +54,13 @@ class Graphics
 {
   public:
 	void set_viewport( const Viewport& v ) { viewport = v; }
+
 	void set_shader_program( const shader::Program* p ) { program = p; }
+
 	void set_light( const Light* l ) { light = l; }
+
 	void set_camera( Entity& c ) { camera = &c; }
+
 	void add_model( component::Model* model ) { models.emplace( model ); }
 
 	/// @param g Gltf with the scene to draw
@@ -73,6 +77,7 @@ class Graphics
 
 	std::unordered_set<component::Model*> models = {};
 
+  public:
 	GltfRenderer renderer = {};
 };
 

@@ -5,9 +5,16 @@
 
 namespace sunspot
 {
+class Game;
+
 class Editor
 {
   public:
+	Editor( Game& g )
+	    : game{ g }
+	{
+	}
+
 	void draw( gltfspot::Gltf& gltf );
 
   private:
@@ -22,6 +29,8 @@ class Editor
 	void draw( gltfspot::Mesh& mesh );
 
 	void draw( gltfspot::Node& node );
+
+	Game& game;
 
 	/// Keep track of selected node
 	void* selected = nullptr;
