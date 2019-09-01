@@ -217,8 +217,6 @@ set(SOURCES
 	source/Color.h
 	source/Color.cpp
 	source/graphics/Light.cpp
-	source/Quad.h
-	source/Quad.cpp
 	source/Camera.h
 	source/Camera.cpp)
 

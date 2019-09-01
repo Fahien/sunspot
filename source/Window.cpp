@@ -7,7 +7,6 @@
 #endif
 
 #include "Camera.h"
-#include "Quad.h"
 #include "SunSpotConfig.h"
 #include "component/Model.h"
 #include "entity/Entity.h"
