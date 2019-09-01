@@ -194,8 +194,6 @@ set(SOURCES
 	source/Cursor.cpp
 	source/graphics/Texture.cpp
 	source/graphics/Material.cpp
-	source/Mesh.h
-	source/Mesh.cpp
 	source/core/Gui.cpp
 	source/component/Camera.cpp
 	source/entity/Script.cpp

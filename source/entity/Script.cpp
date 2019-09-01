@@ -1,6 +1,5 @@
 #include <logspot/Log.h>
 
-#include "Mesh.h"
 #include "sunspot/component/Model.h"
 #include "sunspot/entity/Entity.h"
 // Do not reorder, there is a conflict between json.h and Python.h

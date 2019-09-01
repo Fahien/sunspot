@@ -5,7 +5,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "Mesh.h"
 #include "sunspot/component/Model.h"
 #include "view/GltfRenderer.h"
 

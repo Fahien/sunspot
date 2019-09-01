@@ -19,7 +19,6 @@
 #include "sunspot/graphics/Light.h"
 #include "sunspot/graphics/Shader.h"
 
-#include "Mesh.h"
 #include "repository/EntityRepository.h"
 #include "repository/ModelRepository.h"
 #include "sunspot/entity/Entity.h"

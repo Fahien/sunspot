@@ -7,7 +7,6 @@
 
 #include "ModelRepository.h"
 
-#include "Mesh.h"
 #include "sunspot/component/Camera.h"
 #include "sunspot/component/Collider.h"
 #include "sunspot/component/Rigidbody.h"

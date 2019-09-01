@@ -1,6 +1,5 @@
 #include "sunspot/entity/Entity.h"
 
-#include "Mesh.h"
 #include "sunspot/component/Collider.h"
 #include "sunspot/component/Model.h"
 #include "sunspot/component/Rigidbody.h"
