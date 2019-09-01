@@ -23,7 +23,6 @@ namespace sunspot
 class Game;
 class Quad;
 class Light;
-class WavefrontObject;
 class Camera;
 class Entity;
 

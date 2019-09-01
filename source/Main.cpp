@@ -21,7 +21,6 @@
 #include "sunspot/graphics/Shader.h"
 
 #include "Mesh.h"
-#include "WavefrontObject.h"
 #include "repository/EntityRepository.h"
 #include "repository/ModelRepository.h"
 #include "sunspot/entity/Entity.h"
