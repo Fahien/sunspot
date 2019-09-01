@@ -5,7 +5,6 @@
 #include <filespot/File.h>
 #include <dataspot/Database.h>
 
-#include "core/Renderer.h"
 #include "entity/Script.h"
 #include "sunspot/input/Input.h"
 #include "core/android/App.h"

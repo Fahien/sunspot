@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-#include "ShaderProgram.h"
-
 using namespace sunspot;
 using namespace mathspot;
 

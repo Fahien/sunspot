@@ -4,7 +4,6 @@
 #include "view/GltfRenderer.h"
 
 #include <mathspot/Math.h>
-#include "ShaderProgram.h"
 #include "sunspot/graphics/Shader.h"
 
 using namespace std;

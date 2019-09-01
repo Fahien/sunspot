@@ -225,7 +225,6 @@ set(SOURCES
 if(ANDROID)
 	set(ANDROID_SOURCES
 		source/core/SunSpot.cpp
-		source/core/Renderer.cpp
 		${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
 		source/core/android/Graphics.cpp
 		source/core/android/App.cpp

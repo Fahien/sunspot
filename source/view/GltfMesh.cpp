@@ -1,6 +1,5 @@
 #include <gltfspot/Gltf.h>
 
-#include "ShaderProgram.h"
 #include "view/GltfMesh.h"
 
 namespace sunspot
