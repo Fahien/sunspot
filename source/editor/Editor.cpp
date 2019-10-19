@@ -3,6 +3,7 @@
 #include "sunspot/core/Game.h"
 #include "sunspot/core/Gui.h"
 
+
 namespace sunspot
 {
 void Editor::draw_transform( gltfspot::Node& node )
@@ -206,6 +207,30 @@ void Editor::draw( gltfspot::Node& node )
 }
 
 
+void Editor::create_cube( gltfspot::Node& node )
+{
+	auto& meshes = gltf->get_meshes();
+
+	auto it = std::find_if( std::begin( meshes ), std::end( meshes ), []( auto& mesh ) {
+		return mesh.name == "sunspot-cube";
+	});
+
+	if ( it != std::end( meshes ))
+	{
+		node.mesh_index = it - std::begin( meshes );
+		node.mesh = &(*it);
+	}
+	else
+	{
+		gltfspot::Mesh cube;
+		cube.name = "sunspot-cube";
+		node.mesh_index = meshes.size();
+		meshes.push_back( std::move( cube ) );
+		gltf->load_nodes();
+	}
+}
+
+
 void Editor::draw( gltfspot::Gltf& gltf )
 {
 	using namespace ImGui;
@@ -244,9 +269,17 @@ void Editor::draw( gltfspot::Gltf& gltf )
 
 						selected = nullptr;
 					}
-					EndMenu();
+
+					auto mesh_enabled = selected && selected != &scene;
+					if ( MenuItem( "cube", nullptr, false, mesh_enabled ) )
+					{
+						auto selected_node = reinterpret_cast<gltfspot::Node*>( selected );
+						create_cube( *selected_node );
+					}
+
+					EndMenu(); // New
 				}
-				EndMenu();
+				EndMenu(); // Edit
 			}
 			EndMenuBar();
 		}

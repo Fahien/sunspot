@@ -1,5 +1,4 @@
-#ifndef SST_EDITOR_H_
-#define SST_EDITOR_H_
+#pragma once
 
 #include <gltfspot/Gltf.h>
 
@@ -30,6 +29,10 @@ class Editor
 
 	void draw( gltfspot::Node& node );
 
+	/// @brief Adds a cube to the gltf model
+	/// @return its index
+	void create_cube( gltfspot::Node& node );
+
 	Game& game;
 
 	/// Keep track of selected node
@@ -41,5 +44,3 @@ class Editor
 
 
 }  // namespace sunspot
-
-#endif  // SST_EDITOR_H_
