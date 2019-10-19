@@ -109,62 +109,63 @@ int main( const int argc, const char** argv )
 			auto gltf_path = args.project.path + "/" + args.project.name + ".gltf";
 			auto gltf      = gst::Gltf::Load( gltf_path );
 
-			auto& cameras = gltf.get_cameras();
-			if ( cameras.empty() )
+
+			game.set_gltf( std::move( gltf ) );
+		}
+
+		auto& gltf = game.get_gltf();
+		auto& cameras = gltf.get_cameras();
+		if ( cameras.empty() )
+		{
+			// Create default camera
+			auto camera = create_default_camera( config );
+			cameras.push_back( camera );
+
+			// Create node for camera
+			auto node        = gst::Node();
+			node.camera      = &cameras[0];
+			node.name        = "Camera";
+			node.translation = Vec3{ -0.8f, 1.2f, 5.4f };
+
+			auto& nodes = gltf.get_nodes();
+			node.index  = nodes.size();
+			nodes.push_back( node );
+
+			auto scene = gltf.GetScene();
+			scene->nodes_indices.push_back( nodes.size() - 1 );
+
+			// Create default light
+			auto  light  = gst::Light();
+			auto& lights = gltf.get_lights();
+			lights.push_back( light );
+
+			node               = gst::Node();
+			node.name          = "Light";
+			node.light_index   = 0;
+			node.index         = nodes.size();
+			node.translation.x = -1.0f;
+			node.translation.y = 1.0f;
+			node.translation.z = 1.0f;
+
+			nodes.push_back( node );
+			scene->nodes_indices.push_back( nodes.size() - 1 );
+
+			// Reload scene nodes
+			gltf.load_nodes();
+		}
+		else
+		{
+			for ( auto& camera : cameras )
 			{
-				// Create default camera
-				auto camera = create_default_camera( config );
-				cameras.push_back( camera );
-
-				// Create node for camera
-				auto node        = gst::Node();
-				node.camera      = &cameras[0];
-				node.name        = "Camera";
-				node.translation = Vec3{ -0.8f, 1.2f, 5.4f };
-
-				auto& nodes = gltf.get_nodes();
-				node.index  = nodes.size();
-				nodes.push_back( node );
-
-				auto scene = gltf.GetScene();
-				scene->nodes_indices.push_back( nodes.size() - 1 );
-
-				// Create default light
-				auto  light  = gst::Light();
-				auto& lights = gltf.get_lights();
-				lights.push_back( light );
-
-				node               = gst::Node();
-				node.name          = "Light";
-				node.light_index   = 0;
-				node.index         = nodes.size();
-				node.translation.x = -1.0f;
-				node.translation.y = 1.0f;
-				node.translation.z = 1.0f;
-
-				nodes.push_back( node );
-				scene->nodes_indices.push_back( nodes.size() - 1 );
-
-				// Reload scene nodes
-				gltf.load_nodes();
-			}
-			else
-			{
-				for ( auto& camera : cameras )
+				if ( camera.type == gst::Camera::Type::Perspective )
 				{
-					if ( camera.type == gst::Camera::Type::Perspective )
+					if ( camera.perspective.aspect_ratio == 0.0f )
 					{
-						if ( camera.perspective.aspect_ratio == 0.0f )
-						{
-							float aspect_ratio{ static_cast<float>( config.window.size.width ) / config.window.size.height };
-							camera.perspective.aspect_ratio = aspect_ratio;
-						}
+						float aspect_ratio{ static_cast<float>( config.window.size.width ) / config.window.size.height };
+						camera.perspective.aspect_ratio = aspect_ratio;
 					}
 				}
 			}
-
-
-			game.set_gltf( std::move( gltf ) );
 		}
 
 		auto& graphics = game.get_graphics();

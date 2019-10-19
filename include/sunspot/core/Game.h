@@ -38,7 +38,7 @@ class Game
 
 	gltfspot::Gltf::Scene& get_scene() { return *gltf.GetScene(); }
 
-	void set_gltf( gltfspot::Gltf&& g ) { gltf = std::move( g ); }
+	void set_gltf( gltfspot::Gltf&& g );
 
 	void set_size( const mathspot::Size& s );
 

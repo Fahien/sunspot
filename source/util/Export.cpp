@@ -1,6 +1,3 @@
-#ifndef SUNSPOT_EXPORT_H_
-#define SUNSPOT_EXPORT_H_
-
 #include "sunspot/component/Rigidbody.h"
 #include "sunspot/component/Transform.h"
 #include "sunspot/input/Action.h"
@@ -11,4 +8,13 @@
 #include "mathspot/Math.h"
 #include "gltfspot/Gltf.h"
 
-#endif  // SUNSPOT_EXPORT_H_
+namespace sunspot
+{
+
+struct PYSPOT_EXPORT Export
+{
+	gltfspot::Gltf* g;
+	gltfspot::Node* n;
+};
+
+}

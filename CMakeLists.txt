@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 project(SunSpot LANGUAGES C CXX)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 set(CMAKE_C_STANDARD   11)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -17,7 +15,7 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 message(STATUS "Searching modules in ${CMAKE_MODULE_PATH}")
 
-option(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
+option(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Modules and libs
 set(MODULE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/module)
@@ -66,15 +64,15 @@ else()
 		${LIB_DIR})
 
 	find_package(OpenGL REQUIRED)
-	include(AddGlew)
+	find_package(GLEW REQUIRED)
 	include(AddGlfw)
 	set(DEPENDENCY_LIBRARIES
 		${OPENGL_LIBRARIES}
-		${GLEW_LIBRARIES}
+		GLEW::GLEW
 		${GLFW_LIBRARIES})
 	list(APPEND DEPENDENCY_INCLUDE_DIRS
 		${OPENGL_INCLUDE_DIR}
-		${GLEW_INCLUDE_DIR}
+		${GLEW_INCLUDE_DIRS}
 		${GLFW_INCLUDE_DIR})
 endif()
 
@@ -127,8 +125,8 @@ function(join VALUES GLUE OUTPUT)
 endfunction()
 
 # Sources to export
-set(EXPORT_HEADERS
-	${CMAKE_CURRENT_SOURCE_DIR}/include/sunspot/util/Export.hpp
+set(EXPORT_FILE
+	${CMAKE_CURRENT_SOURCE_DIR}/source/util/Export.cpp
 )
 
 # Includes for export
@@ -136,19 +134,19 @@ set(EXPORT_INCLUDES
 	${DEPENDENCY_INCLUDE_DIRS} ${MATHSPOT_INCLUDE_DIRS} ${GLTFSPOT_INCLUDE_DIRS} ${IMGUI_INCLUDE_DIR} ${PYSPOT_INCLUDE_DIRS}
 )
 
-message(STATUS "Gltf include dirs ${GLTFSPOT_INCLUDE_DIRS}")
 # Generation command
 set( COMMAND_ARGS
-	${EXPORT_HEADERS} -o sunspot
-	-- -xc++ -std=c++17 -DPY_MAJOR_VERSION=3
+	${EXPORT_FILE}
+	-- -std=c++17
 	-I${DEPENDENCY_INCLUDE_DIRS}
 	-I${MATHSPOT_INCLUDE_DIRS}
 	-I${GLTFSPOT_INCLUDE_DIRS}
 	-I${IMGUI_INCLUDE_DIR}
 )
 
-add_custom_command(OUTPUT ${GEN_SOURCES}
-	COMMAND pywrap
+message( STATUS "pywrap ${COMMAND_ARGS}" )
+add_custom_command( OUTPUT ${GEN_SOURCES}
+	COMMAND $ENV{PYWRAP}
 	ARGS ${COMMAND_ARGS}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	COMMENT "Generating Bindings and Extension"

@@ -26,6 +26,8 @@ void Scripts::set_gltf( gltfspot::Gltf& g )
 			for ( auto script_index : node->scripts_indices )
 			{
 				auto& script = scripts[script_index];
+
+				// Call init immediately for every script
 				script.init( *node );
 
 				// Collision callbacks

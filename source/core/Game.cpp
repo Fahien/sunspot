@@ -8,7 +8,16 @@ namespace sunspot
 Game::Game( Config& c )
     : config{ c }
 {
+	scripts.set_gltf( gltf );
 }
+
+
+void Game::set_gltf( gltfspot::Gltf&& g )
+{
+	gltf = std::move( g );
+	scripts.set_gltf( gltf );
+}
+
 
 void Game::set_size( const mathspot::Size& size )
 {
