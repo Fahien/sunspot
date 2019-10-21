@@ -10,7 +10,7 @@ namespace fst = filespot;
 #include <gltfspot/Gltf.h>
 
 #include "sunspot/graphics/Exception.h"
-#include "sunspot/graphics/Gl.h"
+#include "sunspot/graphics/gl/Gl.h"
 
 
 namespace sunspot::graphics
@@ -89,15 +89,13 @@ class Texture
 
 	~Texture();
 
-	void release() const { glDeleteTextures( 1, &mId ); }
-
-	GLuint      getId() const { return mId; }
-	TextureType getType() const { return mType; }
+	GLuint      get_id() const { return id; }
+	TextureType get_type() const { return type; }
 
   private:
-	GLuint      mId = 0;
-	std::string mName;
-	TextureType mType;
+	GLuint      id = 0;
+	std::string name;
+	TextureType type;
 };
 
 

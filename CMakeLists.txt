@@ -182,6 +182,10 @@ set(SOURCES
 	source/util/Cube.cpp
 	source/util/Config.cpp
 	source/core/Config.cpp
+	source/graphics/gl/Renderer.cpp
+	source/graphics/gl/Vao.cpp
+	source/graphics/gl/Vbo.cpp
+	source/graphics/gl/Ebo.cpp
 	source/graphics/Graphics.cpp
 	source/graphics/Shader.cpp
 	source/core/String.cpp
@@ -196,19 +200,12 @@ set(SOURCES
 	source/component/Camera.cpp
 	source/entity/Script.cpp
 	source/entity/Object.cpp
-	source/entity/Entity.cpp
-	source/repository/ModelRepository.h
-	source/repository/ModelRepository.cpp
-	source/repository/EntityRepository.h
-	source/repository/EntityRepository.cpp
 	source/view/GltfCamera.h
 	source/view/GltfCamera.cpp
 	source/view/GltfPrimitive.h
 	source/view/GltfPrimitive.cpp
 	source/view/GltfMesh.h
 	source/view/GltfMesh.cpp
-	source/view/GltfRenderer.h
-	source/view/GltfRenderer.cpp
 	source/editor/Editor.cpp
 	source/Color.h
 	source/Color.cpp

@@ -1,19 +1,16 @@
-#ifndef SUNSPOT_GRAPHICS_H_
-#define SUNSPOT_GRAPHICS_H_
+#pragma once
 
 #include <stdexcept>
 #include <unordered_set>
 
 #include <mathspot/Math.h>
 
-#include "sunspot/component/Model.h"
 #include "sunspot/entity/Entity.h"
 #include "sunspot/graphics/Light.h"
 #include "sunspot/graphics/Shader.h"
+#include "sunspot/graphics/gl/Renderer.h"
 
-namespace sunspot
-{
-namespace graphics
+namespace sunspot::graphics
 {
 #ifdef ANDROID
 
@@ -61,8 +58,6 @@ class Graphics
 
 	void set_camera( Entity& c ) { camera = &c; }
 
-	void add_model( component::Model* model ) { models.emplace( model ); }
-
 	/// @param g Gltf with the scene to draw
 	void draw( gltfspot::Gltf& g );
 
@@ -75,16 +70,11 @@ class Graphics
 
 	Entity* camera = {};
 
-	std::unordered_set<component::Model*> models = {};
-
   public:
-	GltfRenderer renderer = {};
+	gl::Renderer renderer = {};
 };
 
 #endif  // ANDROID
 
 
-}  // namespace graphics
-}  // namespace sunspot
-
-#endif  // SUNSPOT_GRAPHICS_H_
+}  // namespace sunspot::graphics

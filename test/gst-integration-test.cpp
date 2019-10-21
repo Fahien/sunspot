@@ -4,15 +4,13 @@
 #include <logspot/Log.h>
 #include <pyspot/Interpreter.h>
 
-#include "view/GltfRenderer.h"
+#include "sunspot/graphics/gl/Renderer.h"
 
 #include "sunspot/component/Camera.h"
 #include "sunspot/core/Game.h"
 #include "sunspot/graphics/Light.h"
 #include "sunspot/graphics/Shader.h"
 #include "view/GltfCamera.h"
-
-#include "repository/ModelRepository.h"
 
 using namespace std;
 using namespace pyspot;
@@ -49,21 +47,13 @@ int main( int argc, char** argv )
 
 		game.get_graphics().set_viewport( graphics::Viewport{ { 0, 0 }, window_size } );
 
-		Entity                       camera_entity{};
 		component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
-		camera.set_parent( camera_entity );
 		camera.Translate( Vec3{ 0.0f, 0.0f, -3.0f } );
 		camera.SetAspectRatio( aspect_ratio );
-		camera_entity.add( camera );
-		game.get_graphics().set_camera( camera_entity );
 
 		// Load a Gltf model and upload the model into GPU buffers
 		string          model_path{ argv[1] };
-		ModelRepository model_repo{ "test" };
 		int             model_id = 0;  // Just a custom id, not important for a test
-		auto&           model    = model_repo.get_model( model_id, model_path );
-
-		game.get_graphics().add_model( &model );
 
 		/// Render to texture
 		/// Compare it with a reference

@@ -19,9 +19,6 @@
 #include "sunspot/graphics/Light.h"
 #include "sunspot/graphics/Shader.h"
 
-#include "repository/EntityRepository.h"
-#include "repository/ModelRepository.h"
-#include "sunspot/entity/Entity.h"
 #include "sunspot/graphics/Texture.h"
 
 #include "sunspot/component/Camera.h"
@@ -183,10 +180,6 @@ int main( const int argc, const char** argv )
 	catch ( const graphics::Exception& e )
 	{
 		Log::error( "%s: %s", tag.c_str(), e.what() );
-	}
-	catch ( const dst::Exception& e )
-	{
-		Log::error( "%s: %s", tag.c_str(), e.to_string().c_str() );
 	}
 	catch ( const runtime_error& e )
 	{

@@ -26,6 +26,11 @@ using Iterator = typename T::iterator;
 template<typename T>
 using ConstIterator = typename T::const_iterator;
 
+template<typename Container, typename Type>
+inline Iterator<Container> find( Container& container, const Type& val )
+{
+	return std::find( std::begin( container ), std::end( container ), val );
+}
 
 template<typename Container, typename Type>
 inline ConstIterator<Container> find( const Container& container, const Type& val )

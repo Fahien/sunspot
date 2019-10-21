@@ -8,35 +8,37 @@
 #include <SOIL.h>
 #include <logspot/Log.h>
 
-#include "sunspot/graphics/Gl.h"
+#include "sunspot/graphics/gl/Gl.h"
 
 namespace lst = logspot;
 
 namespace sunspot::graphics
 {
+
+
 const char* getTextureTypeName( const TextureType& type )
 {
 	return textureTypeNames[type];
 }
 
 
-Texture::Texture( const std::string& path, const TextureType& type ) : mId{ 0 }, mName{ path }, mType{ type }
+Texture::Texture( const std::string& path, const TextureType& type ) : id{ 0 }, name{ path }, type{ type }
 {
-	glGenTextures( 1, &mId );
-	glBindTexture( GL_TEXTURE_2D, mId );
+	glGenTextures( 1, &id );
+	glBindTexture( GL_TEXTURE_2D, id );
 	SoilData data{ path };
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, data.getWidth(), data.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE,
 	              data.getHandle() );
 	glGenerateMipmap( GL_TEXTURE_2D );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	lst::Log::info( "Texture: created %s", mName.c_str() );  // TODO remove debug log
+	lst::Log::info( "Texture: created %s", name.c_str() );  // TODO remove debug log
 }
 
-Texture::Texture( const SoilData& data, const TextureType& type ) : mType{ type }
+Texture::Texture( const SoilData& data, const TextureType& type ) : type{ type }
 {
-	glGenTextures( 1, &mId );
-	glBindTexture( GL_TEXTURE_2D, mId );
+	glGenTextures( 1, &id );
+	glBindTexture( GL_TEXTURE_2D, id );
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, data.getWidth(), data.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE,
 	              data.getHandle() );
 	glGenerateMipmap( GL_TEXTURE_2D );
@@ -44,14 +46,20 @@ Texture::Texture( const SoilData& data, const TextureType& type ) : mType{ type 
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 }
 
-Texture::Texture( Texture&& other ) : mId{ other.mId }, mName{ other.mName }, mType{ other.mType }
+Texture::Texture( Texture&& other )
+: id{ other.id }
+, name{ std::move( other.name ) }
+, type{ other.type }
 {
+	other.id = 0;
 }
 
 Texture::~Texture()
 {
-	// TODO Release MIPMAP
-	lst::Log::info( "Texture: destroyed %s", mName.c_str() );  // TODO remove debug log
+	if ( id > 0 )
+	{
+		glDeleteTextures( 1, &id );
+	}
 }
 
 

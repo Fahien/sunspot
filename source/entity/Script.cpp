@@ -1,6 +1,7 @@
+#include "sunspot/entity/Script.h"
+
 #include <logspot/Log.h>
 
-#include "sunspot/component/Model.h"
 #include "sunspot/entity/Entity.h"
 // Do not reorder, there is a conflict between json.h and Python.h
 #include <pyspot/Dictionary.h>
@@ -13,7 +14,6 @@
 #include "sunspot/component/Rigidbody.h"
 #include "sunspot/component/Transform.h"
 
-#include "sunspot/entity/Script.h"
 
 using namespace pyspot;
 namespace mst = mathspot;

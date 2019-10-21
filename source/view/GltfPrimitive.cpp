@@ -335,7 +335,7 @@ void GltfPrimitive::bind_material( const graphics::shader::Program& shader, gltf
 		glUniform1i( shader.get_location( "material.colorTexture" ), 0 );
 		glActiveTexture( GL_TEXTURE0 );
 		auto& texture = mTextures.at( pbr.base_color_texture );
-		glBindTexture( GL_TEXTURE_2D, texture.getId() );
+		glBindTexture( GL_TEXTURE_2D, texture.get_id() );
 	}
 
 	// Bind PBR metallic factor

@@ -3,7 +3,7 @@
 
 #include <gltfspot/Gltf.h>
 
-#include "sunspot/graphics/Gl.h"
+#include "sunspot/graphics/gl/Gl.h"
 #include "sunspot/graphics/Material.h"
 #include "sunspot/graphics/Shader.h"
 #include "sunspot/graphics/Texture.h"

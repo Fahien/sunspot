@@ -29,7 +29,7 @@ void Material::bind( const shader::Program& shader ) const
 	{
 		glUniform1i( shader.get_location( "material.colorTexture" ), 0 );
 		glActiveTexture( GL_TEXTURE0 );
-		glBindTexture( GL_TEXTURE_2D, color_texture->getId() );
+		glBindTexture( GL_TEXTURE_2D, color_texture->get_id() );
 	}
 
 	// Bind PBR metallic factor

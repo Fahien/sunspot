@@ -222,7 +222,7 @@ void Editor::create_cube( gltfspot::Node& node )
 	}
 	else
 	{
-		gltfspot::Mesh cube;
+		gltfspot::Mesh cube { *gltf };
 		cube.name = "sunspot-cube";
 		node.mesh_index = meshes.size();
 		meshes.push_back( std::move( cube ) );

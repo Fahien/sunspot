@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "sunspot/graphics/Gl.h"
+#include "sunspot/graphics/gl/Gl.h"
 
 
 namespace sunspot::graphics::shader
