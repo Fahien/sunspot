@@ -2,7 +2,6 @@
 
 #include <logspot/Log.h>
 
-#include "sunspot/entity/Entity.h"
 // Do not reorder, there is a conflict between json.h and Python.h
 #include <pyspot/Dictionary.h>
 #include <pyspot/Error.h>

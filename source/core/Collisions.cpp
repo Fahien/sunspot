@@ -1,10 +1,11 @@
 #include "sunspot/core/Collisions.h"
 #include "sunspot/component/Collider.h"
 #include "sunspot/component/Transform.h"
-#include "sunspot/entity/Entity.h"
 
 namespace sunspot
 {
+
+
 void Collisions::update( const gltfspot::Node& node, const mathspot::Mat4& transform )
 {
 	// Current transform
@@ -27,6 +28,7 @@ void Collisions::update( const gltfspot::Node& node, const mathspot::Mat4& trans
 	}
 }
 
+
 void Collisions::update( gltfspot::Gltf::Scene& scene )
 {
 	shapes.clear();
@@ -37,6 +39,7 @@ void Collisions::update( gltfspot::Gltf::Scene& scene )
 
 	resolve();
 }
+
 
 void Collisions::resolve()
 {

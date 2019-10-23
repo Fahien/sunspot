@@ -20,6 +20,8 @@ class Vao
   public:
 	Vao( Renderer& r, const gltfspot::Mesh::Primitive& p );
 
+	Vao( Renderer& r, const gltfspot::Shape& s );
+
 	Vao( Vao&& v );
 
 	~Vao();

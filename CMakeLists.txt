@@ -197,15 +197,10 @@ set(SOURCES
 	source/graphics/Texture.cpp
 	source/graphics/Material.cpp
 	source/core/Gui.cpp
-	source/component/Camera.cpp
 	source/entity/Script.cpp
 	source/entity/Object.cpp
 	source/view/GltfCamera.h
 	source/view/GltfCamera.cpp
-	source/view/GltfPrimitive.h
-	source/view/GltfPrimitive.cpp
-	source/view/GltfMesh.h
-	source/view/GltfMesh.cpp
 	source/editor/Editor.cpp
 	source/Color.h
 	source/Color.cpp

@@ -21,7 +21,6 @@
 
 #include "sunspot/graphics/Texture.h"
 
-#include "sunspot/component/Camera.h"
 #include "sunspot/core/GlfwWindow.h"
 #include "sunspot/core/Gui.h"
 #include "view/GltfCamera.h"

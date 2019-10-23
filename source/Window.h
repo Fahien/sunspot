@@ -10,7 +10,6 @@
 #include <mathspot/Math.h>
 
 #include "Cursor.h"
-#include "sunspot/component/Camera.h"
 #include "sunspot/core/Collisions.h"
 #include "sunspot/graphics/Graphics.h"
 #include "sunspot/input/Input.h"
@@ -25,9 +24,6 @@ class Quad;
 class Light;
 class Camera;
 class Entity;
-
-class GltfRenderer;
-class GltfCamera;
 
 
 class GlewException : public graphics::Exception

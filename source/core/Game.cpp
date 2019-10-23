@@ -1,10 +1,10 @@
 #include "sunspot/core/Game.h"
 
-#include "sunspot/entity/Entity.h"
-
 
 namespace sunspot
 {
+
+
 Game::Game( Config& c )
     : config{ c }
 {

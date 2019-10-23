@@ -8,6 +8,17 @@ const char* cube = R"--(
         "generator" : "Khronos glTF Blender I/O v0.9.11",
         "version" : "2.0"
     },
+    "extras" : {
+            "shapes": [
+                {
+                    "type": "box",
+                    "box": {
+                        "a": [-1,-1, -1],
+                        "b": [1,1,1]
+                    }
+                }
+            ]
+        },
     "scene" : 0,
     "scenes" : [
         {
@@ -20,7 +31,10 @@ const char* cube = R"--(
     "nodes" : [
         {
             "name" : "Cube",
-            "mesh" : 0
+            "mesh" : 0,
+            "extras": {
+                "bounds": 0
+            }
         }
     ],
     "materials" : [

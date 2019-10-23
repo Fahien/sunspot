@@ -72,8 +72,8 @@ GLuint create_handle()
 } // namespace anonymous
 
 
-Vao::Vao( Renderer& renderer, const gltfspot::Mesh::Primitive& primitive )
-: renderer { &renderer }
+Vao::Vao( Renderer& r, const gltfspot::Mesh::Primitive& primitive )
+: renderer { &r }
 , handle { create_handle() }
 , ebo { primitive }
 , mode { to_gl_mode( primitive.mode ) }
@@ -84,7 +84,7 @@ Vao::Vao( Renderer& renderer, const gltfspot::Mesh::Primitive& primitive )
 	for ( auto [semantic, accessor_index] : primitive.attributes )
 	{
 		auto& accessor = model.GetAccessors().at( accessor_index );
-		auto& vbo      = renderer.get_vbo( accessor, semantic );
+		auto& vbo      = renderer->get_vbo( accessor, semantic );
 		vbo.bind();
 
 		auto type   = to_gl_component_type( accessor.componentType );
@@ -117,6 +117,26 @@ Vao::Vao( Renderer& renderer, const gltfspot::Mesh::Primitive& primitive )
 
 	glBindVertexArray( 0 );  // Unbind vao
 }
+
+
+Vao::Vao( Renderer& r, const gltfspot::Shape& shape )
+:	renderer { &r }
+,	handle { create_handle() }
+,	ebo { shape }
+,	mode { to_gl_mode( gltfspot::Mesh::Primitive::Mode::LINES ) }
+{
+	if ( auto rect = dynamic_cast<const gltfspot::Box*>( &shape ) )
+	{
+		vertex_count = 8;
+		auto& vbo = renderer->get_vbo( *rect );
+		vbo.bind();
+		glEnableVertexAttribArray( 0 );  // Vertex Position
+		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+	}
+
+	glBindVertexArray( 0 );  // Unbind vao
+}
+
 
 
 Vao::Vao( Vao&& other )

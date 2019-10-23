@@ -6,7 +6,6 @@
 
 #include "sunspot/graphics/gl/Renderer.h"
 
-#include "sunspot/component/Camera.h"
 #include "sunspot/core/Game.h"
 #include "sunspot/graphics/Light.h"
 #include "sunspot/graphics/Shader.h"
@@ -46,10 +45,6 @@ int main( int argc, char** argv )
 		float far{ 256.0f };
 
 		game.get_graphics().set_viewport( graphics::Viewport{ { 0, 0 }, window_size } );
-
-		component::PerspectiveCamera camera{ aspect_ratio, fov, far, near };
-		camera.Translate( Vec3{ 0.0f, 0.0f, -3.0f } );
-		camera.SetAspectRatio( aspect_ratio );
 
 		// Load a Gltf model and upload the model into GPU buffers
 		string          model_path{ argv[1] };

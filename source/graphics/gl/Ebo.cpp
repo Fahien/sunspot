@@ -66,6 +66,29 @@ Ebo::Ebo( const gltfspot::Mesh::Primitive& primitive )
 }
 
 
+Ebo::Ebo( const gltfspot::Shape& shape )
+{
+	if ( auto rect = dynamic_cast<const gltfspot::Box*>( &shape ) )
+	{
+		// Gen indices
+		glGenBuffers( 1, &handle );
+		std::vector<GLuint> indices = {
+			// front
+			0, 1, 1, 2, 2, 3, 3, 0,
+			// back
+			4, 5, 5, 6, 6, 7, 7, 4,
+			// sides
+			0, 4, 3, 7, 1, 5, 2, 6
+		};
+		indices_count = indices.size();
+		indices_type  = GL_UNSIGNED_INT;
+
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, handle );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof( indices[0] ), indices.data(), GL_STATIC_DRAW );
+	}
+}
+
+
 Ebo::Ebo( Ebo&& other )
 : handle { other.handle }
 , indices_count { other.indices_count }

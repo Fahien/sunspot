@@ -13,6 +13,8 @@ struct Vbo
 {
 	Vbo( const gltfspot::Gltf::Accessor& a, gltfspot::Mesh::Primitive::Semantic s );
 
+	Vbo( const void* data, size_t s );
+
 	Vbo( Vbo&& v );
 
 	~Vbo();

@@ -3,7 +3,6 @@
 #include <tuple>
 #include <mathspot/Math.h>
 
-#include "view/GltfPrimitive.h"
 #include "sunspot/graphics/Shader.h"
 #include "sunspot/util/Util.h"
 
@@ -20,25 +19,14 @@ Renderer::Renderer( gst::Gltf* gltf )
 	}
 }
 
-void Renderer::set_gltf( gst::Gltf& g )
+void Renderer::set_gltf( gst::Gltf& model )
 {
-	if ( gltf != &g )
+	if ( gltf != &model )
 	{
-		gltf = &g;
-		meshes.clear();
-		for ( auto& m : g.get_meshes() )
-		{
-			meshes.emplace( &m, GltfMesh{ g, m } );
-		}
-
-		shapes.clear();
-		for ( auto& s : g.get_shapes() )
-		{
-			shapes.emplace_back( g, *s );
-		}
+		gltf = &model;
 
 		cameras.clear();
-		for ( auto& c : g.get_cameras() )
+		for ( auto& c : model.get_cameras() )
 		{
 			auto camera = GltfCamera::create( c );
 			cameras.emplace( &c, std::move( camera ) );
@@ -126,6 +114,27 @@ void Renderer::draw( const shader::Program& shader, const gst::Material& materia
 }
 
 
+Vao& Renderer::get_vao( const gst::Shape& shape )
+{
+	Vao* ret = nullptr;
+
+	// Get it from the cache
+	auto it = shape_vaos.find( &shape );
+	if ( it != std::end( shape_vaos ) )
+	{
+		ret = &it->second;
+	}
+	else // Create a new one
+	{
+		Vao vao { *this, shape };
+		auto res = shape_vaos.emplace( &shape, std::move( vao ) );
+		ret = &res.first->second;
+	}
+
+	return *ret;
+}
+
+
 Vao& Renderer::get_vao( const gst::Mesh::Primitive& primitive )
 {
 	Vao* ret = nullptr;
@@ -140,6 +149,36 @@ Vao& Renderer::get_vao( const gst::Mesh::Primitive& primitive )
 	{
 		Vao vao { *this, primitive };
 		auto res = vaos.emplace( &primitive, std::move( vao ) );
+		ret = &res.first->second;
+	}
+
+	return *ret;
+}
+
+
+
+Vbo& Renderer::get_vbo( const gst::Box& box )
+{
+	Vbo* ret = nullptr;
+
+	// Get it from the cache
+	auto it = shape_vbos.find( &box );
+	if ( it != std::end( shape_vbos ) )
+	{
+		ret = &it->second;
+	}
+	else // Create a new one
+	{
+		auto& a = box.a;
+		auto& b = box.b;
+
+		std::vector<mathspot::Vec3> points = {
+			{ a.x, a.y, b.z }, { b.x, a.y, b.z }, b, { a.x, b.y, b.z }, a, { b.x, a.y, a.z },
+			{ b.x, b.y, a.z }, { a.x, b.y, a.z }
+		};
+
+		Vbo vbo { points.data(), points.size() * sizeof( points[0] ) };
+		auto res = shape_vbos.emplace( &box, std::move( vbo ) );
 		ret = &res.first->second;
 	}
 
@@ -168,6 +207,17 @@ Vbo& Renderer::get_vbo( const gst::Gltf::Accessor& accessor, const gst::Mesh::Pr
 }
 
 
+void Renderer::draw( const shader::Program& shader, const gst::Shape& shape, const mst::Mat4& transform )
+{
+	// Bind transform matrix
+	glUniformMatrix4fv( shader.get_location( "model" ), 1, GL_FALSE, transform.matrix );
+
+	auto& vao = get_vao( shape );
+	glUniform1i( shader.get_location( "vertex.hasColor" ), vao.has_vertex_colors );
+	vao.draw();
+}
+
+
 void Renderer::draw( const shader::Program& shader, const gst::Mesh::Primitive& primitive, const mst::Mat4& transform )
 {
 	// Bind transform matrix
@@ -179,10 +229,7 @@ void Renderer::draw( const shader::Program& shader, const gst::Mesh::Primitive& 
 	}
 
 	auto& vao = get_vao( primitive );
-	if ( vao.has_vertex_colors )
-	{
-		glUniform1i( shader.get_location( "vertex.hasColor" ), true );
-	}
+	glUniform1i( shader.get_location( "vertex.hasColor" ), vao.has_vertex_colors );
 	vao.draw();
 }
 
@@ -240,8 +287,7 @@ void Renderer::draw( const shader::Program& shader, const gst::Node& node, const
 	{
 		glDisable( GL_DEPTH_TEST );
 		shape_shader.use();
-		auto& shape = shapes[node.bounds_index];
-		shape.draw( shape_shader, tTransform );
+		draw( shape_shader, *node.bounds, tTransform );
 		shader.use();
 		glEnable( GL_DEPTH_TEST );
 	}

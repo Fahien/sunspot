@@ -1,6 +1,5 @@
 #include "sunspot/graphics/Graphics.h"
 
-#include "sunspot/component/Camera.h"
 
 namespace sunspot::graphics
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gltfspot/Mesh.h>
+#include <gltfspot/Bounds.h>
 
 #include "sunspot/graphics/gl/Gl.h"
 
@@ -14,6 +15,8 @@ struct Ebo
 {
   public:
 	Ebo( const gltfspot::Mesh::Primitive& p );
+
+	Ebo( const gltfspot::Shape& s );
 
 	Ebo( Ebo&& o );
 

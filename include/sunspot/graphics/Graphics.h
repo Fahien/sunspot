@@ -5,7 +5,6 @@
 
 #include <mathspot/Math.h>
 
-#include "sunspot/entity/Entity.h"
 #include "sunspot/graphics/Light.h"
 #include "sunspot/graphics/Shader.h"
 #include "sunspot/graphics/gl/Renderer.h"
@@ -56,8 +55,6 @@ class Graphics
 
 	void set_light( const Light* l ) { light = l; }
 
-	void set_camera( Entity& c ) { camera = &c; }
-
 	/// @param g Gltf with the scene to draw
 	void draw( gltfspot::Gltf& g );
 
@@ -67,8 +64,6 @@ class Graphics
 	const shader::Program* program = {};
 
 	const Light* light = {};
-
-	Entity* camera = {};
 
   public:
 	gl::Renderer renderer = {};
